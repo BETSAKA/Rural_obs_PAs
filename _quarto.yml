@@ -1,0 +1,27 @@
+project:
+  type: book
+  output-dir: docs
+
+book:
+  title: "Evaluating the socioeconomic impacts of protected areas from rural observatories' data"
+  author: "Florent Bédécarrats"
+  date: "02/04/2024"
+  repo-url: https://github.com/BETSAKA/Rural_obs_PAs
+  # cover-image: figs/IRD_010664_ORI_small.png
+  # cover-image-alt: Déforestation à Madagascar © IRD - Bernard Moizo
+  chapters:
+    - index.qmd
+    - 01_georeferencing.qmd
+    - 02_overlaps.qmd
+    - 03_Marovoay-Ankarafantsika.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+    code-fold: true
+
+execute:
+  warning: false
+  error: false

@@ -1,0 +1,67 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# Marovoay
+
+```{r}
+library(tidyverse)    # A series of packages for data manipulation
+library(haven)        # Required for reading STATA files (.dta)
+library(labelled)     # To work with labelled data from STATA
+library(sf)           # for spatial data handling
+library(stringdist)   # for string distance and matching
+library(tmap)         # for mapping
+library(fuzzyjoin)    # for fuzzy joining
+library(readxl)       # Read data frames to Excel format
+library(writexl)      # Write data frames to Excel format
+library(gt)           # for nicely formatted tables
+```
+
+
+```{r}
+obs_communes <- st_read(
+  "data/Observatoires_ROS_communes_COD_v3.gpkg",
+  quiet = TRUE) %>%
+  left_join(select(observatory_names, name, code), 
+            by = c("OBS_NAME" = "name")) %>%
+  rename(OBS_CODE = code) %>%
+  st_drop_geometry() %>%
+  filter(OBS_NAME == "Marovoay")
+
+obs_fknt <- st_read(
+  "data/OCHA_BNGRC admin boundaries/mdg_admbnda_adm4_BNGRC_OCHA_20181031.shp",
+  quiet = TRUE) %>%
+  filter(ADM3_PCODE %in% obs_communes$ADM3_PCODE) %>%
+  st_drop_geometry()
+
+```
+
+
+Extract the faulty municipalities
+
+```{r}
+observatory_names <- read_xlsx("data/observatory_names.xlsx")
+correspondence_obs <- read_dta("output/correspondence_table3.dta") %>%
+  mutate(j0 = as.numeric(j0)) %>%
+  left_join(observatory_names, by = c("j0" = "code")) %>%
+  rename(OBS_NAME = name) %>%
+  relocate(OBS_NAME, .before = j0)
+
+correspondence_marovoay <- correspondence_obs %>%
+  filter(OBS_NAME == "Marovoay")
+
+correspondence_marovoay %>%
+  group_by(method_village) %>%
+  summarise(n = sum(obs_count))
+
+corr_na_marovoay <- correspondence_marovoay %>%
+  filter(method_village == "")
+
+write_xlsx(list(missing = corr_na_marovoay,
+                all_matched = correspondence_marovoay,
+                all_communes = obs_communes,
+                all_fokontany = obs_fknt), 
+           "output/corr_na_marovoay.xlsx")
+```
+
