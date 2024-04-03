@@ -20,6 +20,9 @@ library(writexl)      # Write data frames to Excel format
 library(gt)           # for nicely formatted tables
 ```
 
+## Marovoay observatory data
+
+### Assessing geocoding completeness
 
 ```{r}
 observatory_names <- read_xlsx("data/observatory_names.xlsx")
@@ -36,7 +39,7 @@ obs_fknt <- st_read(
   "data/OCHA_BNGRC admin boundaries/mdg_admbnda_adm4_BNGRC_OCHA_20181031.shp",
   quiet = TRUE) %>%
   filter(ADM3_PCODE %in% obs_communes$ADM3_PCODE) %>%
-  st_drop_geometry()
+  st_drop_geometry() 
 
 ```
 
@@ -54,10 +57,6 @@ correspondence_obs <- read_dta("output/correspondence_table3.dta") %>%
 correspondence_marovoay <- correspondence_obs %>%
   filter(OBS_NAME == "Marovoay")
 
-correspondence_marovoay %>%
-  group_by(method_village) %>%
-  summarise(n = sum(obs_count))
-
 corr_na_marovoay <- correspondence_marovoay %>%
   filter(method_village == "")
 
@@ -66,5 +65,20 @@ write_xlsx(list(missing = corr_na_marovoay,
                 all_communes = obs_communes,
                 all_fokontany = obs_fknt), 
            "output/corr_na_marovoay.xlsx")
+
+correspondence_marovoay %>%
+  group_by(method_village) %>%
+  summarise(n = sum(obs_count)) %>%
+  gt()
+
+```
+
+We see that the village is missing for 521 observations and present in 9,202 observations for this observatory. Let's have a look at the missing observations. 
+
+```{r}
+corr_na_marovoay %>%
+  select(Municipality = j42, Village = j4, `Years of occurrence` = years,
+         `Number of observations` = obs_count) %>%
+  gt()
 ```
 

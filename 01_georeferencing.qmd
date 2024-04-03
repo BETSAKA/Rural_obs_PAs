@@ -532,7 +532,7 @@ correspondence_table3 <- correspondence_table2_updated %>%
              ADM4_clean %in% low_tolerance_invalid_marches ~ NA,
              TRUE ~ .)))
 
-write_dta(correspondence_table3, "output/correspondence_table3.dta")
+write_rds(correspondence_table3, "output/correspondence_table3.rds")
 ```
 
 ## Validating the Quality of Georeferenced Data
