@@ -8,6 +8,7 @@ editor_options:
 
 ```{r load_libraries}
 library(tidyverse)    # A series of packages for data manipulation
+library(haven)
 library(sf)           # for spatial data handling
 library(tmap)         # for mapping
 library(readxl)       # Read data frames to Excel format
