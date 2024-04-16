@@ -55,11 +55,8 @@ ROS_surveys_2007 <- read_dta(paste0(ros_data_loc, "2007/res_deb.dta"))
 observatory_names <- read_xlsx("data/observatory_names.xlsx")
 
 obs_communes <- st_read(
-  "data/Observatoires_ROS_communes_COD_v3.gpkg",
-  quiet = TRUE) %>%
-  left_join(select(observatory_names, name, code), 
-            by = c("OBS_NAME" = "name")) %>%
-  rename(OBS_CODE = code)
+  "data/Observatoires_ROS_communes_COD_v4.gpkg",
+  quiet = TRUE) 
 pop_places <- st_read(
   "data/OCHA_BNGRC populated places/mdg_pplp_places_NGA_OCHA.shp", quiet = TRUE)
 ```
@@ -147,60 +144,60 @@ fuzzy_match <- function(target_string, dataframe, column_name, observatory_code,
 
 The hierarchical organization of spatial entities is key for our challenge. Such an organization allows for a cascading representation of data, starting from broader scopes and narrowing down to more specific layers. This representation is reminiscent of the defining order of geographical entities: regions contain provinces, which contain municipalities, and these in turn contain localities. In the georeferencing context, leveraging this hierarchical structure can lead to more precise matches. For instance, if an observatory code is associated with a specific district, the search for matches is confined to that district, enhancing both the efficiency and accuracy of the process. @fig-spatial-hierarchies represents this hierarchical arrangement, serving as a roadmap for the subsequent data matching tasks.
 
-```{mermaid}
-
-graph TD
-
-A[Legend]
-
-W[ ]
-X[ ]
-Y[ ]
-Z[ ]
-
-W -->|Pre-defined hierarchy| X
-Y -.-|Implemented matching|Z
+```{r}
+# 
+# graph TD
+# 
+# A[Legend]
+# 
+# W[ ]
+# X[ ]
+# Y[ ]
+# Z[ ]
+# 
+# W -->|Pre-defined hierarchy| X
+# Y -.-|Implemented matching|Z
 ```
 
-```{mermaid}
-%%| label: fig-spatial-hierarchies
-%%| fig-cap: Spatial entities pre-defined relationship and matching
-
-graph TD
-
-%% Administrative Logic
-subgraph "Administrative Logic"
-A[Region]
-B[District]
-C[Commune]
-D[Fokontany]
-I[Populated places]
-
-A --> B
-B --> C
-C --> D
-D --> I
-end
-
-%% Observatory Logic
-
-subgraph "Observatory Logic"
-E[Observatory system]
-F[Observatory]
-G[Commune]
-H[Village]
-J[Site]
-
-E --> F
-F --> G
-G --> H
-F --> H
-H--> J
-end
-
-%% Geospatial matching
-H -.- I
-C -.- G
+```{r}
+# %%| label: fig-spatial-hierarchies
+# %%| fig-cap: Spatial entities pre-defined relationship and matching
+# 
+# graph TD
+# 
+# %% Administrative Logic
+# subgraph "Administrative Logic"
+# A[Region]
+# B[District]
+# C[Commune]
+# D[Fokontany]
+# I[Populated places]
+# 
+# A --> B
+# B --> C
+# C --> D
+# D --> I
+# end
+# 
+# %% Observatory Logic
+# 
+# subgraph "Observatory Logic"
+# E[Observatory system]
+# F[Observatory]
+# G[Commune]
+# H[Village]
+# J[Site]
+# 
+# E --> F
+# F --> G
+# G --> H
+# F --> H
+# H--> J
+# end
+# 
+# %% Geospatial matching
+# H -.- I
+# C -.- G
 ```
 
 Madagascar's current administrative setup is straightforward: regions contain districts; districts have communes; and communes are made up of Fokontany. Though a Fokontany should in principle be a single village, it often includes multiple villages or populated areas. It's worth noting that while the idea of communes has been around for a while, they were only officially recognized in 1994. However, rolling them out took some time after 1994. Before 1994, "communes" simply described local government areas without any formal administrative status. The regions were created in 2004. On the ROS side, observatory referred during the first surveys to villages. A systematic registry of the communes only started in the 2004 and 2005 rounds, depending on the observatories. A mention to "sites" also appeared in 2011 but was scarcely documented. Our strategy was to established links between the village information and populated places, and between communes.
@@ -535,6 +532,39 @@ correspondence_table3 <- correspondence_table2_updated %>%
 write_rds(correspondence_table3, "output/correspondence_table3.rds")
 ```
 
+### Method 6 : Manual completion
+
+```{r}
+
+# Manual addition of data
+
+ edit_mne <- tibble::tribble(
+  ~j0,          ~j42,                      ~j4,             ~ADM4_clean,     ~ADM4_PCODE,
+  52L,  "Ambatolahy",             "Antevamena",  "Soaserana Antevamena", "MG54511091002",
+  52L,  "Ankilizato",            "Andranovory",                      NA,              NA,
+  52L,  "Ankilizato",             "Avaradrano", "Ankilizato Avaradrano", "MG54509091005",
+  52L,  "Ankilizato",           "Malainkirafy",                      NA,              NA,
+  52L,  "Ankilizato",                "Tanana?",                      NA,              NA,
+  52L,       "Isalo",             "Antanambao",                "Bepeha", "MG54511072003",
+  52L, "Malaimbandy",          "Ambonara Nord",         "Ambonara Nord", "MG54509130004",
+  52L, "Malaimbandy",         "Anosibe Bevoay",                      NA,              NA,
+  52L, "Malaimbandy",     "Antazoa/Matavirano",           "Malaimbandy", "MG54509130001",
+  52L, "Malaimbandy",           "Mahasoa Nord",          "Mahasoa Nord", "MG54509130003",
+  52L, "Malaimbandy", "Malaimbandy/Avaradrano",           "Malaimbandy", "MG54509130001",
+  52L,  "Tsaraotana",            "Antsiraraky",           "Antsiraraky", "MG54510050001",
+  52L,  "Tsaraotana",             "village 51",                      NA,              NA
+  )
+
+# Joining
+correspondence_table4 <- correspondence_table3 %>%
+  left_join(mutate(edit_mne, j0 = as.character(j0)), by =c("j0", "j42", "j4")) %>%
+  mutate(ADM4_clean = coalesce(ADM4_clean.y, ADM4_clean.x),
+         ADM4_PCODE = coalesce(ADM4_PCODE.y, ADM4_PCODE.x)) 
+
+```
+
+
+
 ## Validating the Quality of Georeferenced Data
 
 To ensure the robustness and validity of our georeferenced data, we employ a multi-tiered validation approach that hinges on quantitative metrics and qualitative consistency checks.
@@ -639,7 +669,7 @@ We visually explore the the georeferenced data to observe its spatial distributi
 #| fig-cap: "Map of the surveyed communes and fokonany"
 
 
-commmune_pcode_years <- correspondence_table3 %>%
+commmune_pcode_years <- correspondence_table4 %>%
   # Split and unnest the years
   mutate(years = str_split(years, ", ")) %>%
   unnest(years) %>%
@@ -652,7 +682,7 @@ commmune_pcode_years <- correspondence_table3 %>%
   # Sort and collapse the years
   mutate(years = map_chr(years, ~ paste(sort(.x), collapse = ", ")))
 
-fokontany_pcode_years <- correspondence_table3 %>%
+fokontany_pcode_years <- correspondence_table4 %>%
   # Split and unnest the years
   mutate(years = str_split(years, ", ")) %>%
   unnest(years) %>%

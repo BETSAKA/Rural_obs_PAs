@@ -24,31 +24,12 @@ library(gt)           # for nicely formatted tables
 
 ### Assessing geocoding completeness
 
-```{r}
-observatory_names <- read_xlsx("data/observatory_names.xlsx")
-obs_communes <- st_read(
-  "data/Observatoires_ROS_communes_COD_v3.gpkg",
-  quiet = TRUE) %>%
-  left_join(select(observatory_names, name, code), 
-            by = c("OBS_NAME" = "name")) %>%
-  rename(OBS_CODE = code) %>%
-  st_drop_geometry() %>%
-  filter(OBS_NAME == "Marovoay")
-
-obs_fknt <- st_read(
-  "data/OCHA_BNGRC admin boundaries/mdg_admbnda_adm4_BNGRC_OCHA_20181031.shp",
-  quiet = TRUE) %>%
-  filter(ADM3_PCODE %in% obs_communes$ADM3_PCODE) %>%
-  st_drop_geometry() 
-
-```
-
-
+First 
 Extract the faulty municipalities
 
 ```{r}
-
-correspondence_obs <- read_dta("output/correspondence_table3.dta") %>%
+observatory_names <- read_xlsx("data/observatory_names.xlsx")
+correspondence_obs <- read_rds("output/correspondence_table3.rds") %>%
   mutate(j0 = as.numeric(j0)) %>%
   left_join(observatory_names, by = c("j0" = "code")) %>%
   rename(OBS_NAME = name) %>%
@@ -58,13 +39,7 @@ correspondence_marovoay <- correspondence_obs %>%
   filter(OBS_NAME == "Marovoay")
 
 corr_na_marovoay <- correspondence_marovoay %>%
-  filter(method_village == "")
-
-write_xlsx(list(missing = corr_na_marovoay,
-                all_matched = correspondence_marovoay,
-                all_communes = obs_communes,
-                all_fokontany = obs_fknt), 
-           "output/corr_na_marovoay.xlsx")
+  filter(is.na(method_village))
 
 correspondence_marovoay %>%
   group_by(method_village) %>%
@@ -82,3 +57,49 @@ corr_na_marovoay %>%
   gt()
 ```
 
+From this table, we see that 500 observations that were not georeferenced come from the fact that location were not registered in this observatory in 1995. For the panel household that were re-surveyed in 1996, we will be able to infer the village from the 1996 data. For the non-repeated observations, it might be possible to infer their vilage from a pattern in the houshehold numbering, otherwise it will have to be considered as missing.
+
+## Spatial overlaps
+
+
+```{r}
+observatory_names <- read_xlsx("data/observatory_names.xlsx")
+obs_communes <- st_read(
+  "data/Observatoires_ROS_communes_COD_v3.gpkg",
+  quiet = TRUE) %>%
+  left_join(select(observatory_names, name, code), 
+            by = c("OBS_NAME" = "name")) %>%
+  rename(OBS_CODE = code) %>%
+  filter(OBS_NAME == "Marovoay")
+
+obs_fknt <- st_read(
+  "data/OCHA_BNGRC admin boundaries/mdg_admbnda_adm4_BNGRC_OCHA_20181031.shp",
+  quiet = TRUE) %>%
+  filter(ADM3_PCODE %in% obs_communes$ADM3_PCODE)
+
+```
+
+
+
+```{r map_ros}
+#| label: fig-map-final
+#| fig-cap: "Map of the surveyed communes and fokonany"
+
+tmap_mode("view")
+tm_shape(selected_communes) + 
+  tm_fill(col = "OBS_NAME", palette = "Set1", title = "Observatory",
+          id = "ADM3_EN", legend.show = FALSE,
+          popup.vars = c("Observatory" = "OBS_NAME",
+                         "Data collection years"  = "years",
+                         "District" = "ADM2_EN",
+                         "Region" = "ADM1_EN")) +
+  tm_shape(selected_fokontany) + 
+  tm_fill(col = "label", palette = c("black"), alpha = 0.6, title = "Fokontany", 
+          id = "ADM4_EN", legend.show = FALSE,
+          popup.vars = c("Observatory" = "OBS_NAME",
+                         "Data collection years"  = "years",
+                         "Commune" = "ADM3_EN",
+                         "District" = "ADM2_EN",
+                         "Region" = "ADM1_EN")) +
+  tm_scale_bar()
+```
