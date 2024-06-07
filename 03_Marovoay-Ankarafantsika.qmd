@@ -24,8 +24,7 @@ library(gt)           # for nicely formatted tables
 
 ### Assessing geocoding completeness
 
-First 
-Extract the faulty municipalities
+First extract the study sites that could not be identified.
 
 ```{r}
 observatory_names <- read_xlsx("data/observatory_names.xlsx")
@@ -75,7 +74,15 @@ obs_communes <- st_read(
 obs_fknt <- st_read(
   "data/OCHA_BNGRC admin boundaries/mdg_admbnda_adm4_BNGRC_OCHA_20181031.shp",
   quiet = TRUE) %>%
-  filter(ADM3_PCODE %in% obs_communes$ADM3_PCODE)
+  filter(ADM3_PCODE %in% obs_communes$ADM3_PCODE & !is.na(OBS_NAME))
+
+pa_2002 <- st_read("data/ap_angap BD 500/ap_angap.shp") %>%
+  st_set_crs(8441)
+ankarafantsika_2002 <- pa_2002 %>%
+  filter(NOM == "Ankarafantsika")
+ankarafanstika_1999 <- st_read("data/Couches_SIG_AB/AIRE_PRO.TAB", layer = "AIRE_PRO") %>% 
+  st_set_crs(8441)
+
 
 ```
 
@@ -83,23 +90,15 @@ obs_fknt <- st_read(
 
 ```{r map_ros}
 #| label: fig-map-final
-#| fig-cap: "Map of the surveyed communes and fokonany"
+#| fig-cap: "Survey sites and proteced area"
 
 tmap_mode("view")
-tm_shape(selected_communes) + 
-  tm_fill(col = "OBS_NAME", palette = "Set1", title = "Observatory",
-          id = "ADM3_EN", legend.show = FALSE,
-          popup.vars = c("Observatory" = "OBS_NAME",
-                         "Data collection years"  = "years",
-                         "District" = "ADM2_EN",
-                         "Region" = "ADM1_EN")) +
-  tm_shape(selected_fokontany) + 
-  tm_fill(col = "label", palette = c("black"), alpha = 0.6, title = "Fokontany", 
-          id = "ADM4_EN", legend.show = FALSE,
-          popup.vars = c("Observatory" = "OBS_NAME",
-                         "Data collection years"  = "years",
-                         "Commune" = "ADM3_EN",
-                         "District" = "ADM2_EN",
-                         "Region" = "ADM1_EN")) +
+tm_shape(obs_fknt) + 
+  tm_fill(col = "OBS_NAME", palette = c("black"), alpha = 0.6, title = "Fokontany", 
+          id = "ADM4_EN", legend.show = FALSE) +
+  tm_shape(ankarafantsika_2002) +
+  tm_borders(col = "green") +
+  tm_shape(ankarafanstika_1999) + 
+  tm_borders(col = "red") +
   tm_scale_bar()
 ```
