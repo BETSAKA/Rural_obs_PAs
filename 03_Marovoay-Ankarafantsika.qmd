@@ -102,3 +102,6 @@ tm_shape(obs_fknt) +
   tm_borders(col = "red") +
   tm_scale_bar()
 ```
+
+
+## Bepako

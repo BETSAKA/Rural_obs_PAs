@@ -1,32 +1,3 @@
-
-library(tidyverse)
-library(sf)
-library(readxl)
-
-# Clean municipality registry ---------------------------------------------
-
-file.remove("data/Observatoires_ROS_communes_COD_v4.gpkg")
-observatory_names <- read_xlsx("data/observatory_names.xlsx")
-obs_communes <- st_read(
-  "data/Observatoires_ROS_communes_COD_v3.gpkg",
-  quiet = TRUE) %>%
-  left_join(select(observatory_names, name, code), 
-            by = c("OBS_NAME" = "name")) %>%
-  rename(OBS_CODE = code)
-obs_communes2 <- obs_communes %>% 
-  mutate(to_remove = ADM3_EN == "Marovoay",
-         OBS_Y_N = ifelse(to_remove, NA, OBS_Y_N),
-         OBS_NAME = ifelse(to_remove, NA, OBS_NAME),
-         SOURCE_OBS = ifelse(to_remove, NA, SOURCE_OBS)) %>%
-  select(-to_remove) %>%
-    mutate(to_add = ADM3_EN == "Tsaraotana",
-           OBS_Y_N = ifelse(to_add, 1, OBS_Y_N),
-           OBS_NAME = ifelse(to_add, "Menabe North-East", OBS_NAME),
-           SOURCE_OBS = ifelse(to_add, "FB_correct", SOURCE_OBS)) %>%
-             select(-to_add) 
-st_write(obs_communes2, "data/Observatoires_ROS_communes_COD_v4.gpkg")
-
-
 # Compute expenses --------------------------------------------------------
 
 
@@ -67,7 +38,7 @@ process_revsec <- function(path = "data/ROS_MDG_microdata/", year) {
       group_by(j5, year) %>%
       summarise(revsec = sum(revsec, na.rm = TRUE))
   }
-
+  
 }
 
 # Process incomes from other sources
@@ -200,74 +171,3 @@ total_income_2014 <- compute_total_income(year = 2014)
 total_income_2013 <- compute_total_income(year = 2013) 
 total_income_2012 <- compute_total_income(year = 2012)
 total_income_2011 <- compute_total_income(year = 2011)
-
-# List labels -------------------------------------------------------------
-
-library(tidyverse)    # A series of packages for data manipulation
-library(haven)        # Required for reading STATA files (.dta)
-library(labelled)     # To work with labelled data from STATA
-library(writexl)      # Write data frames to Excel format
-library(readxl)
-
-ros_data_loc <- "data/ROS_MDG_microdata/"
-
-# Function to extract variable info for a given year and file
-extract_variable_info <- function(year, file) {
-  
-  file_path <- paste0(ros_data_loc, year, "/", file)
-  
-  if (!file.exists(file_path)) return(tibble())
-  
-  data <- read_dta(file_path, n_max = 0)
-  
-  tibble(
-    file_name = file,
-    variable_name = names(data),
-    variable_label = var_label(data) %>% as.character(),
-    year = year)
-}
-
-# Obtain all years from the directory structure
-years <- list.dirs(ros_data_loc, recursive = FALSE, full.names = FALSE)
-
-# Use the tidyverse approach to map over years and files
-all_vars <- map_df(years, ~{
-  files_for_year <- list.files(paste0(ros_data_loc, .x), pattern = "\\.dta$", full.names = FALSE)
-  map_df(files_for_year, extract_variable_info, year = .x)
-})
-
-
-rev_vars <- c("a3b", "a3c", "a3e", "a3f", "as4", "as3", "as4a", "as3a", "rha2", 
-              "rha1", "j0", "r23", "dc22", "dc25", "r6", "r4", "r7", "mo11b", 
-              "mo11c", "mo11d", "mo11e", "mo51a", "mo51b", "mo12", "mo51c", 
-              "mo23", "ita2")
-rev_vars <- all_vars %>% 
-  filter(variable_name %in% rev_vars)
-
-rev_var_labels <- rev_vars %>%
-  select(-file_name) %>%
-  pivot_wider(names_from = year, values_from = variable_label)
-
-rev_var_files <- rev_vars %>%
-  select(-variable_label) %>%
-  pivot_wider(names_from = year, values_from = file_name)
-
-missing_vars <- rev_var_labels %>%
-  pivot_longer(-variable_name) %>%
-  filter(is.na(value)) %>%
-  left_join(select(rev_var_labels, variable_name, label = `2015`), 
-            by = "variable_name") %>%
-  relocate(label, .after = variable_name) %>%
-  select(-value) %>%
-  left_join(select(rev_var_labels, variable_name, file_name = `2015`), 
-            by = "variable_name")
-
-missing_vars_11_14 <- missing_vars %>%
-  filter(as.numeric(name) > 2010)
-
-
-writexl::write_xlsx(missing_vars, "output/missing_vars.xlsx")
-
-case_when(year = )
-
-# as4 en 1996 est 

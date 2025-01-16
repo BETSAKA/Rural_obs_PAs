@@ -1,0 +1,61 @@
+---
+title: "Data collection month"
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+library(readxl)
+library(haven)
+
+# Define the range of years
+years <- 1995:2015
+path <- "data/ROS_MDG_microdata/"
+# Initialize an empty data frame to store all the data
+all_data <- tibble()
+
+# Loop through each year to read the data
+for (year in years) {
+  # Define the file path
+  file_path <- paste0(path, year, "/res_deb.dta")
+  
+  # Read the data file
+  data <- read_dta(file_path) %>%
+    # Select the required columns and add the year
+    select(j0, j14_b) %>%
+    mutate(year = year)
+  
+  # Append the data to the all_data data frame
+  all_data <- bind_rows(all_data, data)
+}
+
+# Convert the observatory code to integer
+all_data <- all_data %>%
+  mutate(j0 = as.integer(j0))
+
+# Read the observatory names
+observatory_names <- read_excel("data/observatory_names.xlsx")
+
+# Convert the code to integer
+observatory_names <- observatory_names %>%
+  mutate(code = as.integer(code))
+
+# Merge the data with observatory names
+merged_data <- all_data %>%
+  left_join(observatory_names, by = c("j0" = "code")) %>%
+  group_by(j0, name, year, j14_b) %>%
+  summarise(n = n()) %>%
+  filter(j0 %in% c(3, 4, 21, 24, 71))
+
+# Plot the data using ggplot2
+ggplot(merged_data, aes(x = as.integer(j14_b), y = year, color = name)) +
+  geom_point(aes(size = n)) +
+  labs(x = "Month", y = "Year", color = "Observatory") +
+  scale_x_continuous(breaks = seq(1, 12, by = 1)) +
+  facet_wrap(~ name, ncol = 1) +
+  scale_y_reverse() +
+  theme_minimal()
+```
