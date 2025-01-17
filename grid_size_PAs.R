@@ -1,3 +1,7 @@
+# Ce code génére un maillage de cellule autour d'une aire protégée. Cela vise à
+# tester la taille appropriée des cellules pour certaines AP
+
+
 library(tidyverse)
 library(tmap)
 library(sf)
