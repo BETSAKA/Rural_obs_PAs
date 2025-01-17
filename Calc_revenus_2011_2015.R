@@ -1,6 +1,7 @@
 # Compute expenses --------------------------------------------------------
 
-
+# Cette collection de fonctions sert à calculer les revenus agrégés 
+# à partir des données OR pour les années 2011 à 2015
 
 # Libraries 
 library(tidyverse)

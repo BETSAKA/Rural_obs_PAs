@@ -5,6 +5,8 @@ editor_options:
   chunk_output_type: console
 ---
 
+Dans ce document, on ouvre les données d'OR pour voir à quel mois ont été réalisées les enquêtes
+
 ```{r}
 # Load necessary libraries
 library(tidyverse)
