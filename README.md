@@ -20,7 +20,7 @@ Spécifiquement, il s'agit de :
 
 -   **Renforcement des Capacités** : Accompagner les collègues qui se familiarisent avec ces outils à prendre en main R et les pratiques de science ouverte.
 
-# Préparation des fichiers
+## Préparation des fichiers
 
 Pour utiliser ce code sous RStudio, commencez par cloner ce dépôt sur votre machine locale. Ouvrez RStudio et créez un nouveau projet en sélectionnant "File" \> "New Project" \> "Version Control" \> "Git". Entrez l'URL du dépôt GitHub et choisissez un répertoire local où cloner le projet.
 
@@ -38,7 +38,7 @@ data
 │   └── 2015
 ```
 
-# Installation des dépendances
+## Installation des dépendances
 
 Avant d'exécuter les scripts, assurez-vous d'installer les packages R nécessaires. Vous pouvez utiliser le fichier `install_packages.R` pour installer toutes les dépendances :
 
@@ -58,7 +58,7 @@ Les contributions sont les bienvenues ! Voici quelques moyens de contribuer :
 
 -    **Questions et problèmes** : Si vous rencontrez des difficultés ou avez des questions, créez un ticket dans la section "Issues" du repository en ligne.
 
-### Comment poster des modifications
+## Comment poster des modifications
 
 Pour poster vos modifications, voici plusieurs solutions :
 
@@ -86,7 +86,7 @@ Pour poster vos modifications, voici plusieurs solutions :
 
     -   Si vous avez des idées, des suggestions ou des problèmes, utilisez l'interface GitHub pour créer une "Issue".
 
-### Instructions détaillées pour les débutants
+## Instructions détaillées pour les débutants
 
 Si vous n'avez jamais utilisé Git ou GitHub, voici des instructions simples pour vous aider à démarrer :
 
@@ -127,6 +127,10 @@ Si vous n'avez jamais utilisé Git ou GitHub, voici des instructions simples pou
     -   Cliquez sur "Compare & pull request".
 
     -   Décrivez vos modifications et soumettez la Pull Request.
+
+## Wiki
+
+Consultez [le Wiki du projet](https://github.com/BETSAKA/Tools/wiki) pour des guides détaillés, des tutoriels et des informations supplémentaires sur le projet. Vous pouvez également contribuer au Wiki en ajoutant ou en modifiant des pages pour partager vos connaissances et ressources.
 
 ### Issues
 
