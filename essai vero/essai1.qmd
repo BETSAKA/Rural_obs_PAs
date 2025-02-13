@@ -1,0 +1,11 @@
+---
+title: "EssaiVero13022025"
+author: "Veri"
+editor: visual
+---
+
+```{r}
+
+```
+
+essai
