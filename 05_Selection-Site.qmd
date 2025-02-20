@@ -6,7 +6,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-Nous allons selectionner les sites à réactiver dans les OR.
+Nous allons sélectionner les sites à réactiver dans les OR.
 
 ## Calcul des revenus des ménages
 
@@ -214,13 +214,13 @@ menage_local <- left_join(res_deb2012, cor_table, by = c("j4", "j42", "j0"))
 merge_income2012 <- left_join(menage_local, total_income_2012, by = "j5")
 ```
 
-## Résumé de la moyenne des revenus par commune et par village
+## Moyenne des revenus par commune et par village
 
 Nous allons donner les résumés des données affichant la moyenne des revenus par commune et par village pour l'année 2012.
 
 ```{r}
-summary_rev2012 <- (merge_income2012 |>
- group_by(j4, j42) |>
+summary_rev2012 <- (merge_income2012 %>%
+ group_by(j42, j4) %>%
  summarize(moy_rev2012=mean(revtot)))
 
 
