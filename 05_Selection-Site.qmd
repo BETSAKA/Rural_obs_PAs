@@ -6,11 +6,101 @@ editor_options:
   chunk_output_type: console
 ---
 
-Nous allons sélectionner les sites à réactiver dans les OR.
+Nous allons sélectionner les sites à réactiver dans les observatoires ruraux (OR) de Marovoay et Alaotra.
 
-## Calcul des revenus des ménages
+Le travail consiste à vérifier s'il y a une tendance d'évolution similaire des villages proches et éloignés des aires protégées (APs), avant et après une intervention spécifique à chaque OR afin de répondre aux questions suivantes :
 
-Nous allons maintenant calculer les revenus annuels des ménages entre 2011 et 2015.
+-   Les APs améliorent-elles les conditions de vie des ménages? (**impact positif ou négatif)**
+
+-   Le rapprochement de Bepako, de Madiromiongana avec le Parc National d'Ankarafantsiaka a-t-il un impact sur les conditions de vie des ménages?
+
+-   **Question à voir pour ALAOTRA.**
+
+Dans le cas de Marovoay, l'intervention porte sur l'extension du Parc National d'Ankarafantsika en 2002. [^05_selection-site-1] Avant 2002, les villages sont tous éloignés des APs (= Villages non traités). Tandis qu'après 2002, certains villages sont devenus proches des APs tandis que d'autres villages demeurent probablement éloignés **(A VERIFIER/PRECISER)**.
+
+[^05_selection-site-1]: Ankarafantsika était une réserve forestière avant 2002 **(?? REF) A CONFIRMER**
+
+**INTERVENTION A DETERMINER** **POUR ALAOTRA**.
+
+Les villages sont éloignés des APs s'ils sont à plus de 10km **(A CONFIRMER + REF si possible**).
+
+Au préalabe, le travail sur la sélection des sites consistent à l'/la :
+
+1.  Etude de l'évolution des villages dans les ORs pour toutes les années disponibles,
+
+2.  Comparaison de la moyenne de niveau de vie des villages proches des APs avec celle des villages éloignés des APs,
+
+3.  Comparaison de la moyenne de niveau de vie des villages avant l'intervention avec celle après l'intervention.
+
+***Remarques :***
+
+-    Intervention =Traitement (cf. contrôle synthétique)
+
+-   [Indicateurs de niveau de vie des ménages retenus]{.underline} : Revenu, Crédit, Dépense
+
+# Sélection des sites de l'OR de Marovoay
+
+Il est question de tester la similitude entre les villages pour pouvoir sélectionner les sites.
+
+## Traitement des données
+
+### Chargement et fusion des jeux de données
+
+Il s'agit de :
+
+1.  **Fusionner** les tables avec les variables pertinentes pour l'étude,
+
+2.  **Traiter les valeurs manquantes** : Rerchercher les valeurs manquantes et procéder à leur traitement.
+
+*Exemple :* Résorber les 'NA' dans ADM4_clean et retrouver les fkt manquants (Utilisation code GPS en ligne, ou voir INSTAT)
+
+### Statistiques descriptives des ménages 
+
+Il s'agit de déterminer le :
+
+-   Nombre d'observations année par année par rapport aux sites ou par fokontany,
+
+-   Nombre de ménages par entité géographique,
+
+puis, de faire une agregation de ces résultats en utilisant la moyenne par entité géographique par exemple.
+
+#### Statistiques descriptives des ménages avant 2002
+
+-   Il s'agit de déterminer le :
+
+    -   Nombre d'observations année par année par rapport aux sites ou par fokontany,
+
+    -   Nombre de ménages par entité géographique avant 2002,
+
+    puis, de faire une agregation de ces résultats en utilisant la moyenne par entité géographique par exemple.
+
+#### Statistiques descriptives des ménages après 2002
+
+-   Il s'agit de déterminer le :
+
+    -   Nombre d'observations année par année par rapport aux sites ou par fokontany,
+
+    -   Nombre de ménages par entité géographique après 2002,
+
+    puis, de faire une agregation de ces résultats en utilisant la moyenne par entité géographique par exemple.
+
+## Moyenne de niveau de vie des villages proches de l'AP VS villages éloignés
+
+### Statistiques sur les crédits 
+
+A vérifier si c'est pertinent
+
+### Statistiques sur les dépenses des ménages
+
+A vérifier la pertinence ou pas
+
+### Statistiques sur les revenus des ménages
+
+Il s'agit de calculer la moyenne des revenus par fokontany puis procéder à leur comparaison.
+
+#### Calcul des revenus des ménages
+
+D'abord, nous allons calculer les revenus annuels des ménages entre 2011 et 2015, **et après nous allons étendre ce calcul sur les autres années**.
 
 ```{r}
 # Compute expenses --------------------------------------------------------
@@ -190,7 +280,7 @@ total_income_2011 <- compute_total_income(year = 2011)
 
 Pour la suite, nous retenons les revenus des ménages pour l'année 2012.
 
-## Chargement et fusion des jeux de données
+#### Chargement et fusion des jeux de données
 
 Nous allons charger les données ayant les identifiants ménages, les révenus et les localités au niveau de fokontany et commune avant de les assembler en une seule base ayant pour clé l'identifiant des ménages, le code OR, le fkt et la commune.
 
@@ -212,16 +302,36 @@ menage_local <- left_join(res_deb2012, cor_table, by = c("j4", "j42", "j0"))
 
 #Merge recent datasets with income
 merge_income2012 <- left_join(menage_local, total_income_2012, by = "j5")
+sum(!is.na(merge_income2012$ADM4_PCODE))
+
+observatory_names <- readxl::read_excel("data/observatory_names.xlsx")
+
+merge_income2012 %>% 
+  group_by(j0) %>% 
+  summarise(adm4_NA = sum(is.na(ADM4_PCODE)),  
+            nb_men = n())
+
+merge_income2012_Alaotra <- filter(merge_income2012, j0 == "21")
+merge_income2012_Alaotra <- merge_income2012 %>%
+  filter(j0 == "21")
 ```
 
-## Moyenne des revenus par commune et par village
+#### Moyenne des revenus par commune et par village
 
 Nous allons donner les résumés des données affichant la moyenne des revenus par commune et par village pour l'année 2012.
 
 ```{r}
+# résumé des moyennes des revenus par commune et par village (avec les variables initiales)
 summary_rev2012 <- (merge_income2012 %>%
- group_by(j42, j4) %>%
- summarize(moy_rev2012=mean(revtot)))
+                      group_by(j42, j4) %>%
+                      summarize(moy_rev2012=mean(revtot))) # Pas de valeurs manquantes dans les résultats
+
+# résumé des moyennes des revenus par commune et par village (avec les variables corrigées)
+summary_rev2012_bis <- (merge_income2012 %>%
+                          group_by(ADM3_EN, ADM4_clean) %>%
+                          summarize(moy_rev2012=mean(revtot))) # Existence de plusieurs valeurs manquantes dans les variables communes et village
 
 
 ```
+
+# Sélection des sites de l'OR Alaotra
