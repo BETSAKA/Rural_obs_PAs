@@ -1,0 +1,465 @@
+---
+title: "Revenus riz: adaptation aux évolutions des questionnaires"
+author: "Florent Bédécarrats"
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+Le revenu issu de la culture du riz constitue une composante majeure des revenus agricoles dans les enquêtes OR. Il est intégré dans le calcul du revenu total via la fonction process_reven_exp() pour les années récentes (2011–2015). Or, les structures de fichiers et les formulations de questions ont évolué au fil du temps, rendant nécessaire une documentation explicite et une adaptation des scripts pour exploiter les données antérieures (1995–2010).
+
+# Fonctionnement actuel (2011–2015)
+
+Dans la fonction `process_reven_exp()` (appelée par `compute_total_income()`), la composante riz est décomposée en trois éléments :
+
+-   Production de riz (valeur) : calculée comme prod_riz \* pxpaddy_obs
+
+    -   `prod_riz` vient de la variable r23 (production en kg)
+    -   `pxpaddy_obs` vient du rapport `dc25 / dc22` (prix moyen observatoire)
+
+-   Rente foncière riz :
+
+    -   `r6` (quantité de paddy reçue ou donnée en métayage/location)
+
+    -   `r7` (argent reçu ou payé pour métayage/location)
+
+    -   Le tout valorisé par le prix du paddy dans l'observatoire (`pxpaddy_obs`)
+
+-   Coûts de production :
+
+    -   Coûts de main-d'oeuvre (`mo11\*`, `mo12`, `mo23`, `mo51\*`)
+
+    -   Coûts en intrants (`ita2`)
+
+    -   Coûts du métayage payé (valeur de `r6`, `r7` pour les statuts locataires)
+
+Ces éléments sont ensuite intégrés pour calculer le revenu net lié à la culture du riz : `rev_riz = recette_riz - charge_riz`avec `recette_riz = prod_riz_val et charge_riz = coutmori + coutint + coutmetloc`
+
+# Problématique pour les années 1995–2010
+
+Les mêmes concepts sont souvent présents, mais :
+
+-   les fichiers sont parfois scindés différemment
+
+-   les noms de variables changent (ex. r23a, r23b, puis dc02, etc.)
+
+-   certaines variables sont manquantes certaines années
+
+# Solution par composante
+
+On va donc écrire des fonctions applicables aux données d'avant 2011 en reprenant les trois composantes ci-dessus.
+
+## Production de riz (valeur)
+
+**Concept** : volume total produit multiplié par le prix moyen du paddy dans l’observatoire
+
+**2011-2015** :
+
+-   Volume : r23 (res_r.dta)
+
+-   Prix : dc25/dc22 (res_dc21.dta)
+
+**Avant 2011** :
+
+En regardant le dictionnaire des variables, on observe qu'on a :
+
+-   Pour le volume :
+
+    -   `r23a + r23b` (res_r.dta) pour la plupart des années
+    -   dc02, dc02_03, dc01_02_03 ou même dc01, dc05, dc09, dc10, etc., pour certaines années où la production est reconstituée via les usages
+
+-   Pour les prix : `dc25 / dc22` (structure constante sur la période 1995–2010)
+
+On peut par exemple utiliser la fonction suivante :
+
+-   Charge les fichiers res_r.dta et res_dc21.dta
+
+-   Détecte dynamiquement les variables de production disponibles selon l'année
+
+-   Reconstitue `prod_riz` et `pxpaddy_obs`
+
+-   Calcule `prod_riz_val` en les combinant
+
+On aura ainsi :
+
+```{r}
+process_production_riz_old <- function(path = "data/ROS_MDG_microdata/", 
+                                       year) {
+  stopifnot(year < 2011)
+  message("Traitement année ", year)
+
+  # Chargement des données de production (res_r.dta)
+  df_riz <- read_dta(paste0(path, year, "/res_r.dta"))
+
+  # Chargement des données de prix (res_dc21.dta), si disponible
+  df_dc21 <- tryCatch(
+    read_dta(paste0(path, year, "/res_dc21.dta")),
+    error = function(e) NULL
+  )
+
+  # Création d'une variable production de riz (prod_riz)
+  # Selon les années, les variables changent. On teste plusieurs combinaisons.
+  df_riz <- df_riz %>% mutate(prod_riz = NA_real_)
+
+  if (all(c("r23a", "r23b") %in% names(df_riz))) {
+    # Cas classique : somme de r23a et r23b (en kg)
+    df_riz <- df_riz %>% mutate(prod_riz = r23a + r23b)
+  } else if ("r23" %in% names(df_riz)) {
+    # Cas plus simple : toute la production dans une seule variable
+    df_riz <- df_riz %>% mutate(prod_riz = r23)
+  } else if (
+    all(c("r23a1", "r23a2", "r23b1", "r23b2") %in% names(df_riz))
+  ) {
+    # Cas spécifique : sous-détails à additionner
+    df_riz <- df_riz %>%
+      mutate(prod_riz = r23a1 + r23a2 + r23b1 + r23b2)
+  } else {
+    message("Aucune variable de production disponible pour ", year)
+  }
+
+  # Agrégation : production totale par ménage (identifié par j5)
+  df_prod <- df_riz %>%
+    group_by(j5, year) %>%
+    summarise(prod_riz = sum(prod_riz, na.rm = TRUE), .groups = "drop")
+
+  #  Calcul du prix moyen observé du paddy (pxpaddy_obs)
+  if (!is.null(df_dc21) && all(c("dc25", "dc22") %in% names(df_dc21))) {
+    # Attention : certaines années (ex. 1997) utilisent probablement des FMG
+    df_dc21 <- df_dc21 %>%
+      mutate(
+        pxpaddy_obs = if_else(dc22 > 0, dc25 / dc22, NA_real_)
+      ) %>%
+      group_by(j5, year) %>%
+      summarise(
+        pxpaddy_obs = mean(pxpaddy_obs, na.rm = TRUE),
+        .groups = "drop"
+      )
+  } else {
+    # Si pas de données prix, on met NA pour pxpaddy_obs
+    message("Fichier ou variables de prix manquants pour ", year)
+    df_dc21 <- df_prod %>%
+      select(j5, year) %>%
+      mutate(pxpaddy_obs = NA_real_)
+  }
+
+  # --- Fusion des données de production et de prix
+  df <- left_join(df_prod, df_dc21, by = c("j5", "year")) %>%
+    mutate(prod_riz_val = prod_riz * pxpaddy_obs)
+
+  return(df)
+}
+
+```
+
+On teste la fonction pour vérifier qu'elle marche bien :
+
+```{r}
+years <- 1995:2010
+output <- purrr::map_dfr(years, ~{
+  message("Traitement année ", .x)
+  tryCatch({
+    df <- process_production_riz_old("data/ROS_MDG_microdata/", .x)
+    df %>% mutate(annee = .x)
+  }, error = function(e) tibble(j5 = NA, year = .x, prod_riz = NA, pxpaddy_obs = NA, prod_riz_val = NA, annee = .x))
+})
+
+output %>% 
+  group_by(annee) %>% 
+  summarise(n = sum(!is.na(prod_riz_val)), moyenne = mean(prod_riz_val, na.rm = TRUE), .groups = "drop")
+```
+
+> Poblèmes apparents en 1997 et en 2001, à analyser plus tard.
+
+## Rente riz (métayage ou fermage)
+
+**Concept :** revenus ou dépenses associés à la mise à disposition ou à la location de rizières, valorisés selon la quantité ou le montant perçu/donné.
+
+**2011–2015**
+
+- Données extraites de `res_r.dta`, dans process_reven_exp() :
+
+      - `r6` : quantité de paddy reçue ou donnée en métayage/location
+
+      - `r7` : montant monétaire reçu ou payé
+
+      Les deux sont valorisés avec `pxpaddy_obs` (issu de `res_dc21.dta`)
+
+- Si le ménage est preneur, la rente est une charge ; s’il est bailleur, c’est un revenu.
+
+- La valeur de la rente en nature est calculée comme `r6 * pxpaddy_obs`.
+
+**Avant 2011**
+
+Les variables sont relativement stables sur la période 1995–2010 :
+
+- `r6` (quantité en kg) et `r7 (montant) sont présents dans res_r.dta
+    
+- Le prix `pxpaddy_obs` peut être réutilisé tel que défini dans `process_production_riz_old()`
+
+- L’information sur le **statut** (locataire ou propriétaire) est rarement explicite, alors on calcule les deux composantes.
+
+**Proposition de fonction**
+
+On peut construire une fonction `process_rente_riz_old()` qui :
+
+- charge les fichiers `res_r.dta` et `res_dc21.dta`
+
+- valorise la rente en nature (kg) et en argent
+
+- retourne pour chaque ménage et année une valeur totale de rente, sans signe (la distinction bailleur/preneur se fera en aval)
+
+```{r}
+process_rente_riz_old <- function(path = "data/ROS_MDG_microdata/", 
+                                  year) {
+  stopifnot(year < 2011)
+  message("Traitement rente année ", year)
+
+  # Chargement des fichiers
+  df_r <- read_dta(paste0(path, year, "/res_r.dta"))
+
+  # Chargement du fichier de prix si disponible
+  df_dc21 <- tryCatch(
+    read_dta(paste0(path, year, "/res_dc21.dta")),
+    error = function(e) NULL
+  )
+
+  # Prix moyen observatoire
+  if (!is.null(df_dc21) && all(c("dc25", "dc22") %in% names(df_dc21))) {
+    df_px <- df_dc21 %>%
+      mutate(pxpaddy_obs = if_else(dc22 > 0, dc25 / dc22, NA_real_)) %>%
+      group_by(j5, year) %>%
+      summarise(pxpaddy_obs = mean(pxpaddy_obs, na.rm = TRUE), 
+                .groups = "drop")
+  } else {
+    df_px <- df_r %>%
+      select(j5, year) %>%
+      mutate(pxpaddy_obs = NA_real_)
+  }
+
+  # Calcul rente : en nature et monétaire
+  df_rente <- df_r %>%
+    mutate(
+      r6_val = if_else(!is.na(r6), r6, 0),
+      r7_val = if_else(!is.na(r7), r7, 0)
+    ) %>%
+    group_by(j5, year) %>%
+    summarise(
+      r6_total = sum(r6_val, na.rm = TRUE),
+      r7_total = sum(r7_val, na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
+    left_join(df_px, by = c("j5", "year")) %>%
+    mutate(
+      rente_riz = r6_total * pxpaddy_obs + r7_total
+    )
+
+  return(df_rente)
+}
+
+```
+
+**Vérification sur toutes les années** 
+
+```{r}
+years <- 1995:2010
+rente_output <- purrr::map_dfr(years, ~{
+  message("Traitement année ", .x)
+  tryCatch({
+    df <- process_rente_riz_old("data/ROS_MDG_microdata/", .x)
+    df %>% mutate(annee = .x)
+  }, error = function(e) tibble(j5 = NA, year = .x, rente_riz = NA, annee = .x))
+})
+
+rente_output %>%
+  group_by(annee) %>%
+  summarise(
+    n = sum(!is.na(rente_riz)),
+    moyenne = mean(rente_riz, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+```
+
+> PRoblèmes apparents en 1995 et 1997, à analyser plus tard
+
+## Coûts de production riz
+
+**Concept :** ensemble des dépenses engagées pour la culture du riz, incluant main-d’œuvre, intrants et frais de location (métayage payé). Ces coûts sont soustraits de la recette pour obtenir le revenu net agricole.
+
+**2011–2015**
+
+Dans `process_reven_exp()`, les coûts sont décomposés en trois composantes :
+
+- Main-d’œuvre (res_mo.dta) :
+
+        - Heures de travail valorisées par un taux implicite
+
+        - Variables utilisées : `mo11*`, `mo12`, `mo23`, `mo51*`
+
+- Intrants (res_ita.dta) :
+
+        - Coût total des achats d’intrants agricoles
+
+        - Variable utilisée : ita2
+
+- Coût du métayage payé (res_r.dta) :
+
+        - Rente versée (quantité r6 ou montant r7), valorisée au prix observatoire (pxpaddy_obs) si en nature
+
+Le tout est agrégé pour chaque ménage dans une variable `charge_riz`.
+
+**Avant 2011**
+
+Les sources sont globalement similaires, mais les fichiers peuvent différer selon les années :
+
+- `res_mo.dta`, `res_ita.dta`, et `res_r.dta` sont en général présents
+
+- Les noms de variables sont globalement stables, mais certaines années peuvent ne contenir que les montants, ou ne pas distinguer les cultures
+
+**Proposition de fonction**
+
+La fonction `process_cout_riz_old()` :
+
+- Charge les fichiers nécessaires
+
+- Agrège les coûts de main-d’œuvre et intrants
+
+- Valorise le métayage payé si données disponibles
+
+- Retourne le total des coûts de production par ménage
+
+```{r}
+process_cout_riz_old <- function(path = "data/ROS_MDG_microdata/", 
+                                 year) {
+  stopifnot(year < 2011)
+  message("Traitement coûts année ", year)
+
+  # Chargement du fichier principal sur le riz
+  df_r <- read_dta(paste0(path, year, "/res_r.dta"))
+
+  # Chargement conditionnel des fichiers auxiliaires
+  df_mo1 <- tryCatch(
+    read_dta(paste0(path, year, "/res_mo1.dta")),
+    error = function(e) NULL
+  )
+  df_mo3 <- tryCatch(
+    read_dta(paste0(path, year, "/res_mo3.dta")),
+    error = function(e) NULL
+  )
+  df_ita <- tryCatch(
+    read_dta(paste0(path, year, "/res_ita.dta")),
+    error = function(e) NULL
+  )
+  df_dc21 <- tryCatch(
+    read_dta(paste0(path, year, "/res_dc21.dta")),
+    error = function(e) NULL
+  )
+
+  # ---------------------
+  # Métayage : valorisation de r6 (en nature) et r7 (en argent)
+  # ---------------------
+  if (!is.null(df_dc21) && all(c("dc25", "dc22") %in% names(df_dc21))) {
+    df_px <- df_dc21 %>%
+      mutate(pxpaddy_obs = if_else(dc22 > 0, dc25 / dc22, NA_real_)) %>%
+      group_by(j5, year) %>%
+      summarise(pxpaddy_obs = mean(pxpaddy_obs, na.rm = TRUE),
+                .groups = "drop")
+  } else {
+    df_px <- df_r %>%
+      select(j5, year) %>%
+      mutate(pxpaddy_obs = NA_real_)
+  }
+
+  df_coutmet <- df_r %>%
+    mutate(
+      r6_val = if_else(!is.na(r6), r6, 0),
+      r7_val = if_else(!is.na(r7), r7, 0)
+    ) %>%
+    group_by(j5, year) %>%
+    summarise(
+      r6_total = sum(r6_val, na.rm = TRUE),
+      r7_total = sum(r7_val, na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
+    left_join(df_px, by = c("j5", "year")) %>%
+    mutate(cout_metayage = r6_total * pxpaddy_obs + r7_total)
+
+  # ---------------------
+  # Coût main-d'œuvre : mo11*, mo12, mo23 typiquement dans res_mo1
+  # ---------------------
+  mo_vars <- c("mo11d", "mo11e", "mo12", "mo23")
+  df_mo1_cout <- if (!is.null(df_mo1)) {
+    df_mo1 %>%
+      mutate(across(all_of(mo_vars), ~replace_na(., 0))) %>%
+      rowwise() %>%
+      mutate(cout_mo = sum(c_across(all_of(mo_vars)), na.rm = TRUE)) %>%
+      ungroup() %>%
+      group_by(j5, year) %>%
+      summarise(cout_mo = sum(cout_mo, na.rm = TRUE), .groups = "drop")
+  } else {
+    df_r %>% select(j5, year) %>% mutate(cout_mo = NA_real_)
+  }
+
+  # ---------------------
+  # Coût intrants : typiquement variable ita2 dans res_ita.dta
+  # ---------------------
+  df_ita_cout <- if (!is.null(df_ita) && "ita2" %in% names(df_ita)) {
+    df_ita %>%
+      group_by(j5, year) %>%
+      summarise(cout_intrants = sum(ita2, na.rm = TRUE), .groups = "drop")
+  } else {
+    df_r %>% select(j5, year) %>% mutate(cout_intrants = NA_real_)
+  }
+
+  # ---------------------
+  # Fusion finale des trois composantes
+  # ---------------------
+  df <- reduce(
+    list(df_coutmet, df_mo1_cout, df_ita_cout),
+    full_join,
+    by = c("j5", "year")
+  ) %>%
+    mutate(
+      cout_total = cout_metayage + cout_mo + cout_intrants
+    )
+
+  return(df)
+}
+
+```
+
+**Vérification sur toutes les années**
+
+```{r}
+years <- 1995:2010
+couts_output <- purrr::map_dfr(years, ~{
+  message("Traitement année ", .x)
+  tryCatch({
+    df <- process_cout_riz_old("data/ROS_MDG_microdata/", .x)
+    df %>% mutate(annee = .x)
+  }, error = function(e) tibble(j5 = NA, year = .x, cout_total = NA, annee = .x))
+})
+
+couts_output %>%
+  group_by(annee) %>%
+  summarise(
+    n = sum(!is.na(cout_total)),
+    moyenne = mean(cout_total, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+```
+
+> Il y a visiblement des problèmes en 1995 et 1996, à noter pour plus tard.
+
+# Etapes suivantes
+
+Le riz est probablement la culture la plus complexe à analyser. Voici les autres composantes à intégrer pour calculer le revenu total avant 2011 : 
+
+- Cultures non agricoles
+
+- Elevage
+
+- Activités non agricoles
+
+- Transferts et autres revenus
