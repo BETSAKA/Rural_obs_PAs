@@ -43,6 +43,9 @@ menage_local2012 <- left_join(res_deb2012, cor_table, by = c("j0","j42","j4"))
 Nous allons fusionner les données des ménages, localités et observatoires pour toutes les années.
 
 ```{r}
+library(readxl)
+library(purrr)
+
 #Load household datasets
 process_fusion <- function(year) {
   path <- "data/ROS_MDG_microdata/"
@@ -68,8 +71,6 @@ process_fusion <- function(year) {
 
 ros_years <- 1995:2015
 all_hh <- map_dfr(ros_years, process_fusion)
-str(all_hh)
-str(cor_table)
 
 
 matched <- all_hh %>%
