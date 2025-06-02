@@ -1,0 +1,222 @@
+---
+title: "Selection des sites _brouillon"
+author: "Veromanitra Ramizason, Florent Bédécarrats"
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# 0) Fusion des données
+
+## 0.1) Fusion des données pour l'année 2012
+
+Nous allons d'abord fusionner les données concernant les ménages, les observatoires, les communes et villages par année.
+
+```{r}
+
+library(dplyr)
+library(haven)
+
+#Load household datasets
+res_deb2012 <- read_dta("data/ROS_MDG_microdata/2012/res_deb.dta") %>% 
+  select(year,j0,j42,j4,j5) %>% 
+  mutate(j0 = as.character(j0))
+#j0 = observatoire
+#j4 = nom du village
+#j42 = nom des communes
+#j5 = identification des ménages
+
+
+#load corrected locality datasets
+cor_table <- readr::read_rds("output/correspondence_table4.rds") %>% 
+  select(j0,j42,j4,ADM3_PCODE, ADM3_EN, ADM4_PCODE, ADM4_clean)
+'#ADM3 : fait référence aux communes
+ #ADM4 : fait référence au village/fokontany
+
+
+# Merge houselhold and locality data
+menage_local2012 <- left_join(res_deb2012, cor_table, by = c("j0","j42","j4"))
+```
+
+## 0.2) Fusion des données pour toutes les années
+
+Nous allons fusionner les données des ménages, localités et observatoires pour toutes les années.
+
+```{r}
+#Load household datasets
+process_fusion <- function(path = "data/ROS_MDG_microdata/", year) {
+  if(year==1995){
+    read_dta(paste0(path, year, "/res_deb.dta")) %>%
+    rename(j4=j4_code)
+    select(year,j0,j4,j5) %>% 
+    mutate(j0 = as.character(j0)) %>% 
+        group_by(j0) %>% 
+  summarise(menage = sum(is.na(5)),  
+            nb_men = n())
+  }
+  else if (year >= 1996 && year <= 2004){
+    read_dta(paste0(path, year, "/res_deb.dta")) %>%
+    select(year,j0,j4,j5) %>% 
+    mutate(j0 = as.character(j0))  
+  }
+  else{
+     read_dta(paste0(path, year, "/res_deb.dta")) %>%
+    select(year,j0,j4,j42,j5) %>% 
+    mutate(j0 = as.character(j0)) 
+  }
+}
+
+#----------------------------------------------------------------
+process_fusion <- function(path = "data/ROS_MDG_microdata/", year) {
+  if (year == 1995) {
+    read_dta(paste0(path, year, "/res_deb.dta")) %>%
+      rename(j4 = j4_code) %>%
+      select(year, j0, j4, j5) %>%
+      mutate(j0 = as.character(j0)) %>%
+      group_by(j0) %>%
+      summarise(
+        menage = sum(is.na(j5)),
+        nb_men = n()
+      )
+  } else if (year >= 1996 && year <= 2004) {
+    read_dta(paste0(path, year, "/res_deb.dta")) %>%
+      select(year, j0, j4, j5) %>%
+      mutate(j0 = as.character(j0))
+  } else {
+    read_dta(paste0(path, year, "/res_deb.dta")) %>%
+      select(year, j0, j4, j42, j5) %>%
+      mutate(j0 = as.character(j0))
+  }
+}
+
+
+
+#-----------------------------------------------------------------
+
+
+
+# Remarque
+    #j4 n'existe pas pour l'année 1995 => les tables pour ces années là n'existent pas
+    #j42 n'existe pas pour les années 1995-2004 => les tables pour ces années là n'existent pas
+
+#Vérification
+res_fus1995 <- process_fusion(year=1995) #j4 n'existe pas
+res_fus1996 <- process_fusion(year='1996') #j42 n'existe pas
+res_fus2004 <- process_fusion(year = '2004')
+
+# res_deb2012 <- read_dta("data/ROS_MDG_microdata/2012/res_deb.dta") %>% 
+#   select(year,j0,j4,j42,j5) %>% 
+#   mutate(j0 = as.character(j0))
+
+```
+
+# I) Statistiques sur les ménages
+
+## I.1) Cas de Marovoay
+
+### I.1.1) Moyenne des ménages en général
+
+#### a) De 1995 à 2015
+
+```{r}
+
+# Compter les ménages où j5 n'est pas manquant (NA)
+count_j5 <- process_fusion(path = "data/ROS_MDG_microdata/", year = 2012) %>%
+  filter(!is.na(j5)) %>%
+  summarise(count = n())
+
+print(count_j5)
+```
+
+#### b) Avant 2002
+
+#### c) Après 2002
+
+### I.1.2) Moyenne des ménages par commune
+
+#### a) De 1995 à 2015
+
+#### b) Avant 2002
+
+#### c) Après 2002
+
+### I.1.3) Moyenne des ménages par village
+
+#### a) De 1995 à 2015
+
+#### b) Avant 2002
+
+#### c) Après 2002
+
+## I.2) Cas d' Alaotra
+
+La création de la Nouvelle Aire Protégée du lac Alaotra était en 2015. Or que notre donnée concerne les années d'avant 2000 - avant 2015
+
+### I.2.1) Moyenne des ménages en général
+
+### I.2.2) Moyenne des ménages par commune
+
+### I.2.3) Moyenne des ménages par village
+
+# II) Statistiques sur la sécurité alimentaire
+
+# III) Statistiques sur l'éducation
+
+# IV) Statistiques sur les revenus
+
+2.1) Pour 2012
+
+```{r}
+# code calcul des revenus : total_income_year
+```
+
+2.2) Pour toutes les années
+
+3\) Fusion des données ménages et localités avec les données des revenus
+
+3.1) Pour 2012
+
+```{r}
+#Merge recent datasets with income
+merge_income2012 <- left_join(menage_local, total_income_2012, by = "j5")
+sum(!is.na(merge_income2012$ADM4_PCODE))
+
+observatory_names <- readxl::read_excel("data/observatory_names.xlsx")
+
+merge_income2012 %>% 
+  group_by(j0) %>% 
+  summarise(adm4_NA = sum(is.na(ADM4_PCODE)),  
+            nb_men = n())
+
+merge_income2012_Alaotra <- filter(merge_income2012, j0 == "21")
+merge_income2012_Alaotra <- merge_income2012 %>%
+  filter(j0 == "21")
+```
+
+3.2) Pour toutes les années
+
+4\) Calcul des revenus
+
+4.1) Pour 2012
+
+a\) Cas de Marovoay
+
+```{r}
+merge_income2012_Alaotra <- filter(merge_income2012, j0 == "3")
+merge_income2012_Alaotra <- merge_income2012 %>%
+  filter(j0 == "21")
+```
+
+b\) Cas d' Alaotra
+
+```{r}
+merge_income2012_Alaotra <- filter(merge_income2012, j0 == "21")
+merge_income2012_Alaotra <- merge_income2012 %>%
+  filter(j0 == "21")
+```
+
+4.2) Pour toutes les années
+
+a\) Cas de Marovoay
+
+b\) Cas d' Alaotra

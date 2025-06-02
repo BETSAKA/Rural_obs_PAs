@@ -2,7 +2,9 @@
 output: html_document
 editor_options: 
   chunk_output_type: console
-execute:
+
+execute: 
+  echo: true
   eval: false
 ---
 # Georeferencing
@@ -564,7 +566,7 @@ correspondence_table4 <- correspondence_table3 %>%
   left_join(mutate(edit_mne, j0 = as.character(j0)), by =c("j0", "j42", "j4")) %>%
   mutate(ADM4_clean = coalesce(ADM4_clean.y, ADM4_clean.x),
          ADM4_PCODE = coalesce(ADM4_PCODE.y, ADM4_PCODE.x)) 
-
+write_rds(correspondence_table4, "output/correspondence_table4.rds")
 ```
 
 

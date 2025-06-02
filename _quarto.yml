@@ -14,7 +14,7 @@ book:
     - 01_georeferencing.qmd
     - 02_overlaps.qmd
     - 03_Marovoay-Ankarafantsika.qmd
-
+    - 05_Selection-Site.qmd
 bibliography: references.bib
 
 format:
@@ -25,3 +25,4 @@ format:
 execute:
   warning: false
   error: false
+

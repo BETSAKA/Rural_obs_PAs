@@ -1,3 +1,4 @@
 # Introduction
 
 Using the rural observatory data to assess the protected areas impacts on household living conditions.
+

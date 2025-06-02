@@ -1,0 +1,13 @@
+---
+title: "Test R"
+author: "Vero"
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(haven)
+mtcars |>
+  group_by(cyl) |>
+  summarize(avg=mean(mpg))
+```
