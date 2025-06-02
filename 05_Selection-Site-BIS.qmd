@@ -44,8 +44,8 @@ Nous allons fusionner les données des ménages, localités et observatoires pou
 
 ```{r}
 #Load household datasets
-process_fusion <- function(path = "data/ROS_MDG_microdata/", year) {
-  
+process_fusion <- function(year) {
+  path <- "data/ROS_MDG_microdata/"
   df <- read_dta(paste0(path, year, "/res_deb.dta"))
   
   if (year == 1995) {
@@ -54,22 +54,43 @@ process_fusion <- function(path = "data/ROS_MDG_microdata/", year) {
   } 
   df <- df %>%
     select(any_of(c("year", "j0", "j4", "j42", "j5"))) %>%
-      mutate(j0 = as.character(j0))
+      mutate(across(any_of(c("j0", "j4", "j42", "j5")), as.character))
 }
+#j0 = observatoire
+#j4 = nom du village
+#j42 = nom des communes
+#j5 = identification des ménages
 
-#-----------------------------------------------------------------
 # Remarque
     #j4 n'existe pas pour l'année 1995 => les tables pour ces années là n'existent pas
     #j42 n'existe pas pour les années 1995-2004 => les tables pour ces années là n'existent pas
 
-#Vérification
-res_fus1995 <- process_fusion(year=1995) #j4 n'existe pas
-res_fus1996 <- process_fusion(year='1996') #j42 n'existe pas
-res_fus2004 <- process_fusion(year = '2004')
 
-# res_deb2012 <- read_dta("data/ROS_MDG_microdata/2012/res_deb.dta") %>% 
-#   select(year,j0,j4,j42,j5) %>% 
-#   mutate(j0 = as.character(j0))
+ros_years <- 1995:2015
+all_hh <- map_dfr(ros_years, process_fusion)
+str(all_hh)
+str(cor_table)
+
+
+matched <- all_hh %>%
+  left_join(cor_table, by = c("j0", "j4", "j42"))
+
+observatory_names <- read_xlsx("data/observatory_names.xlsx") %>%
+  mutate(code = as.character(code)) %>%
+  select(code, name)
+
+summary_stats <- matched %>%
+  group_by(j0, year) %>%
+  summarize(
+    n = n(),
+    n_adm3 = sum(!is.na(ADM3_PCODE)),
+    pct_adm3 = round(100 * n_adm3 / n, 1),
+    n_adm4 = sum(!is.na(ADM4_PCODE)),
+    pct_adm4 = round(100 * n_adm4 / n, 1),
+    .groups = "drop"
+  ) %>%
+  left_join(observatory_names, by = c("j0" = "code")) %>%
+  relocate(name, .after = j0)
 
 ```
 
