@@ -8,49 +8,42 @@ editor_options:
 
 # 0) Fusion des données
 
-## 0.1) Fusion des données pour l'année 2012
+Nous allons d'abord fusionner les données concernant les ménages, les observatoires, les communes et villages pour toutes les années entre 1995-2015.
 
-Nous allons d'abord fusionner les données concernant les ménages, les observatoires, les communes et villages par année.
+Les variables utilisées sont :
+
+-   j0 : observatoire ;
+
+-   j4 : nom du village ;
+
+-   j42 : nom des communes ;
+
+-   j5 : identification des ménages ;
+
+-   ADM3 fait référence aux communes ;
+
+-   ADM4 fait référence aux villages.
+
+**Remarques :**
+
+-   j4 n'existe pas pour l'année 1995 =\> les tables pour ces années là n'existent pas ;
+
+-   j42 n'existe pas pour les années 1995-2004 =\> les tables pour ces années là n'existent pas.
 
 ```{r}
-
 library(dplyr)
 library(haven)
-
-#Load household datasets
-res_deb2012 <- read_dta("data/ROS_MDG_microdata/2012/res_deb.dta") %>% 
-  select(year,j0,j42,j4,j5) %>% 
-  mutate(j0 = as.character(j0))
-#j0 = observatoire
-#j4 = nom du village
-#j42 = nom des communes
-#j5 = identification des ménages
-
-
-#load corrected locality datasets
-cor_table <- readr::read_rds("output/correspondence_table4.rds") %>% 
-  select(j0,j42,j4,ADM3_PCODE, ADM3_EN, ADM4_PCODE, ADM4_clean)
-#ADM3 : fait référence aux communes
-#ADM4 : fait référence au village/fokontany
-
-
-# Merge houselhold and locality data
-menage_local2012 <- left_join(res_deb2012, cor_table, by = c("j0","j42","j4"))
-```
-
-## 0.2) Fusion des données pour toutes les années
-
-Nous allons fusionner les données des ménages, localités et observatoires pour toutes les années.
-
-```{r}
 library(readxl)
 library(purrr)
+
+#Load corrected locality datasets
+cor_table <- readr::read_rds("output/correspondence_table4.rds") %>% 
+  select(j0,j42,j4,ADM3_PCODE, ADM3_EN, ADM4_PCODE, ADM4_clean)
 
 #Load household datasets
 process_fusion <- function(year) {
   path <- "data/ROS_MDG_microdata/"
   df <- read_dta(paste0(path, year, "/res_deb.dta"))
-  
   if (year == 1995) {
     df <- df %>%
       rename(j4 = j4_code) 
@@ -59,19 +52,10 @@ process_fusion <- function(year) {
     select(any_of(c("year", "j0", "j4", "j42", "j5"))) %>%
       mutate(across(any_of(c("j0", "j4", "j42", "j5")), as.character))
 }
-#j0 = observatoire
-#j4 = nom du village
-#j42 = nom des communes
-#j5 = identification des ménages
-
-# Remarque
-    #j4 n'existe pas pour l'année 1995 => les tables pour ces années là n'existent pas
-    #j42 n'existe pas pour les années 1995-2004 => les tables pour ces années là n'existent pas
 
 
 ros_years <- 1995:2015
 all_hh <- map_dfr(ros_years, process_fusion)
-
 
 matched <- all_hh %>%
   left_join(cor_table, by = c("j0", "j4", "j42"))
@@ -92,12 +76,51 @@ summary_stats <- matched %>%
   ) %>%
   left_join(observatory_names, by = c("j0" = "code")) %>%
   relocate(name, .after = j0)
-
+# j0 = observatoire, year = année, adm3_pcode = code des communes, adm4_pcode = code des fokontany
 ```
 
 # I) Statistiques sur les ménages
 
 ## I.1) Cas de Marovoay
+
+Nous allons fusionner les données annuelles des localités par observatoire avec les données des ménages
+
+```{r}
+
+# Fonction pour lire les données d'une seule année
+process_fusion_hh <- function(year) {
+  path = "data/ROS_MDG_microdata/"
+  if (year == 1995) {
+    df <- read_dta(paste0(path, year, "/res_m.dta")) %>%
+      select(year, obsr, j5, m, m4, m5, m6) %>% 
+      rename (j0 = obsr)
+    # A CREER VARIABLE TAILLE DES MENAGES AVEC LA VARIABLE "m"
+    # SELECTIONNER CM =1 pour "m6"
+  } else if (year == 1996) {
+    df <- read_dta(paste0(path, year, "/res_m_a.dta")) %>%
+      select(year, obsr96, j5, m, m4, m5, m6) %>% 
+      rename (j0 = obsr96)
+    # A CREER VARIABLE TAILLE DES MENAGES AVEC LA VARIABLE "m"
+    # SELECTIONNER CM =1 pour "m6"
+  } else if (year > 1996) {
+      df <- read_dta(paste0(path, year, "/res_m_a.dta")) %>%
+       mutate(j0 = substr(j5, 1, 2)) %>% 
+        select(year, j0, j5, m, m4, m5, m6)
+      # A CREER VARIABLE TAILLE DES MENAGES AVEC LA VARIABLE "m"
+      # SELECTIONNER CM =1 pour "m6"
+  }
+  return(df)
+}
+
+# Appliquer la fonction à chaque année et concaténer les résultats
+data_hh <- bind_rows(lapply(ros_years, process_fusion_hh))  
+
+matched <- matched %>%
+  left_join(data_hh, by = c("year", "j0", "j5"))
+# ATTENTION POUR LE MOMENT LES DIMENSIONS DES TABLEAUX NE CORRESPONDENT PAS
+
+
+```
 
 ### I.1.1) Moyenne des ménages en général
 
