@@ -54,7 +54,8 @@ process_fusion <- function(year) {
 }
 
 ros_years <- 1995:2015
-all_hh <- map_dfr(ros_years, process_fusion)
+all_hh <- map_dfr(ros_years, process_fusion) %>%
+  distinct(year, j0, j5, .keep_all = TRUE) # On enlève 13 doublons / 101266 obs
 
 matched <- all_hh %>%
   left_join(cor_table, by = c("j0", "j4", "j42"))
@@ -92,11 +93,7 @@ process_fusion_hh <- function(year) {
   if (year == 1995) {
     df <- read_dta(paste0(path, year, "/res_m.dta")) %>%
       select(year, obsr, j5, m, m4, m5, m6) %>% 
-      rename (j0 = obsr) %>% 
-  # A CREER VARIABLE TAILLE DES MENAGES AVEC LA VARIABLE "m"
-  filter(!is.na(m)) %>%
-  group_by(year, j0, j5) %>%
-  summarise(n = n())
+      rename (j0 = obsr)
     # SELECTIONNER CM =1 pour "m6"
   } else if (year == 1996) {
     df <- read_dta(paste0(path, year, "/res_m_a.dta")) %>%
@@ -111,15 +108,17 @@ process_fusion_hh <- function(year) {
       # A CREER VARIABLE TAILLE DES MENAGES AVEC LA VARIABLE "m"
       # SELECTIONNER CM =1 pour "m6"
   }
+  df <- df %>%
+    mutate(j0 = as.character(as.numeric(j0)))
   return(df)
 }
 
 # Appliquer la fonction à chaque année et concaténer les résultats
-data_hh <- map_dfr(ros_years, process_fusion_hh)
+mb_hh <- map_dfr(ros_years, process_fusion_hh)
 # matched <- matched %>%
 #   left_join(data_hh, by = c("year", "j0", "j5"))
 
-test <- data_hh %>%
+test <- mb_hh %>%
   group_by(year) %>%
   summarise(tot = n(),
             m4_na = sum(is.na(m4)),
@@ -128,17 +127,25 @@ test <- data_hh %>%
             m6_na_perc = m6_na / tot)
 
 # Nettoyage pour ne garder que les "vrais" membres du ménage
-data_hh_revu <- data_hh %>%
+mb_hh_revu <- mb_hh %>%
+  distinct(year, j0, j5, m, .keep_all = TRUE) %>% # On enlève 48 doublons / 101266 obs
   filter(!is.na(m4) | !is.na(m6))
 
 # On commence par compter le nombre de membres par ménage
-hh_n <- data_hh_revu %>%
+mb_hh_n <- mb_hh_revu %>%
   group_by(year, j0, j5) %>%
-  summarise(n_membres = n())
+  summarise(n_membres = n()) %>%
+  ungroup() %>%
+  select(-j0)
+if (sum(duplicated(paste(mb_hh_n$year, mb_hh_n$j5))) != 0) {
+  cat("Certains numéros de ménages sont dupliqués entre observatoires")
+} else {
+  cat("Aucun numéro de ménage n'est dupliqué entre observatoires")
+}
 
-# On joint avec les données matchées
+# On joint avec les données matchées sans utiliser j0
 matched_2 <- matched %>%
-  left_join(hh_n, by = c("year", "j0", "j5"))
+  left_join(mb_hh_n, by = c("year", "j5"))
 
 matched_2 %>%
   group_by(year) %>%
@@ -146,8 +153,32 @@ matched_2 %>%
             menages_nmb_na = sum(is.na(n_membres)),
             perc_nmb_na = menages_nmb_na / n_menages)
 
-res_m_95 <- read_dta("data/ROS_MDG_microdata/1995/res_m.dta")
+# On extrait les données de chef de ménage
+hhh <- mb_hh_revu %>%
+  filter(m6 == 1) %>%
+  select(year, j5, m, hhh_sex = m4, hhh_age = m5)
 
+# On regarde si certains ménages ont plusieurs chefs
+hhh_dupli <- hhh %>%
+  group_by(year, j5) %>%
+  summarise(n = n()) %>%
+  filter(n > 1)
+# On voit qu'il y en a 70.
+
+# On explore le contenu de leur composition
+hhh_dupli_contenu <- hhh %>%
+  filter(paste(year, j5) %in% paste(test$year, test$j5))
+
+hhh_revu <- hhh %>%
+  arrange(year, j5, m) %>%
+  distinct(year, j5, .keep_all = TRUE) %>%
+  select(-m)
+  
+
+matched_3 <- matched_2 %>%
+  left_join(hhh_revu, by = c("year", "j5"))
+# Ménage 012173 duppliqué dans all_hh
+# Ménage 0426065 a plusieurs chefs
 ```
 
 ### I.1.1) Moyenne des ménages en général
