@@ -79,6 +79,19 @@ summary_stats <- matched %>%
 # j0 = observatoire, year = année, adm3_pcode = code des communes, adm4_pcode = code des fokontany
 ```
 
+## Géolocalisation manquante
+
+### Cas d'Alaotra
+
+```{r}
+cor_table_alaotra <- cor_table %>%
+  filter(j0 == 21)
+
+writexl::write_xlsx(cor_table_alaotra, "output/cor_table_alaotra.xlsx")
+```
+
+
+
 # I) Statistiques sur les ménages
 
 ## I.1) Cas de Marovoay
