@@ -1,0 +1,104 @@
+---
+title: "01bis_georeferencing_manual"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+# Amélioration du géoréférencement
+
+## Chargement des données disponibles
+
+```{r}
+# Load libraries ---------------------------------------------------
+
+library(tidyverse)
+library(haven)
+library(readxl)
+library(labelled)
+
+# Load observatories -----------------------------------------------
+
+# Load the locality correspondence table with administrative codes
+locality_reference <- readr::read_rds("output/correspondence_table4.rds") %>% 
+  select(j0, j42, j4, ADM3_PCODE, ADM3_EN, ADM4_PCODE, ADM4_clean)
+
+# Load observatory names and match them to their codes
+observatory_labels <- read_xlsx("data/observatory_names.xlsx") %>%
+  mutate(code = as.character(code)) %>%
+  select(code, name)
+
+# Load household description --------------------------------------------
+
+# Function to rename variables using a named list
+# e.g. renames = list("j0" = c("obsr", "obsr96"))
+rename_all_custom <- function(df, renames) {
+  if (length(renames) == 0) return(df)
+  for (new_name in names(renames)) {
+    # Skip renaming if new_name already exists in df
+    if (new_name %in% names(df)) next
+    old_names <- renames[[new_name]]
+    matched_old <- old_names[old_names %in% names(df)]
+    if (length(matched_old) > 0) {
+      df <- df %>% rename(!!new_name := all_of(matched_old[1]))
+    }
+  }
+  return(df)
+}
+
+# Generic function to load and standardize records from any year
+# Arguments:
+#   - year: numeric year of the survey
+#   - vars: vector of variables to select (after renaming)
+#   - renames: named list of renaming rules (new_name = c(possible_old_names))
+load_records <- function(year, file_name, vars, renames = list()) {
+  path <- paste0("data/ROS_MDG_microdata/", year, "/")
+  df <- read_dta(paste0(path, file_name))
+
+  df <- rename_all_custom(df, renames)
+
+  # Ensure all expected vars exist (fill missing with NA)
+  missing_vars <- setdiff(vars, names(df))
+  df[missing_vars] <- NA
+
+  # Handle j0 if not in original file
+  if (!"j0" %in% names(df)) {
+    df <- df %>%
+      mutate(j0 = substr(j5, 1, 2)) %>% 
+      mutate(j0 = as.character(as.numeric(j0)))
+  }
+
+  df %>%
+    mutate(j0 = as.character(as.numeric(j0))) %>%
+    select(any_of(vars))
+}
+
+
+# Define variables to extract from res_deb files
+vars_res_deb <- c("year", "j0", "j5", "j4", "j42")
+renames_res_deb <- list("j0" = c("obsr", "obsr96"))
+# Load res_deb for all years using the same generic function
+household_locality_all <- map_dfr(
+  1995:2015,
+  ~load_records(.x, file_name = "res_deb.dta", vars = vars_res_deb, 
+                renames = renames_res_deb)
+) %>%
+  distinct(year, j0, j5, .keep_all = TRUE) %>%
+  mutate(across(any_of(c("j0", "j4", "j42", "j5")), as.character))
+
+# Join with geographical references and add observatory names
+household_geolocated <- household_locality_all %>%
+  left_join(locality_reference, by = c("j0", "j4", "j42")) %>%
+  left_join(observatory_labels, by = c("j0" = "code")) %>%
+  relocate(name, .after = j0)
+```
+
+## Identification des sites
+
+Les trois premiers chiffres sont a priori des observatoires
+
+```{r}
+
+```
+
+
