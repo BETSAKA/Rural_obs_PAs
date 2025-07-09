@@ -564,12 +564,14 @@ write_rds(correspondence_table3, "output/correspondence_table3.rds")
 # Joining
 correspondence_table4 <- correspondence_table3 %>%
   left_join(mutate(edit_mne, j0 = as.character(j0)), by =c("j0", "j42", "j4")) %>%
+  #  Consolidate new columns
   mutate(ADM4_clean = coalesce(ADM4_clean.y, ADM4_clean.x),
-         ADM4_PCODE = coalesce(ADM4_PCODE.y, ADM4_PCODE.x)) 
+         ADM4_PCODE = coalesce(ADM4_PCODE.y, ADM4_PCODE.x)) %>%
+  # Remove former columns
+  select(-ADM4_clean.y, -ADM4_clean.x, -ADM4_PCODE.y, -ADM4_PCODE.x)
+
 write_rds(correspondence_table4, "output/correspondence_table4.rds")
 ```
-
-
 
 ## Validating the Quality of Georeferenced Data
 
@@ -738,7 +740,7 @@ From this summary table, we see that the communes could not be re-identified for
 
 ## Conclusion
 
-Given the variability in location labels recorded in the ROS data, we emphasized standardizing and aligning toponyms. We introduced the clean_string function to unify place names, addressing variances in language, letter casing, and other descriptors. Utilizing fuzzy matching, we connected similar text strings, using the Levenshtein distance as a benchmark. To heighten accuracy, a hierarchical data matching strategy was applied, reflecting the inherent structure of geographical units, where regions envelop districts, which further consist of municipalities and localities. The COD data, curated by BNGRC and OCHA, was our reference point for these matches. Various techniques, including hierarchical fuzzy matching and visual checks, were employed.
+Given the variability in location labels recorded in the ROS data, we emphasized standardizing and aligning toponyms. We introduced the clean_string function to unify place names, addressing variances in language, letter casing, and o ther descriptors. Utilizing fuzzy matching, we connected similar text strings, using the Levenshtein distance as a benchmark. To heighten accuracy, a hierarchical data matching strategy was applied, reflecting the inherent structure of geographical units, where regions envelop districts, which further consist of municipalities and localities. The COD data, curated by BNGRC and OCHA, was our reference point for these matches. Various techniques, including hierarchical fuzzy matching and visual checks, were employed.
 
 As a result, we could automatically match 98% of commune name variations in the dataset with an official commune, and 62% of village name variations with a fokontany. The outcomes are consistent with ROS's internal documentation, and the spatial representations can be further inspected for validation. Future corrections and enhancements are anticipated, and our system, leveraging Quarto notebook and reproducible R code, will facilitate these refinements.
 

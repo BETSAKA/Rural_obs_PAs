@@ -176,37 +176,39 @@ output %>%
 
 **2011–2015**
 
-- Données extraites de `res_r.dta`, dans process_reven_exp() :
+-   Données extraites de `res_r.dta`, dans process_reven_exp() :
 
-      - `r6` : quantité de paddy reçue ou donnée en métayage/location
+    ```         
+    - `r6` : quantité de paddy reçue ou donnée en métayage/location
 
-      - `r7` : montant monétaire reçu ou payé
+    - `r7` : montant monétaire reçu ou payé
 
-      Les deux sont valorisés avec `pxpaddy_obs` (issu de `res_dc21.dta`)
+    Les deux sont valorisés avec `pxpaddy_obs` (issu de `res_dc21.dta`)
+    ```
 
-- Si le ménage est preneur, la rente est une charge ; s’il est bailleur, c’est un revenu.
+-   Si le ménage est preneur, la rente est une charge ; s’il est bailleur, c’est un revenu.
 
-- La valeur de la rente en nature est calculée comme `r6 * pxpaddy_obs`.
+-   La valeur de la rente en nature est calculée comme `r6 * pxpaddy_obs`.
 
 **Avant 2011**
 
 Les variables sont relativement stables sur la période 1995–2010 :
 
-- `r6` (quantité en kg) et `r7 (montant) sont présents dans res_r.dta
-    
-- Le prix `pxpaddy_obs` peut être réutilisé tel que défini dans `process_production_riz_old()`
+-   `r6` (quantité en kg) et \`r7 (montant) sont présents dans res_r.dta
 
-- L’information sur le **statut** (locataire ou propriétaire) est rarement explicite, alors on calcule les deux composantes.
+-   Le prix `pxpaddy_obs` peut être réutilisé tel que défini dans `process_production_riz_old()`
+
+-   L’information sur le **statut** (locataire ou propriétaire) est rarement explicite, alors on calcule les deux composantes.
 
 **Proposition de fonction**
 
 On peut construire une fonction `process_rente_riz_old()` qui :
 
-- charge les fichiers `res_r.dta` et `res_dc21.dta`
+-   charge les fichiers `res_r.dta` et `res_dc21.dta`
 
-- valorise la rente en nature (kg) et en argent
+-   valorise la rente en nature (kg) et en argent
 
-- retourne pour chaque ménage et année une valeur totale de rente, sans signe (la distinction bailleur/preneur se fera en aval)
+-   retourne pour chaque ménage et année une valeur totale de rente, sans signe (la distinction bailleur/preneur se fera en aval)
 
 ```{r}
 process_rente_riz_old <- function(path = "data/ROS_MDG_microdata/", 
@@ -258,7 +260,7 @@ process_rente_riz_old <- function(path = "data/ROS_MDG_microdata/",
 
 ```
 
-**Vérification sur toutes les années** 
+**Vérification sur toutes les années**
 
 ```{r}
 years <- 1995:2010
@@ -290,21 +292,27 @@ rente_output %>%
 
 Dans `process_reven_exp()`, les coûts sont décomposés en trois composantes :
 
-- Main-d’œuvre (res_mo.dta) :
+-   Main-d’œuvre (res_mo.dta) :
 
-        - Heures de travail valorisées par un taux implicite
+    ```         
+      - Heures de travail valorisées par un taux implicite
 
-        - Variables utilisées : `mo11*`, `mo12`, `mo23`, `mo51*`
+      - Variables utilisées : `mo11*`, `mo12`, `mo23`, `mo51*`
+    ```
 
-- Intrants (res_ita.dta) :
+-   Intrants (res_ita.dta) :
 
-        - Coût total des achats d’intrants agricoles
+    ```         
+      - Coût total des achats d’intrants agricoles
 
-        - Variable utilisée : ita2
+      - Variable utilisée : ita2
+    ```
 
-- Coût du métayage payé (res_r.dta) :
+-   Coût du métayage payé (res_r.dta) :
 
-        - Rente versée (quantité r6 ou montant r7), valorisée au prix observatoire (pxpaddy_obs) si en nature
+    ```         
+      - Rente versée (quantité r6 ou montant r7), valorisée au prix observatoire (pxpaddy_obs) si en nature
+    ```
 
 Le tout est agrégé pour chaque ménage dans une variable `charge_riz`.
 
@@ -312,21 +320,21 @@ Le tout est agrégé pour chaque ménage dans une variable `charge_riz`.
 
 Les sources sont globalement similaires, mais les fichiers peuvent différer selon les années :
 
-- `res_mo.dta`, `res_ita.dta`, et `res_r.dta` sont en général présents
+-   `res_mo.dta`, `res_ita.dta`, et `res_r.dta` sont en général présents
 
-- Les noms de variables sont globalement stables, mais certaines années peuvent ne contenir que les montants, ou ne pas distinguer les cultures
+-   Les noms de variables sont globalement stables, mais certaines années peuvent ne contenir que les montants, ou ne pas distinguer les cultures
 
 **Proposition de fonction**
 
 La fonction `process_cout_riz_old()` :
 
-- Charge les fichiers nécessaires
+-   Charge les fichiers nécessaires
 
-- Agrège les coûts de main-d’œuvre et intrants
+-   Agrège les coûts de main-d’œuvre et intrants
 
-- Valorise le métayage payé si données disponibles
+-   Valorise le métayage payé si données disponibles
 
-- Retourne le total des coûts de production par ménage
+-   Retourne le total des coûts de production par ménage
 
 ```{r}
 process_cout_riz_old <- function(path = "data/ROS_MDG_microdata/", 
@@ -454,12 +462,12 @@ couts_output %>%
 
 # Etapes suivantes
 
-Le riz est probablement la culture la plus complexe à analyser. Voici les autres composantes à intégrer pour calculer le revenu total avant 2011 : 
+Le riz est probablement la culture la plus complexe à analyser. Voici les autres composantes à intégrer pour calculer le revenu total avant 2011 :
 
-- Cultures non agricoles
+-   Cultures non agricoles
 
-- Elevage
+-   Elevage
 
-- Activités non agricoles
+-   Activités non agricoles
 
-- Transferts et autres revenus
+-   Transferts et autres revenus

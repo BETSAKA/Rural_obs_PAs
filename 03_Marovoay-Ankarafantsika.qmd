@@ -28,7 +28,8 @@ First extract the study sites that could not be identified.
 
 ```{r}
 observatory_names <- read_xlsx("data/observatory_names.xlsx")
-correspondence_obs <- read_rds("output/correspondence_table3.rds") %>%
+correspondence_table4 <- read_rds("output/correspondence_table4.rds")
+correspondence_obs <- correspondence_table4 %>%
   mutate(j0 = as.numeric(j0)) %>%
   left_join(observatory_names, by = c("j0" = "code")) %>%
   rename(OBS_NAME = name) %>%
@@ -58,6 +59,70 @@ corr_na_marovoay %>%
 
 From this table, we see that 500 observations that were not georeferenced come from the fact that location were not registered in this observatory in 1995. For the panel household that were re-surveyed in 1996, we will be able to infer the village from the 1996 data. For the non-repeated observations, it might be possible to infer their vilage from a pattern in the houshehold numbering, otherwise it will have to be considered as missing.
 
+
+### Data correction
+
+We have corrected the missing data for Marovay.
+
+```{r}
+adjusted_sites_marovoay <- read_xlsx(
+  "output/Cor_table_Marovoay_modif_v1.xlsx"
+  ) %>%
+  filter(!is.na(Site)) %>%
+  mutate(Site = str_to_lower(Site))
+
+# adjusted_sites_marovoay %>%
+#   pluck("Site") %>%
+#   unique()
+
+table_corr <- correspondence_marovoay %>%
+  select(starts_with("ADM")) %>%
+  unique() %>%
+  filter(!is.na(ADM4_PCODE)) %>%
+  filter(ADM3_EN != "Marovoay")# Pas d'enquête dans la commune Marovoa
+  
+
+adjusted_sites_marovoay2 <- adjusted_sites_marovoay %>%
+  select(-ADM4_clean) %>%
+  rename(ADM4_clean = Site) %>%
+  left_join(table_corr, by = "ADM4_clean") %>%
+  mutate(ADM3_PCODE = coalesce(ADM3_PCODE.y, ADM3_PCODE.x),
+         ADM3_EN = coalesce(ADM3_EN.y, ADM3_EN.x),
+         ADM4_PCODE = coalesce(ADM4_PCODE.y, ADM4_PCODE.x)) %>%
+  select(-ADM3_PCODE.y, -ADM3_PCODE.x,-ADM3_EN.y, -ADM3_EN.x, -ADM4_PCODE.y, 
+         -ADM4_PCODE.x) %>%
+  relocate(ADM4_clean, .after = last_col()) %>%
+              mutate(matched_string = NA,
+                     distance = NA,
+                     distance2 = NA,
+                     method = "Manual",
+                     method_village = "Manual")
+
+
+correspondence_table5 <- correspondence_table4 %>%
+  left_join(adjusted_sites_marovoay2, by = c("j0", "j42", "j4")) %>%
+  mutate(matched_string = coalesce(matched_string.y, matched_string.x),
+         distance = coalesce(distance.y, distance.x),
+         distance2 = coalesce(distance2.y, distance2.x),
+         method = coalesce(method.y, method.x),
+         method_village = coalesce(method_village.y, method_village.x),
+         ADM3_PCODE = coalesce(ADM3_PCODE.y, ADM3_PCODE.x),
+         ADM3_EN = coalesce(ADM3_EN.y, ADM3_EN.x),
+         ADM4_PCODE = coalesce(ADM4_PCODE.y, ADM4_PCODE.x),
+         ADM4_clean = coalesce(ADM4_clean.y, ADM4_clean.x)) %>%
+  select(-ADM3_PCODE.y, -ADM3_PCODE.x,-ADM3_EN.y, -ADM3_EN.x, 
+         -ADM4_PCODE.y, -ADM4_PCODE.x, -ADM4_clean.y, -ADM4_clean.x,
+         -matched_string.y, -matched_string.x, 
+         -distance.y, -distance.x,
+         -distance2.y, -distance2.x,
+         -method.y, -method.x,
+         -method_village.y, -method_village.x)
+
+write_rds(correspondence_table5, "output/correspondence_table5.rds")
+
+```
+
+
 ## Spatial overlaps
 
 
@@ -82,7 +147,6 @@ ankarafantsika_2002 <- pa_2002 %>%
   filter(NOM == "Ankarafantsika")
 ankarafanstika_1999 <- st_read("data/Couches_SIG_AB/AIRE_PRO.TAB", layer = "AIRE_PRO") %>% 
   st_set_crs(8441)
-
 
 ```
 
