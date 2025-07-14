@@ -94,7 +94,6 @@ merge_income2012_Alaotra <- merge_income2012 %>%
   filter(j0 == "21")
 ```
 
-
 ### Statistiques descriptives des ménages
 
 Il s'agit de déterminer le :
@@ -124,9 +123,6 @@ puis, de faire une agregation de ces résultats en utilisant la moyenne par enti
     -   Nombre de ménages par entité géographique après 2002,
 
     puis, de faire une agregation de ces résultats en utilisant la moyenne par entité géographique par exemple.
-    
-    
-    
 
 ## Moyenne de niveau de vie des villages proches de l'AP VS villages éloignés
 
