@@ -40,3 +40,14 @@ test5 <- household_geolocated %>%
   mutate(or_id = str_sub(j5, 1, 2)) %>%
   group_by(year, site_id) %>%
   summarise(n = n())
+
+# Check 3rd and 4th digit
+test6 <- household_geolocated %>%
+  mutate(or_id = str_sub(j5, 1, 2),
+         site_id = str_sub(j5, 3, 4)) %>%
+  group_by(year, or_id, site_id) %>%
+  summarise(n = n()) %>%
+  filter(or_id == "04") %>%
+  pivot_wider(names_from = site_id, values_from = n)
+
+

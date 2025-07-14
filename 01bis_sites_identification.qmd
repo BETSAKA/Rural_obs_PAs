@@ -89,9 +89,10 @@ household_geolocated <- household_locality_all %>%
 ```
 
 ```{r}
+# Extract rural observatories and site IDs
 household_geolocated <- household_geolocated %>%
   mutate(ro_id = str_sub(j5, 1, 2),
-         site_id = str_sub(j5, 3, 4))
+         site_id = str_sub(j5, 3, 3))
 
 # Adjust 1995 household IDs using 1996 mapping
 hh_96 <- read_dta("data/ROS_MDG_microdata/1996/res_deb.dta") %>%
@@ -141,8 +142,10 @@ modal_adm4 <- hh_site %>%
 
 # Combine everything ---
 summary_by_site <- attrition %>%
-  select(ro_id, site_id, year, attrition_percent) %>%
-  left_join(modal_adm4, by = c("site_id", "year"))
+  select(ro_id, site_id, year, j5_count, attrition_percent) %>%
+  left_join(modal_adm4, by = c("ro_id", "site_id", "year"))  %>%
+  rename(n = j5_count) %>%
+  arrange(ro_id, site_id, year)
 
 ```
 

@@ -480,132 +480,327 @@ process_rev_riz <- function(year, path = "data/ROS_MDG_microdata/") {
 
 # rev_cu ------------------------------------------------------------------
 
-process_rev_cu <- function(path = "data/ROS_MDG_microdata/", year) {
-  # Production valorisée
-  prodcu <- read_dta(paste0(path, year, "/res_c.dta")) %>%
-    mutate(obs = substr(j5, 1, 2),
-           cult = paste0(c1, c37)) %>%
-    group_by(j5, cult, year) %>%
-    summarise(c2 = sum(c2, na.rm = TRUE), .groups = "drop")
-  
-  prix_cu <- read_dta(paste0(path, year, "/res_c.dta")) %>%
-    mutate(obs = substr(j5, 1, 2),
-           cult = paste0(c1, c37)) %>%
-    group_by(cult, obs, year) %>%
-    summarise(c4 = sum(c4, na.rm = TRUE), c6b = sum(c6b, na.rm = TRUE), 
-              .groups = "drop") %>%
-    mutate(prix_cu = if_else(c4 > 0, c6b / c4, NA_real_)) %>%
-    select(cult, obs, year, prix_cu)
-  
-  prodcu_val <- prodcu %>%
-    mutate(obs = substr(j5, 1, 2)) %>%
-    left_join(prix_cu, by = c("cult", "obs", "year")) %>%
-    mutate(prodcu_val = c2 * prix_cu) %>%
-    group_by(j5, year) %>%
-    summarise(prodcu_val = sum(prodcu_val, na.rm = TRUE), .groups = "drop")
-  
-  # Coûts : main-d'œuvre
-  compute_coutmocu <- function(path, year) {
-    file <- paste0(path, year, "/res_mo3.dta")
-    if (!file.exists(file)) stop("Missing file: ", file)
+
+## prodcu_val ----------------------------------------
+
+process_prodcu_val <- function(path = "data/ROS_MDG_microdata/", year) {
+  # Définition des données de base selon l'année
+  if (year == 1995) {
+    df <- read_dta(paste0(path, year, "/res_c.dta"))
     
-    df <- read_dta(file)
+    prix_cu <- df %>%
+      mutate(
+        obs = substr(j5, 1, 2),
+        cult = c1,
+        prix_cu = if_else(c4 > 0, c6a, NA_real_)
+      ) %>%
+      group_by(cult, obs, year) %>%
+      summarise(prix_cu = mean(prix_cu, na.rm = TRUE), .groups = "drop")
     
-    df <- df %>% mutate(year = year)
+    prodcu_val <- df %>%
+      mutate(
+        obs = substr(j5, 1, 2),
+        cult = c1,
+        qte = c2
+      ) %>%
+      group_by(j5, cult, obs, year) %>%
+      summarise(qte = sum(qte, na.rm = TRUE), .groups = "drop") %>%
+      left_join(prix_cu, by = c("cult", "obs", "year")) %>%
+      mutate(prodcu_val = qte * prix_cu) %>%
+      group_by(j5, year) %>%
+      summarise(prodcu_val = sum(prodcu_val, na.rm = TRUE), .groups = "drop")
     
-    if (year == 1995) {
-      required <- c("j5", "mo31f", "wg", "moc")
-      if (!all(required %in% names(df))) 
-        stop("Missing variables in 1995 for coutmocu")
-      
-      df %>%
-        filter(moc != 1) %>%  # Remove rice
-        mutate(across(c(mo31f, wg), ~replace_na(.x, 0))) %>%
-        mutate(
-          salarie = mo31f,
-          entraide = wg,
-          coutmocu = salarie + entraide
-        ) %>%
-        group_by(j5, year) %>%
-        summarise(coutmocu = sum(coutmocu, na.rm = TRUE), .groups = "drop")
-    } else if (year == 1996) {
-      required <- c("j5", "w4b", "w4c", "w4d", "w4e", "w5b", "w5c", "w5d", 
-                    "w5e", "w6a", "w6b")
-      if (!all(required %in% names(df))) 
-        stop("Missing variables in 1996 for coutmocu")
-      
-      df %>%
-        mutate(across(all_of(required[-1]), ~replace_na(.x, 0))) %>%
-        mutate(
-          salarie = w4b * w4c * w4d + w4b * w4c * w4e,
-          tache   = w5b * w5c * w5d + w5b * w5c * w5e,
-          entraide = w6a + w6b,
-          coutmocu = salarie + tache + entraide
-        ) %>%
-        group_by(j5, year) %>%
-        summarise(coutmocu = sum(coutmocu, na.rm = TRUE), .groups = "drop")
-      
-    } else if (year == 1997) {
-      required <- c("j5", "mo31c", "mo31e", "mo31f", "mo31d", "mo31g", "mo31h", 
-                    "mo32a", "mo32b", "mo44", "mo45")
-      if (!all(required %in% names(df))) 
-        stop("Missing variables in 1997 for coutmocu")
-      
-      df %>%
-        mutate(across(all_of(required[-1]), ~replace_na(.x, 0))) %>%
-        mutate(
-          salarie = mo31c * mo31e + mo31c * mo31f + mo31d * mo31g + mo31d * mo31h,
-          tache = mo32a + mo32b,
-          entraide = mo44 + mo45,
-          coutmocu = salarie + tache + entraide
-        ) %>%
-        group_by(j5, year) %>%
-        summarise(coutmocu = sum(coutmocu, na.rm = TRUE), .groups = "drop")
-      
-    } else if (year >= 1998 && year <= 2008) {
-      required <- c("j5", "mo31c", "mo31e", "mo32", "mo44")
-      if (!all(required %in% names(df))) 
-        stop("Missing variables 1998–2008 for coutmocu")
-      
-      df %>%
-        mutate(across(all_of(required[-1]), ~replace_na(.x, 0))) %>%
-        mutate(
-          salarie = mo31c * mo31e,
-          tache = mo32,
-          entraide = mo44,
-          coutmocu = salarie + tache + entraide
-        ) %>%
-        group_by(j5, year) %>%
-        summarise(coutmocu = sum(coutmocu, na.rm = TRUE), .groups = "drop")
-      
-    } else {
-      required <- c("j5", "mo31c", "mo31e", "mo61a", "mo32", "mo61c", "mo44")
-      if (!all(required %in% names(df))) 
-        stop("Missing variables post-2008 for coutmocu")
-      
-      df %>%
-        mutate(across(all_of(required[-1]), ~replace_na(.x, 0))) %>%
-        mutate(
-          salarie = mo31c * mo31e + mo31c * mo61a,
-          tache = mo32 + mo61c,
-          entraide = mo44,
-          coutmocu = salarie + tache + entraide
-        ) %>%
-        group_by(j5, year) %>%
-        summarise(coutmocu = sum(coutmocu, na.rm = TRUE), .groups = "drop")
+  } else if (year == 1996) {
+    df <- read_dta(paste0(path, year, "/res_c19.dta"))
+    
+    prix_cu <- df %>%
+      mutate(
+        obs = substr(j5, 1, 2),
+        cult = c20,
+        prix_cu = if_else(c22 > 0, c24 / c22, NA_real_)
+      ) %>%
+      group_by(cult, obs, year) %>%
+      summarise(prix_cu = mean(prix_cu, na.rm = TRUE), .groups = "drop")
+    
+    prodcu_val <- df %>%
+      mutate(
+        obs = substr(j5, 1, 2),
+        cult = c20,
+        qte = c21
+      ) %>%
+      group_by(j5, cult, obs, year) %>%
+      summarise(qte = sum(qte, na.rm = TRUE), .groups = "drop") %>%
+      left_join(prix_cu, by = c("cult", "obs", "year")) %>%
+      mutate(prodcu_val = qte * prix_cu) %>%
+      group_by(j5, year) %>%
+      summarise(prodcu_val = sum(prodcu_val, na.rm = TRUE), .groups = "drop")
+    
+  } else {
+    df <- read_dta(paste0(path, year, "/res_c.dta"))
+    
+    prix_cu <- df %>%
+      mutate(
+        obs = substr(j5, 1, 2),
+        cult = if ("c37" %in% names(.)) paste0(c1, c37) else c1,
+        c6b = if (!"c6b" %in% names(.)) c4 * c6a else c6b
+      ) %>%
+      group_by(cult, obs, year) %>%
+      summarise(c4 = sum(c4, na.rm = TRUE),
+                c6b = sum(c6b, na.rm = TRUE), .groups = "drop") %>%
+      mutate(prix_cu = if_else(c4 > 0, c6b / c4, NA_real_)) %>%
+      select(cult, obs, year, prix_cu)
+    
+    prodcu_val <- df %>%
+      mutate(
+        obs = substr(j5, 1, 2),
+        cult = if ("c37" %in% names(.)) paste0(c1, c37) else c1,
+        qte = c2
+      ) %>%
+      group_by(j5, cult, obs, year) %>%
+      summarise(qte = sum(qte, na.rm = TRUE), .groups = "drop") %>%
+      left_join(prix_cu, by = c("cult", "obs", "year")) %>%
+      mutate(prodcu_val = qte * prix_cu) %>%
+      group_by(j5, year) %>%
+      summarise(prodcu_val = sum(prodcu_val, na.rm = TRUE), .groups = "drop")
+  }
+  
+  return(prodcu_val)
+}
+
+## coutmocu ---------------------------------------------------
+
+process_coutmocu <- function(path = "data/ROS_MDG_microdata/", year) {
+  file <- paste0(path, year, "/res_mo3.dta")
+  if (!file.exists(file)) stop("Fichier manquant : ", file)
+  
+  df <- haven::read_dta(file) %>% mutate(year = year)
+  
+  if (year == 1995) {
+    required <- c("j5", "mo31f", "wg", "moc")
+    stopifnot(all(required %in% names(df)))
+    
+    df %>%
+      filter(moc != 1) %>%  # exclut le riz
+      mutate(across(c(mo31f, wg), ~replace_na(.x, 0))) %>%
+      mutate(
+        salarie = mo31f,
+        entraide = wg,
+        coutmocu = salarie + entraide
+      ) %>%
+      group_by(j5, year) %>%
+      summarise(coutmocu = sum(coutmocu, na.rm = TRUE), .groups = "drop")
+    
+  } else if (year == 1996) {
+    required <- c("j5", "w4b", "w4c", "w4d", "w4e", "w5b", "w5c", "w5d", 
+                  "w5e", "w6a", "w6b")
+    stopifnot(all(required %in% names(df)))
+    
+    df %>%
+      mutate(across(required[-1], ~replace_na(.x, 0))) %>%
+      mutate(
+        salarie = w4b * w4c * w4d + w4b * w4c * w4e,
+        tache   = w5b * w5c * w5d + w5b * w5c * w5e,
+        entraide = w6a + w6b,
+        coutmocu = salarie + tache + entraide
+      ) %>%
+      group_by(j5, year) %>%
+      summarise(coutmocu = sum(coutmocu, na.rm = TRUE), .groups = "drop")
+    
+  } else if (year == 1997) {
+    required_base <- c("j5", "mo31c", "mo31e", "mo31f", "mo31d", "mo31g", "mo31h", "mo44", "mo45")
+    optional <- c("mo32a", "mo32b")
+    stopifnot(all(required_base %in% names(df)))
+    
+    df <- df %>%
+      mutate(across(all_of(required_base[-1]), ~replace_na(as.numeric(.x), 0)))
+    
+    # Crée les variables mo32a et mo32b à 0 si elles sont absentes
+    for (v in optional) {
+      if (!v %in% names(df)) df[[v]] <- 0
     }
+    
+    df %>%
+      mutate(
+        salarie = mo31c * mo31e + mo31c * mo31f + mo31d * mo31g + mo31d * mo31h,
+        tache   = mo32a + mo32b,
+        entraide = mo44 + mo45,
+        coutmocu = salarie + tache + entraide
+      ) %>%
+      group_by(j5, year) %>%
+      summarise(coutmocu = sum(coutmocu, na.rm = TRUE), .groups = "drop")
+    
+  } else if (year >= 1998 && year <= 2008) {
+    required <- c("j5", "mo31c", "mo31e", "mo32", "mo44")
+    stopifnot(all(required %in% names(df)))
+    
+    df %>%
+      mutate(across(required[-1], ~replace_na(as.numeric(.x), 0))) %>%
+      mutate(
+        salarie = mo31c * mo31e,
+        tache = mo32,
+        entraide = mo44,
+        coutmocu = salarie + tache + entraide
+      ) %>%
+      group_by(j5, year) %>%
+      summarise(coutmocu = sum(coutmocu, na.rm = TRUE), .groups = "drop")
+    
+  } else {
+    required <- c("j5", "mo31c", "mo31e", "mo61a", "mo32", "mo61c", "mo44")
+    stopifnot(all(required %in% names(df)))
+    
+    df %>%
+      mutate(across(required[-1], ~replace_na(.x, 0))) %>%
+      mutate(
+        salarie = mo31c * mo31e + mo31c * mo61a,
+        tache = mo32 + mo61c,
+        entraide = mo44,
+        coutmocu = salarie + tache + entraide
+      ) %>%
+      group_by(j5, year) %>%
+      summarise(coutmocu = sum(coutmocu, na.rm = TRUE), .groups = "drop")
   }
 }
 
-df_cu <- map_dfr(2015:1995, function(y) {
-  df <- process_rev_cu(path = "data/ROS_MDG_microdata/", year = y)
-})
+
+## coutintcu -------------------------------------------------
+
+process_coutintcu <- function(path = "data/ROS_MDG_microdata/", year) {
+  if (year == 1995) return(NULL)  # pas de données en 1995
+  
+  file <- paste0(path, year, "/res_itb.dta")
+  if (!file.exists(file)) stop("Fichier manquant : ", file)
+  
+  df <- haven::read_dta(file) %>%
+    mutate(year = year)
+  
+  if (year == 2004 && "itb2" %in% names(df)) {
+    df <- df %>% rename(itb5 = itb2)
+  }
+  
+  if (!"itb5" %in% names(df)) stop("Variable 'itb5' absente pour l'année ", year)
+  
+  df %>%
+    rename(coutintcu = itb5) %>%
+    mutate(coutintcu = replace_na(as.numeric(coutintcu), 0)) %>%
+    group_by(j5, year) %>%
+    summarise(coutintcu = sum(coutintcu, na.rm = TRUE), .groups = "drop")
+}
+
+
+## coutloccu -------------------------------------------------
+
+process_coutloccu <- function(path = "data/ROS_MDG_microdata/", year) {
+  if (year == 1995) {
+    return(NULL)
+  }
+  
+  if (year == 1996) {
+    df <- read_dta(paste0(path, year, "/res_c1.dta"))
+    
+    df <- df %>%
+      mutate(
+        obs = substr(j5, 1, 2),
+        # c4 == 2 : argent, on récupère c7
+        coutloccu = if_else(c4 == 2, c7, 0)
+      ) %>%
+      group_by(j5, year) %>%
+      summarise(coutloccu = sum(coutloccu, na.rm = TRUE), .groups = "drop")
+    
+    return(df)
+  }
+  
+  # Années > 1996 : version standard avec c3a (nature) et c3b (argent)
+  df <- read_dta(paste0(path, year, "/res_c.dta")) %>%
+    mutate(
+      obs = substr(j5, 1, 2),
+      cult = if ("c37" %in% names(.)) paste0(c1, c37) else c1
+    )
+  
+  if (!"c6b" %in% names(df) && all(c("c4", "c6a") %in% names(df))) {
+    df <- df %>% mutate(c6b = c4 * c6a)
+  }
+  
+  prix_cu <- df %>%
+    group_by(cult, obs, year) %>%
+    summarise(
+      c4 = sum(c4, na.rm = TRUE),
+      c6b = sum(c6b, na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
+    mutate(prix_cu = if_else(c4 > 0, c6b / c4, NA_real_)) %>%
+    select(cult, obs, year, prix_cu)
+  
+  # Nature
+  coutloccu1 <- df %>%
+    group_by(j5, cult, obs, year) %>%
+    summarise(cumetloc = sum(c3a, na.rm = TRUE), .groups = "drop") %>%
+    left_join(prix_cu, by = c("cult", "obs", "year")) %>%
+    mutate(coutloccu1 = cumetloc * prix_cu) %>%
+    group_by(j5, year) %>%
+    summarise(coutloccu1 = sum(coutloccu1, na.rm = TRUE), .groups = "drop")
+  
+  # Argent
+  coutloccu2 <- df %>%
+    group_by(j5, year) %>%
+    summarise(coutloccu2 = sum(c3b, na.rm = TRUE), .groups = "drop")
+  
+  # Total
+  full <- full_join(coutloccu1, coutloccu2, by = c("j5", "year")) %>%
+    mutate(coutloccu = replace_na(coutloccu1, 0) + replace_na(coutloccu2, 0)) %>%
+    select(j5, year, coutloccu)
+  
+  return(full)
+}
+
+
+process_rev_cu <- function(path = "data/ROS_MDG_microdata/", year) {
+  
+  prod <- process_prodcu_val(path, year)
+  coutmo <- process_coutmocu(path, year)
+  
+  if (year == 1995) {
+    # Pas de coutint ni coutloc en 1995
+    full <- prod %>%
+      full_join(coutmo, by = c("j5", "year")) %>%
+      mutate(across(c(prodcu_val, coutmocu), ~replace_na(., 0))) %>%
+      mutate(rev_cu = prodcu_val - coutmocu) %>%
+      select(j5, year, rev_cu)
+  } else {
+    coutint <- process_coutintcu(path, year)
+    coutloc <- process_coutloccu(path, year)
+    
+    # Fonction pour créer un tibble vide avec colonnes données si NULL
+    ensure_tbl <- function(df, cols) {
+      if (is.null(df)) {
+        df <- tibble(!!!rlang::set_names(rep(list(NA), length(cols)), 
+                                         names(cols)))
+        df[] <- Map(function(x, t) vector(typeof(t), 0), df, cols)
+      }
+      df
+    }
+    
+    # Colonnes attendues pour chaque composante
+    coutint <- ensure_tbl(coutint, c(j5 = "", year = 0L, coutintcu = 0))
+    coutloc <- ensure_tbl(coutloc, c(j5 = "", year = 0L, coutloccu = 0))
+    
+    full <- prod %>%
+      full_join(coutmo, by = c("j5", "year")) %>%
+      full_join(coutint, by = c("j5", "year")) %>%
+      full_join(coutloc, by = c("j5", "year")) %>%
+      mutate(across(c(prodcu_val, coutmocu, coutintcu, coutloccu), 
+                    ~replace_na(., 0))) %>%
+      mutate(rev_cu = prodcu_val - coutmocu - coutintcu - coutloccu) %>%
+      select(j5, year, rev_cu)
+  }
+  
+  return(full)
+}
+
 
 # revel -------------------------------------------------------------------
 
 
 # revpeche ----------------------------------------------------------------
-
 
 
 # vte_par -----------------------------------------------------------------
@@ -621,7 +816,6 @@ df_cu <- map_dfr(2015:1995, function(y) {
 
 
 # rente_riz ---------------------------------------------------------------
-
 
 
 # rente_cu ----------------------------------------------------------------
@@ -644,202 +838,3 @@ df_cu <- map_dfr(2015:1995, function(y) {
 
 # transrecnomo ------------------------------------------------------------
 
-
-
-# Process incomes from other sources (only from 2005 onwards)
-process_rha <- function(path = "data/ROS_MDG_microdata/", year) {
-  if (year < 2005) {
-    return(tibble(j5 = integer(), year = integer(), autre_rev = numeric()))
-  }
-  if (year)
-  read_dta(paste0(path, year, "/res_rha.dta")) %>%
-    mutate(rha2 = replace_na(rha2, 0)) %>%
-    select(-rha1) %>%
-    rename(autre_rev = rha2) %>%
-    group_by(j5, year) %>%
-    summarise(autre_rev = sum(autre_rev, na.rm = TRUE), .groups = "drop")
-}
-
-process_reven_exp <- function(path = "data/ROS_MDG_microdata/", year) {
-  # Load the household to observatory mapping
-  household_to_obs <- read_dta(paste0(path, year, "/res_deb.dta")) %>%
-    select(j5, j0) %>%
-    rename(obs = j0)
-  
-  # prod_riz
-  prod_riz <- read_dta(paste0(path, year, "/res_r.dta")) %>%
-    mutate(prod_riz = r23) %>%
-    group_by(j5, year) %>%
-    summarise(prod_riz = sum(prod_riz, na.rm = TRUE), .groups = "drop") %>%
-    left_join(household_to_obs, by = "j5")
-  
-  # px_paddy_obs
-  px_paddy_obs <- read_dta(paste0(path, year, "/res_dc21.dta")) %>%
-    left_join(household_to_obs, by = "j5") %>%
-    group_by(obs, year) %>%
-    summarise(dc22 = sum(dc22, na.rm = TRUE), dc25 = sum(dc25, na.rm = TRUE), 
-              .groups = "drop") %>%
-    mutate(pxpaddy_obs = dc25 / dc22) %>%
-    select(obs, year, pxpaddy_obs)
-  
-  # prod_riz_val
-  prod_riz_val <- prod_riz %>%
-    left_join(px_paddy_obs, by = c("obs", "year")) %>%
-    mutate(prod_riz_val = prod_riz * pxpaddy_obs) %>%
-    select(j5, year, prod_riz_val)
-  
-  # rente_riz
-  recmetloc <- read_dta(paste0(path, year, "/res_r.dta")) %>%
-    mutate(recmetloc = r6 * (r4 == 5 | r4 == 6)) %>%
-    group_by(j5, year) %>%
-    summarise(recmetloc = sum(recmetloc, na.rm = TRUE), .groups = "drop") %>%
-    left_join(household_to_obs, by = "j5") %>%
-    left_join(px_paddy_obs, by = c("obs", "year")) %>%
-    mutate(rente_riz1 = recmetloc * pxpaddy_obs) %>%
-    select(j5, year, rente_riz1)
-  
-  rente_riz2 <- read_dta(paste0(path, year, "/res_r.dta")) %>%
-    mutate(rente_riz2 = r7 * (r4 == 5 | r4 == 6)) %>%
-    group_by(j5, year) %>%
-    summarise(rente_riz2 = sum(rente_riz2, na.rm = TRUE), .groups = "drop")
-  
-  rente_riz <- recmetloc %>%
-    left_join(rente_riz2, by = c("j5", "year")) %>%
-    mutate(rente_riz = coalesce(rente_riz1, 0) + coalesce(rente_riz2, 0)) %>%
-    select(j5, year, rente_riz)
-  
-  # rev_riz
-  file_mo <- ifelse(year %in% c(2013, 2014), "/res_mo.dta", "/res_mo1.dta")
-  coutmori <- read_dta(paste0(path, year, file_mo)) %>%
-    mutate(across(c(mo11b, mo11c, mo11d, mo11e, mo51a, mo51b, mo12, mo51c, mo23), 
-                  ~ replace_na(.x, 0))) %>%
-    mutate(salarie = (mo11b * mo11d) + (mo11b * mo51a) + (mo11c * mo11e) + 
-             (mo11c * mo51b),
-           tache = mo12 + mo51c,
-           entraide = mo23,
-           coutmori = salarie + tache + entraide) %>%
-    group_by(j5, year) %>%
-    summarise(coutmori = sum(coutmori, na.rm = TRUE), .groups = "drop")
-  
-  coutint <- read_dta(paste0(path, year, "/res_ita.dta")) %>%
-    group_by(j5, year) %>%
-    summarise(coutint = sum(ita2, na.rm = TRUE), .groups = "drop")
-  
-  coutmetloc1 <- read_dta(paste0(path, year, "/res_r.dta")) %>%
-    mutate(rimetloc = r6 * (r4 == 2 | r4 == 3)) %>%
-    group_by(j5, year) %>%
-    summarise(rimetloc = sum(rimetloc, na.rm = TRUE), .groups = "drop") %>%
-    left_join(household_to_obs, by = "j5") %>%
-    left_join(px_paddy_obs, by = c("obs", "year")) %>%
-    mutate(coutmetloc1 = rimetloc * pxpaddy_obs) %>%
-    select(j5, year, coutmetloc1)
-  
-  coutmetloc2 <- read_dta(paste0(path, year, "/res_r.dta")) %>%
-    mutate(coutmetloc2 = r7 * (r4 == 2 | r4 == 3)) %>%
-    group_by(j5, year) %>%
-    summarise(coutmetloc2 = sum(coutmetloc2, na.rm = TRUE), .groups = "drop")
-  
-  coutmetloc <- coutmetloc1 %>%
-    left_join(coutmetloc2, by = c("j5", "year")) %>%
-    mutate(coutmetloc = coalesce(coutmetloc1, 0) + coalesce(coutmetloc2, 0)) %>%
-    select(j5, year, coutmetloc)
-  
-  rev_riz <- prod_riz_val %>%
-    left_join(coutmori, by = c("j5", "year")) %>%
-    left_join(coutint, by = c("j5", "year")) %>%
-    left_join(coutmetloc, by = c("j5", "year")) %>%
-    mutate(recette_riz = prod_riz_val,
-           charge_riz = coutmori + coutint + coutmetloc,
-           rev_riz = recette_riz - charge_riz) %>%
-    select(j5, year, rev_riz)
-  
-  list(prod_riz_val = prod_riz_val, rente_riz = rente_riz, rev_riz = rev_riz)
-}
-
-
-  # Coûts : intrants
-  coutintcu <- tryCatch({
-    read_dta(paste0(path, year, "/res_itb.dta")) %>%
-      group_by(j5, year) %>%
-      summarise(coutintcu = sum(itb5, na.rm = TRUE), .groups = "drop")
-  }, error = function(e) tibble(j5 = character(), year = year, 
-                                coutintcu = NA_real_))
-  
-  # Coûts : métayage/location en nature
-  coutloccu1 <- read_dta(paste0(path, year, "/res_c.dta")) %>%
-    mutate(obs = substr(j5, 1, 2),
-           cult = paste0(c1, c37),
-           cumetloc = c3a) %>%
-    group_by(j5, cult, year) %>%
-    summarise(cumetloc = sum(cumetloc, na.rm = TRUE), .groups = "drop") %>%
-    mutate(obs = substr(j5, 1, 2)) %>%
-    left_join(prix_cu, by = c("cult", "obs", "year")) %>%
-    mutate(coutloccu1 = cumetloc * prix_cu) %>%
-    group_by(j5, year) %>%
-    summarise(coutloccu1 = sum(coutloccu1, na.rm = TRUE), .groups = "drop")
-  
-  # Coûts : métayage/location en argent
-  coutloccu2 <- read_dta(paste0(path, year, "/res_c.dta")) %>%
-    group_by(j5, year) %>%
-    summarise(coutloccu2 = sum(c3b, na.rm = TRUE), .groups = "drop")
-  
-  # Fusion et calcul revenu
-  rev_cu <- prodcu_val %>%
-    full_join(coutmocu, by = c("j5", "year")) %>%
-    full_join(coutintcu, by = c("j5", "year")) %>%
-    full_join(coutloccu1, by = c("j5", "year")) %>%
-    full_join(coutloccu2, by = c("j5", "year")) %>%
-    mutate(across(c(prodcu_val, coutmocu, coutintcu, coutloccu1, coutloccu2), 
-                  ~ replace_na(.x, 0)),
-           charge_cu = coutmocu + coutintcu + coutloccu1 + coutloccu2,
-           rev_cu = prodcu_val - charge_cu) %>%
-    select(j5, year, rev_cu)
-  
-  return(rev_cu)
-}
-
-# Combining income components
-compute_total_income <- function(path = "data/ROS_MDG_microdata/", year) {
-  revppal <- process_revppal(path, year)
-  revsec <- process_revsec(path, year)
-  autre_rev <- process_rha(path, year)
-  rev_cu <- process_rev_cu(path, year)
-  
-  if (year < 2011) {
-    prod_riz_val <- process_production_riz_old(path, year)
-    rente_riz <- process_rente_riz_old(path, year)
-    cout_riz <- process_cout_riz_old(path, year)
-    
-    rev_riz <- prod_riz_val %>%
-      full_join(cout_riz, by = c("j5", "year")) %>%
-      mutate(rev_riz = prod_riz_val - cout_total) %>%
-      select(j5, year, rev_riz)
-  } else {
-    rev_exp <- process_reven_exp(path, year)
-    prod_riz_val <- rev_exp$prod_riz_val
-    rente_riz <- rev_exp$rente_riz
-    rev_riz <- rev_exp$rev_riz
-  }
-  
-  income_data <- revppal %>%
-    left_join(revsec, by = c("j5", "year")) %>%
-    left_join(autre_rev, by = c("j5", "year")) %>%
-    left_join(prod_riz_val, by = c("j5", "year")) %>%
-    left_join(rente_riz, by = c("j5", "year")) %>%
-    left_join(rev_riz, by = c("j5", "year")) %>%
-    left_join(rev_cu, by = c("j5", "year")) %>%  # AJOUTÉ
-    mutate(revcou = coalesce(revppal, 0) + coalesce(revsec, 0) + 
-             coalesce(rev_riz, 0) + coalesce(rev_cu, 0),
-           revexcept = coalesce(rente_riz, 0) + coalesce(autre_rev, 0),
-           revtot = revcou + revexcept) %>%
-    select(j5, year, revtot)
-  
-  return(income_data)
-}
-
-
-total_income_2015 <- compute_total_income(year = 2015) 
-total_income_2014 <- compute_total_income(year = 2014) 
-total_income_2013 <- compute_total_income(year = 2013) 
-total_income_2012 <- compute_total_income(year = 2012)
-total_income_2011 <- compute_total_income(year = 2011)
