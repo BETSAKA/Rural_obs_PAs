@@ -4,9 +4,9 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Overlaps
+# Overlaps between ROS data and PAs
 
-From the georeferencing work implemented in the previous chapter, we map the sites surveyed by the rural observatories against the protected areas referenced in the SAPM (système des aires protégées de Madagascar).
+From the georeferencing work implemented in the previous section, we map the sites surveyed by the rural observatories against the protected areas referenced in the SAPM (système des aires protégées de Madagascar).
 
 ```{r load_libraries}
 library(tidyverse)    # A series of packages for data manipulation

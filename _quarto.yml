@@ -11,10 +11,10 @@ book:
   # cover-image-alt: Déforestation à Madagascar © IRD - Bernard Moizo
   chapters:
     - index.qmd
-    - 01_georeferencing.qmd
-    - 02_overlaps.qmd
-    - 03_Marovoay-Ankarafantsika.qmd
-    - 05_Selection-Site.qmd
+    - 01_Georeference_observatories.qmd
+    - 02_Overlaps_PAs_observatories.qmd
+    - 03_Variable computation.qmd
+    - 04_Marovoay-Ankarafantsika.qmd
 bibliography: references.bib
 
 format:

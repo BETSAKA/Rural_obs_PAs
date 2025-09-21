@@ -2,16 +2,14 @@
 output: html_document
 editor_options: 
   chunk_output_type: console
-
 execute: 
   echo: true
   eval: false
 ---
-# Georeferencing
 
-> Ici on reproduit juste pour information l'algorithme qu'on a utilisé pour géoréférencer les données OR 1995-2015 par commune et Fokontany. Cette page provient de [Madagascar rural observatory system data validation, preparation, and georeferencing](https://betsaka.github.io/Rural_obs_Madagascar/03-ros-data-georeferencing.html). Ceci au cas où on trouverait des géoréférencements erronés ou manquants.
+# ROS historical data georeferencing
 
-This section provides details about the georeferencing process applied to household panel data collected by the Rural Observatory System (ROS) from 1995 to 2015. The ROS gathered data on various rural contexts in Madagascar. While the data quality was carefully monitored, its geolocation attributes were not fully developed, limiting its use in spatially integrated research and public policy evaluation. This appendix aligns the ROS dataset's various spatial designations with a standardized geographic database, ensuring consistent correlation between each ROS observation and the corresponding geospatial entities, namely communes and fokontany. Similar to other sections of this document, the source code developed to perform all the data processing is accessible by expanding the code blocks, as shown below.
+This section provides details about the georeferencing process applied to household panel data collected by the Rural Observatory System (ROS) from 1995 to 2015. The ROS gathered data on various rural contexts in Madagascar. While the data quality was carefully monitored, the survey were not precisely geolocated and, while some fields included mentions to the household place of residence, this were open entry fields and they have not been systematically harmonized or linked to official administrative references. This limits its use in spatially integrated research and public policy evaluation. This appendix aligns the ROS dataset's various spatial designations with a standardized geographic database, ensuring consistent correlation between each ROS observation and the corresponding geospatial entities, namely communes and fokontany. Similar to other sections of this document, the source code developed to perform all the data processing is accessible by expanding the code blocks, as shown below.
 
 ```{r load_libraries}
 library(tidyverse)    # A series of packages for data manipulation
