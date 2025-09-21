@@ -25,27 +25,27 @@ Vahatra <- st_read("data/Vahatra/Shapefiles/AP_Vahatra.shp",
 
 tmap_mode("view")
 tm_shape(selected_communes) + 
-  tm_fill(col = "OBS_NAME", palette = "Set1", title = "Observatory",
-          id = "ADM3_EN", legend.show = FALSE,
+  tm_polygons(fill = "OBS_NAME", col = NULL,
+              fill.legend = tm_legend_hide(),
           popup.vars = c("Observatory" = "OBS_NAME",
                          "Data collection years"  = "years",
                          "District" = "ADM2_EN",
                          "Region" = "ADM1_EN")) +
   tm_shape(selected_fokontany) + 
-  tm_fill(col = "label", palette = c("black"), alpha = 0.6, title = "Fokontany", 
-          id = "ADM4_EN", legend.show = FALSE,
+  tm_polygons(fill = "label", palette = c("black"), fill_alpha = 0.6, 
+              fill.legend = tm_legend_hide(),
           popup.vars = c("Observatory" = "OBS_NAME",
                          "Data collection years"  = "years",
                          "Commune" = "ADM3_EN",
                          "District" = "ADM2_EN",
                          "Region" = "ADM1_EN")) +
   tm_shape(Vahatra) + 
-  tm_fill(col = "darkgreen", alpha = 0.4,
+  tm_polygons(fill = "darkgreen", fill_alpha = 0.4,
           popup.vars = c("Year creation" = "an_crtn",
                          "IUCN category" = "cat_icn",
                          "Manager" = "gest_1",
                          "Manager 2" = "gest_2")) +
-  tm_scale_bar()
+  tm_scalebar()
 
 ```
 
@@ -291,38 +291,6 @@ tm_shape(selected_communes2) +
   tm_scale_bar()
 ```
 
-
-```{r}
-selected_communes <- read_rds("output/selected_communes.rds")
-selected_fokontany <- read_rds("output/selected_fokontany.rds")
-
-# library(wdpar)
-# wdpa <- wdpar::wdpa_read("Madagascar")
-# write_rds(wdpa, "data/wdpa/wdpa_202406.rds")
-wdpa <- read_rds("data/wdpa/wdpa_202406.rds")
-
-
-tmap_mode("view")
-tm_shape(selected_communes) + 
-  tm_fill(col = "OBS_NAME", palette = "Set1", title = "Observatory",
-          id = "ADM3_EN", legend.show = FALSE,
-          popup.vars = c("Observatory" = "OBS_NAME",
-                         "Data collection years"  = "years",
-                         "District" = "ADM2_EN",
-                         "Region" = "ADM1_EN")) +
-  tm_shape(selected_fokontany) + 
-  tm_fill(col = "label", palette = c("black"), alpha = 0.6, title = "Fokontany", 
-          id = "ADM4_EN", legend.show = FALSE,
-          popup.vars = c("Observatory" = "OBS_NAME",
-                         "Data collection years"  = "years",
-                         "Commune" = "ADM3_EN",
-                         "District" = "ADM2_EN",
-                         "Region" = "ADM1_EN")) +
-  tm_shape(wdpa) + 
-  tm_fill(col = "darkgreen", alpha = 0.4) +
-  tm_scale_bar()
-```
-
 Selected list by order of priorities: 
 
 - Alaotra - lac Alaotra and Corridor forestier Ankeniheny Zahamena
@@ -330,130 +298,3 @@ Selected list by order of priorities:
 - Tolanaro - Andohahela
 - Toliara North - Mikea
 - Fenerive East - Tamporo
-
-```{r}
-library(tidyverse)
-library(sf)
-library(tmap)
-library(gridExtra)
-
-# Filter data for each observatory and its corresponding PA
-generate_faceted_map <- function(obs_name, pa_name) {
-  # Filter relevant observatory data
-  selected_communes_obs <- selected_communes2 %>%
-    filter(OBS_NAME == obs_name)
-  selected_fokontany_obs <- selected_fokontany2 %>%
-    st_filter(selected_communes_obs, .predicate = st_intersects)
-  Vahatra_obs <- Vahatra2 %>%
-    filter(nom == pa_name)
-  Vahatra_buffer_obs <- Vahatra2_buffer %>%
-    filter(nom == pa_name)
-
-  # Define bounding box with 10 km margin
-  bbox <- st_bbox(selected_communes_obs) %>%
-    st_as_sfc() %>%
-    st_transform(crs = 29701) %>%
-    st_buffer(dist = 10000) %>%
-    st_transform(crs = 4326) %>%
-    st_bbox()
-
-  # Create the map for the specific observatory
-  tm_shape(selected_communes_obs, bbox = bbox) + 
-    tm_fill(col = "OBS_NAME", palette = "Set1", title = "Observatory") +
-    tm_shape(selected_fokontany_obs) + 
-    tm_fill(col = "label", palette = c("black"), alpha = 0.6, title = "Fokontany") +
-    tm_shape(Vahatra_obs) + 
-    tm_fill(col = "darkgreen", alpha = 0) +
-    tm_borders(col = "darkgreen") +
-    tm_shape(Vahatra_buffer_obs) +
-    tm_borders(col = "lightgreen") +
-    tm_scale_bar(position = c("left", "bottom")) +
-    tm_layout(title = paste(obs_name, "-", pa_name), title.size = 1)
-}
-
-# List of observatories and their corresponding PAs
-observatories <- obs_PA_revu %>%
-  distinct(Observatory_name, PA_Name)
-
-# Generate maps for all observatories
-map_list <- observatories %>%
-  pmap(~ generate_faceted_map(..1, ..2)) %>%
-  map(tmap::tmap_grob) # Convert tmap objects to grobs
-
-# Combine all maps into a grid using grid.arrange
-combined_plot <- gridExtra::grid.arrange(grobs = map_list, ncol = 2)
-
-# Display the combined plot
-print(combined_plot)
-
-
-```
-
-
-
-```{r}
-generate_combined_map <- function(obs_name) {
-  # Filter relevant observatory data
-  selected_communes_obs <- selected_communes2 %>%
-    filter(OBS_NAME == obs_name)
-  
-  selected_fokontany_obs <- selected_fokontany2 %>%
-    st_filter(selected_communes_obs, .predicate = st_intersects)
-  
-  # Check if the observatory has corresponding PAs in obs_PA_revu
-  pa_names <- obs_PA_revu %>% 
-    filter(Observatory_name == obs_name) %>% 
-    pull(PA_Name)
-  
-  if (length(pa_names) == 0) {
-    stop(paste("No matching PA found for observatory:", obs_name))
-  }
-  
-  # Combine all PAs for the observatory
-  Vahatra_obs <- Vahatra2 %>%
-    filter(nom %in% pa_names)
-  
-  Vahatra_buffer_obs <- Vahatra2_buffer %>%
-    filter(nom %in% pa_names)
-  
-  # Define bounding box with 10 km margin
-  bbox <- st_bbox(selected_communes_obs) %>%
-    st_as_sfc() %>%
-    st_transform(crs = 29701) %>%
-    st_buffer(dist = 10000) %>%
-    st_transform(crs = 4326) %>%
-    st_bbox()
-  
-  # Create the map
-  tm_shape(selected_communes_obs, bbox = bbox) + 
-    tm_fill(col = "OBS_NAME", palette = "Set1", title = "Observatory") +
-    tm_shape(selected_fokontany_obs) + 
-    tm_fill(col = "label", palette = "gray", alpha = 0.6, title = "Fokontany") +
-    tm_shape(Vahatra_obs) + 
-    tm_fill(col = "darkgreen", alpha = 0) +
-    tm_borders(col = "darkgreen") +
-    tm_shape(Vahatra_buffer_obs) +
-    tm_borders(col = "lightgreen") +
-    tm_scale_bar(position = c("left", "bottom")) +
-    tm_layout(title = paste("Observatory:", obs_name), 
-              title.size = 1.2,
-              frame = FALSE)
-}
-
-# Generate maps
-map_list <- map(observatories, ~ tryCatch(
-  generate_combined_map(.x), 
-  error = function(e) {
-    message(e$message)
-    NULL
-  }
-)) %>%
-  discard(is.null) %>%   # Remove failed maps
-  map(tmap::tmap_grob)   # Convert to grobs
-
-# Check individual map creation
-map_check <- generate_combined_map(observatories[1]) # Try with the first observatory
-print(map_check) # Should display the first map in 'plot' mode
-
-```
-
