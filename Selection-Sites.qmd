@@ -14,29 +14,23 @@ Les principales variables utilisées sont :
 Pour l'ensemble des fichiers :
 
 -   `j0` : code de l'observatoire
-
 -   `j5` : identifiant du ménage, les deux premiers caractères indiquent le numéro de l'observatoire, et le troisième correspond au site.
 
-Dans les fichiers de renseignements sur les ménages `res_deb`
+Dans les fichiers de renseignements sur les ménages `res_deb` :
 
 -   `j4` : nom du village
-
 -   `j42` : nom de la commune
 
 Dans les fichiers sur les membres du ménage (res_m en 1995, res_m_a ensuite) :
 
--   `m` : identifiant de membre du ménage
-
--   `m4` : sexe du membre
-
--   `m5` : âge du membre
-
+-   `m` : identifiant de membre du ménage  
+-   `m4` : sexe du membre  
+-   `m5` : âge du membre   
 -   `m6` : lien au chef du ménage (1 = chef)
 
 Dans le fichier de correspondance spatiale :
 
 -   `ADM3_PCODE` : code de la commune (niveau administratif 3)
-
 -   `ADM4_PCODE` : code du village (niveau administratif 4)
 
 # Géolocalisation des données des OR

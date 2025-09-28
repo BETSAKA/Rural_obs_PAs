@@ -77,13 +77,23 @@ process_revsec <- function(path = "data/ROS_MDG_microdata/", year) {
     # in 1996 : only income in cash, but month begin and month ends
   } else if (year == 1996) {
     read_dta(paste0(path, year, "/res_as.dta")) %>%
+      mutate(across(c(as3b, as3c, as3d), ~ replace_na(.x, 0)),
+      months = case_when(
+        as3b == 0 ~ 0,
+        as3d >= as3c ~ as3d - as3c + 1,
+        as3d < as3c  ~ as3d - as3c + 13
+      ),
+      revsec = as3b * months * 1000
+    ) %>%
       group_by(j5, year) %>%
-      summarise(revsec = sum(as3b, na.rm = TRUE))
+      summarise(revsec = sum(revsec, na.rm = TRUE))
     # Value not available in 1995
   } else if (year == 1995) {
     return(tibble(j5 = character(), year = year, revsec = NA_real_))
   }
 } 
+
+
 # rev_riz -----------------------------------------------------------------
 
 ## prod_riz_val OK ----------------------------------------------------
@@ -1151,12 +1161,6 @@ process_rente_riz <- function(year, path = "data/ROS_MDG_microdata/") {
     ) %>%
     select(j5, year, rente_riz)
   
-  # En 1997, les prix sont encore en milliers
-  if (year == 1997) {
-    rente_riz <- rente_riz %>%
-      mutate(rente_riz = rente_riz * 1000)
-  }
-  
   return(rente_riz)
 }
 
@@ -1164,90 +1168,79 @@ process_rente_riz <- function(year, path = "data/ROS_MDG_microdata/") {
 process_rente_cu <- function(year, path = "data/ROS_MDG_microdata/") {
   message("Traitement rente cultures autres - année ", year)
   
-  # Cas particulier : pas de calcul possible en 1995
+  # Cas particulier : structure différente ou pas de données pour 1995
   if (year == 1995) {
     return(tibble(j5 = NA_character_, year = 1995, rente_cu = NA_real_))
   }
   
+  # Lecture du fichier des cultures autres
   file_c <- paste0(path, year, "/res_c.dta")
   file_fr21 <- paste0(path, year, "/res_fr21.dta")
   
-  rente_cu1 <- NULL
-  rente_cu2 <- NULL
-  
-# Rente monétaire : fr21g sur fr21c == 7
-  if (file.exists(file_fr21)) {
-    df_fr21 <- read_dta(file_fr21) %>% mutate(year = year)
-    
-    rente_cu1 <- df_fr21 %>%
-      filter(fr21c == 7, fr21a != 1) %>%
-      mutate(rente_cu1 = coalesce(fr21g, 0)) %>%
-      group_by(j5, year) %>%
-      summarise(rente_cu1 = sum(rente_cu1, na.rm = TRUE), .groups = "drop")
-  }
-  
-  # Rente en nature : recmetloccu × prix_cu
-  if (file.exists(file_c)) {
-    df_c <- read_dta(file_c) %>%
-      mutate(
-        obs  = substr(j5, 1, 2),
-        cult = if ("c37" %in% names(.)) paste0(c1, c37) else as.character(c1),
-        c6b  = if ("c6b" %in% names(.)) c6b else c4 * c6a,
-        year = year
-      )
-    
-    if ("c21" %in% names(df_c)) {
-      prix_cu <- df_c %>%
-        group_by(cult, obs, year) %>%
-        summarise(
-          c4 = sum(c4, na.rm = TRUE),
-          c6b = sum(c6b, na.rm = TRUE),
-          .groups = "drop"
-        ) %>%
-        mutate(
-          prix_cu = if_else(c4 > 0, c6b / c4, NA_real_)
-        ) %>%
-        select(cult, obs, year, prix_cu)
-      
-      rente_cu2 <- df_c %>%
-        group_by(j5, cult, obs, year) %>%
-        summarise(recmetloccu = sum(c21, na.rm = TRUE), .groups = "drop") %>%
-        left_join(prix_cu, by = c("cult", "obs", "year")) %>%
-        mutate(rente_cu2 = recmetloccu * prix_cu) %>%
-        group_by(j5, year) %>%
-        summarise(rente_cu2 = sum(rente_cu2, na.rm = TRUE), .groups = "drop")
-    }
-  }
-  
-  # Fusion des deux composantes
-  if (is.null(rente_cu1) && is.null(rente_cu2)) {
-    warning("Aucune composante disponible pour l'année ", year)
+  if (!file.exists(file_c) || !file.exists(file_fr21)) {
+    warning("Fichiers manquants pour l'année ", year)
     return(tibble(j5 = NA_character_, year = year, rente_cu = NA_real_))
   }
   
-  # Init composants manquants comme tibbles vides
-  if (is.null(rente_cu1)) {
-    rente_cu1 <- tibble(j5 = character(), year = integer(), rente_cu1 = numeric())
-  }
-  if (is.null(rente_cu2)) {
-    rente_cu2 <- tibble(j5 = character(), year = integer(), rente_cu2 = numeric())
-  }
+  df_c <- read_dta(file_c) %>%
+    mutate(
+      obs  = substr(j5, 1, 2),
+      cult = if ("c37" %in% names(.)) paste0(c1, c37) else as.character(c1),
+      c6b  = if ("c6b" %in% names(.)) c6b else c4 * c6a,
+      year = year
+    )
   
-  # Fusionner et sommer
+  # Calcul des prix unitaires par culture et observatoire
+  prix_cu <- df_c %>%
+    group_by(cult, obs, year) %>%
+    summarise(
+      c4   = sum(c4, na.rm = TRUE),
+      c6b  = sum(c6b, na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
+    mutate(
+      prix_cu = if_else(c4 > 0, c6b / c4, NA_real_)
+    ) %>%
+    select(cult, obs, year, prix_cu)
+  
+  # Recette en nature recueillie via métayage (rente_cu2)
+  recmetloccu <- df_c %>%
+    mutate(recmetloccu = c21) %>%
+    group_by(j5, cult, year) %>%
+    summarise(recmetloccu = sum(recmetloccu, na.rm = TRUE), .groups = "drop") %>%
+    mutate(obs = substr(j5, 1, 2)) %>%
+    left_join(prix_cu, by = c("cult", "obs", "year")) %>%
+    mutate(rente_cu2 = recmetloccu * prix_cu) %>%
+    group_by(j5, year) %>%
+    summarise(rente_cu2 = sum(rente_cu2, na.rm = TRUE), .groups = "drop")
+  
+  # Recette monétaire via métayage (rente_cu1)
+  df_fr21 <- read_dta(file_fr21) %>%
+    mutate(year = year)
+  
+  # Rente monétaire
+  rente_cu1 <- df_fr21 %>%
+    filter(fr21c == 7, fr21a != 1) %>%
+    mutate(rente_cu1 = coalesce(fr21g, 0)) %>%
+    group_by(j5, year) %>%
+    summarise(rente_cu1 = sum(rente_cu1, na.rm = TRUE), .groups = "drop")
+  
+  rente_cu2 <- recmetloccu %>%
+    mutate(obs = substr(j5, 1, 2)) %>%
+    left_join(prix_cu, by = c("cult", "obs", "year")) %>%
+    mutate(rente_cu2 = recmetloccu * prix_cu) %>%
+    group_by(j5, year) %>%
+    summarise(rente_cu2 = sum(rente_cu2, na.rm = TRUE), .groups = "drop")
+  
+  
+  # Fusion et total
   rente_cu <- full_join(rente_cu1, rente_cu2, by = c("j5", "year")) %>%
     mutate(
       rente_cu1 = replace_na(rente_cu1, 0),
       rente_cu2 = replace_na(rente_cu2, 0),
-      rente_cu = rente_cu1 + rente_cu2
+      rente_cu  = rente_cu1 + rente_cu2
     ) %>%
     select(j5, year, rente_cu)
-  
-  # les prix sont en milliers en 2003 et 2004
-  if (year %in% c(2003, 2004)) {
-    rente_cu <- rente_cu %>%
-      mutate(rente_cu = rente_cu * 1000)
-  }
-
   
   return(rente_cu)
 }
@@ -1482,53 +1475,5 @@ process_transrec <- function(year, path = "data/ROS_MDG_microdata/") {
       transrecnomo = sum(transrecnomo, na.rm = TRUE),
       .groups = "drop"
     )
-}
-
-
-# Wrapper for all incomes -----------------------------------------------------
-
-compute_income_year <- function(year, path = "data/ROS_MDG_microdata/") {
-  # core components
-  revppal   <- process_revppal(path, year)
-  revsec    <- process_revsec(path, year)
-  rev_riz   <- process_rev_riz(year, path)
-  rev_cu    <- process_rev_cu(path, year)
-  revel     <- process_revel(year, path)
-  revpeche  <- process_revpeche(year, path) # will be empty pre-2015
-  rente_riz <- process_rente_riz(year, path)
-  rente_cu  <- process_rente_cu(year, path)
-  autre_rev <- process_autre_rev(year, path)
-  himo      <- process_himo(year, path)
-  decap     <- process_decap(year, path) # using vte_par + vente_bovin + vente_beef + vte_equip
-  transrec  <- process_transrec(year, path) # transrecmo + transrecnomo
-  
-  # vte_biens comes from the same equipment/biens process used by decap
-  vte_biens <- process_vte_equip(year, path) %>% 
-    select(j5, year, vte_biens = vte_biens)
-  
-  # merge everything
-  df <- reduce(
-    list(revppal, revsec, rev_riz, rev_cu, revel, revpeche,
-         rente_riz, rente_cu, autre_rev, himo, decap, vte_biens, transrec),
-    full_join, by = c("j5", "year")
-  ) %>%
-    # Stata collapses treat missings as 0 in sums → coalesce to 0
-    mutate(across(
-      c(revppal, revsec, rev_riz, rev_cu, revel, revpeche,
-        rente_riz, rente_cu, autre_rev, himo, decap, vte_biens,
-        transrecmo, transrecnomo),
-      ~replace_na(., 0)
-    )) %>%
-    mutate(
-      revcou    = revppal + revsec + rev_riz + rev_cu + revel + revpeche,
-      revexcept = rente_riz + rente_cu + autre_rev + himo + decap + vte_biens + transrecmo + transrecnomo,
-      revtot    = revcou + revexcept
-    )
-  
-  df
-}
-
-compute_income_all_years <- function(years = 1995:2015, path = "data/ROS_MDG_microdata/") {
-  map_dfr(years, ~compute_income_year(.x, path))
 }
 

@@ -146,7 +146,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Using the rural observatory data to assess the protected areas impacts on household living conditions.</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -164,7 +164,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./03_Variable computation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">04_variable computation</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Variable computation</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -379,7 +379,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="hierarchical-matching-of-data" class="level3" data-number="2.2.3">
 <h3 data-number="2.2.3" class="anchored" data-anchor-id="hierarchical-matching-of-data"><span class="header-section-number">2.2.3</span> Hierarchical matching of data</h3>
-<p>The hierarchical organization of spatial entities is key for our challenge. Such an organization allows for a cascading representation of data, starting from broader scopes and narrowing down to more specific layers. This representation is reminiscent of the defining order of geographical entities: regions contain provinces, which contain municipalities, and these in turn contain localities. In the georeferencing context, leveraging this hierarchical structure can lead to more precise matches. For instance, if an observatory code is associated with a specific district, the search for matches is confined to that district, enhancing both the efficiency and accuracy of the process. <a href="#fig-spatial-hierarchies" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-spatial-hierarchies</span></a> represents this hierarchical arrangement, serving as a roadmap for the subsequent data matching tasks.</p>
+<p>The hierarchical organization of spatial entities is key for our challenge. Such an organization allows for a cascading representation of data, starting from broader scopes and narrowing down to more specific layers. This representation is reminiscent of the defining order of geographical entities: regions contain provinces, which contain municipalities, and these in turn contain localities. In the georeferencing context, leveraging this hierarchical structure can lead to more precise matches. For instance, if an observatory code is associated with a specific district, the search for matches is confined to that district, enhancing both the efficiency and accuracy of the process. <span class="quarto-unresolved-ref">?fig-spatial-hierarchies</span> represents this hierarchical arrangement, serving as a roadmap for the subsequent data matching tasks.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -445,7 +445,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="a-detailed-walk-through" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="a-detailed-walk-through"><span class="header-section-number">2.3</span> A Detailed walk-through</h2>
-<p>We now break down our approach to describe each subsequent step. We began by exploring the ROS documentation, and in particular the reports associated to community survey, that contain descriptions of the area surveyed by each observatory. While doing so, we updated the COD subnational administrative boundary dataset by adding a field named <code>OBS_Y_N</code>. This field was marked as ‘1’ if the municipality was listed in an observatory survey; if not, it was left empty. Additionally, we added another field, <code>OBS_NUM</code>, which would store the observatory number. If the municipality wasn’t part of any survey, this field was left empty. The list of observatories and surveyed municipalities can be found in the <a href="#tbl-list-muni" class="quarto-xref">Table&nbsp;<span class="quarto-unresolved-ref">tbl-list-muni</span></a>.</p>
+<p>We now break down our approach to describe each subsequent step. We began by exploring the ROS documentation, and in particular the reports associated to community survey, that contain descriptions of the area surveyed by each observatory. While doing so, we updated the COD subnational administrative boundary dataset by adding a field named <code>OBS_Y_N</code>. This field was marked as ‘1’ if the municipality was listed in an observatory survey; if not, it was left empty. Additionally, we added another field, <code>OBS_NUM</code>, which would store the observatory number. If the municipality wasn’t part of any survey, this field was left empty. The list of observatories and surveyed municipalities can be found in the <a href="#tbl-list-muni" class="quarto-xref">Table&nbsp;<span>2.2</span></a>.</p>
 <p>Next, we moved on to geolocation, which took place in four stages. Each stage depended heavily on the data quality and completeness obtained from the previous ones.</p>
 <section id="method-1-fuzzy-matching-from-registered-municipality-names" class="level3" data-number="2.3.1">
 <h3 data-number="2.3.1" class="anchored" data-anchor-id="method-1-fuzzy-matching-from-registered-municipality-names"><span class="header-section-number">2.3.1</span> Method 1 : Fuzzy matching from registered municipality names</h3>
@@ -655,7 +655,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="matching-villages" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="matching-villages"><span class="header-section-number">2.4</span> Matching villages</h2>
-<p>After successfully matching commune names with an official, normalized reference, our next goal is to align the villages as identified by the ROS with their administrative counterpart, known as Fokontany. This task presents challenges, notably because the ROS village identifications weren’t directly linked to Fokontany names, and the Fokontany names themselves have undergone changes. Additionally, variations in village naming within the ROS dataset complicate the process. Our approach involves several steps: First, we load the official COD Fokontany dataset. Next, we standardize the place names using our previously discussed <code>clean_string</code> function. Then, using the purpose-built <code>fuzzy_match_village</code> function, we assess the similarity between the village names in the ROS dataset and the Fokontany names within the same commune, specifically by calculating the Jaro-Winkler distance between the strings(see <a href="#sec-anonymization" class="quarto-xref"><span class="quarto-unresolved-ref">sec-anonymization</span></a> for more details on the Jaro-Winkler distance). We select the names with the highest degree of matching. During a manual review of these results, we closely examined the matches, especially those with larger Jaro-Winkler distance. From this examination, we derived a distance of 0.2, below which the majority of matches were accurate. Notably, some matches above this threshold were deemed accurate and retained, while a small number of matches below this threshold were identified as false positives and subsequently discarded.</p>
+<p>After successfully matching commune names with an official, normalized reference, our next goal is to align the villages as identified by the ROS with their administrative counterpart, known as Fokontany. This task presents challenges, notably because the ROS village identifications weren’t directly linked to Fokontany names, and the Fokontany names themselves have undergone changes. Additionally, variations in village naming within the ROS dataset complicate the process. Our approach involves several steps: First, we load the official COD Fokontany dataset. Next, we standardize the place names using our previously discussed <code>clean_string</code> function. Then, using the purpose-built <code>fuzzy_match_village</code> function, we assess the similarity between the village names in the ROS dataset and the Fokontany names within the same commune, specifically by calculating the Jaro-Winkler distance between the strings(see <span class="quarto-unresolved-ref">?sec-anonymization</span> for more details on the Jaro-Winkler distance). We select the names with the highest degree of matching. During a manual review of these results, we closely examined the matches, especially those with larger Jaro-Winkler distance. From this examination, we derived a distance of 0.2, below which the majority of matches were accurate. Notably, some matches above this threshold were deemed accurate and retained, while a small number of matches below this threshold were identified as false positives and subsequently discarded.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1419,8 +1419,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./index.html" class="pagination-link" aria-label="Introduction">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span>
+      <a href="./index.html" class="pagination-link" aria-label="Using the rural observatory data to assess the protected areas impacts on household living conditions.">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Using the rural observatory data to assess the protected areas impacts on household living conditions.</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

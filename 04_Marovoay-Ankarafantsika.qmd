@@ -3,65 +3,65 @@ output: html_document
 editor_options: 
   chunk_output_type: console
 ---
+
 # Marovoay-Ankarafantsika
 
-INTRO 
+The Marovoay rural observatory offers an outstanding opportunities to study the socio-economic impacts of protected areas in Madagascar. This is because its panel data coincides both spatially and temporally with the expansion of Ankarafantsika, one of the country’s oldest and most emblematic protected areas. By comparing villages located on different sides of the Betsiboka river, we can build a quasi-experimental design to estimate how the 2002 reclassification of the reserve into a national park affected local households.
 
-```{r}
-#| label: fig-map-sites
-#| fig-cap: "Survey sites and current Ankarafantsika national parks borders"
-
-
-library(tidyverse)    # A series of packages for data manipulation
-library(haven)        # Required for reading STATA files (.dta)
-library(labelled)     # To work with labelled data from STATA
-library(sf)           # for spatial data handling
-library(stringdist)   # for string distance and matching
-library(tmap)         # for mapping
-library(fuzzyjoin)    # for fuzzy joining
-library(readxl)       # Read data frames to Excel format
-library(writexl)      # Write data frames to Excel format
-library(gt)           # for nicely formatted tables
-library(wdpar)
-library(panelView)
-```
-
+::: {.callout-warning}
+Note that this is very rough result at this stage. We need to refine the variable calculation, perform outlier identification, carefully reconsider the choice of outcome variables (on education and food security), strenghten model specification and conduct robustness checks.
+:::
 
 ## Protected area expansion
 
 ### Ankarafantsika before 2002
 
-L'aire protégée d'Ankarafantsika fait partie des dix Réserves naturelles intégralles (RNI) crées en 1927, pendant la période coloniale. Elle recouvrait alors moins de la moitié de la moitié de sa surface actuelle : 
+Ankarafantsika was first created as a Réserve Naturelle Intégrale (RNI) in 1927, with boundaries covering only a fraction of today’s surface:
 
-> Septième réserve naturelle. — Plateau d'Ankarafantsika, situé dans le district de Marovoay, région de Majunga, superficie approximative : 66.541 hectares, ayant pour limites: Au nord, la propriété dite: « Sainte-Marie Marovoay », titre n° 784-M,dts terrains domaniaux et, à une distance de cinq kilomètres environ, les villages d'Ampombomangarakaraka et Beronono ; A l'est, des terrains domaniaux; Au sud, des terrains dumaniaux et, à quelque distance, des villages d'Ankorika et de Bevasaka ;
-A l'ouest, des terrains domaniaux et la rivière Mahajamba. Tel au surplus que cette réserve naturelle est figurée à l'un des trois plans annexés audit arrêté.
-Décret du 31 décembre 1927
+> Septième réserve naturelle. — Plateau d'Ankarafantsika, situé dans le district de Marovoay, région de Majunga, superficie approximative : 66.541 hectares, ayant pour limites: Au nord, la propriété dite: « Sainte-Marie Marovoay », titre n° 784-M,dts terrains domaniaux et, à une distance de cinq kilomètres environ, les villages d'Ampombomangarakaraka et Beronono ; A l'est, des terrains domaniaux; Au sud, des terrains dumaniaux et, à quelque distance, des villages d'Ankorika et de Bevasaka ; A l'ouest, des terrains domaniaux et la rivière Mahajamba. Tel au surplus que cette réserve naturelle est figurée à l'un des trois plans annexés audit arrêté. Décret du 31 décembre 1927
 
-Elle a par la suite évoluée de la manière décrite ci-dessous:
+Over the decades, its legal status evolved through a series of decrees and classifications:
 
 > la Réserve Naturelle Intégrale d’Ankarafantsika fut créée en 1927 et ses limites ont été précisées en 1966 avec le Décret n° 66-242 du 1 juin 1966 (60 520 ha). Parallèlement, des territoires de la Forêt d’Ankarafantsika sur les districts de Marovoay et Ambato Boeny ont été classés réserves forestières avec l’Arrêté du 24 décembre 1929 (75 000 ha). De plus, le Jardin botanique d’Ampijoroa (district d’Ambato Boeny, 91 ha), recensé en 1969 par le Domaine Forestier National est devenu la Station Forestière d’Ampijoroa (4974 ha) en 1999 par l’Arrêté interministériel n° 13-056/99 du 7 décembre 1999. En 2002, la réserve naturelle intégrale créée en 1927 et reclassée en 1966, les réserves forestières instituées en 1929 ainsi que la Station Forestière d’Ampijoroa sont toutes instituées en un seul parc national (Décret n° 2002-798 du 7 août 2002, 130 000 ha). Ce dernier subit un changement de limites en 2015 sous le Décret n° 2015-730 du 21 avril 2015 ; Dernière modification de statut : suivant le Décret n° 2015-730 du 21 avril 2015 ; Surface actuelle : 136 513 ha (selon le décret en vigueur). [@goodman2018, vol. 2, p. 157]"
 
-L'extension de l'aire protégée en 2002 a été cartographée de la manière suivante en 2002, par des experts de l'ONG Conservation internationale qui en avant la charge.
+The extension of the protected area in 2002 was mapped as follows in 2002 by experts from the NGO Conservation International, which spearheaded the initiative.
 
-![Ankarafantsika 2002 expansion](images/Alonso_Shuldenberg_2002.png)
-L'objectif de la présente étude est d'évaluer l'impact de l'extension survenue en 2002 sur les populations de villages devenus à cette date limitrophes de la RNI.
+![Ankarafantsika 2002 expansion](images/Alonso_Shuldenberg_2002.png) The objective of this study is to assess the impact of the 2002 expansion on the populations of villages that became adjacent to the RNI at that time.
 
-Quelques précisions sur le statut de la réserve forestière transformée en RNI lors de l'extension :
+Some details on the status of the forest reserve that was transformed into an RNI during the expansion:
 
 > Par arrêté du Gouverneur Général p. i., en date du 24 décembre 1929, pris en conseil d'administration, est mise en réserve, dans les conditions fixées par les articles 50 à 52 du décret du 28 août 1913, la portion du massif forestier dit de l'Ankarafantsika, situé à l'ouest de la 7e réserve naturelle créée par le décret du 31 décembre 1927, dans la province de Marovoay ; La réserve ainsi instituée, d'une surface approximative de 75.000 hectares telle qu'elle est figurée au plan ci-annexé, est limitée: Au nord, par une ligne droite partant de l'angle N. W. de la 7e réserve naturelle et allant jusqu'au village d'Ampombilavakely, puis de ce village jusqu'à la limite de la propriété dite « Croix Rousse » titre n°3153; A l'ouest, par les propriété dites « Croix Rousse et Mont-rouge » titre no 3153 — M. et 2970 — M jusqu'au vilhge de Bongomaro ; Au sud, par la concession n°1059, jusqu'au nord du village de Beilalana, puis; par une ligne droite passant par le village de Bedo et allant jusqu'à l'angle S. W. de la 7e réserve naturelle ; A l'est, par la 7e réserve naturelle.
 
-Les articles 50 à 52 du code forestier de 1913 évoquent le régime aux réserves forestières. Mais on a peu d'éléments sur ce que ça implique en terme de règles.
-
-Cf. Brondeau 1999 sur l'absence de controle dans la réserve forestière à la veille de l'extension de la RNI.
+Articles 50 to 52 of the 1913 Forest Code refer to the forest reserve regime. However, there is little information on what this entails in terms of rules. More importantly, subsequent analysis reveal that there was no effective control over the forest reserve (Brondeau 1999).
 
 ## Survey sites location
 
-The Marovoay rural observatory, performed annual panel household surveys every year from 1995 to 2014, except in 2009 due to the political crisis that rocked the country on that year.
+The Marovoay observatory conducted panel household surveys nearly continuously from 1995 to 2014 (with an interruption in 2009 due to the national political crisis). To analyze treatment effects, we need to identify which survey sites are located inside or near the expanded protected area.
 
-```{r}
+```{r map_marovoay_or_ankarafantsika_pa}
+#| label: Map of survey sites relative to Ankarafantsika
+
+library(tidyverse) # A series of packages for data manipulation
+library(haven) # Required for reading STATA files (.dta)
+library(labelled) # To work with labelled data from STATA
+library(sf) # for spatial data handling
+library(stringdist) # for string distance and matching
+library(tmap) # for mapping
+library(fuzzyjoin) # for fuzzy joining
+library(readxl) # Read data frames to Excel format
+library(writexl) # Write data frames to Excel format
+library(gt)  # for nicely formatted tables
+library(wdpar)
+library(panelView)
+# remotes::install_github("https://github.com/xuyiqing/gsynth")
+library(gsynth)
+library(purrr)
+
+
+
 observatory_names <- read_xlsx("data/observatory_names.xlsx")
 
-obs_maro <- read_rds("output/correspondence_table4.rds") |> 
+obs_maro <- read_rds("output/correspondence_table4.rds") %>% 
   mutate(j0 = as.numeric(j0)) %>%
   left_join(observatory_names, by = c("j0" = "code")) %>%
   rename(OBS_NAME = name) %>%
@@ -81,10 +81,8 @@ obs_maro_fokontany <- st_read(
   quiet = TRUE) %>%
   filter(ADM3_PCODE %in% obs_maro_communes$ADM3_PCODE & !is.na(OBS_NAME))
 
-ankarafantsika_2025 <- wdpa_read("data/WDPA_WDOECM_Jul2025_Public_MDG.zip") |> 
+ankarafantsika_2025 <- wdpa_read("data/WDPA_WDOECM_Jul2025_Public_MDG.zip") %>% 
   filter(NAME == "Ankarafantsika")
-
-st_write(ankarafantsika_2025, "data/ankarafantsika_2025.geojson")
 
 tmap_mode("view")
 tm_shape(obs_maro_fokontany %>% 
@@ -100,25 +98,24 @@ tm_shape(obs_maro_fokontany %>%
   tm_shape(ankarafantsika_2025) +
   tm_borders(col = "darkgreen") +
   tm_fill(fill = "darkgreen", fill_alpha = 0.3) + 
-  tm_text(text = "NAME")
+  tm_text(text = "NAME") +
   tm_scalebar() +
   tm_basemap("Esri.WorldGrayCanvas")
 ```
 
-Bien que Maroala et Ampijoara soient proches d'Ankarafantsika à vol d'oiseau, les trajets sont plus rares et couteux. The river Betsiboka is one of the largest in Madagascar. The crossing is possible out of flood or drought period, but it is longer and more coastly, and most boats do it between Maroala and Marovoay (donwstream). 
+This map shows the four relevant sites: Bepako and Madiromiongana, located on the same side of the Betsiboka river as Ankarafantsika, and Ampijoroa and Maroala, located across the river.
 
-## Observatory data available
+Although the latter two appear geographically close “as the crow flies,” in practice the Betsiboka forms a major natural barrier. Crossing is possible only under certain hydrological conditions, often requiring long detours or costly boat transport. In practice, flows of people, goods, and services are much denser along the Marovoay downstream axis than across the river. This physical separation strengthens the plausibility of using the cross-river sites as a control group.
+
+## Available observations
+
+### Marovoay observatory only
+
+To proceed with the evaluation, we document the size of the household panels in each site and year, and assign treatment status. The treatment definition follows the 2002 expansion: households in Bepako and Madiromiongana are coded as “treated” (pre-2002 vs. post-2002), while Ampijoroa and Maroala serve as untreated controls.
 
 ```{r}
 #| label: fig-panel-size
 #| fig-cap: "Number of household surveyed each year in Marovoay observatory"
-
-library(tidyverse)
-library(sf)
-library(haven)
-library(readxl)
-library(labelled)
-
 
 # Load the locality correspondence table with administrative codes
 locality_reference <- readr::read_rds("output/correspondence_table5.rds") %>% 
@@ -221,7 +218,7 @@ hh_count_sites <- household_geolocated %>%
 
 # Plot time trends in income by site, without legend
 
-hh_count_maro <- hh_count_sites |> 
+hh_count_maro <- hh_count_sites %>%
   filter(ro_id == "03") %>%
   mutate(site_name = case_when(
     site_id == "031" ~ "031. Bepako",
@@ -231,7 +228,7 @@ hh_count_maro <- hh_count_sites |>
     .default = NA_character_
   ))
 
-hh_count_maro |> 
+hh_count_maro %>% 
   ggplot(aes(x = year, y = fct_rev(site_name), fill = treatment)) + 
   geom_tile(color = "white") +
   geom_text(aes(label = n), color = "black", size = 3) +
@@ -249,6 +246,185 @@ hh_count_maro |>
   theme(legend.position = "bottom", legend.direction = "horizontal")
 ```
 
-Entre 1995 et 1995, l'observatoire de Marovoay ne comptait que deux sites, ceux situés du même côté de la Betsiboka qu'Ankarafantsika. Ce n'est qu'à partir de 1998 que les deux sites de l'autre côté de la rivière ont été ajoutés.
+The resulting heatmap presents three key insights:
 
-### Broader control pool
+- Early years (1995–1997): only the two treated sites (same side of the river) were included in the survey. This means that the earliest baseline lacks control villages, which will lead to discard these years from comparisons.
+- Post-1998: the two control sites were added, creating a four-site structure that enables a difference-in-differences design.
+- Attrition and coverage: while household counts vary across years, the overall panel remains sufficiently populated to support longitudinal analysis.
+
+### Larger control pool
+
+While the Marovoay observatory offers a natural treated–control comparison across the Betsiboka river, restricting the control group to its two sites limits statistical power. We therefore enlarge the control pool to include all other ROS sites that have both pre- and post-2002 observations. This approach relies on the same identification strategy — comparing households adjacent to the expanded Ankarafantsika park to those in unaffected areas — but increases sample size and improves the precision of estimates.
+
+```{r}
+# Structuration des données
+
+household_consolidated <- read_rds("data/household_consolidated.rds")
+
+
+# Create site-level identifiers and treatment indicator, select relevant variables
+panel_hh <- household_consolidated %>%
+  mutate(
+    obs = substr(j5, 1, 2),
+    site_id = substr(j5, 1, 3),
+    site_id2 = ifelse(site_id == "032", "031", site_id),
+    treatment = if_else(site_id %in% c("031", "032") & year >= 2003, 1, 0)
+  ) %>%
+  distinct(j5, year, .keep_all = TRUE)
+
+panel_hh <- panel_hh %>%
+  mutate(
+    rev_riz = coalesce(rev_riz, 0),
+    rev_cu  = coalesce(rev_cu, 0),
+    revel  = coalesce(revel, 0),
+    revpeche = coalesce(revpeche, 0),
+    revppal  = coalesce(revppal, 0),
+    revsec = coalesce(revsec, 0),
+    revcou = coalesce(revcou, revppal + revsec + rev_riz + rev_cu + revel + revpeche),
+    rev_agri_current = rev_riz + rev_cu + revel + revpeche,
+    rev_nonagri_current = revppal + revsec,
+    share_agri_in_revcou = if_else(revcou > 0, rev_agri_current / revcou, NA_real_),
+    youth_schooling_rate = coalesce(pct_with_schooling, NA_real_),
+    agro_share_members = coalesce(hh_any_agro_lato, NA_real_),
+    hhh_agro_stricto_bin = coalesce(as.numeric(hhh_activ_agro_stricto), NA_real_)
+  )
+
+# Aggregate to site-year level with main outcomes
+panel_site <- panel_hh %>%
+  group_by(obs, site_id, site_id2, year, treatment) %>%
+  summarise(
+    revtot = mean(revtot, na.rm = TRUE),
+    revcou = mean(revcou, na.rm = TRUE),
+    rev_agri_current = mean(rev_agri_current, na.rm = TRUE),
+    rev_nonagri_current = mean(rev_nonagri_current, na.rm = TRUE),
+    share_agri_in_revcou = mean(share_agri_in_revcou, na.rm = TRUE),
+    agro_share_members = mean(agro_share_members, na.rm = TRUE),
+    hhh_agro_stricto_bin = mean(hhh_agro_stricto_bin, na.rm = TRUE),
+    food_selfsuff_months = mean(food_selfsuff_months, na.rm = TRUE),
+    any_schooling_rate = mean(youth_schooling_rate, na.rm = TRUE),
+    n_membres = mean(n_membres, na.rm = TRUE),
+    .groups = "drop"
+  )
+# Plot time trends in income by site
+date_init = 1999
+date_end = 2007
+
+sites_init <- panel_site %>% filter(year == date_init) %>% pull(site_id)
+sites_end <- panel_site %>% filter(year == date_end) %>% pull(site_id)
+
+sites_both_years <- intersect(sites_init, sites_end)
+
+panel_site_filtered <- panel_site %>%
+  filter(site_id2 %in% sites_both_years)
+
+
+panel_site_filtered %>%
+  panelview(Y = "revtot", D = "treatment",  
+          index = c("site_id","year"), 
+          pre.post = TRUE) 
+```
+
+This consolidation yields a broader panel of sites and years, from which we can derive outcome variables. We use these variables for synthetic control estimation. We start with our main outcome.
+
+```{r}
+#| message: false
+#| warning: false
+
+# Keep only after 1998
+panel_site_filtered2 <- panel_site_filtered %>%
+  filter(year >= 1998) # %>% # If we were to restrict to Marovoay and Alaotra
+  # filter(obs %in% c("03", "21"))
+
+# Estimation
+out_revtot <- gsynth(revtot ~ treatment + n_membres, 
+              data = panel_site_filtered2,  
+              index = c("site_id","year"), 
+              se = TRUE, 
+              inference = "parametric", 
+              r = c(0, 3),
+              CV = TRUE,
+              force = "two-way", 
+              parallel = TRUE, 
+              min.T0 = 4, 
+              nboots = 100, 
+              seed = 02139)
+
+plot(out_revtot, type = "gap")
+print(out_revtot)
+```
+
+
+We expand the logic to complementary secondary outcomes : current income (overal and agri/non-agri), share of household members and household heads in agriculture, number of soudure months and share of household members older than 6yo with any schooling.
+
+```{r}
+#| message: false
+#| warning: false
+
+# Outcomes to estimate
+outcomes <- c(
+  "revtot", "revcou", "rev_agri_current", "rev_nonagri_current",
+  "share_agri_in_revcou", "agro_share_members", "hhh_agro_stricto_bin",
+  "food_selfsuff_months", "any_schooling_rate"
+)
+
+# Function to run gsynth for a given outcome
+run_gsynth <- function(outcome, data) {
+  formula <- as.formula(paste0(outcome, " ~ treatment + n_membres"))
+  gsynth(
+    formula,
+    data = data,
+    index = c("site_id", "year"),
+    se = TRUE,
+    inference = "parametric",
+    r = c(0, 3),
+    CV = TRUE,
+    force = "two-way",
+    parallel = TRUE,
+    min.T0 = 4,
+    nboots = 100,
+    seed = 2139
+  )
+}
+
+# Apply to all outcomes and store in a named list
+# We tag them with an attribute with the outcome name
+gsynth_results <- purrr::imap(outcomes, ~ {
+  res <- run_gsynth(.x, panel_site_filtered2)
+  attr(res, "outcome") <- .x
+  res
+})
+names(gsynth_results) <- outcomes
+
+# Batch plotting (e.g., all outcomes with type = "gap")
+purrr::walk2(gsynth_results, names(gsynth_results),
+             ~ plot(.x, type = "gap", main = .y))
+purrr::walk(gsynth_results, function(res) {
+  cat("Outcome:", attr(res, "outcome"), "\n")
+  print(res)
+  cat("\n")
+})
+```
+
+## Results (provisional and subject to change)
+
+::: {.callout-important}
+Note that this is very rough result at this stage. We need to refine the variable calculation, perform outlier identification, carefully reconsider the choice of outcome variables (on education and food security), strenghten model specification and conduct robustness checks.
+:::
+
+The figures plot event-study coefficients relative to the year of expansion, while tables report average treatment effects on the treated (ATT).
+
+The synthetic control estimations do not show systematic evidence of income gains for households living adjacent to Ankarafantsika following the 2002 PA extension. For total income (`revtot`) and constructed income (`revcou`), the average treatment effects are negative, though not statistically significant, with confidence intervals spanning both positive and negative values. The time profiles suggest some short-term increases around the mid-2000s, followed by a decline, but the uncertainty margins remain wide.
+
+Disaggregating by income source points to a similar pattern. Agricultural revenues (`rev_agri_current`) display negative average effects, while non-agricultural revenues (`rev_nonagri_current`) show no consistent trend, with only a brief positive deviation in the mid-2000s. Taken together, these results suggest that households did not experience sustained income growth as a result of the park expansion, and if anything, agricultural activities may have been more adversely affected.
+
+The composition of household activities also does not show discernible shifts. Neither the share of agriculture in total income nor the probability that the household head is an agricultural worker register significant changes, and the share of household members in agro-related activities remains flat. This indicates that diversification away from agriculture was not triggered by the protected area expansion.
+
+Broader welfare indicators lead to similar conclusions. Food self-sufficiency months show no significant improvement; if anything, point estimates turn negative towards the later years, though again with large confidence intervals. Similarly, youth schooling rates remain unaffected throughout the observation window .
+
+## (very preliminary) Discussion
+
+At this stage, the first raw estimates point to no robust positive socio-economic impacts on local households. The evidence is more consistent with a neutral or slightly negative effect, particularly in agricultural income, though with considerable statistical uncertainty.
+
+
+
+

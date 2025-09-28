@@ -1,11 +1,20 @@
 ---
-title: "04_variable computation"
-format: html
+output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
-## Chargement des données de ménages géoréférencées
 
-```{r}
+# Variable computation
+
+In this chapter we build a harmonized dataset of household-level variables across all ROS survey years (1995–2015). This involves three steps: (i) georeferencing households, (ii) constructing demographic, educational, and food security indicators, and (iii) reconstructing income variables. Each step requires dealing with inconsistencies across years in the structure of the questionnaires and the naming of variables.
+
+## Georeferencing households
+
+We begin by linking household identifiers (`j5`) with locality codes and administrative boundaries. Because the format of identifiers changed in early survey years, we implement corrections using the 1996 survey as a reference to align identifiers from 1995.
+
+```{r load_align_hh_ids}
+
 library(tidyverse)
 library(sf)
 library(haven)
@@ -97,9 +106,13 @@ household_geolocated <- household_locality_all %>%
   relocate(name, .after = j0)
 ```
 
-## Segmentation par observatoire
+We now have a table where each household is uniquely identified by (year, j5) and linked to its administrative location and observatory label.
 
-```{r}
+## Observatory-level segmentation and attrition
+
+Once georeferenced, we segment households by observatory and site. We compute attrition rates, i.e., the share of households that drop out between consecutive survey years. We also identify the modal administrative unit (ADM4) of each site in each year to track potential shifts in the effective coverage of the panel.
+
+```{r obs_attrition}
 # Extract rural observatories and site IDs
 household_geolocated <- household_geolocated %>%
   mutate(ro_id = str_sub(j5, 1, 2),
@@ -146,13 +159,17 @@ summary_by_site <- attrition %>%
   arrange(ro_id, site_id, year)
 ```
 
-# Données individuelles des membres des ménages
+The recurrent challenges of ROS data is maintaining longitudinal comparability despite household replacement and site-level redefinitions.
 
-Nous extrayons ensuite les informations sur les membres des ménages, identifiés par le code `m`, pour chaque ménage `j5`. Cela permet de calculer leur taille, et d’identifier le sexe (`m4`) et l’âge (`m5`) du chef de ménage (`m6 == 1`).
+## Household composition
 
-## Chargement des membres de ménage
+We then move to the individual-level files (`m*` identifiers) to reconstruct household size and demographic profiles. Information on sex (`m4`), age (`m5`), and household headship (`m6 == 1`) is aggregated to build indicators at the household level.
 
-```{r}
+
+```{r hh_structure}
+
+# Load and clean individual data ---------------------------------
+
 # Define variables of interest to extract and standardize
 vars_indiv <- c("year", "j0", "j5", "m", "m4", "m5", "m6", "m2a")  
 
@@ -183,11 +200,8 @@ individuals_all_years <- map_dfr(years, function(y) {
   ) %>%
     mutate(m2a = if (!"m2a" %in% names(.)) NA_integer_ else m2a)
 })
-```
+# Count household members -------------------------------------
 
-## Nettoyage et calcul de la taille des ménages
-
-```{r}
 # Remove duplicates and retain valid members (with age or relationship info)
 individuals_cleaned <- individuals_all_years %>%
   distinct(year, j0, j5, m, .keep_all = TRUE) %>%
@@ -204,11 +218,9 @@ if (sum(duplicated(paste(household_size$year, household_size$j5))) != 0) {
 } else {
   message("Aucun numéro de ménage dupliqué entre observatoires")
 }
-```
 
-## Identification des chefs de ménage
+# Identify household heads ----------------------------------
 
-```{r}
 # Select individuals who are head of household (m6 == 1)
 household_heads_raw <- individuals_cleaned %>%
   filter(m6 == 1, is.na(m2a) | m2a == 1) %>%
@@ -227,11 +239,15 @@ household_heads_clean <- household_heads_raw %>%
   select(-m)
 ```
 
+We know have a description of the household and hh head demographical characteristics. 
+
 ## Education
 
-On commence par vérifier que toutes les variables sont bien codées de la même manière :
+Education variables (`s1a`, `s1b`, `s2`, `s3a`) were not collected consistently across years. For example, reading and writing were not asked in 1996 and 1998, and spurious values appear in some years (e.g., code 0 in 2003). We document these differences, recode consistently, and aggregate to the household level.
 
-```{r}
+```{r check_educ_coding}
+
+# Check education coding across years --------------------
 
 # Define education variables
 
@@ -321,9 +337,6 @@ edu_presence_tables <- edu_values_all %>%
   }) %>%
   set_names(unique(edu_values_all$variable))
 
-# Example: print the presence table for s1a
-edu_presence_tables$s1a
-
 ```
 
 Les variables d'éducation sont manquantes pour l'année 1996.J'ai cherché dans le dictionnaire et vérifié les fichiers sources. Après vérification du questionnaire administré en 1996 (dans la documentation), il ressort que ces questions n'ont pas été posées cette année-là (j'imagine qu'on a préféré ne pas reposer la réponse pour les ménages déjà interrogés l'année précédente).
@@ -337,7 +350,7 @@ On a donc :
 
 On extrait et on recode donc ces variables en fonction de ces informations.
 
-```{r}
+```{r extract_recode_educ}
 # Define education variables and identifiers
 vars_educ <- c("year", "j0", "j5", "m", "s1a", "s1b", "s2", "s3a")
 
@@ -437,11 +450,12 @@ Nous avons donc construit un jeu additionnel `education_household_summary` avec 
 
 Par ailleurs, nous extrayons pour chaque ménage les quatre variables d’éducation relatives au chef de ménage : sa capacité à lire (`hhh_s1a_cat`), à écrire (`hhh_s1b_cat`), sa déclaration de fréquentation de l’école (`hhh_s2_bin`) et le nombre d’années d’éducation déclarées (`hhh_s3a`).
 
-## Sécurité alimentaire
 
-### Part de producteurs agricoles
+## Agricultural activities
 
-Tout d'abord, on vérifie que les codes d'activité sont bien restés les mêmes pour chaque année d'enquête. On voit que c'est bien le cas.
+A key dimension of household livelihoods is the degree of engagement in agriculture and related activities. To capture this, we exploit the individual activity codes (a1) recorded for each household member. Before using these variables, it is necessary to verify the consistency of activity codes across survey years.
+
+We begin by extracting the list of activity codes from each year (1996–2015) and checking whether their labels remained stable over time.
 
 ```{r}
 extract_a1_labels <- function(year) {
@@ -469,7 +483,7 @@ a1_labels_table <- a1_labels_all_years %>%
   arrange(code)
 ```
 
-Ce point est validé. On procède donc maintenant au recodage.
+We then extract individual activity information for all available years. For most surveys (1996–2015), the variable `a1` directly identifies the main activity of each individual.
 
 ```{r}
 # Années pour lesquelles on dispose des activités individuelles
@@ -489,7 +503,7 @@ activ_indiv_all_years <- map_dfr(years_activ_indiv, function(x) {
 })
 ```
 
-Pour 1995, la question n'était pas posée de la même manière. On demandait quelle était l'activité principale et secondaire du ménage et qui y participait.
+The 1995 survey did not follow the same format. Instead of asking each individual for their main activity, the questionnaires identified the household’s main and secondary activities, as well as which members were involved. We therefore reconstruct individual activities from two separate files (`res_apm.dta` and `res_asm.dta`), prioritizing main activities when both are available.
 
 ```{r}
 # Charger les deux fichiers de 1995
@@ -526,7 +540,10 @@ activ_indiv_all_years <- bind_rows(activ_indiv_all_years, activ_1995_unique %>%
                                      select(-source))
 ```
 
-À partir de la table individuelle des activités principales déclarées, nous construisons une table de synthèse avec une ligne par ménage et par année. Voir la signification des codes activité en annexe des manuels d'enquête OR.
+Once the individual-level activity table is harmonized, we aggregate it at the household–year level. We distinguish between two levels of agricultural engagement:
+
+- Stricto sensu agriculture (`agro_stricto`): farming or livestock rearing, coded as `95` and `96`.
+- Lato sensu agriculture (`agro_lato`): a broader set of codes encompassing farming, livestock, fishing, gathering, apiculture, and agriculture-related crafts.
 
 ```{r}
 # Codes d'activité pour les regroupements
@@ -554,16 +571,20 @@ activ_menage_annee <- activ_indiv_all_years %>%
   )
 ```
 
-La table `activ_menage_annee` comprend :
+The resulting table `activ_menage_annee` includes several household-level indicators:
 
--   l’activité principale du chef de ménage (`hhh_activ`) ;
--   une variable binaire indiquant si le chef de ménage exerce une activité agricole ou d’élevage "stricto sensu" (`hhh_activ_agro_stricto`), définie par les codes 95 (cultivateur exploitant) ou 96 (éleveur) ;
--   une variable binaire plus large, qualifiant d’agro-pastorale ou halieutique ("lato sensu") l’activité du chef de ménage (`hhh_activ_agro_lato`), selon une liste étendue de codes incluant également la pêche, la cueillette, l’apiculture ou certaines activités artisanales liées à l’agriculture ;
--   deux variables identifiant si au moins un membre du ménage est engagé dans une activité agro_stricto (`any_agro_stricto`) ou agro_lato (`any_agro_lato`).
+- `hhh_activ`: the main activity of the household head,
+- `hhh_activ_agro_stricto`: whether the household head is strictly engaged in farming or livestock,
+- `hhh_activ_agro_lato`: whether the household head is engaged in agriculture more broadly,
+- `hh_any_agro_stricto`: whether at least one member of the household is strictly engaged in farming or livestock,=
+- `hh_any_agro_lato`: whether at least one member of the household is broadly engaged in agricultural or related activities.
 
-Cette classification permet de caractériser les ménages selon leur insertion dans le secteur agricole, avec différents niveaux de spécialisation.
+This classification makes it possible to characterize households according to their insertion in the agricultural sector, capturing both specialization (stricto sensu) and diversification into related activities (lato sensu).
 
-### Durée de l'autosuffisance alimentaire pour les producteurs agricoles
+## Food security
+
+Food security questions were phrased differently across years, but one consistent element is the number of months of self-sufficiency from household production. We harmonize all available questions into a single measure, food_selfsuff_months, capped at 12 months.
+
 
 Les questions relatives à la sécurité alimentaire ont beaucoup varié d'une année à l'autre dans les enquêtes ROS. Néanmoins, une question reste globalement comparable : la durée (en mois) pendant laquelle la production vivrière du ménage suffit à couvrir ses besoins alimentaires. Selon les années, cette information est captée de manière légèrement différente :
 
@@ -631,101 +652,73 @@ sa_all <- bind_rows(sa_95, sa_9697, sa_9814, sa_15) %>%
 
 Lorsque plusieurs cultures sont prises en compte (riz 1ère saison, 2ème saison, maïs), nous additionnons les mois d'autosuffisance déclarés, tout en plafonnant la somme à 12 mois pour éviter les surestimations. La variable `source_food_selfsuff` permet de tracer l’origine des données selon l’année.
 
-## Revenus
+## Incomes
 
-Nous avons cherché à reconstituer les différentes composantes du revenu des ménages ruraux malgaches à partir des enquêtes ROS (1995–2015), en reproduisant fidèlement les traitements réalisés historiquement sous Stata. L’objectif est de produire un revenu agricole total cohérent et comparable dans le temps, en tenant compte des spécificités de chaque vague d’enquête. La difficulté majeure réside dans l’hétérogénéité des questionnaires et des structures de données entre les années : noms de variables changeants, formats divergents, absence ou présence de modules spécifiques. À ce stade, nous avons entièrement codé et testé les fonctions R permettant de calculer les revenus liés à l’activité principale, secondaire, à la riziculture, et aux cultures autres que le riz. Ces fonctions intègrent la valorisation des productions, les revenus fonciers liés au métayage, ainsi que les charges agricoles (main-d’œuvre, intrants, location).
-
-Ce qui reste à coder concerne essentiellement les autres composantes du revenu total : l’élevage, la pêche, les transferts reçus, les ventes exceptionnelles (zébus, terres, biens durables), ainsi que certains revenus marginaux (HIMO, autres revenus agricoles). Nous allons pour l'instant nous focaliser sur les revenus liés à l’activité principale, secondaire, à la riziculture, et aux cultures autres que le riz.
+We reconstructed the various components of rural Malagasy household income based on ROS surveys (1995–2015), reproducing the processing carried out in Stata in for the latest surveys. The aim aim to produce a total income that is consistent and comparable over time, taking into account the specific characteristics of each survey wave. The main difficulty lies in the heterogeneity of the questionnaires and data structures between years: changing variable names, divergent formats, and the absence or presence of specific modules.
 
 ```{r}
+#| output: false
+
 # Chargement des fonctions
-source("Calc_revenus_all_years_v4.R")
-
-# Définir les années à traiter
-years <- 1995:2015
-
-# Fonction pour nettoyer une composante : garantir unicité (year, j5)
-clean_component <- function(df, value_col) {
-  df %>%
-    mutate(j5 = as.character(j5), year = as.integer(year)) %>%
-    group_by(year, j5) %>%
-    summarise(!!value_col := sum(.data[[value_col]], na.rm = TRUE), .groups = "drop")
-}
+source("Calc_revenus_all_years.R")
 
 # Chargement + nettoyage immédiat
-revppal_all <- map_dfr(years, ~process_revppal(year = .x)) %>%
-  clean_component("revppal")
-
-revsec_all <- map_dfr(years, ~process_revsec(year = .x)) %>%
-  clean_component("revsec")
-
-revriz_all <- map_dfr(years, ~process_rev_riz(year = .x)) %>%
-  clean_component("rev_riz")
-
-revcu_all <- map_dfr(years, ~process_rev_cu(year = .x)) %>%
-  clean_component("rev_cu")
-
-# Harmoniser les types (j5 = caractère, year = entier) dans chaque data frame
-standardize_ids <- function(df) {
-  df %>%
-    mutate(
-      j5 = as.character(j5),
-      year = as.integer(year)
-    )
-}
-
-revppal_all <- standardize_ids(revppal_all)
-revsec_all  <- standardize_ids(revsec_all)
-revriz_all  <- standardize_ids(revriz_all)
-revcu_all   <- standardize_ids(revcu_all)
-
-# Fusion des résultats
-revenus_dispo <- reduce(
-  list(revppal_all, revsec_all, revriz_all, revcu_all),
-  full_join,
-  by = c("j5", "year")
-)
-
-# Fusion des revenus partiels
-revenus_dispo <- reduce(
-  list(revppal_all, revsec_all, revriz_all, revcu_all),
-  full_join,
-  by = c("j5", "year")
-) %>%
-  mutate(across(c(revppal, revsec, rev_riz, rev_cu), ~replace_na(.x, 0))) %>%
-  mutate(revcou_partiel = revppal + revsec + rev_riz + rev_cu)
+revenus <- compute_income_all_years()
 ```
 
-À l’issue de ce bloc de code, nous avons produit un tableau de synthèse harmonisé des revenus courants partiels pour tous les ménages enquêtés entre 1995 et 2015 dans les enquêtes ROS. Ce tableau, stocké dans l’objet `revenus_dispo`, contient une ligne par ménage (identifié par `j5`) et par année, avec pour chaque ligne les quatre composantes suivantes :
+The reference script Calc_revenus_all_years.R contains a suite of functions, each dedicated to one component of income:
 
--   `revppal` : revenu de l’activité principale,
--   `revsec` : revenu des activités secondaires,
--   `rev_riz` : revenu net de la riziculture (production – charges),
--   `rev_cu` : revenu net des autres cultures (hors riz).
+- `revppal`: income from the main activity,
+- `revsec`: income from secondary activities,
+- `rev_riz`: net rice income (production minus charges),
+- `rev_cu`: net income from other crops,
+- `revel`: livestock income,
+- `revpeche`: fishing income (2015 only),
+- `rente_riz`, rente_cu: land rents,
+- `autre_rev`: miscellaneous incomes,
+- `himo`: high labor intensity public works (HIMO),
+- `decap`: exceptional sales (land, cattle, equipment, durables),
+- `transrecmo` and `transrecnomo`: transfers (monetary and non-monetary).
 
-Ces quatre composantes sont ensuite agrégées dans une variable de synthèse appelée `revcou_partiel`, représentant un revenu courant partiel. Ce revenu n’inclut pas encore les autres composantes exceptionnelles ou périphériques (élevage, pêche, transferts, ventes de biens, etc.), mais constitue une première base robuste pour l’analyse de l’évolution des revenus agricoles dans le temps. Grâce à l’harmonisation des identifiants (`j5`, `year`) et à la jointure complète, ce tableau peut être enrichi ultérieurement sans rupture structurelle.
+These functions rely on harmonized household identifiers and systematically handle missing files, variable name changes, and differences in questionnaire design. They make it possible to reconstruct three aggregate measures:
 
-# Consolidation
+- Current income (`revcou`) = `revppal` + `revsec` + `rev_riz` + `rev_cu` + `revel` + `revpeche`
+- Exceptional income (`revexcept`) = `rente_riz` + `rente_cu` + `autre_rev` + `himo` + `decap` +  `vte_biens` + `transrecmo` + `transrecnomo`
+- Total income (`revtot`) = `revcou` + `revexcept`
+
+## Consolidation
+
+Finally, we merge all household-level variables — demographic, educational, food security, and income — into a single consolidated dataset. We ensure that (year, j5) is unique, check for potential duplications, and save the result for further analysis.
 
 ```{r}
 # Harmonisation des identifiants dans les autres tables
-fix_ids <- function(df) df %>% mutate(j5 = as.character(j5), year = as.integer(year))
-household_size <- fix_ids(household_size)
-household_heads_clean <- fix_ids(household_heads_clean)
-education_household_summary <- fix_ids(education_household_summary)
-activ_menage_annee <- fix_ids(activ_menage_annee)
-sa_all <- fix_ids(sa_all)
-revenus_dispo <- fix_ids(revenus_dispo)
-household_geolocated <- fix_ids(household_geolocated)
+
+# Une fonction pour forcer l'unicité j5 + year
+clean_all_components <- function(df) {
+  df %>%
+    mutate(j5 = as.character(j5), year = as.integer(year)) %>%
+    mutate(across(where(is.logical), as.numeric)) %>% 
+    group_by(year, j5) %>%
+    summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE)), .groups = "drop")
+}
+
+revenus_clean <- clean_all_components(revenus) 
+household_size <- clean_all_components(household_size)
+household_heads_clean <- clean_all_components(household_heads_clean)
+education_household_summary <- clean_all_components(education_household_summary)
+activ_menage_annee <- clean_all_components(activ_menage_annee) 
+sa_all <- clean_all_components(sa_all) 
+revenus <- clean_all_components(revenus) 
+household_geolocated <- clean_all_components(household_geolocated) 
 
 # Étape 2 – Fusion avec les autres sources de données
 household_consolidated <- household_geolocated %>%
-  left_join(select(household_size, -j0), by = c("year", "j5")) %>%
-  left_join(select(household_heads_clean, -j0), by = c("year", "j5")) %>%
-  left_join(select(education_household_summary, -j0), by = c("year", "j5")) %>%
+  left_join(household_size, by = c("year", "j5")) %>%
+  left_join(household_heads_clean, by = c("year", "j5")) %>%
+  left_join(education_household_summary, by = c("year", "j5")) %>%
   left_join(activ_menage_annee, by = c("year", "j5")) %>%
   left_join(sa_all, by = c("year", "j5")) %>%
-  left_join(revenus_dispo, by = c("year", "j5"))
+  left_join(revenus_clean, by = c("year", "j5"))
 
 # Étape 3 – Vérification d’unicité
 dup_check <- household_consolidated %>%
@@ -741,3 +734,5 @@ if (nrow(dup_check) == 0) {
 
 write_rds(household_consolidated, "data/household_consolidated.rds")
 ```
+
+This dataset forms the backbone of our study, allowing us to assess the relationship between conservation policies and household living conditions in a harmonized longitudinal perspective.

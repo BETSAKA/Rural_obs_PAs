@@ -6,15 +6,21 @@ editor_options:
 
 # Overlaps between ROS data and PAs
 
-From the georeferencing work implemented in the previous section, we map the sites surveyed by the rural observatories against the protected areas referenced in the SAPM (système des aires protégées de Madagascar).
+Following the georeferencing of ROS household survey sites (previous chapter), we now examine how these locations overlap with the official boundaries of Madagascar’s protected areas. This section investigates both spatial and temporal overlaps, with the objective of identifying observatories that can serve as relevant cases for impact evaluation of conservation policies.
 
-```{r load_libraries}
-library(tidyverse)    # A series of packages for data manipulation
-library(haven)
-library(sf)           # for spatial data handling
-library(tmap)         # for mapping
-library(readxl)       # Read data frames to Excel format
+## Spatial overlaps
 
+We begin by mapping the communes and fokontany surveyed by ROS against the SAPM (Système des Aires Protégées de Madagascar) dataset. This step provides a visual overview of which observatories are located in or near protected areas.
+
+```{r map_ros_pas}
+#| label: "Map ROS sites and PAs"
+
+library(tidyverse) # A series of packages for data manipulation
+library(haven) # Load stata dataset
+library(sf) # for spatial data handling
+library(tmap) # for mapping
+library(readxl) # Read data frames to Excel format
+library(gt)
 
 selected_communes <- read_rds("output/selected_communes.rds")
 selected_fokontany <- read_rds("output/selected_fokontany.rds")
@@ -40,7 +46,7 @@ tm_shape(selected_communes) +
                          "District" = "ADM2_EN",
                          "Region" = "ADM1_EN")) +
   tm_shape(Vahatra) + 
-  tm_polygons(fill = "darkgreen", fill_alpha = 0.4,
+  tm_polygons(col = "darkgreen", fill_alpha = 0.4,
           popup.vars = c("Year creation" = "an_crtn",
                          "IUCN category" = "cat_icn",
                          "Manager" = "gest_1",
@@ -49,9 +55,15 @@ tm_shape(selected_communes) +
 
 ```
 
+This visualization highlights areas of potential interaction between ROS survey sites and PAs, which form the basis for further analysis.
+
 ## Inventory of ROS data
 
-```{r}
+Before analyzing overlaps with PAs, we establish a complete inventory of the ROS survey data. We load the household-level datasets for each year between 1995 and 2015 and count the number of households surveyed per observatory. This provides the temporal coverage required to assess potential baselines and follow-up data.
+
+```{r obs_survey_count}
+#| label: "Count surveys per observatory"
+
 # Select appropriate folder as data source
 data_path <- "data/ROS_MDG_microdata/"
 
@@ -98,13 +110,37 @@ obs_count <- obs_count %>%
   left_join(observatory_names, by = c("observatory" = "code")) %>%
   group_by(observatory_name, year) %>%
   summarise(survey_count = sum(survey_count))
+
+# Pivot to wide: observatories as rows, years as columns
+obs_table <- obs_count %>%
+  ungroup() %>%
+  pivot_wider(
+    names_from = year,
+    values_from = survey_count,
+    values_fill = 0  # replace missing values with 0
+  ) %>%
+  arrange(observatory_name)
+
+# Display nicely as a table
+library(gt)
+obs_table %>%
+  gt() %>%
+  tab_header(
+    title = "Number of surveyed households per observatory and year"
+  )
 ```
+
+This inventory highlights the heterogeneity of survey continuity across observatories, with some monitored only for a few years while others offer long continuous panels.
 
 ## Temporal overlaps
 
-We have the following time frame for observatories neighbouring Protected areas:
+For spatially overlapping situations, we now examine the timing of ROS surveys relative to the official creation years of protected areas. Several cases can be identifies:
 
-```{r}
+- If PAs predate ROS entirely, they can not be used for impact evaluation (no baseline).
+- If PAs were created while ROS surveys were ongoing, some impact analysis can already be undertaken. 
+- If PAs were created after ROS surveys ended, the existing data can only serve as baseline and we need to re-survey the area to perform before-after analysis.
+
+```{r timing_ro_pa}
 #| label: fig-ror-pa-years
 #| fig-cap: "Timing of ROR surveys and neigbouring PA creations"
 
@@ -180,13 +216,13 @@ ggplot(obs_PA, aes(x = year, y = facet_label)) +
 As it can be seen here, the Ranomanfana protected area that was created well before the ROR surveys. Two protected areas where created during ROR survey years: Ankarafantsika protected area (Marovoay observatory) and Mikea (Toliara Nord observatory). 8 other protected areas were created after the ROR surveys had stoped: Vohidava, Tsimanampesotsoa, Menabe Antinmena, Lac Alaotra, Corridor Forestier Abositra-Vodronzo, Corridor Ankeniheny Zahamena, Complexe Zones Humides Mangoky Ihotry and Andohahela.
 
 
-## Check décrets provisoires
+## Revising decree dates
 
-On checke sur https://cnlegis.gov.mg avec les noms des AP
+Official PA creation years do not always correspond to the first implementation of conservation rules. In some cases, temporary decrees (décrets provisoires) preceded the final legal establishment of a PA. We therefore cross-checked dates with [official legislation (CNLEGIS)](https://cnlegis.gov.mg) and revised several creation years accordingly.
 
-Vohadava-Betsimalaho
 
 ```{r}
+
 obs_PA1_revu <- obs_PA1 %>%
   bind_rows(
     filter(obs_PA1, str_detect(PA_Name, "Zahamena")) %>%
@@ -226,7 +262,11 @@ ggplot(obs_PA_revu, aes(x = year, y = facet_label)) +
         legend.position = "top")
 ```
 
-On fait une carte avec uniquement ces AP
+This refinement ensures that the temporal alignment between ROS and PA timelines better reflects the actual policy environment faced by households.
+
+## Mapping priority overlaps
+
+Based on these adjustments, we produce a refined map focusing on observatories located near PAs with verified temporal overlaps. This includes applying buffers to account for households living near but outside official PA polygons.
 
 ```{r}
 
@@ -291,10 +331,20 @@ tm_shape(selected_communes2) +
   tm_scale_bar()
 ```
 
-Selected list by order of priorities: 
+The resulting selection highlights a few priority observatory–PA pairs that combine strong temporal coverage and spatial relevance.
 
-- Alaotra - lac Alaotra and Corridor forestier Ankeniheny Zahamena
-- Marovoay - Ankarafantsika
-- Tolanaro - Andohahela
-- Toliara North - Mikea
-- Fenerive East - Tamporo
+## Priorization for analysis
+
+From this process, we identified a short list of priority pairs:
+
+- Marovoay – Ankarafantsika
+- Alaotra – Lac Alaotra and Corridor Ankeniheny–Zahamena (CAZ)
+- Tolanaro – Andohahela
+- Toliara North – Mikea
+- Fenerive East – Tampolo
+
+Among these, Marovoay–Ankarafantsika and Alaotra–Alaotra/CAZ emerge as the most promising candidates for in-depth impact evaluation, given their data richness and close alignment with PA creation.
+
+## Limitations and next steps
+
+It is important to note that ROS observatories represent a unique opportunity to obtain long time baseline and follow-up data on socioeconomic impacts of PAs, but ROS were not designed with conservation impacts in mind. Their locations were chosen for agricultural and socio-economic monitoring, not proximity to PAs. As such, overlaps are partly coincidental and require cautious interpretation. 
