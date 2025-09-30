@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; ROS historical data georeferencing – Evaluating the socioeconomic impacts of protected areas from rural observatories' data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./02_Overlaps_PAs_observatories.html" rel="next">
+<link href="./index.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-8da5b4427184b79ecddefad3d342027e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01_Georeference_observatories.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ROS historical data georeferencing</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Evaluating the socioeconomic impacts of protected areas from rural observatories’ data</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/BETSAKA/Rural_obs_PAs" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Using the rural observatory data to assess the protected areas impacts on household living conditions.</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_Georeference_observatories.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ROS historical data georeferencing</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_Overlaps_PAs_observatories.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Overlaps between ROS data and PAs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_Variable computation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Variable computation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_Marovoay-Ankarafantsika.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Marovoay-Ankarafantsika</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#shared-geographic-reference-system" id="toc-shared-geographic-reference-system" class="nav-link active" data-scroll-target="#shared-geographic-reference-system"><span class="header-section-number">2.1</span> Shared geographic reference system</a>
+  <ul class="collapse">
+  <li><a href="#the-common-operational-dataset" id="toc-the-common-operational-dataset" class="nav-link" data-scroll-target="#the-common-operational-dataset"><span class="header-section-number">2.1.1</span> The Common Operational Dataset</a></li>
+  <li><a href="#administrative-boundaries" id="toc-administrative-boundaries" class="nav-link" data-scroll-target="#administrative-boundaries"><span class="header-section-number">2.1.2</span> Administrative boundaries</a></li>
+  <li><a href="#localities" id="toc-localities" class="nav-link" data-scroll-target="#localities"><span class="header-section-number">2.1.3</span> Localities</a></li>
+  </ul></li>
+  <li><a href="#georeferencing-methodology" id="toc-georeferencing-methodology" class="nav-link" data-scroll-target="#georeferencing-methodology"><span class="header-section-number">2.2</span> Georeferencing methodology</a>
+  <ul class="collapse">
+  <li><a href="#simplify-strings" id="toc-simplify-strings" class="nav-link" data-scroll-target="#simplify-strings"><span class="header-section-number">2.2.1</span> Simplify strings</a></li>
+  <li><a href="#fuzzy-matching" id="toc-fuzzy-matching" class="nav-link" data-scroll-target="#fuzzy-matching"><span class="header-section-number">2.2.2</span> Fuzzy matching</a></li>
+  <li><a href="#hierarchical-matching-of-data" id="toc-hierarchical-matching-of-data" class="nav-link" data-scroll-target="#hierarchical-matching-of-data"><span class="header-section-number">2.2.3</span> Hierarchical matching of data</a></li>
+  </ul></li>
+  <li><a href="#a-detailed-walk-through" id="toc-a-detailed-walk-through" class="nav-link" data-scroll-target="#a-detailed-walk-through"><span class="header-section-number">2.3</span> A Detailed walk-through</a>
+  <ul class="collapse">
+  <li><a href="#method-1-fuzzy-matching-from-registered-municipality-names" id="toc-method-1-fuzzy-matching-from-registered-municipality-names" class="nav-link" data-scroll-target="#method-1-fuzzy-matching-from-registered-municipality-names"><span class="header-section-number">2.3.1</span> Method 1 : Fuzzy matching from registered municipality names</a></li>
+  <li><a href="#method-2-extracting-municipality-names-from-text-in-village-names" id="toc-method-2-extracting-municipality-names-from-text-in-village-names" class="nav-link" data-scroll-target="#method-2-extracting-municipality-names-from-text-in-village-names"><span class="header-section-number">2.3.2</span> Method 2: Extracting municipality names from text in “village names”</a></li>
+  <li><a href="#method-3-village-name-fuzzy-matching-with-populated-places" id="toc-method-3-village-name-fuzzy-matching-with-populated-places" class="nav-link" data-scroll-target="#method-3-village-name-fuzzy-matching-with-populated-places"><span class="header-section-number">2.3.3</span> Method 3: Village name fuzzy matching with populated places</a></li>
+  <li><a href="#method-4" id="toc-method-4" class="nav-link" data-scroll-target="#method-4"><span class="header-section-number">2.3.4</span> Method 4</a></li>
+  </ul></li>
+  <li><a href="#matching-villages" id="toc-matching-villages" class="nav-link" data-scroll-target="#matching-villages"><span class="header-section-number">2.4</span> Matching villages</a>
+  <ul class="collapse">
+  <li><a href="#method-6-manual-completion" id="toc-method-6-manual-completion" class="nav-link" data-scroll-target="#method-6-manual-completion"><span class="header-section-number">2.4.1</span> Method 6 : Manual completion</a></li>
+  </ul></li>
+  <li><a href="#validating-the-quality-of-georeferenced-data" id="toc-validating-the-quality-of-georeferenced-data" class="nav-link" data-scroll-target="#validating-the-quality-of-georeferenced-data"><span class="header-section-number">2.5</span> Validating the Quality of Georeferenced Data</a>
+  <ul class="collapse">
+  <li><a href="#quantitative-metrics" id="toc-quantitative-metrics" class="nav-link" data-scroll-target="#quantitative-metrics"><span class="header-section-number">2.5.1</span> Quantitative metrics</a></li>
+  <li><a href="#consistency-check-with-documentation" id="toc-consistency-check-with-documentation" class="nav-link" data-scroll-target="#consistency-check-with-documentation"><span class="header-section-number">2.5.2</span> Consistency check with documentation</a></li>
+  <li><a href="#visual-exploration-and-avenues-for-continuous-corrections" id="toc-visual-exploration-and-avenues-for-continuous-corrections" class="nav-link" data-scroll-target="#visual-exploration-and-avenues-for-continuous-corrections"><span class="header-section-number">2.5.3</span> Visual exploration and avenues for continuous corrections</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">2.6</span> Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ROS historical data georeferencing</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This section provides details about the georeferencing process applied to household panel data collected by the Rural Observatory System (ROS) from 1995 to 2015. The ROS gathered data on various rural contexts in Madagascar. While the data quality was carefully monitored, the survey were not precisely geolocated and, while some fields included mentions to the household place of residence, this were open entry fields and they have not been systematically harmonized or linked to official administrative references. This limits its use in spatially integrated research and public policy evaluation. This appendix aligns the ROS dataset’s various spatial designations with a standardized geographic database, ensuring consistent correlation between each ROS observation and the corresponding geospatial entities, namely communes and fokontany. Similar to other sections of this document, the source code developed to perform all the data processing is accessible by expanding the code blocks, as shown below.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)    <span class="co"># A series of packages for data manipulation</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)        <span class="co"># Required for reading STATA files (.dta)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(labelled)     <span class="co"># To work with labelled data from STATA</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)           <span class="co"># for spatial data handling</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringdist)   <span class="co"># for string distance and matching</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmap)         <span class="co"># for mapping</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fuzzyjoin)    <span class="co"># for fuzzy joining</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)       <span class="co"># Read data frames to Excel format</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(writexl)      <span class="co"># Write data frames to Excel format</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)           <span class="co"># for nicely formatted tables</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)      <span class="co"># to combine plots</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)    <span class="co"># to produce nice summary tables</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)      <span class="co"># to simply add rowsums</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtain all years from the directory structure</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>ros_data_loc <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"data/ROS_MDG_microdata/"</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">list.dirs</span>(ros_data_loc, <span class="at">recursive =</span> <span class="cn">FALSE</span>, <span class="at">full.names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="shared-geographic-reference-system" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="shared-geographic-reference-system"><span class="header-section-number">2.1</span> Shared geographic reference system</h2>
+<p>The main purpose of this section is to enhance the georeferencing of the ROS survey data for open data sharing. The initial ROS survey, initiated in 1995, recorded geographical information in varying formats: from “village” to a combination of “municipality”, “village”, and “site”. A significant challenge was that data collection started in 1995, while in Madagascar municipalities were only formally established in 1994, and it took several years required for stabilization. The toponyms, which mostly came from oral traditions, were subjected to change, resulting in varied written representations. Our goal is to identify, disambiguate, and georeference the observations recorded in the ROS data, adopting the Common Operational Datasets (CODs) as a reference, which have been collaboratively defined by OCHA and Madagascar’s BNGRC (National Disaster Management Office).</p>
+<section id="the-common-operational-dataset" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="the-common-operational-dataset"><span class="header-section-number">2.1.1</span> The Common Operational Dataset</h3>
+<p>CODs are the foundation for all preparedness and response operations, particularly within the humanitarian sector. They were adopted by the IASC in 2008 and revised in 2010, and they play a crucial role in facilitating informed decision-making during the critical initial hours of a crisis. By ensuring consistency among stakeholders, CODs simplify data management and establish a shared operational picture of a crisis. Of particular relevance to our purpose is the inclusion of P-codes in CODs. These unique geographic identification codes can be found in both Administrative Boundary CODs (COD-ABs) and Population Statistics CODs (COD-PSs), and they help overcome challenges posed by variations in place names and spellings. For example, in Madagascar, there are 81 different administrative level 4 (ADM4) features labeled “Morafeno,” with six of them existing within ADM3 features also called “Morafeno.” The only way to distinguish them is through their unique ADM2 features.</p>
+<p>P-codes serve as reliable geographic identifiers, eliminating errors that may arise from identical or differently spelled geographic locations. Using the HDX platform, an open platform for cross-crisis data sharing, we retrieve this data to ensure the accurate georeferencing of our ROS data. By leveraging the standardized and official spelling of places provided by P-codes, we can combine, harmonize, and analyze data from various sources, thereby offering a comprehensive and geographically accurate view of the survey’s findings.</p>
+<p>Although some level of harmonization is achieved, especially regarding certain variables and household identifiers, the data varies in terms of geographical granularity. In the early years, the data primarily includes a single field indicating the village name. As the years go by, this evolves to include a municipality name, and in later years, an additional “site” name occasionally appears. A comprehensive overview of the observations can be obtained from the “res_deb.dta” files for each year.</p>
+</section>
+<section id="administrative-boundaries" class="level3" data-number="2.1.2">
+<h3 data-number="2.1.2" class="anchored" data-anchor-id="administrative-boundaries"><span class="header-section-number">2.1.2</span> Administrative boundaries</h3>
+<p>The “Madagascar Subnational Administrative Boundaries” dataset is sourced from the Common Operational Datasets (CODs), which provide authoritative reference datasets for decision-making during humanitarian operations. CODs are specifically designed to streamline the discovery and exchange of essential data, ensuring uniformity and using the ‘best available’ datasets. This particular dataset focuses on administrative boundaries, including gazetteers with P-codes, which facilitate organized humanitarian assessments and data management. P-codes act as unique identifiers for every administrative unit and populated area, ensuring standardization in nomenclature. When datasets adhere to the P-code standard, their integration and analysis become more efficient. The dataset provides comprehensive boundary information for Madagascar at five administrative levels: country, region, district, commune, and fokontany. It is accessible for download as shapefiles from <a href="https://data.humdata.org/dataset/cod-ab-mdg">the provided link</a>.</p>
+</section>
+<section id="localities" class="level3" data-number="2.1.3">
+<h3 data-number="2.1.3" class="anchored" data-anchor-id="localities"><span class="header-section-number">2.1.3</span> Localities</h3>
+<p>The “Madagascar Populated Places” dataset is also part of the Common Operational Datasets (CODs). This dataset includes populated place points for Madagascar. The data has been sourced from the National Geospatial-Intelligence Agency and provided by the University of Georgia - ITOS. Furthermore, the Geographic Information Support Team (GIST) has taken on the role of distributor, with the data being published on 2007-03-07. UN OCHA ROSA has enhanced the dataset by adding P-codes and administrative boundary names based on the BNGRC (National Disaster Management Office) data. The dataset geolocates 28,184 populated places with their toponyms (names), codes related to various administrative levels such as fokontany, commune, district, and region, as well as their spatial coordinates.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load datasets</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ROS_surveys_2007 <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="fu">paste0</span>(ros_data_loc, <span class="st">"2007/res_deb.dta"</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>observatory_names <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">"data/observatory_names.xlsx"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>obs_communes <span class="ot">&lt;-</span> <span class="fu">st_read</span>(</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/Observatoires_ROS_communes_COD_v4.gpkg"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">quiet =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>pop_places <span class="ot">&lt;-</span> <span class="fu">st_read</span>(</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/OCHA_BNGRC populated places/mdg_pplp_places_NGA_OCHA.shp"</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+</section>
+<section id="georeferencing-methodology" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="georeferencing-methodology"><span class="header-section-number">2.2</span> Georeferencing methodology</h2>
+<section id="simplify-strings" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="simplify-strings"><span class="header-section-number">2.2.1</span> Simplify strings</h3>
+<p>The treatment of toponyms presents a unique challenge, especially when these names are captured from varied sources. In the dataset, these names can vary due to differences in languages, case sensitivity, and the inclusion of additional descriptive terms. To address this, the <code>clean_string</code> function was developed. This function begins by converting all strings to lowercase, ensuring that subsequent comparisons are not sensitive to case variations. Next, to create a uniform standard, all non-alphanumeric characters are removed, retaining only spaces and the alphanumeric content. Common qualifiers in toponyms, such as “centre”, “haut” (high) or “bas” (low), which are not consistently used across records, are also removed. Given the bilingual nature of the dataset, with entries potentially in both Malagasy and French, the function translates cardinal points to the Malagasy language to ensure uniformity. Lastly, certain locales with multiple names, such as “Fort Dauphin”, also known as “Taolagnaro”, “Tolagnaro” or “Tolanaro”, are standardized to a single term, “Tolanaro”, to eliminate potential disparities. We also address instances of Roman numerals from I to VI, converting them to their Arabic numeral counterparts, ensuring consistent representation across records.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>clean_string <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  x <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tolower</span>() <span class="sc">%&gt;%</span> <span class="co"># Convert to lowercase</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Retain spaces, remove other non-alphanumeric characters</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"[^[:alnum:][:space:]]"</span>, <span class="st">" "</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_remove_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b(centre|haut|bas|androy)</span><span class="sc">\\</span><span class="st">b"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_trim</span>() <span class="sc">%&gt;%</span> <span class="co"># Trim spaces from start and end of string</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">bcentre</span><span class="sc">\\</span><span class="st">b"</span>, <span class="st">""</span>) <span class="sc">%&gt;%</span> <span class="co"># Remove the word 'centre'</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Translate cardinal points</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">bnord</span><span class="sc">\\</span><span class="st">b"</span>, <span class="st">"avaratra"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">best</span><span class="sc">\\</span><span class="st">b"</span>, <span class="st">"atsinanana"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">bouest</span><span class="sc">\\</span><span class="st">b"</span>, <span class="st">"andrefana"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">bsud</span><span class="sc">\\</span><span class="st">b"</span>, <span class="st">"atsimo"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">batsinana</span><span class="sc">\\</span><span class="st">b"</span>, <span class="st">"atsinanana"</span>) <span class="sc">%&gt;%</span> <span class="co"># Replace short form </span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"(fort dauphin)|(taolagnaro)|(tolagnaro)"</span>, </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"tolanaro"</span>) <span class="sc">%&gt;%</span> <span class="co"># Variations for fort dauphin</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert Roman numerals to Arabic</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">bi</span><span class="sc">\\</span><span class="st">b"</span>, <span class="st">"1"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">bii</span><span class="sc">\\</span><span class="st">b"</span>, <span class="st">"2"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">biii</span><span class="sc">\\</span><span class="st">b"</span>, <span class="st">"3"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">biv</span><span class="sc">\\</span><span class="st">b"</span>, <span class="st">"4"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">bv</span><span class="sc">\\</span><span class="st">b"</span>, <span class="st">"5"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">bvi</span><span class="sc">\\</span><span class="st">b"</span>, <span class="st">"6"</span>)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="fuzzy-matching" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="fuzzy-matching"><span class="header-section-number">2.2.2</span> Fuzzy matching</h3>
+<p>By default, statistical softwares and computing languages match text by pairing only identical strings. Exact string matching is inappropriate in our context, where location data entry was subject to human errors like typographical mistakes or minor variations in spelling. To avoid this rigidity, fuzzy matching is employed. This approach gauges the degree of similarity between two strings, bypassing the need for an exact character-to-character match. The principle metric adopted for this is the “Levenshtein distance,” which quantifies the minimum number of single-character edits required to change one string into another. The <code>fuzzy_match</code> function encapsulates this approach. The function initiates the process by filtering the reference list of encontered toponyms based on a given observatory code, which considerably narrows down potential matches. Then, using the Jaro-Winkler distance metric — a variant of the Levenshtein distance particularly suited for shorter strings — the function computes the similarity between the target string and entries in the filtered reference. To ensure that only relevant matches are acknowledged, a threshold, termed max_distance, is set. Matches that exceed this threshold are disregarded. For those that pass this validation, the function then extracts the pertinent details of the matched row from the reference dataframe.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fuzzy_match <span class="ot">&lt;-</span> <span class="cf">function</span>(target_string, dataframe, column_name, observatory_code, </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">max_distance =</span> <span class="fl">0.25</span>) {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Filter the dataframe based on observatory_code</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  filtered_reference <span class="ot">&lt;-</span> dataframe <span class="sc">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(OBS_CODE <span class="sc">==</span> observatory_code) <span class="sc">%&gt;%</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">all_of</span>(column_name), ADM3_PCODE, ADM3_EN)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If filtered_reference is empty, return NA values</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(filtered_reference) <span class="sc">==</span> <span class="dv">0</span>) {</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">matched_string =</span> <span class="cn">NA</span>, <span class="at">ADM3_PCODE =</span> <span class="cn">NA</span>, <span class="at">ADM3_EN =</span> <span class="cn">NA</span>, <span class="at">distance =</span> <span class="dv">1</span>))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Use stringdist to find the closest match</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  distances <span class="ot">&lt;-</span> stringdist<span class="sc">::</span><span class="fu">stringdistmatrix</span>(target_string, filtered_reference[[column_name]], <span class="at">method =</span> <span class="st">"jw"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If there are no valid distances, set min_distance to Inf</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">all</span>(<span class="fu">is.na</span>(distances))) {</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    min_distance <span class="ot">&lt;-</span> <span class="cn">Inf</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    min_distance <span class="ot">&lt;-</span> <span class="fu">min</span>(distances, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)  <span class="co"># Ensure NA values don't affect the min calculation</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Check for Inf distance and replace it with 1</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.infinite</span>(min_distance)) {</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    min_distance <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If min_distance exceeds the max_distance threshold, return NA values</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (min_distance <span class="sc">&gt;</span> max_distance) {</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">matched_string =</span> <span class="cn">NA</span>, <span class="at">ADM3_PCODE =</span> <span class="cn">NA</span>, <span class="at">ADM3_EN =</span> <span class="cn">NA</span>, <span class="at">distance =</span> <span class="cn">NA</span>))</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  matched_row <span class="ot">&lt;-</span> filtered_reference[<span class="fu">which.min</span>(distances), ]</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">matched_string =</span> matched_row[[column_name]], </span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>              <span class="at">ADM3_PCODE =</span> matched_row<span class="sc">$</span>ADM3_PCODE, </span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>              <span class="at">ADM3_EN =</span> matched_row<span class="sc">$</span>ADM3_EN, </span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>              <span class="at">distance =</span> min_distance))</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="hierarchical-matching-of-data" class="level3" data-number="2.2.3">
+<h3 data-number="2.2.3" class="anchored" data-anchor-id="hierarchical-matching-of-data"><span class="header-section-number">2.2.3</span> Hierarchical matching of data</h3>
+<p>The hierarchical organization of spatial entities is key for our challenge. Such an organization allows for a cascading representation of data, starting from broader scopes and narrowing down to more specific layers. This representation is reminiscent of the defining order of geographical entities: regions contain provinces, which contain municipalities, and these in turn contain localities. In the georeferencing context, leveraging this hierarchical structure can lead to more precise matches. For instance, if an observatory code is associated with a specific district, the search for matches is confined to that district, enhancing both the efficiency and accuracy of the process. <span class="quarto-unresolved-ref">?fig-spatial-hierarchies</span> represents this hierarchical arrangement, serving as a roadmap for the subsequent data matching tasks.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># graph TD</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># A[Legend]</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># W[ ]</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># X[ ]</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Y[ ]</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Z[ ]</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># W --&gt;|Pre-defined hierarchy| X</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Y -.-|Implemented matching|Z</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># %%| label: fig-spatial-hierarchies</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># %%| fig-cap: Spatial entities pre-defined relationship and matching</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># graph TD</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># %% Administrative Logic</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># subgraph "Administrative Logic"</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># A[Region]</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># B[District]</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># C[Commune]</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># D[Fokontany]</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># I[Populated places]</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># A --&gt; B</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co"># B --&gt; C</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># C --&gt; D</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co"># D --&gt; I</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co"># end</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># %% Observatory Logic</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co"># subgraph "Observatory Logic"</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co"># E[Observatory system]</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co"># F[Observatory]</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co"># G[Commune]</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co"># H[Village]</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co"># J[Site]</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co"># E --&gt; F</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co"># F --&gt; G</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co"># G --&gt; H</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co"># F --&gt; H</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co"># H--&gt; J</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co"># end</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co"># %% Geospatial matching</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co"># H -.- I</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co"># C -.- G</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Madagascar’s current administrative setup is straightforward: regions contain districts; districts have communes; and communes are made up of Fokontany. Though a Fokontany should in principle be a single village, it often includes multiple villages or populated areas. It’s worth noting that while the idea of communes has been around for a while, they were only officially recognized in 1994. However, rolling them out took some time after 1994. Before 1994, “communes” simply described local government areas without any formal administrative status. The regions were created in 2004. On the ROS side, observatory referred during the first surveys to villages. A systematic registry of the communes only started in the 2004 and 2005 rounds, depending on the observatories. A mention to “sites” also appeared in 2011 but was scarcely documented. Our strategy was to established links between the village information and populated places, and between communes.</p>
+</section>
+</section>
+<section id="a-detailed-walk-through" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="a-detailed-walk-through"><span class="header-section-number">2.3</span> A Detailed walk-through</h2>
+<p>We now break down our approach to describe each subsequent step. We began by exploring the ROS documentation, and in particular the reports associated to community survey, that contain descriptions of the area surveyed by each observatory. While doing so, we updated the COD subnational administrative boundary dataset by adding a field named <code>OBS_Y_N</code>. This field was marked as ‘1’ if the municipality was listed in an observatory survey; if not, it was left empty. Additionally, we added another field, <code>OBS_NUM</code>, which would store the observatory number. If the municipality wasn’t part of any survey, this field was left empty. The list of observatories and surveyed municipalities can be found in the <a href="#tbl-list-muni" class="quarto-xref">Table&nbsp;<span>2.2</span></a>.</p>
+<p>Next, we moved on to geolocation, which took place in four stages. Each stage depended heavily on the data quality and completeness obtained from the previous ones.</p>
+<section id="method-1-fuzzy-matching-from-registered-municipality-names" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="method-1-fuzzy-matching-from-registered-municipality-names"><span class="header-section-number">2.3.1</span> Method 1 : Fuzzy matching from registered municipality names</h3>
+<p>This phase involved a systematic alignment process for the municipalities. When municipality names were included in our dataset, we attempted to correlate them with names of municipalities identified as data collection locations. To ensure accuracy, this alignment was carried out separately for each observatory. Due to possible differences in terminology across sources, a fuzzy matching algorithm was used. This method calculates the likelihood of two different names referring to the same entity. Once a probable match was identified, we visually verified all matches and flagged any false positives for removal.</p>
+<p>The following code segment details the methodology applied:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List of years</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="dv">1995</span><span class="sc">:</span><span class="dv">2015</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Read all datasets and combine</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>all_surveys_description <span class="ot">&lt;-</span> <span class="fu">map_df</span>(years, <span class="cf">function</span>(year) {</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="fu">paste0</span>(ros_data_loc, year, <span class="st">"/res_deb.dta"</span>))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert all columns to character to ensure consistency</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">mutate_all</span>(as.character)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract unique combinations and list all the years they appeared in</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>unique_combinations <span class="ot">&lt;-</span> all_surveys_description <span class="sc">%&gt;%</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(j0, j42, j4) <span class="sc">%&gt;%</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">years =</span> <span class="fu">toString</span>(<span class="fu">unique</span>(year)),</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">obs_count =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Harmonize the fields that contain municipality or village names</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>unique_combinations <span class="ot">&lt;-</span> unique_combinations <span class="sc">%&gt;%</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">clean_muni =</span> <span class="fu">clean_string</span>(j42),</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">clean_village =</span> <span class="fu">clean_string</span>(j4))</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>obs_communes <span class="ot">&lt;-</span> obs_communes <span class="sc">%&gt;%</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">clean_ADM3 =</span> <span class="fu">clean_string</span>(ADM3_EN))</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>pop_places <span class="ot">&lt;-</span> pop_places <span class="sc">%&gt;%</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">clean_pname =</span> <span class="fu">clean_string</span>(PLACE_NAME)) </span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co"># List of observatories for which municipalities have been identified</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>identified_observatories <span class="ot">&lt;-</span> <span class="fu">unique</span>(obs_communes<span class="sc">$</span>OBS_CODE) <span class="sc">%&gt;%</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for the observatory for which we already have a manual identification</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="co"># of municipalities</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>unique_combinations <span class="ot">&lt;-</span> unique_combinations <span class="sc">%&gt;%</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(j0 <span class="sc">%in%</span> identified_observatories) </span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the fuzzy matching observatory-wise</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">map2_df</span>(unique_combinations<span class="sc">$</span>clean_muni, </span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>                   unique_combinations<span class="sc">$</span>j0, </span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>                   <span class="sc">~</span> <span class="fu">as.data.frame</span>(<span class="fu">t</span>(</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">fuzzy_match</span>(.x, obs_communes, <span class="st">"clean_ADM3"</span>, .y))))  <span class="sc">%&gt;%</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(matched_string, distance, ADM3_PCODE, ADM3_EN))</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine the results with the unique_combinations</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>correspondence_table <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(unique_combinations, results) </span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a column for the matching method</span></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>correspondence_table <span class="ot">&lt;-</span> correspondence_table <span class="sc">%&gt;%</span></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(matched_string), <span class="st">"method_1"</span>, <span class="cn">NA_character_</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>To synthesize and visually represent our matches, the identified municipalities are plotted on a map:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract matched resuts</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>matched_results <span class="ot">&lt;-</span> <span class="fu">unique</span>(correspondence_table<span class="sc">$</span>ADM3_PCODE) <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep municipalities in those</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>matched_spatial <span class="ot">&lt;-</span> obs_communes <span class="sc">%&gt;%</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ADM3_PCODE <span class="sc">%in%</span> matched_results)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"view"</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(matched_spatial) <span class="sc">+</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"OBS_NAME"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="method-2-extracting-municipality-names-from-text-in-village-names" class="level3" data-number="2.3.2">
+<h3 data-number="2.3.2" class="anchored" data-anchor-id="method-2-extracting-municipality-names-from-text-in-village-names"><span class="header-section-number">2.3.2</span> Method 2: Extracting municipality names from text in “village names”</h3>
+<p>For observations where the field “municipality name” was empty (all cases before 2004 and still a frequent situation afterwards), we turned our attention to the village name field. The objective was to determine whether these village names could potentially contain a municipality’s name that had been previously identified during the observatory surveys. For the observations with no municipality value, we extracted the first word or segment in the village name. This extracted word then underwent a process of fuzzy matching against the list of identified municipalities’ names. However, manual verification identified errors. Certain matches, which we labeled as ‘false positives’, were found to be errors and were removed from the results. Once this cleansing step was completed, we included the validated matches back into the primary correspondence table.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter out matched municipalities and extract the first word</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>unmatched_results <span class="ot">&lt;-</span> correspondence_table <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(matched_string)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(j0<span class="sc">:</span>clean_village) <span class="sc">%&gt;%</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">first_word =</span> <span class="fu">str_extract</span>(clean_village, <span class="st">"^[^</span><span class="sc">\\</span><span class="st">s/]+"</span>))</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Fuzzy matching with the first word and identified municipalities</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>results_step2 <span class="ot">&lt;-</span> <span class="fu">map2_df</span>(unmatched_results<span class="sc">$</span>first_word, </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                         unmatched_results<span class="sc">$</span>j0, </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                         <span class="sc">~</span> <span class="fu">as.data.frame</span>(<span class="fu">t</span>(</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">fuzzy_match</span>(.x, obs_communes, <span class="st">"clean_ADM3"</span>, .y))))  <span class="sc">%&gt;%</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(matched_string, distance, ADM3_PCODE, ADM3_EN))</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Update Results</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>potential_matches2 <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(unmatched_results, results_step2)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Manually identify false positives and remove them</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>false_positives <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"madiromionga"</span>, <span class="st">"maroarla"</span>, <span class="st">"tsaratanteraka"</span>, </span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"ambatoharanana"</span>, <span class="st">"ambatoaranana"</span>, <span class="st">"maroala"</span>, <span class="st">"erakoja"</span>, </span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"erakoka"</span>, <span class="st">"maroalo"</span>, <span class="st">"erakka"</span>, <span class="st">"erakoa"</span>)</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>validated_matches2 <span class="ot">&lt;-</span> potential_matches2 <span class="sc">%&gt;%</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(matched_string, ADM3_PCODE, ADM3_EN, distance),</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>               <span class="sc">~</span> <span class="fu">ifelse</span>(first_word <span class="sc">%in%</span> false_positives, <span class="cn">NA</span>, .)),</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(matched_string), <span class="st">"method_2"</span>, <span class="cn">NA_character_</span>))</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Integrate new results in correspondence table</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>correspondence_table <span class="ot">&lt;-</span> correspondence_table <span class="sc">%&gt;%</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(matched_string)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(validated_matches2) <span class="sc">%&gt;%</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>first_word)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="method-3-village-name-fuzzy-matching-with-populated-places" class="level3" data-number="2.3.3">
+<h3 data-number="2.3.3" class="anchored" data-anchor-id="method-3-village-name-fuzzy-matching-with-populated-places"><span class="header-section-number">2.3.3</span> Method 3: Village name fuzzy matching with populated places</h3>
+<p>With some observations still devoid of a matched municipality, we initiated another processing layer. This phase saw the unmatched village names being subjected to fuzzy matching against the populated places dataset described above. We first sifted out the unmatched results from our prior analysis. Then, we augmented the ‘pop_places’ dataset with observatory codes for the entries that were located in communes recognized as surveyed by observatories. Next we performed another fuzzy matching, comparing the village names against the ‘pop_places’ names. To maintain a level of precision, we set a restrictive threshold, dismissing any match that exceeded a certain “distance” or degree of difference. But, as with the previous methods, visual verification revealed some mismatches. These ‘false positives’ were flagged and discarded and the remaining ones were integrated into the overarching correspondence table.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Re-filter unmatched results</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>unmatched_results2 <span class="ot">&lt;-</span> correspondence_table <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(matched_string)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(j0<span class="sc">:</span>clean_village)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Join OBS_CODE to pop_places</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>pop_places <span class="ot">&lt;-</span> pop_places <span class="sc">%&gt;%</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">ADM3_PCODE =</span> COM_PCODE, <span class="at">ADM3_EN =</span> COMMUNE) <span class="sc">%&gt;%</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ADM3_PCODE =</span> <span class="fu">str_replace</span>(ADM3_PCODE, <span class="st">"^MDG"</span>, <span class="st">"MG"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(obs_communes, ADM3_PCODE, OBS_CODE) <span class="sc">%&gt;%</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">st_drop_geometry</span>(), </span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">"ADM3_PCODE"</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the fuzzy matching observatory-wise</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>results_step3 <span class="ot">&lt;-</span> <span class="fu">map2_df</span>(unmatched_results2<span class="sc">$</span>clean_village, </span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>                         unmatched_results2<span class="sc">$</span>j0, </span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>                         <span class="sc">~</span> <span class="fu">as.data.frame</span>(<span class="fu">t</span>(</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">fuzzy_match</span>(.x, pop_places, <span class="st">"clean_pname"</span>, .y,</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>                                       <span class="at">max_distance =</span> <span class="fl">0.22</span>))))  <span class="sc">%&gt;%</span> <span class="co"># erratic results beyond</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(matched_string, distance, ADM3_PCODE, ADM3_EN))</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Bind the results with unmatched_results_v2</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>potential_matches3 <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(unmatched_results2, results_step3)</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Manually identify false positives and remove them</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>false_positives2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"analambarika"</span>, <span class="st">"maroaloka"</span>, <span class="st">"ambakela"</span>, <span class="st">"ambodirofia"</span>,</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"ambohibao"</span>, <span class="st">"ambato mangabe"</span>, <span class="st">"marofonaritra"</span>, </span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"andranovo ambodimanga"</span>, <span class="st">"morataitra"</span>, <span class="st">"antanambao"</span>, </span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"ankililoa"</span>)</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>validated_matches3 <span class="ot">&lt;-</span> potential_matches3 <span class="sc">%&gt;%</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(matched_string, ADM3_PCODE, ADM3_EN, distance),</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>               <span class="sc">~</span> <span class="fu">ifelse</span>(clean_village <span class="sc">%in%</span> false_positives2, <span class="cn">NA</span>, .)),</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(matched_string), <span class="st">"method_3"</span>, <span class="cn">NA_character_</span>))</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>correspondence_table <span class="ot">&lt;-</span> correspondence_table <span class="sc">%&gt;%</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(matched_string)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(validated_matches3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="method-4" class="level3" data-number="2.3.4">
+<h3 data-number="2.3.4" class="anchored" data-anchor-id="method-4"><span class="header-section-number">2.3.4</span> Method 4</h3>
+<p>For the remaining, we try matching with other village names for which the municipality has been matched.</p>
+<p>Even after the above measures, there remained observations that had eluded a municipality match. The subsequent strategy was to juxtapose them with other village names that had already been successfully matched to a municipality. We assembled a table comprising municipality names and their paired village names, using data from previous successful matches. Then the still-unmatched village names were run through a fuzzy matching process against the known village names. We fine-tuned the algorithm with a restrictive matching threshold. Again, some matches stood out as anomalies. Labeled as ‘false positives’, these were sifted out and the newly matched data was incorporated into the main correspondence table.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a list of municipality names and village names for matched observations</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>matched_villages <span class="ot">&lt;-</span> correspondence_table <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(method)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(j0, ADM3_PCODE, ADM3_EN, clean_village) <span class="sc">%&gt;%</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">OBS_CODE =</span> j0)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Re-filter unmatched results</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>unmatched_results3 <span class="ot">&lt;-</span> correspondence_table <span class="sc">%&gt;%</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(method)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(j0<span class="sc">:</span>clean_village)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Try matching unmatched villages against matched village names observatory-wise</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>results_village_match <span class="ot">&lt;-</span> <span class="fu">map2_df</span>(</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  unmatched_results3<span class="sc">$</span>clean_village, unmatched_results3<span class="sc">$</span>j0,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">as.data.frame</span>(<span class="fu">t</span>(<span class="fu">fuzzy_match</span>(.x, matched_villages, <span class="st">"clean_village"</span>,</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>                                .y, <span class="at">max_distance =</span> <span class="fl">0.28</span>)))) <span class="sc">%&gt;%</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(matched_string, distance, ADM3_PCODE, ADM3_EN))</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Bind these results with unmatched_results_v3</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>potential_matches4 <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(unmatched_results3, results_village_match)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Manually identify false positives and remove them</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>false_positives4 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"amp0mbibitika antanakova"</span>, <span class="st">"arakoke ambonano ampihamibe"</span>, </span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"farara farara"</span>, <span class="st">"farara ambakela"</span>, <span class="st">"fara ambakela"</span>, </span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"ambatotelo marofinaritra"</span>)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>validated_matches4 <span class="ot">&lt;-</span> potential_matches4 <span class="sc">%&gt;%</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(matched_string, ADM3_PCODE, ADM3_EN, distance),</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>               <span class="sc">~</span> <span class="fu">ifelse</span>(clean_village <span class="sc">%in%</span> false_positives4, <span class="cn">NA</span>, .)),</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(matched_string), <span class="st">"method_4"</span>, <span class="cn">NA_character_</span>))</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge the updated results back to the correspondence table</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>correspondence_table <span class="ot">&lt;-</span> correspondence_table <span class="sc">%&gt;%</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(matched_string)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(validated_matches4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+</section>
+<section id="matching-villages" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="matching-villages"><span class="header-section-number">2.4</span> Matching villages</h2>
+<p>After successfully matching commune names with an official, normalized reference, our next goal is to align the villages as identified by the ROS with their administrative counterpart, known as Fokontany. This task presents challenges, notably because the ROS village identifications weren’t directly linked to Fokontany names, and the Fokontany names themselves have undergone changes. Additionally, variations in village naming within the ROS dataset complicate the process. Our approach involves several steps: First, we load the official COD Fokontany dataset. Next, we standardize the place names using our previously discussed <code>clean_string</code> function. Then, using the purpose-built <code>fuzzy_match_village</code> function, we assess the similarity between the village names in the ROS dataset and the Fokontany names within the same commune, specifically by calculating the Jaro-Winkler distance between the strings(see <span class="quarto-unresolved-ref">?sec-anonymization</span> for more details on the Jaro-Winkler distance). We select the names with the highest degree of matching. During a manual review of these results, we closely examined the matches, especially those with larger Jaro-Winkler distance. From this examination, we derived a distance of 0.2, below which the majority of matches were accurate. Notably, some matches above this threshold were deemed accurate and retained, while a small number of matches below this threshold were identified as false positives and subsequently discarded.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the ADM4 dataset, which corresponds to Fokontany</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>fokontany <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"data/OCHA_BNGRC admin boundaries/mdg_admbnda_adm4_BNGRC_OCHA_20181031.shp"</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">quiet =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ADM4_clean =</span> <span class="fu">clean_string</span>(ADM4_EN))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># A function to perform fuzzy matching with Fokontany or populated places</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>fuzzy_match_village <span class="ot">&lt;-</span> <span class="cf">function</span>(target_string, dataframe, column_name, </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>                                ADM3_PCODE_filter, id_column, </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                                <span class="at">municipality_string =</span> <span class="cn">NULL</span>, <span class="at">max_distance =</span> <span class="fl">0.4</span>) {</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Check if target_string has multiple words and if the first word matches the municipality_string</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(municipality_string) <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(<span class="fu">unlist</span>(<span class="fu">strsplit</span>(target_string, <span class="st">" "</span>))) <span class="sc">&gt;</span> <span class="dv">1</span>) {</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    first_word <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">strsplit</span>(target_string, <span class="st">" "</span>))[<span class="dv">1</span>]</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    distances_municipality <span class="ot">&lt;-</span> stringdist<span class="sc">::</span><span class="fu">stringdist</span>(first_word, municipality_string, <span class="at">method =</span> <span class="st">"jw"</span>)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">min</span>(distances_municipality, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">&lt;=</span> max_distance) {</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>      target_string <span class="ot">&lt;-</span> <span class="fu">str_remove</span>(target_string, <span class="fu">paste0</span>(<span class="st">"^"</span>, first_word, <span class="st">" "</span>))</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  filtered_reference <span class="ot">&lt;-</span> dataframe <span class="sc">%&gt;%</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">filter</span>(ADM3_PCODE <span class="sc">==</span> ADM3_PCODE_filter) <span class="sc">%&gt;%</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">select</span>(<span class="fu">all_of</span>(column_name), <span class="fu">all_of</span>(id_column))</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If filtered_reference is empty, return NA values</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(filtered_reference) <span class="sc">==</span> <span class="dv">0</span>) {</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">matched_string =</span> <span class="cn">NA</span>, <span class="at">ID =</span> <span class="cn">NA</span>, <span class="at">geometry =</span> <span class="cn">NA</span>, <span class="at">distance =</span> <span class="dv">1</span>))</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Use stringdist to find the closest match</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>  distances <span class="ot">&lt;-</span> stringdist<span class="sc">::</span><span class="fu">stringdistmatrix</span>(</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>    target_string, filtered_reference[[column_name]], <span class="at">method =</span> <span class="st">"jw"</span>)</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If there are no valid distances, set min_distance to Inf</span></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">all</span>(<span class="fu">is.na</span>(distances))) {</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>    min_distance <span class="ot">&lt;-</span> <span class="cn">Inf</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>    min_distance <span class="ot">&lt;-</span> <span class="fu">min</span>(distances, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Check for Inf distance and replace it with 1</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.infinite</span>(min_distance)) {</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>    min_distance <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If min_distance exceeds the max_distance threshold, return NA values</span></span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (min_distance <span class="sc">&gt;</span> max_distance) {</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">matched_string =</span> <span class="cn">NA</span>, <span class="at">ID =</span> <span class="cn">NA</span>, <span class="at">geometry =</span> <span class="cn">NA</span>, </span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>                <span class="at">distance =</span> <span class="cn">NA</span>))</span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>  matched_row <span class="ot">&lt;-</span> filtered_reference[<span class="fu">which.min</span>(distances), ]</span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">matched_string =</span> matched_row[[column_name]], </span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>              <span class="at">ID =</span> matched_row[[id_column]], </span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>              <span class="at">distance =</span> min_distance))</span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a><span class="co"># correspondence table without municipality geometry</span></span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>correspondence_table2 <span class="ot">&lt;-</span> correspondence_table <span class="sc">%&gt;%</span></span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>()</span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a><span class="co"># For fokontany</span></span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a>results_fokontany <span class="ot">&lt;-</span> <span class="fu">pmap_df</span>(</span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">clean_village =</span> correspondence_table2<span class="sc">$</span>clean_village, </span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>       <span class="at">ADM3_PCODE =</span> correspondence_table2<span class="sc">$</span>ADM3_PCODE, </span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a>       <span class="at">municipality_string =</span> correspondence_table2<span class="sc">$</span>clean_muni),</span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(clean_village, ADM3_PCODE, municipality_string) {</span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.data.frame</span>(<span class="fu">t</span>(<span class="fu">fuzzy_match_village</span>(clean_village, fokontany, </span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"ADM4_clean"</span>, ADM3_PCODE, <span class="st">"ADM4_PCODE"</span>, municipality_string)))</span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a>   <span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">ADM4_PCODE =</span> ID, <span class="at">ADM4_clean =</span> matched_string, <span class="at">distance2 =</span> distance) <span class="sc">%&gt;%</span></span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>geometry)</span>
+<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine the results with correspondence_table</span></span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a>correspondence_table2_updated <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(correspondence_table2, </span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>                                          results_fokontany) <span class="sc">%&gt;%</span></span>
+<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method_village =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(ADM4_PCODE), <span class="st">"method_5"</span>, <span class="cn">NA_character_</span>))</span>
+<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a><span class="co"># For a visual validation</span></span>
+<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a>correspondence_table2_updated <span class="sc">%&gt;%</span> </span>
+<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(distance2)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_xlsx</span>(<span class="st">"correspondence_table2_update.xlsx"</span>)</span>
+<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a><span class="co"># After instpecting the data, we find that a 0.2 threshold in distance is </span></span>
+<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a><span class="co"># appropriate. However some valid matches above this threshold should be kept</span></span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a>high_tolerance_valid_matches <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ambanja"</span>, <span class="st">"ambararata 2"</span>, <span class="st">"ambaro"</span>, <span class="st">"ambatoharanana"</span>, <span class="st">"ambatomanga"</span>, </span>
+<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ambazoamazava"</span>, <span class="st">"ambazoamirafy"</span>, <span class="st">"ambodibonara"</span>, <span class="st">"ambodimotso atsimo"</span>, </span>
+<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ambohidrony"</span>, <span class="st">"ambohimahatsinjo atsinanana"</span>, <span class="st">"ambongabe"</span>, <span class="st">"amparafaravola"</span>, </span>
+<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ampasy"</span>, <span class="st">"ampijoroa"</span>, <span class="st">"ampijoroan ala"</span>, <span class="st">"ampitana"</span>, <span class="st">"analambarika"</span>, </span>
+<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a>  <span class="st">"andohasoamahainty"</span>, <span class="st">"anjiamangirana 1"</span>, <span class="st">"ankazoabo anivo"</span>, <span class="st">"ankerereake"</span>, </span>
+<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ankililoaka 2"</span>, <span class="st">"bepako"</span>, <span class="st">"bevato"</span>, <span class="st">"erada 2"</span>, <span class="st">"esanta fototra"</span>, </span>
+<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a>  <span class="st">"esanta marofoty"</span>, <span class="st">"esanta maromainty"</span>, <span class="st">"feramanga atsimo"</span>, <span class="st">"habohabo atsimo"</span>, </span>
+<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a>  <span class="st">"habohabo avaratra"</span>, <span class="st">"lafiatsinanana"</span>, <span class="st">"madiromiongana"</span>, <span class="st">"manambaro 2"</span>, </span>
+<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a>  <span class="st">"manantenina"</span>, <span class="st">"mangabe"</span>, <span class="st">"mangaoka"</span>, <span class="st">"maritampona"</span>, <span class="st">"maroala"</span>, <span class="st">"marofoty"</span>, </span>
+<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a>  <span class="st">"marolampy"</span>, <span class="st">"marovantaza"</span>, <span class="st">"miary"</span>, <span class="st">"miary ankasy"</span>, <span class="st">"miary ankoronga"</span>, </span>
+<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a>  <span class="st">"miorimivalana"</span>, <span class="st">"tanambao"</span>, <span class="st">"tanambao 2"</span>, <span class="st">"tandroka andrefana"</span>, </span>
+<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tsarahasina"</span>, <span class="st">"vohilengo"</span>)</span>
+<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-104"><a href="#cb12-104" aria-hidden="true" tabindex="-1"></a><span class="co"># Below this threshold, a few false positives should be removed</span></span>
+<span id="cb12-105"><a href="#cb12-105" aria-hidden="true" tabindex="-1"></a>low_tolerance_invalid_marches <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb12-106"><a href="#cb12-106" aria-hidden="true" tabindex="-1"></a>  <span class="st">"AMBOHIMAHATSINJO EST"</span>, <span class="st">"AMBOHIMAHATSINJO-EST/CENTRE"</span>, </span>
+<span id="cb12-107"><a href="#cb12-107" aria-hidden="true" tabindex="-1"></a>  <span class="st">"AMBALAKINDRESY/ANDOHARENINA"</span>, <span class="st">"ambazoa /ampiha"</span>, <span class="st">"AMBALAKINDRESY/ANDOHARENA"</span>, </span>
+<span id="cb12-108"><a href="#cb12-108" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ANKAZOABO SUD/ALAMBARIKE"</span>, <span class="st">"ANKARINEZAKA/NAMARINA"</span>, <span class="st">"AMBALA/ANDRANOLAVA"</span>, </span>
+<span id="cb12-109"><a href="#cb12-109" aria-hidden="true" tabindex="-1"></a>  <span class="st">"AMBALAKINDRESY/ANDRANOLAVA"</span>, <span class="st">"AMBALAKINDRESY/ANDRANOLAVA"</span>)</span>
+<span id="cb12-110"><a href="#cb12-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-111"><a href="#cb12-111" aria-hidden="true" tabindex="-1"></a>correspondence_table3 <span class="ot">&lt;-</span> correspondence_table2_updated <span class="sc">%&gt;%</span></span>
+<span id="cb12-112"><a href="#cb12-112" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb12-113"><a href="#cb12-113" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">c</span>(ADM4_clean, ADM4_PCODE, distance2, method_village), </span>
+<span id="cb12-114"><a href="#cb12-114" aria-hidden="true" tabindex="-1"></a>           <span class="sc">~</span> <span class="fu">case_when</span>(</span>
+<span id="cb12-115"><a href="#cb12-115" aria-hidden="true" tabindex="-1"></a>             (distance2 <span class="sc">&gt;</span> <span class="fl">0.2</span> <span class="sc">&amp;</span> <span class="sc">!</span>ADM4_clean <span class="sc">%in%</span> high_tolerance_valid_matches) <span class="sc">|</span></span>
+<span id="cb12-116"><a href="#cb12-116" aria-hidden="true" tabindex="-1"></a>             ADM4_clean <span class="sc">%in%</span> low_tolerance_invalid_marches <span class="sc">~</span> <span class="cn">NA</span>,</span>
+<span id="cb12-117"><a href="#cb12-117" aria-hidden="true" tabindex="-1"></a>             <span class="cn">TRUE</span> <span class="sc">~</span> .)))</span>
+<span id="cb12-118"><a href="#cb12-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-119"><a href="#cb12-119" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(correspondence_table3, <span class="st">"output/correspondence_table3.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="method-6-manual-completion" class="level3" data-number="2.4.1">
+<h3 data-number="2.4.1" class="anchored" data-anchor-id="method-6-manual-completion"><span class="header-section-number">2.4.1</span> Method 6 : Manual completion</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Manual addition of data</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a> edit_mne <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tribble</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>j0,          <span class="sc">~</span>j42,                      <span class="sc">~</span>j4,             <span class="sc">~</span>ADM4_clean,     <span class="sc">~</span>ADM4_PCODE,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L,  <span class="st">"Ambatolahy"</span>,             <span class="st">"Antevamena"</span>,  <span class="st">"Soaserana Antevamena"</span>, <span class="st">"MG54511091002"</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L,  <span class="st">"Ankilizato"</span>,            <span class="st">"Andranovory"</span>,                      <span class="cn">NA</span>,              <span class="cn">NA</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L,  <span class="st">"Ankilizato"</span>,             <span class="st">"Avaradrano"</span>, <span class="st">"Ankilizato Avaradrano"</span>, <span class="st">"MG54509091005"</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L,  <span class="st">"Ankilizato"</span>,           <span class="st">"Malainkirafy"</span>,                      <span class="cn">NA</span>,              <span class="cn">NA</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L,  <span class="st">"Ankilizato"</span>,                <span class="st">"Tanana?"</span>,                      <span class="cn">NA</span>,              <span class="cn">NA</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L,       <span class="st">"Isalo"</span>,             <span class="st">"Antanambao"</span>,                <span class="st">"Bepeha"</span>, <span class="st">"MG54511072003"</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L, <span class="st">"Malaimbandy"</span>,          <span class="st">"Ambonara Nord"</span>,         <span class="st">"Ambonara Nord"</span>, <span class="st">"MG54509130004"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L, <span class="st">"Malaimbandy"</span>,         <span class="st">"Anosibe Bevoay"</span>,                      <span class="cn">NA</span>,              <span class="cn">NA</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L, <span class="st">"Malaimbandy"</span>,     <span class="st">"Antazoa/Matavirano"</span>,           <span class="st">"Malaimbandy"</span>, <span class="st">"MG54509130001"</span>,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L, <span class="st">"Malaimbandy"</span>,           <span class="st">"Mahasoa Nord"</span>,          <span class="st">"Mahasoa Nord"</span>, <span class="st">"MG54509130003"</span>,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L, <span class="st">"Malaimbandy"</span>, <span class="st">"Malaimbandy/Avaradrano"</span>,           <span class="st">"Malaimbandy"</span>, <span class="st">"MG54509130001"</span>,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L,  <span class="st">"Tsaraotana"</span>,            <span class="st">"Antsiraraky"</span>,           <span class="st">"Antsiraraky"</span>, <span class="st">"MG54510050001"</span>,</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="dv">52</span>L,  <span class="st">"Tsaraotana"</span>,             <span class="st">"village 51"</span>,                      <span class="cn">NA</span>,              <span class="cn">NA</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Joining</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>correspondence_table4 <span class="ot">&lt;-</span> correspondence_table3 <span class="sc">%&gt;%</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">mutate</span>(edit_mne, <span class="at">j0 =</span> <span class="fu">as.character</span>(j0)), <span class="at">by =</span><span class="fu">c</span>(<span class="st">"j0"</span>, <span class="st">"j42"</span>, <span class="st">"j4"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  Consolidate new columns</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ADM4_clean =</span> <span class="fu">coalesce</span>(ADM4_clean.y, ADM4_clean.x),</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">ADM4_PCODE =</span> <span class="fu">coalesce</span>(ADM4_PCODE.y, ADM4_PCODE.x)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove former columns</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>ADM4_clean.y, <span class="sc">-</span>ADM4_clean.x, <span class="sc">-</span>ADM4_PCODE.y, <span class="sc">-</span>ADM4_PCODE.x)</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(correspondence_table4, <span class="st">"output/correspondence_table4.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+</section>
+<section id="validating-the-quality-of-georeferenced-data" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="validating-the-quality-of-georeferenced-data"><span class="header-section-number">2.5</span> Validating the Quality of Georeferenced Data</h2>
+<p>To ensure the robustness and validity of our georeferenced data, we employ a multi-tiered validation approach that hinges on quantitative metrics and qualitative consistency checks.</p>
+<section id="quantitative-metrics" class="level3" data-number="2.5.1">
+<h3 data-number="2.5.1" class="anchored" data-anchor-id="quantitative-metrics"><span class="header-section-number">2.5.1</span> Quantitative metrics</h3>
+<p>We first look at the distribution of the unique observations that were successfully matched during the various stages of the georeferencing process.</p>
+<div id="tbl-stats-matching" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-stats-matching-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.1: Number of ROS observation which commune and village were matched
+</figcaption>
+<div aria-describedby="tbl-stats-matching-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Re-format modality labels  </span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>matching_tbl <span class="ot">&lt;-</span> correspondence_table3 <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">method =</span> <span class="fu">case_when</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    method <span class="sc">==</span> <span class="st">"method_1"</span> <span class="sc">~</span> <span class="st">"Method 1"</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    method <span class="sc">==</span> <span class="st">"method_2"</span> <span class="sc">~</span> <span class="st">"Method 2"</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    method <span class="sc">==</span> <span class="st">"method_3"</span> <span class="sc">~</span> <span class="st">"Method 3"</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    method <span class="sc">==</span> <span class="st">"method_4"</span> <span class="sc">~</span> <span class="st">"Method 4"</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(method) <span class="sc">~</span> <span class="st">"Unmatched communes"</span>),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">method_village =</span> <span class="fu">case_when</span>(</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>      method_village <span class="sc">==</span> <span class="st">"method_5"</span> <span class="sc">~</span> <span class="st">"Matched villages"</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(method_village) <span class="sc">~</span> <span class="st">"Unmatched villages"</span>))</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>summarized_data <span class="ot">&lt;-</span> matching_tbl <span class="sc">%&gt;%</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(method, method_village) <span class="sc">%&gt;%</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total_obs =</span> <span class="fu">sum</span>(obs_count, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">percent_obs =</span> total_obs<span class="sc">/</span><span class="fu">sum</span>(total_obs))</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>count_tbl <span class="ot">&lt;-</span> summarized_data <span class="sc">%&gt;%</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(method, method_village, total_obs) <span class="sc">%&gt;%</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> method_village, <span class="at">values_from =</span> total_obs, </span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Total =</span> <span class="fu">sum</span>(<span class="fu">c</span>(<span class="st">`</span><span class="at">Matched villages</span><span class="st">`</span>, <span class="st">`</span><span class="at">Unmatched villages</span><span class="st">`</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()  <span class="sc">%&gt;%</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">adorn_totals</span>(<span class="st">"row"</span>)</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>percent_tbl <span class="ot">&lt;-</span> summarized_data <span class="sc">%&gt;%</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(method, method_village, percent_obs) <span class="sc">%&gt;%</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> method_village, <span class="at">values_from =</span> percent_obs, </span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Total (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="fu">c</span>(<span class="st">`</span><span class="at">Matched villages</span><span class="st">`</span>, <span class="st">`</span><span class="at">Unmatched villages</span><span class="st">`</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Matched villages (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Matched villages</span><span class="st">`</span>,</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Unmatched villages (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Unmatched villages</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">round</span>(.x <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">2</span>)),</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>         <span class="fu">across</span>(<span class="fu">where</span>(is.numeric))) <span class="sc">%&gt;%</span></span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">adorn_totals</span>(<span class="st">"row"</span>)</span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>summarized_data2 <span class="ot">&lt;-</span> count_tbl <span class="sc">%&gt;%</span></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(percent_tbl, <span class="at">by =</span> <span class="st">"method"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(method, <span class="st">`</span><span class="at">Matched villages</span><span class="st">`</span>, <span class="st">`</span><span class="at">Matched villages (%)</span><span class="st">`</span>, </span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>           <span class="st">`</span><span class="at">Unmatched villages</span><span class="st">`</span>, <span class="st">`</span><span class="at">Unmatched villages (%)</span><span class="st">`</span>,</span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>           Total, <span class="st">`</span><span class="at">Total (%)</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Commune matching method</span><span class="st">`</span> <span class="ot">=</span> method)</span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a><span class="fu">gt</span>(summarized_data2)  <span class="sc">%&gt;%</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add a title</span></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Result of matching process"</span>,</span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a>             <span class="at">subtitle =</span> <span class="st">"Number of survey observation per method"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</figure>
+</div>
+</section>
+<section id="consistency-check-with-documentation" class="level3" data-number="2.5.2">
+<h3 data-number="2.5.2" class="anchored" data-anchor-id="consistency-check-with-documentation"><span class="header-section-number">2.5.2</span> Consistency check with documentation</h3>
+<p>To ensure the comprehensiveness of our georeferencing process, we summarize the list of unique matches for villages from all the municipalities in the final dataset. This check will help ensure there are no glaring gaps in the matched data.</p>
+<div id="tbl-list-muni" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-list-muni-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2.2: List of fokontany per commune and observatory
+</figcaption>
+<div aria-describedby="tbl-list-muni-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fokontany_list <span class="ot">&lt;-</span> correspondence_table3 <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">j0 =</span> <span class="fu">as.numeric</span>(j0)) <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(observatory_names, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"j0"</span> <span class="ot">=</span> <span class="st">"code"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">OBS_NAME =</span> name) <span class="sc">%&gt;%</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(<span class="fu">st_drop_geometry</span>(fokontany), ADM4_PCODE, ADM4_EN),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">"ADM4_PCODE"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(OBS_NAME, ADM3_EN) <span class="sc">%&gt;%</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">ADM4_EN =</span> <span class="fu">list</span>(<span class="fu">unique</span>(<span class="fu">if_else</span>(<span class="fu">is.na</span>(ADM4_EN), <span class="st">"Unknown"</span>, ADM4_EN)))) <span class="sc">%&gt;%</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ADM4_EN =</span> <span class="fu">map_chr</span>(ADM4_EN, <span class="sc">~</span> <span class="fu">str_c</span>(.x, <span class="at">collapse =</span> <span class="st">", "</span>)))</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>fokontany_list <span class="sc">%&gt;%</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Observatory Name</span><span class="st">`</span> <span class="ot">=</span> OBS_NAME,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Commune Name</span><span class="st">`</span> <span class="ot">=</span> ADM3_EN,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Fokontany Names</span><span class="st">`</span> <span class="ot">=</span> ADM4_EN) <span class="sc">%&gt;%</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  DT<span class="sc">::</span><span class="fu">datatable</span>(<span class="at">caption =</span> <span class="st">"List of fokontany per commune and observatory"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</figure>
+</div>
+<p>We compare this with the ROS documentation to assess which villages might have been omitted by our algorithm.</p>
+</section>
+<section id="visual-exploration-and-avenues-for-continuous-corrections" class="level3" data-number="2.5.3">
+<h3 data-number="2.5.3" class="anchored" data-anchor-id="visual-exploration-and-avenues-for-continuous-corrections"><span class="header-section-number">2.5.3</span> Visual exploration and avenues for continuous corrections</h3>
+<p>We visually explore the the georeferenced data to observe its spatial distribution and spot eventual anomalies or clustering patterns that might not be immediately obvious from numerical summaries. The visualization below maps out our matched municipalities alongside villages. Discrepancies or clusters may indicate a need for further refinement or correction.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>commmune_pcode_years <span class="ot">&lt;-</span> correspondence_table4 <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Split and unnest the years</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">years =</span> <span class="fu">str_split</span>(years, <span class="st">", "</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(years) <span class="sc">%&gt;%</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Convert years to numeric for proper sorting</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">years =</span> <span class="fu">as.numeric</span>(years)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Group by ADM3_PCODE and extract unique, sorted years</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ADM3_PCODE) <span class="sc">%&gt;%</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">years =</span> <span class="fu">list</span>(<span class="fu">unique</span>(years))) <span class="sc">%&gt;%</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Sort and collapse the years</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">years =</span> <span class="fu">map_chr</span>(years, <span class="sc">~</span> <span class="fu">paste</span>(<span class="fu">sort</span>(.x), <span class="at">collapse =</span> <span class="st">", "</span>)))</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>fokontany_pcode_years <span class="ot">&lt;-</span> correspondence_table4 <span class="sc">%&gt;%</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Split and unnest the years</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">years =</span> <span class="fu">str_split</span>(years, <span class="st">", "</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(years) <span class="sc">%&gt;%</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Convert years to numeric for proper sorting</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">years =</span> <span class="fu">as.numeric</span>(years)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Group by ADM3_PCODE and extract unique, sorted years</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ADM4_PCODE) <span class="sc">%&gt;%</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">years =</span> <span class="fu">list</span>(<span class="fu">unique</span>(years))) <span class="sc">%&gt;%</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Sort and collapse the years</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">years =</span> <span class="fu">map_chr</span>(years, <span class="sc">~</span> <span class="fu">paste</span>(<span class="fu">sort</span>(.x), <span class="at">collapse =</span> <span class="st">", "</span>)))</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>selected_communes <span class="ot">&lt;-</span> commmune_pcode_years <span class="sc">%&gt;%</span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(ADM3_PCODE)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(obs_communes, <span class="at">by =</span> <span class="st">"ADM3_PCODE"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_sf</span>()</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>selected_fokontany <span class="ot">&lt;-</span> fokontany_pcode_years <span class="sc">%&gt;%</span></span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(ADM4_PCODE)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(fokontany, <span class="at">by =</span> <span class="st">"ADM4_PCODE"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_sf</span>()  <span class="sc">%&gt;%</span></span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">label =</span> <span class="st">"Surveyed______"</span>)</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(selected_communes, <span class="st">"output/selected_communes.rds"</span>)</span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(selected_fokontany, <span class="st">"output/selected_fokontany.rds"</span>)</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"view"</span>)</span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(selected_communes) <span class="sc">+</span> </span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="at">col =</span> <span class="st">"OBS_NAME"</span>, <span class="at">palette =</span> <span class="st">"Set1"</span>, <span class="at">title =</span> <span class="st">"Observatory"</span>,</span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>          <span class="at">id =</span> <span class="st">"ADM3_EN"</span>, <span class="at">legend.show =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>          <span class="at">popup.vars =</span> <span class="fu">c</span>(<span class="st">"Observatory"</span> <span class="ot">=</span> <span class="st">"OBS_NAME"</span>,</span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"Data collection years"</span>  <span class="ot">=</span> <span class="st">"years"</span>,</span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"District"</span> <span class="ot">=</span> <span class="st">"ADM2_EN"</span>,</span>
+<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"Region"</span> <span class="ot">=</span> <span class="st">"ADM1_EN"</span>)) <span class="sc">+</span></span>
+<span id="cb16-49"><a href="#cb16-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(selected_fokontany) <span class="sc">+</span> </span>
+<span id="cb16-50"><a href="#cb16-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="at">col =</span> <span class="st">"label"</span>, <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"black"</span>), <span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">title =</span> <span class="st">"Fokontany"</span>, </span>
+<span id="cb16-51"><a href="#cb16-51" aria-hidden="true" tabindex="-1"></a>          <span class="at">id =</span> <span class="st">"ADM4_EN"</span>, <span class="at">legend.show =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb16-52"><a href="#cb16-52" aria-hidden="true" tabindex="-1"></a>          <span class="at">popup.vars =</span> <span class="fu">c</span>(<span class="st">"Observatory"</span> <span class="ot">=</span> <span class="st">"OBS_NAME"</span>,</span>
+<span id="cb16-53"><a href="#cb16-53" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"Data collection years"</span>  <span class="ot">=</span> <span class="st">"years"</span>,</span>
+<span id="cb16-54"><a href="#cb16-54" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"Commune"</span> <span class="ot">=</span> <span class="st">"ADM3_EN"</span>,</span>
+<span id="cb16-55"><a href="#cb16-55" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"District"</span> <span class="ot">=</span> <span class="st">"ADM2_EN"</span>,</span>
+<span id="cb16-56"><a href="#cb16-56" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"Region"</span> <span class="ot">=</span> <span class="st">"ADM1_EN"</span>)) <span class="sc">+</span></span>
+<span id="cb16-57"><a href="#cb16-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_scale_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>From this summary table, we see that the communes could not be re-identified for 8.18% of the observations and the village could not be re-identified for 38.49% of observations. A manual work to identify villages will have to be implemented to be able to improve this matching.</p>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">2.6</span> Conclusion</h2>
+<p>Given the variability in location labels recorded in the ROS data, we emphasized standardizing and aligning toponyms. We introduced the clean_string function to unify place names, addressing variances in language, letter casing, and o ther descriptors. Utilizing fuzzy matching, we connected similar text strings, using the Levenshtein distance as a benchmark. To heighten accuracy, a hierarchical data matching strategy was applied, reflecting the inherent structure of geographical units, where regions envelop districts, which further consist of municipalities and localities. The COD data, curated by BNGRC and OCHA, was our reference point for these matches. Various techniques, including hierarchical fuzzy matching and visual checks, were employed.</p>
+<p>As a result, we could automatically match 98% of commune name variations in the dataset with an official commune, and 62% of village name variations with a fokontany. The outcomes are consistent with ROS’s internal documentation, and the spatial representations can be further inspected for validation. Future corrections and enhancements are anticipated, and our system, leveraging Quarto notebook and reproducible R code, will facilitate these refinements.</p>
+<p>ROS began its data collection at a time when geolocation best practices weren’t as evolved as they are today. Should more survey rounds be conducted in the future, the intricate georeferencing process demonstrated here should serve both as a cautionary tale and a guide on optimizing data registration (for instance, using PCODES). We’re optimistic that refining the georeferencing of past ROS data, as presented in this work, will amplify the data’s utility for both research and policy decisions.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link" aria-label="Using the rural observatory data to assess the protected areas impacts on household living conditions.">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Using the rural observatory data to assess the protected areas impacts on household living conditions.</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./02_Overlaps_PAs_observatories.html" class="pagination-link" aria-label="Overlaps between ROS data and PAs">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Overlaps between ROS data and PAs</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

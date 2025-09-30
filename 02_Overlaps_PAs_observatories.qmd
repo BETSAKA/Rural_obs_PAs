@@ -1,0 +1,350 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Overlaps between ROS data and PAs
+
+Following the georeferencing of ROS household survey sites (previous chapter), we now examine how these locations overlap with the official boundaries of Madagascar’s protected areas. This section investigates both spatial and temporal overlaps, with the objective of identifying observatories that can serve as relevant cases for impact evaluation of conservation policies.
+
+## Spatial overlaps
+
+We begin by mapping the communes and fokontany surveyed by ROS against the SAPM (Système des Aires Protégées de Madagascar) dataset. This step provides a visual overview of which observatories are located in or near protected areas.
+
+```{r map_ros_pas}
+#| label: "Map ROS sites and PAs"
+
+library(tidyverse) # A series of packages for data manipulation
+library(haven) # Load stata dataset
+library(sf) # for spatial data handling
+library(tmap) # for mapping
+library(readxl) # Read data frames to Excel format
+library(gt)
+
+selected_communes <- read_rds("output/selected_communes.rds")
+selected_fokontany <- read_rds("output/selected_fokontany.rds")
+Vahatra <- st_read("data/Vahatra/Shapefiles/AP_Vahatra.shp", 
+                   quiet = TRUE) %>%
+  st_make_valid()
+
+
+tmap_mode("view")
+tm_shape(selected_communes) + 
+  tm_polygons(fill = "OBS_NAME", col = NULL,
+              fill.legend = tm_legend_hide(),
+          popup.vars = c("Observatory" = "OBS_NAME",
+                         "Data collection years"  = "years",
+                         "District" = "ADM2_EN",
+                         "Region" = "ADM1_EN")) +
+  tm_shape(selected_fokontany) + 
+  tm_polygons(fill = "label", palette = c("black"), fill_alpha = 0.6, 
+              fill.legend = tm_legend_hide(),
+          popup.vars = c("Observatory" = "OBS_NAME",
+                         "Data collection years"  = "years",
+                         "Commune" = "ADM3_EN",
+                         "District" = "ADM2_EN",
+                         "Region" = "ADM1_EN")) +
+  tm_shape(Vahatra) + 
+  tm_polygons(col = "darkgreen", fill_alpha = 0.4,
+          popup.vars = c("Year creation" = "an_crtn",
+                         "IUCN category" = "cat_icn",
+                         "Manager" = "gest_1",
+                         "Manager 2" = "gest_2")) +
+  tm_scalebar()
+
+```
+
+This visualization highlights areas of potential interaction between ROS survey sites and PAs, which form the basis for further analysis.
+
+## Inventory of ROS data
+
+Before analyzing overlaps with PAs, we establish a complete inventory of the ROS survey data. We load the household-level datasets for each year between 1995 and 2015 and count the number of households surveyed per observatory. This provides the temporal coverage required to assess potential baselines and follow-up data.
+
+```{r obs_survey_count}
+#| label: "Count surveys per observatory"
+
+# Select appropriate folder as data source
+data_path <- "data/ROS_MDG_microdata/"
+
+# Define a function to load and count surveys per observatory for a given year
+load_and_count <- function(year, factorize = FALSE) {
+  # Define file path
+  file_path <- paste0(data_path, year, "/res_deb.dta")
+  
+  # Load data
+  data <- read_dta(file_path)
+  
+  # Extract label and convert to factors if option
+  if (factorize) {
+    data <- data %>%
+      mutate(across(everything(), as.character),
+             across(where(is.labelled), ~ as.character(as_factor(.))))
+  }
+  
+  # Count surveys per observatory
+  count_data <- data %>%
+    group_by(j0) %>%
+    summarise(survey_count = n()) %>%
+    ungroup() %>%
+    mutate(year = year)  # Add year column
+  
+  return(count_data)
+}
+
+# Generate a list of years
+years <- 1995:2015
+
+# Use purrr::map_df to loop through each year and bind results
+obs_count <- map_df(years, load_and_count) %>%
+  # Remove rows with observatory "7 " and "NA", which are errors
+  filter(j0 != 7 & !is.na(j0) & survey_count > 1) %>%
+  rename(observatory = j0)
+
+# Read observatory names
+observatory_names <- readxl::read_xlsx("data/observatory_names.xlsx") %>%
+  select(code, observatory_name = name)
+
+# PAss it to wide.
+obs_count <- obs_count %>%
+  left_join(observatory_names, by = c("observatory" = "code")) %>%
+  group_by(observatory_name, year) %>%
+  summarise(survey_count = sum(survey_count))
+
+# Pivot to wide: observatories as rows, years as columns
+obs_table <- obs_count %>%
+  ungroup() %>%
+  pivot_wider(
+    names_from = year,
+    values_from = survey_count,
+    values_fill = 0  # replace missing values with 0
+  ) %>%
+  arrange(observatory_name)
+
+# Display nicely as a table
+library(gt)
+obs_table %>%
+  gt() %>%
+  tab_header(
+    title = "Number of surveyed households per observatory and year"
+  )
+```
+
+This inventory highlights the heterogeneity of survey continuity across observatories, with some monitored only for a few years while others offer long continuous panels.
+
+## Temporal overlaps
+
+For spatially overlapping situations, we now examine the timing of ROS surveys relative to the official creation years of protected areas. Several cases can be identifies:
+
+- If PAs predate ROS entirely, they can not be used for impact evaluation (no baseline).
+- If PAs were created while ROS surveys were ongoing, some impact analysis can already be undertaken. 
+- If PAs were created after ROS surveys ended, the existing data can only serve as baseline and we need to re-survey the area to perform before-after analysis.
+
+```{r timing_ro_pa}
+#| label: fig-ror-pa-years
+#| fig-cap: "Timing of ROR surveys and neigbouring PA creations"
+
+Vahatra <- Vahatra %>%
+  mutate(nom = ifelse(str_starts(nom, "Corridor Forestier Ambositra-Vondrozo"),
+                      "Corridor Forestier Ambositra-Vondrozo", nom))
+
+obs_PA <- tibble::tribble(
+       ~Observatory_name,                                ~PA_Name,
+              "Marovoay",                        "Ankarafantsika",
+               "Alaotra",                           "Lac Alaotra",
+               "Alaotra",          "Corridor Ankeniheny Zahamena",
+           "Menabe-Belo",                       "Menabe Antimena",
+         "Ambohimahasoa",                            "Ranomafana",
+         "Ambohimahasoa", "Corridor Forestier Ambositra-Vondrozo",
+          "Fianarantsoa", "Corridor Forestier Ambositra-Vondrozo",
+             "Tanandava", "Complexe Zones Humides Mangoky Ihotry",
+         "Toliara North",                                 "Mikea",
+       "Toliara coastal",                       "Tsimanampesotsa",
+              "Tolanaro",                            "Andohahela",
+               "Tsivory",                  "Vohidava-Betsimalaho",
+         "Toliara North",                           "Ranobe PK32")
+
+
+
+# Combine the PA name and observatory name into a single label for faceting
+obs_PA <- obs_PA %>%
+  mutate(facet_label = paste(PA_Name, "-", Observatory_name))
+
+# Fetch Survey Years and add as a new column in obs_PA
+obs_PA1 <- obs_PA %>%
+  rowwise() %>%
+  mutate(year = Vahatra %>%
+      filter(nom == PA_Name) %>%
+      pull(an_crtn) %>%
+      unique(),
+    year_type = "PA creation year",
+    dot_size = 3) %>%
+  ungroup()
+
+obs_PA2 <- obs_PA %>%
+  rowwise() %>%
+  mutate(year = list(
+    obs_count %>%
+      filter(observatory_name == Observatory_name) %>%
+      pull(year)),
+    year_type = "ROR survey year",
+    dot_size = 2) %>%
+  ungroup() %>%
+  unnest(year)
+
+obs_PA <- bind_rows(obs_PA1, obs_PA2)
+
+# Create the facet plot
+ggplot(obs_PA, aes(x = year, y = facet_label)) +
+  geom_point(aes(color = year_type, size = dot_size)) +
+  scale_color_manual(
+    values = c("ROR survey year" = "blue", "PA creation year" = "red"),
+    name = "",
+    labels = c("PA creation year", "ROR survey year")
+  )+
+  scale_size(
+    range = c(2, 4),
+    guide = "none"  # This removes the size scale from the legend
+  ) +
+  scale_x_continuous(limits = c(1990, 2015)) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "top")
+```
+
+As it can be seen here, the Ranomanfana protected area that was created well before the ROR surveys. Two protected areas where created during ROR survey years: Ankarafantsika protected area (Marovoay observatory) and Mikea (Toliara Nord observatory). 8 other protected areas were created after the ROR surveys had stoped: Vohidava, Tsimanampesotsoa, Menabe Antinmena, Lac Alaotra, Corridor Forestier Abositra-Vodronzo, Corridor Ankeniheny Zahamena, Complexe Zones Humides Mangoky Ihotry and Andohahela.
+
+
+## Revising decree dates
+
+Official PA creation years do not always correspond to the first implementation of conservation rules. In some cases, temporary decrees (décrets provisoires) preceded the final legal establishment of a PA. We therefore cross-checked dates with [official legislation (CNLEGIS)](https://cnlegis.gov.mg) and revised several creation years accordingly.
+
+
+```{r}
+
+obs_PA1_revu <- obs_PA1 %>%
+  bind_rows(
+    filter(obs_PA1, str_detect(PA_Name, "Zahamena")) %>%
+      mutate(year = 2005),
+    filter(obs_PA1, str_detect(PA_Name, "Alaotra")) %>%
+      mutate(year = 2007),
+    filter(obs_PA1, str_detect(PA_Name, "Mangoky")) %>%
+      mutate(year = 2008),
+    filter(obs_PA1, str_detect(PA_Name, "Vondrozo")) %>%
+      mutate(year = 2008),
+    filter(obs_PA1, str_detect(PA_Name, "Antimena")) %>%
+      mutate(year = 2006),
+    filter(obs_PA1, str_detect(PA_Name, "Mikea")) %>%
+      mutate(year = 2007),
+    filter(obs_PA1, str_detect(PA_Name, "Ranobe")) %>%
+      mutate(year = 2008))
+
+obs_PA_revu <- bind_rows(obs_PA1_revu, obs_PA2) %>%
+  filter(!(PA_Name %in% c("Tsimanampesotsa", "Ranomafana")))
+
+# Create the facet plot
+ggplot(obs_PA_revu, aes(x = year, y = facet_label)) +
+  geom_point(aes(color = year_type, size = dot_size)) +
+  scale_color_manual(
+    values = c("ROR survey year" = "blue", "PA creation year" = "red"),
+    name = "",
+    labels = c("PA creation year", "ROR survey year")
+  )+
+  scale_size(
+    range = c(2, 4),
+    guide = "none"  # This removes the size scale from the legend
+  ) +
+  scale_x_continuous(limits = c(1990, 2015)) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "top")
+```
+
+This refinement ensures that the temporal alignment between ROS and PA timelines better reflects the actual policy environment faced by households.
+
+## Mapping priority overlaps
+
+Based on these adjustments, we produce a refined map focusing on observatories located near PAs with verified temporal overlaps. This includes applying buffers to account for households living near but outside official PA polygons.
+
+```{r}
+
+selected_communes2 <- selected_communes %>%
+  filter(OBS_NAME %in% obs_PA_revu$Observatory_name)
+selected_fokontany2 <- selected_fokontany %>%
+  st_filter(selected_communes2, .predicate = st_overlaps)
+Vahatra2 <- Vahatra %>%
+  filter(nom %in% obs_PA_revu$PA_Name) %>%
+  mutate(temp_decree_year = case_when(
+    str_detect(nom, "Zahamena") ~ 2005,
+    str_detect(nom, "Alaotra") ~ 2007,
+    str_detect(nom, "Mangoky") ~ 2008,
+    str_detect(nom, "Vondrozo") ~ 2008,
+    str_detect(nom, "Antimena") ~ 2006,
+    str_detect(nom, "Mikea") ~ 2007,
+    str_detect(nom, "Ranobe") ~ 2008,
+    .default = NA),
+    an_crtn = as.character(an_crtn),
+    an_crtn = case_when(
+      str_detect(nom, "Ankarafantsika") ~ "1927-2002",
+      .default = an_crtn))
+
+Vahatra2_buffer <- Vahatra2 %>%
+  st_transform(crs = 29701) %>%
+  st_buffer(dist = 10000) %>%
+  st_transform(crs = 4326)
+
+# library(wdpar)
+# wdpa <- wdpar::wdpa_read("Madagascar")
+# write_rds(wdpa, "data/wdpa/wdpa_202406.rds")
+wdpa <- read_rds("data/wdpa/wdpa_202406.rds")
+   
+tmap_mode("view")
+tm_shape(selected_communes2) + 
+  tm_fill(col = "OBS_NAME", palette = "Set1", title = "Observatory",
+          id = "ADM3_EN", legend.show = FALSE,
+          popup.vars = c("Observatory" = "OBS_NAME",
+                         "Data collection years"  = "years",
+                         "District" = "ADM2_EN",
+                         "Region" = "ADM1_EN")) +
+  tm_shape(selected_fokontany2) + 
+  tm_fill(col = "label", palette = c("black"), alpha = 0.6, title = "Fokontany", 
+          id = "ADM4_EN", legend.show = FALSE,
+          popup.vars = c("Observatory" = "OBS_NAME",
+                         "Data collection years"  = "years",
+                         "Commune" = "ADM3_EN",
+                         "District" = "ADM2_EN",
+                         "Region" = "ADM1_EN")) +
+  tm_shape(Vahatra2) + 
+  tm_fill(col = "darkgreen", alpha = 0,
+          popup.vars = c("Year temporal decree" = "temp_decree_year",
+                         "Year creation" = "an_crtn",
+                         "IUCN category" = "cat_icn",
+                         "Manager" = "gest_1",
+                         "Manager 2" = "gest_2")) +
+  tm_borders(col = "darkgreen") +
+  tm_shape(Vahatra2_buffer) +
+  tm_borders(col = "lightgreen") +
+ # tm_shape(wdpa) + 
+ # tm_fill(col = "darkgreen", alpha = 0.4) +
+  tm_scale_bar()
+```
+
+The resulting selection highlights a few priority observatory–PA pairs that combine strong temporal coverage and spatial relevance.
+
+## Priorization for analysis
+
+From this process, we identified a short list of priority pairs:
+
+- Marovoay – Ankarafantsika
+- Alaotra – Lac Alaotra and Corridor Ankeniheny–Zahamena (CAZ)
+- Tolanaro – Andohahela
+- Toliara North – Mikea
+- Fenerive East – Tampolo
+
+Among these, Marovoay–Ankarafantsika and Alaotra–Alaotra/CAZ emerge as the most promising candidates for in-depth impact evaluation, given their data richness and close alignment with PA creation.
+
+## Limitations and next steps
+
+It is important to note that ROS observatories represent a unique opportunity to obtain long time baseline and follow-up data on socioeconomic impacts of PAs, but ROS were not designed with conservation impacts in mind. Their locations were chosen for agricultural and socio-economic monitoring, not proximity to PAs. As such, overlaps are partly coincidental and require cautious interpretation. 

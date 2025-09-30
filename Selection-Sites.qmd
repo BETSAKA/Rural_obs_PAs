@@ -1,0 +1,165 @@
+---
+title: "Traitement et géolocalisation des données des OR"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+# Introduction
+
+Ce document Quarto décrit les étapes de traitement et de fusion des données issues des Observatoires Ruraux (OR) de Madagascar entre 1995 et 2015. Il présente notamment le processus de géolocalisation des ménages, l'extraction de variables sociodémographiques et la consolidation de jeux de données pour des analyses ultérieures.
+
+Les principales variables utilisées sont :
+
+Pour l'ensemble des fichiers :
+
+-   `j0` : code de l'observatoire
+-   `j5` : identifiant du ménage, les deux premiers caractères indiquent le numéro de l'observatoire, et le troisième correspond au site.
+
+Dans les fichiers de renseignements sur les ménages `res_deb` :
+
+-   `j4` : nom du village
+-   `j42` : nom de la commune
+
+Dans les fichiers sur les membres du ménage (res_m en 1995, res_m_a ensuite) :
+
+-   `m` : identifiant de membre du ménage  
+-   `m4` : sexe du membre  
+-   `m5` : âge du membre   
+-   `m6` : lien au chef du ménage (1 = chef)
+
+Dans le fichier de correspondance spatiale :
+
+-   `ADM3_PCODE` : code de la commune (niveau administratif 3)
+-   `ADM4_PCODE` : code du village (niveau administratif 4)
+
+# Géolocalisation des données des OR
+
+Nous commençons par fusionner les données relatives aux ménages, observatoires, communes et villages. L’objectif est d’associer à chaque ménage un niveau de géolocalisation correspondant aux communes (ADM3) et villages (ADM4).
+
+# Structuration des données
+
+```{r}
+household_consolidated <- read_rds("data/household_consolidated.rds")
+
+# Remove outliers in revcou_partiel using the 5th and 95th percentiles
+quant <- quantile(household_consolidated$revcou_partiel, 
+                  probs = c(0.05, 0.95), 
+                  na.rm = TRUE)
+household_consolidated2 <- household_consolidated %>%
+  filter(revcou_partiel >= quant[1], revcou_partiel <= quant[2])
+
+# Create site-level identifiers and treatment indicator, select relevant variables
+panel_hh <- household_consolidated2 %>%
+  mutate(
+    site_id = substr(j5, 1, 3),
+    site_id2 = ifelse(site_id == "032", "031", site_id),
+    obs = j0,
+    treatment = if_else(site_id %in% c("031", "032") & year >= 2003, 1, 0)
+  ) %>%
+  select(j5, site_id, site_id2, year, treatment, rev_riz, rev_cu,
+         revcou_partiel, food_selfsuff_months, n_membres)  |> 
+  distinct(j5, year, .keep_all = TRUE)
+
+# Aggregate to site-year level with mean values
+panel_site <- panel_hh %>%
+  group_by(site_id, site_id2, year, treatment) %>%
+  summarise(
+    revcou_partiel = mean(revcou_partiel, na.rm = TRUE),
+    rev_riz = mean(rev_riz, na.rm = TRUE),
+    rev_cu = mean(rev_cu, na.rm = TRUE),
+    food_selfsuff_months = mean(food_selfsuff_months, na.rm = TRUE),
+    n_membres = mean(n_membres, na.rm = TRUE),
+    .groups = "drop"
+  ) 
+
+# Plot time trends in income by site, without legend
+
+date_init = 1999
+date_end = 2007
+
+sites_init <- panel_site %>% filter(year == date_init) %>% pull(site_id)
+sites_end <- panel_site %>% filter(year == date_end) %>% pull(site_id)
+
+sites_both_years <- intersect(sites_init, sites_end)
+
+panel_site_filtered <- panel_site %>%
+  filter(site_id2 %in% sites_both_years)
+
+library(panelView)
+panel_site_filtered %>%
+  panelview(Y = "revcou_partiel", D = "treatment",  
+          index = c("site_id","year"), 
+          pre.post = TRUE) 
+```
+
+# gsynth
+
+## Incomes
+
+```{r}
+# remotes::install_github("https://github.com/xuyiqing/gsynth")
+library(gsynth)
+panel_site_filtered2 <- panel_site_filtered %>%
+  filter(year >= 1998)
+
+out_revcou <- gsynth(revcou_partiel ~ treatment + n_membres, 
+              data = panel_site_filtered2,  
+              index = c("site_id","year"), 
+              se = TRUE, 
+              inference = "parametric", 
+              r = c(0, 3),
+              CV = TRUE,
+              force = "two-way", 
+              parallel = TRUE, 
+              min.T0 = 4, 
+              nboots = 100, 
+              seed = 02139)
+
+plot(out_revcou, type = "gap")
+print(out_revcou)
+```
+
+## Food self-sufficiency
+
+```{r}
+
+out_food <- gsynth(food_selfsuff_months ~ treatment, 
+              data = panel_site_filtered2,  
+              index = c("site_id","year"), 
+              se = TRUE, 
+              inference = "parametric", 
+              r = c(0, 3),
+              CV = TRUE,
+              force = "two-way", 
+              parallel = TRUE, 
+              min.T0 = 4, 
+              nboots = 100, 
+              seed = 02139)
+
+plot(out_food, type = "gap")
+print(out_revcou)
+```
+
+# Predictabilité à Alaotra
+
+```{r}
+panel_site_maro_alaotra <- panel_site_filtered %>%
+  filter(substr(site_id, 1, 2) %in% c("03", "21")) %>%
+  group_by(site_id, site_id2, year, treatment) %>%
+  summarise(
+    revcou_partiel = mean(revcou_partiel, na.rm = TRUE),
+    rev_riz = mean(rev_riz, na.rm = TRUE),
+    rev_cu = mean(rev_cu, na.rm = TRUE),
+    food_selfsuff_months = mean(food_selfsuff_months, na.rm = TRUE),
+    n_membres = mean(n_membres, na.rm = TRUE),
+    .groups = "drop"
+  ) 
+
+panel_site_maro_alaotra %>%
+  panelview(Y = "revcou_partiel", D = "treatment",  
+          index = c("site_id","year"), 
+          pre.post = TRUE) 
+```
+
+## Test with marovoay
