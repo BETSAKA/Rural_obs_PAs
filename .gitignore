@@ -48,5 +48,9 @@ rsconnect/
 /.quarto/
 
 # data
-
 data/*
+
+# positron/vscode settings
+extensions.json
+settings.json
+air.toml
