@@ -69,8 +69,9 @@ obs_maro <- read_rds("output/correspondence_table4.rds") %>%
   filter(OBS_NAME == "Marovoay")
 
 obs_maro_communes <- st_read(
-  "data/Observatoires_ROS_communes_COD_v3.gpkg",
+  "data/Observatoires_ROS_communes_COD_v4.gpkg",
   quiet = TRUE) %>%
+  select(-OBS_CODE) %>% 
   left_join(select(observatory_names, name, code), 
             by = c("OBS_NAME" = "name")) %>%
   rename(OBS_CODE = code) %>%
@@ -81,7 +82,7 @@ obs_maro_fokontany <- st_read(
   quiet = TRUE) %>%
   filter(ADM3_PCODE %in% obs_maro_communes$ADM3_PCODE & !is.na(OBS_NAME))
 
-ankarafantsika_2025 <- wdpa_read("data/WDPA_WDOECM_Jul2025_Public_MDG.zip") %>% 
+ankarafantsika_2025 <- wdpa_read("data/WDPA_WDOECM_Nov2025_Public_MDG.zip") %>% 
   filter(NAME == "Ankarafantsika")
 
 tmap_mode("view")
