@@ -49,12 +49,23 @@ rsconnect/
 *_files/
 *_cache/
 _freeze/
+docs/
 
 # data
 data/*
 
+# legacy directories (kept on main, removed from paper-website)
+archive/
+documentation/
+output/
+exemples_stata/
+utils/
+images/
+
 # positron/vscode settings
+.vscode/
 extensions.json
 settings.json
 air.toml
 **/*.quarto_ipynb
+bash.exe.stackdump
