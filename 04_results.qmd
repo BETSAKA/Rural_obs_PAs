@@ -10,44 +10,118 @@ source("R/gsynth_helpers.R")
 source("R/plot_themes.R")
 ```
 
-<!-- TODO: Extract core results from archive/12_strict_vs_multipurpose.qmd -->
+```{r}
+#| label: load-results
+#| eval: false
 
-# Marovoay / Ankarafantsika (strict conservation) {#sec-maro}
+# TODO: Load cached gsynth results
+# gs_maro <- read_rds("data/paper14_gsynth_maro_oecd.rds")
+# gs_ala  <- read_rds("data/paper14_gsynth_ala_oecd.rds")
+```
 
-<!-- 
-Content to develop:
-- gsynth estimation with 9 donors, then 5 clean donors
-- ATT event study plot
-- Counterfactual trajectory plot
-- ATT ≈ -0.31 log points (equivalised income)
-- Pre-treatment fit assessment
--->
+# Ankarafantsika: strict conservation (IUCN II) {#sec-maro}
 
-# Alaotra / Lac Alaotra (multipurpose conservation) {#sec-ala}
+## Panel construction
 
-<!-- 
-Content to develop:
-- gsynth estimation with equivalent donor pools
-- ATT event study plot  
-- Near-zero effect: ATT ≈ +0.01 log points
-- Pre-treatment fit assessment
--->
+The Marovoay model comprises 2 treated sites (Bepako and Madiromiongana, east bank) and approximately 60 donor sites from 9 observatories. The treatment period begins in 2003, providing 4 pre-treatment years (1999–2002) and up to 12 post-treatment years (2003–2014).
+
+## gsynth ATT path {#sec-maro-att}
+
+```{r}
+#| label: fig-maro-att
+#| fig-cap: "Ankarafantsika: gsynth ATT path for east-bank sites relative to treatment onset (2003). Outcome: log OECD-equivalised income. Shaded band: 95% parametric bootstrap CI."
+#| eval: false
+
+# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (fig-maro-att)
+```
+
+The gsynth estimator finds a persistent negative treatment effect on equivalised household income at the east-bank Marovoay sites. The average post-treatment ATT is approximately {{< var att_maro >}} log points, corresponding to a roughly 27% decline in equivalised income relative to the synthetic counterfactual. The effect emerges shortly after the 2002 reclassification and does not attenuate over the observation period.
+
+## Unit-specific effects
+
+```{r}
+#| label: fig-maro-units
+#| fig-cap: "Unit-specific treatment effects for the two east-bank fokontany."
+#| eval: false
+
+# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (fig-maro-units)
+```
+
+Both treated fokontany show negative effects, though with different magnitudes. Bepako (5.2 km from the park boundary) shows a larger and more consistent effect than Madiromiongana (11.7 km), consistent with a distance gradient in enforcement intensity.
+
+# Lac Alaotra: multipurpose conservation (IUCN VI) {#sec-ala}
+
+## Panel construction
+
+The Alaotra model has 1 treated unit (the aggregated observatory) and approximately 60 donor sites. The treatment period begins in 2008, providing 9 pre-treatment years (1999–2007) and 7 post-treatment years (2008–2014).
+
+## gsynth ATT path {#sec-ala-att}
+
+```{r}
+#| label: fig-ala-att
+#| fig-cap: "Lac Alaotra: gsynth ATT path for the aggregated observatory relative to treatment onset (2008). Outcome: log OECD-equivalised income. Shaded band: 95% parametric bootstrap CI."
+#| eval: false
+
+# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (fig-ala-att)
+```
+
+The Alaotra gsynth estimates an average post-treatment ATT of approximately {{< var att_ala >}} log points — close to zero and not statistically significant. The confidence interval comfortably spans zero. Year-by-year estimates are noisy with no clear trend away from the counterfactual.
+
+The null result is consistent with several interpretations: participatory conservation under CBNRM may impose lower costs on aggregate income; the 7-year post-treatment window may be insufficient to detect a gradual effect; and the single-unit design limits statistical power.
 
 # Comparison {#sec-comparison}
 
-<!-- 
-Content to develop:
-- Side-by-side ATT comparison (forest plot or table)
-- Why the contrast? Governance model, enforcement, livelihood integration
-- Placebo tests (in-space)
--->
+```{r}
+#| label: tbl-comparison
+#| tbl-cap: "Summary of gsynth results: strict (Ankarafantsika) vs multipurpose (Alaotra) conservation."
+#| eval: false
+
+# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (tbl-comparison)
+```
+
+```{r}
+#| label: fig-comparison
+#| fig-cap: "Side-by-side ATT paths. Left: Ankarafantsika (strict, from 2003) shows a persistent negative effect. Right: Lac Alaotra (multipurpose, from 2008) shows no significant effect."
+#| eval: false
+
+# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (fig-comparison)
+```
+
+The contrast is striking. Strict enforcement at Ankarafantsika produces a large, persistent negative effect on household income. Participatory conservation at Lac Alaotra produces no detectable aggregate effect. This divergence is consistent with the different institutional arrangements: exclusionary management restricting access to forest resources versus community-based management integrating local livelihoods.
 
 # Long-run evidence: 2025 resurvey {#sec-longrun}
 
-<!-- 
-Content to develop:
-- Repeated cross-section DiD using 2025 wave
-- 22 years post-treatment for Marovoay, 17 for Alaotra
-- Persistence of negative effect around Ankarafantsika
-- Descriptive comparison of 2025 vs pre-treatment levels
--->
+A 2025 resurvey of Marovoay (1,026 households across the same fokontany) extends the observation window to 22 years post-treatment.
+
+## Extended gsynth {#sec-ext-gsynth}
+
+```{r}
+#| label: fig-ext-att
+#| fig-cap: "Extended ATT path for Ankarafantsika east-bank sites (1999–2025). The 2025 point, 22 years after reclassification, shows the largest single-period effect."
+#| eval: false
+
+# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (fig-ext-att)
+```
+
+Including 2025 in the panel, the average post-treatment ATT deepens substantially. The 2025-specific ATT is roughly twice the 1999–2014 average, indicating that income losses compound rather than dissipate over time. The widening gap is visible in raw site-level trajectories:
+
+```{r}
+#| label: fig-ext-traj
+#| fig-cap: "Site-level income trajectories for the four Marovoay fokontany (1998–2025). East-bank (treated, red) and west-bank (control, blue) tracked together through 2003, then diverge persistently."
+#| eval: false
+
+# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (fig-ext-traj)
+```
+
+## Robustness of the 2025 gap {#sec-ext-robust}
+
+The east-west income gap in 2025 is not driven by outliers:
+
+- The gap is visible at *every* percentile of the income distribution.
+- IQR-based outlier removal *widens* the gap (outliers disproportionately favour the east bank).
+- The west-bank advantage spans 5 of 7 major income components.
+- Wilcoxon rank-sum $p = 2.1 \times 10^{-10}$; Welch $t$-test $p = 1.8 \times 10^{-5}$.
+
+## Alaotra long-run assessment {#sec-ext-ala}
+
+For Alaotra, a 2025 gsynth extension is not feasible: all Alaotra sites are treated and no other observatory was resurveyed, so there are no 2025 control observations. The Alaotra estimate remains based on the 1999–2014 panel (ATT ≈ {{< var att_ala >}}, $p = 0.93$).

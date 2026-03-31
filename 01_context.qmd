@@ -3,39 +3,36 @@ title: "Conservation in Madagascar"
 subtitle: "Protected areas, governance models, and rural livelihoods"
 ---
 
-```{r setup}
-#| label: setup
-source("R/load_data.R")
-```
+# Madagascar's protected area expansion {#sec-pa-system}
 
-<!-- TODO: Condense from archive/09_paper_manuscript.qmd intro + archive/12_strict_vs_multipurpose.qmd intro -->
+The international community has committed to protecting 30% of global land and sea by 2030 under the Kunming-Montréal Global Biodiversity Framework. For biodiversity-rich countries like Madagascar, this target translates into sustained pressure to expand and strengthen protected area (PA) networks. Madagascar responded early: at the 2003 Durban World Parks Congress, President Ravalomanana announced the *Durban Vision* — a commitment to triple the country's PA surface from 1.7 million to 6 million hectares [@Kremen2006]. By 2015, the *Système des Aires Protégées de Madagascar* (SAPM) had grown from 47 to over 160 protected areas, covering roughly 12% of the national territory.
 
-# Madagascar's protected area system {#sec-pa-system}
+This expansion was not monolithic. The SAPM introduced a diversity of governance models, ranging from strictly protected national parks under parastatal management (Madagascar National Parks, MNP) to multipurpose landscapes co-managed by international NGOs and local communities through *transferts de gestion*. The IUCN classification system captures this spectrum: Category II parks prioritise ecosystem integrity with limited human use, while Categories V and VI allow sustainable resource extraction and community participation.
 
-<!-- 
-Content to develop:
-- SAPM expansion timeline (Durban Vision 2003, tripling of PA surface)
-- IUCN governance categories relevant to this study (II vs VI)
-- The tension between conservation goals and rural livelihoods
-- Brief literature review: global evidence on PA impacts
--->
+The welfare consequences of this expansion for adjacent rural communities remain contested. A growing quasi-experimental literature finds heterogeneous effects of PAs worldwide: some studies document negative impacts on local incomes and consumption [@Andam2010; @Sims2010], while others find neutral or positive effects, particularly when PAs generate tourism revenues or ecosystem services [@Naidoo2019]. In Madagascar specifically, evidence remains thin and largely cross-sectional [@Ferraro2011]. The few causal studies focus on deforestation outcomes rather than household livelihoods.
+
+A central question in this debate is whether the **governance model** of a protected area matters for the people living around it. Strict exclusionary conservation and participatory community-based management represent fundamentally different social contracts with local populations. Yet most empirical studies treat PAs as homogeneous interventions, comparing "protected" with "unprotected" rather than examining how different institutional arrangements mediate livelihood impacts.
 
 # The Rural Observatory Surveys {#sec-ros}
 
-<!-- 
-Content to develop:
-- What are the ROS? (IRD/Dial, 1995–2015, then 2025 resurvey)
-- 28 observatories across agroecological zones
-- Repeated cross-sections (not panel), ~500 HH per site per year
-- Why this is a rare dataset for impact evaluation
--->
+This study exploits a rare longitudinal dataset: the *Réseau des Observatoires Ruraux* (ROR), a system of Rural Observatory Surveys conducted across Madagascar between 1995 and 2015. Coordinated by IRD and Dial, the ROR surveyed approximately 500 households per observatory per year across up to 28 observatory sites spanning the country's diverse agroecological zones — from the humid eastern lowlands to the semi-arid south.
+
+The ROR operates as a **rotating panel**: each observatory tracks a fixed set of households, but approximately 15% leave the sample each year through death, migration, or attrition, with replacement drawn from the original sampling frame. Over a decade, cumulative attrition reaches roughly 80% of the initial cohort. While this design limits individual-level panel analysis, it preserves **cross-sectional representativeness** at each wave: village-year aggregates consistently estimate the same population quantities, making the data well-suited for site-level quasi-experimental methods.
+
+Critically, several ROR observatories are located adjacent to protected areas that were created or reclassified during the survey period (2002–2008). This overlap between a two-decade household survey and staggered conservation interventions provides a natural laboratory for impact evaluation — one that has not been systematically exploited until now.
+
+A 2025 resurvey of two key sites (Marovoay and Alaotra) adds a long-run perspective, enabling us to assess whether short-run effects persist more than two decades after treatment onset. A further 2026 wave is planned to extend coverage to additional observatories.
 
 # Research question {#sec-research-question}
 
-<!-- 
-Content to develop:
-- Does the GOVERNANCE MODEL of a PA matter for local livelihoods?
-- Strict (Ankarafantsika NP, IUCN II, 2002) vs Multipurpose (Lac Alaotra, IUCN VI, 2008)
-- Why staggered adoption helps identification
-- Preview of the five-observatory extension
--->
+We ask: **does the governance model of a protected area affect household income in surrounding communities?**
+
+We compare two natural experiments embedded in the ROR data:
+
+1. **Strict conservation** — The 2002 reclassification of Ankarafantsika as a national park (IUCN Category II), managed by MNP. The Marovoay observatory straddles the park boundary, with the Betsiboka River creating a natural treatment-control divide between east-bank villages (adjacent to the park) and west-bank villages (effectively separated by the river).
+
+2. **Multipurpose conservation** — The creation of the Lac Alaotra new protected area (IUCN Category VI), managed by Durrell Wildlife Conservation Trust through community-based natural resource management (CBNRM), with effective enforcement from approximately 2008. The entire Alaotra observatory shares dependence on the lake-marsh ecosystem.
+
+Using generalized synthetic control methods [@Xu2017] with an extended donor pool of up to nine additional observatories, we estimate the average treatment effect on the treated (ATT) for equivalised household income. We then extend the analysis to three additional observatory–PA pairs (Farafangana, Toliara North, Fénérive East) where PAs were created in 2006–2007, exploiting the staggered timing to strengthen identification.
+
+The remainder of this document is structured as follows. [Chapter 2](02_data.qmd) describes the data sources and variable construction. [Chapter 3](03_strategy.qmd) details the identification strategy and estimation methods. [Chapter 4](04_results.qmd) presents the main results for Ankarafantsika and Alaotra. [Chapter 5](05_extensions.qmd) extends the analysis to three additional sites. [Chapter 6](06_discussion.qmd) discusses policy implications and outlines plans for the 2026 survey wave.

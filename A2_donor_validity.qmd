@@ -8,24 +8,122 @@ subtitle: "Are donor observatories truly unexposed to conservation interventions
 source("R/load_data.R")
 ```
 
-<!-- 
-Migrate from archive/13_donor_pool_pa_exposure.qmd.
-This is largely self-contained and can be adapted with minimal restructuring.
+The generalised synthetic control estimator requires that **donor pool units are never exposed to the treatment of interest**. In this study, the nine donor observatories used in the primary analysis (@sec-results) should not themselves be adjacent to protected areas that became actively enforced during the 1999--2014 study period. This assumption is plausible by design --- ROS observatories were chosen for agricultural monitoring, not PA proximity --- but has never been systematically verified. This appendix provides a spatial audit.
 
-Key sections:
-- Motivation: why donor pool purity matters for gsynth
-- Dynamic WDPA: temporal PA boundary dataset
-- Proximity analysis: which donors are near active PAs?
-- Results: 4 contaminated, 5 clean donors
-- Implications for main analysis and extensions
--->
 
-# Motivation {#sec-b-motivation}
+# Why static PA boundaries are insufficient {#sec-b-static}
+
+Standard PA databases --- including the current WDPA and the Vahatra dataset --- record the **most recent boundary and designation** of each protected area. They do not convey:
+
+1. **Boundary changes**: many Malagasy PAs were significantly extended or reorganised between 1999 and 2015.
+2. **Temporary protection decrees**: Madagascar's post-2003 SAPM expansion created PAs first via temporary decrees (*décrets provisoires*) before formal designation.
+3. **Date accuracy**: numerous PAs in the static WDPA carry incorrect or missing `STATUS_YR` values.
+
 
 # Dynamic WDPA construction {#sec-b-wdpa}
 
+We use the **dynamic WDPA for Madagascar** (`dynamic_wdpa.rds`), a temporally explicit database that corrects and extends the standard WDPA with historical states derived from legal texts, multiple institutional datasets, and spatially referenced decree dates. Each record carries a valid-from / valid-to date range, allowing us to reconstruct which PA boundaries were legally operative in any given year.
+
+```{r}
+#| label: fig-wdpa-timeline
+#| fig-cap: "Timeline of PA activation dates by observatory. Study period (1999--2014) shaded."
+#| eval: false
+
+# Dot-plot of PA activation dates, colour-coded by observatory exposure type
+```
+
+
 # Proximity analysis {#sec-b-proximity}
+
+## Method
+
+Observatory locations are represented by commune-level polygon centroids from `Observatories_ROS_communes_COD_v4.gpkg`. The dynamic WDPA is filtered to external boundaries active during 1999--2014, then unioned per WDPAID. Both layers are projected to UTM 38S for distance computation.
+
+For each (commune centroid, PA boundary) pair, we compute centroid-to-boundary distance in km. All pairs within **{{< var threshold_km >}} km** are retained and classified by exposure timing:
+
+- **Pre-existing**: PA active before 1999 with unchanged boundaries throughout.
+- **New during study**: PA became operative between 1999 and 2014.
+- **Post-study**: PA created after 2014.
+
+```{r}
+#| label: tbl-proximity
+#| tbl-cap: "All observatory--PA pairs within 20 km, colour-coded by exposure type."
+#| eval: false
+
+# Long-form table: observatory, commune, PA name, IUCN, distance, activation date, exposure type
+```
+
 
 # Results {#sec-b-results}
 
+## Exposure classification
+
+The nine donor observatories fall into three categories:
+
+**Clean** (no PA within 20 km during study period):
+
+- Antsirabe (02)
+- Tsiroanomandidy (13)
+- Ambovombe (16)
+- Mahanoro (25)
+- Itasy (41)
+
+**Potentially contaminated** (new PA within 20 km during study period):
+
+- **Antsohihy (12)** --- within 0.3 km of Corridor forestier Bongolava (IUCN V, 15 September 2006). The commune of Tsarahasina borders the corridor directly. However, Antsohihy's survey ends in 2005, providing only 1 post-2006 year. It is excluded from both the donor pool and the treated sample.
+- **Farafangana (15)** --- within 14 km of Corridor Forestier Ambositra-Vondrozo (IUCN V, 15 September 2006), and with pre-existing proximity to Manombo SR (IUCN IV, 1962). Pre-existing exposure is absorbed by the unit fixed effect; the 2006 CFAV decree represents new treatment.
+- **Toliara North (23)** --- within 1.4 km of Ranobe PK 32 (December 2008), 12 km of Amoron'i Onilahy (January 2007), and 16 km of Mikea NP (April 2007). The most problematic case: a cascade of three PAs starting January 2007.
+- **Fénérive East (24)** --- within 6 km of Réserve de Tampolo (IUCN IV, August 2007). Small reserve with low enforcement intensity, but proximity is clear.
+
+```{r}
+#| label: tbl-donor-status
+#| tbl-cap: "Donor pool PA exposure status summary."
+#| eval: false
+
+# Table: Observatory | Status | Nearest new PA | Distance (km) | PA year | Recommendation
+```
+
+```{r}
+#| label: fig-map-exposure
+#| fig-cap: "Map of observatory communes coloured by exposure status. Nearby PA polygons shown."
+#| eval: false
+
+# Map: clean (green), pre-existing (yellow), contaminated (red) + PA polygons
+```
+
+## Detailed exposure profiles
+
+```{r}
+#| label: fig-contaminated-detail
+#| fig-cap: "Distance-to-PA for each potentially contaminated donor observatory."
+#| eval: false
+
+# Lollipop chart: distance to each PA, faceted by observatory
+```
+
+
 # Implications {#sec-b-implications}
+
+## For the primary analysis
+
+The contamination audit has two consequences:
+
+1. **Restricted donor pool**: removing the four contaminated observatories leaves five clean donors (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). Gsynth estimates for Marovoay and Alaotra should be re-run with this restricted pool as a robustness check.
+
+2. **Pre-treatment validity preserved for Marovoay**: the treatment onset (2003) predates all contamination events (earliest 2006). Pre-treatment balance tests (placebo ATTs before 2003) are unaffected by post-2006 donor contamination.
+
+## For the extended analysis
+
+The four contaminated donors become **treated units** in the extended analysis (@sec-extensions). Antsohihy is excluded (insufficient post-treatment coverage). Farafangana, Toliara North, and Fénérive East are viable treated cases with ≥3 post-treatment years and plausible identification stories. Their reclassification from donors to treated units simultaneously:
+
+- Purifies the donor pool (removing contaminated units).
+- Enriches the treated sample (five observatory--PA pairs instead of two).
+- Enables a broader comparison of conservation governance types.
+
+```{r}
+#| label: fig-clean-donors
+#| fig-cap: "Map of Madagascar with observatory locations coloured by status: treated (Ch. 4), new treated (Ch. 5), clean donor, excluded."
+#| eval: false
+
+# Point map of Madagascar with observatory classification
+```

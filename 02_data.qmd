@@ -6,45 +6,98 @@ subtitle: "Rural Observatory Surveys, georeferencing, and variable construction"
 ```{r setup}
 #| label: setup
 source("R/load_data.R")
+source("R/plot_themes.R")
 ```
 
-<!-- TODO: Condense archive/01_Georeference_observatories.qmd + archive/02_Overlaps_PAs_observatories.qmd + archive/03_Variable_computation.qmd into ~3-4 pages -->
+This chapter summarises the data construction pipeline. The full reproducible workflow — georeferencing, PA overlap analysis, and variable harmonisation — is documented in [Appendix A](A1_data_pipeline.qmd).
 
 # Survey data {#sec-survey-data}
 
-<!-- 
-Content to develop:
-- 11 observatories used in this study, {{< var n_household_years >}} HH-year observations
-- Map of observatory locations
-- Year coverage per observatory (heatmap)
-- Key variables: income, demographics, food security
--->
+The *Réseau des Observatoires Ruraux* (ROR) surveyed rural households across Madagascar from 1995 to 2015. We use {{< var n_observatories >}} observatories comprising approximately {{< var n_household_years >}} household-year observations. Each observatory tracks ~500 households per year in a rotating panel design, with random replacement of attrited households preserving cross-sectional representativeness.
+
+```{r}
+#| label: fig-obs-map
+#| fig-cap: "Location of the 11 rural observatories used in this study."
+#| eval: false
+
+# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (fig-donor-map)
+# Map showing all 11 observatories, colour-coded by role (treated/donor)
+```
+
+```{r}
+#| label: fig-time-grid
+#| fig-cap: "Year-by-year data coverage across observatories and survey sites."
+#| eval: false
+
+# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (fig-time-grid)
+# Heatmap of site × year coverage
+```
 
 # Georeferencing {#sec-georef}
 
-<!-- 
-Content to develop:
-- Matching ROS locality names to COD P-codes
-- Fuzzy matching approach (brief — full details in Appendix A)
-- Summary of matching quality
--->
+The original ROS data lacked systematic georeferencing. Locality names were recorded as free text, with inconsistent spellings across years and languages (Malagasy and French). We linked each observation to official administrative boundaries using the Common Operational Datasets (COD), maintained by OCHA and Madagascar's BNGRC.
+
+The matching procedure is hierarchical:
+
+1. **String normalisation** — lowercase, remove diacritics and qualifiers (*centre*, *haut*, *bas*), standardise bilingual toponyms, convert Roman to Arabic numerals.
+2. **Fuzzy matching** — Jaro-Winkler distance against the COD gazetteer, filtered by observatory-level district membership, with a maximum distance threshold of 0.25.
+3. **Cascading spatial levels** — match first at the commune (ADM3) level, then refine to fokontany (ADM4) where possible.
+
+The result is a geocoded correspondence table linking each ROR household identifier (`j5`) to its P-coded commune and fokontany. This enables spatial overlay with protected area boundaries.
 
 # Protected area overlaps {#sec-pa-overlaps}
 
-<!-- 
-Content to develop:
-- Which observatories overlap with which PAs?
-- Timeline: which PAs were created/reclassified during 1995–2015?
-- Map showing observatory–PA spatial relationships
-- Table of treatment assignments
--->
+We overlay the geocoded ROR communes and fokontany with the Vahatra protected area database and the dynamic WDPA layer (see [Appendix B](A2_donor_validity.qmd) for the temporal PA boundary construction). Three temporal configurations emerge:
+
+| Configuration | Observatories | Use |
+|---|---|---|
+| PA predates ROS (no baseline) | e.g., Ranomafana, Andringitra | Excluded |
+| PA created *during* ROS (1999–2014) | Marovoay (2003), Alaotra (2008) | **Primary treatment** |
+| PA created *after* ROS ended | Farafangana, Toliara, Fénérive (2006–07) | **Extension treatment** |
+
+: Overview of observatory–PA temporal relationships. {#tbl-pa-timing}
+
+```{r}
+#| label: fig-pa-overlaps
+#| fig-cap: "Protected areas and rural observatories: spatial and temporal relationships."
+#| eval: false
+
+# TODO: Migrate from archive/02_Overlaps_PAs_observatories.qmd (fig-ror-pa-years)
+# Timeline figure: ROS survey windows vs PA creation dates
+```
+
+The two primary pairs — **Marovoay / Ankarafantsika** (strict, IUCN II, 2002) and **Alaotra / Lac Alaotra** (multipurpose, IUCN VI, ~2008) — offer the longest pre- and post-treatment windows. Three additional pairs provide shorter but informative extensions ([Chapter 5](05_extensions.qmd)).
 
 # Outcome variable {#sec-outcome}
 
-<!-- 
-Content to develop:
-- Household income construction (OECD equivalised, log-transformed, winsorised)
-- Brief description of income components
-- Cross-year harmonisation challenges (summary — full details in Appendix A)
-- Descriptive statistics table
--->
+The primary outcome is **log equivalised household income**. Construction proceeds as follows:
+
+1. **Total income** (`revtot`) — the sum of current income components: rice revenue (`rev_riz`), other crop revenue (`rev_cu`), livestock revenue (`revel`), fishing revenue (`revpeche`), principal activity income (`revppal`), and secondary activity income (`revsec`). Missing components are set to zero; the total is imputed from available sub-components when `revtot` itself is missing.
+
+2. **Equivalisation** — using the OECD-modified scale: $1 + 0.5 \times (\text{additional adults}) + 0.3 \times (\text{children under 14})$, computed from individual-level demographic records.
+
+3. **Winsorisation** — at the 1st and 99th percentiles within each year to limit the influence of extreme values.
+
+4. **Log transformation** — $y_{it} = \log(\text{equivalised income}_{it} + 1)$.
+
+Cross-year harmonisation is non-trivial: variable names, questionnaire modules, and income definitions changed across survey waves. The full details of these adjustments are in [Appendix A](A1_data_pipeline.qmd).
+
+```{r}
+#| label: fig-income-trends
+#| fig-cap: "Mean log equivalised household income over time, by observatory."
+#| eval: false
+
+# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (fig-trends)
+# Line plot of mean log income by observatory across years
+```
+
+# Descriptive statistics {#sec-descriptives}
+
+```{r}
+#| label: tbl-descriptives
+#| tbl-cap: "Summary statistics for the analysis sample."
+#| eval: false
+
+# TODO: Create summary table of key variables
+# N households, mean income, demographics by observatory group (treated/donor)
+```

@@ -6,48 +6,93 @@ subtitle: "Treatment definitions, donor pool, and estimation methods"
 ```{r setup}
 #| label: setup
 source("R/load_data.R")
+source("R/gsynth_helpers.R")
 ```
-
-<!-- TODO: Extract from archive/12_strict_vs_multipurpose.qmd strategy section + archive/13_donor_pool_pa_exposure.qmd summary -->
 
 # Treatment definition {#sec-treatment}
 
-<!-- 
-Content to develop:
-- Marovoay: east-bank sites (031, 032) treated from 2003 (Ankarafantsika reclassification)
-- Alaotra: sites (211, 212, 213) treated from 2008 (Lac Alaotra creation)
-- Betsiboka river as natural boundary for Marovoay (map)
-- Extensions: Farafangana (2006), Toliara (2007), Fénérive East (2007)
--->
+We exploit two natural experiments arising from the staggered creation and reclassification of protected areas during the ROR survey period.
+
+## Marovoay / Ankarafantsika (2003) {#sec-treat-maro}
+
+The Ankarafantsika National Park was formally reclassified by Decree 2002-798 on 7 August 2002, merging the former *Réserve Naturelle Intégrale* (60,500 ha, 1927) with forest reserves into a 136,500 ha national park under IUCN Category II. We set the treatment year to **2003** — the first full ROR survey year following the decree.^[Using 2002 as the treatment onset instead has negligible impact on the estimated ATT.]
+
+The Marovoay observatory comprises four *fokontany* split by the Betsiboka River:
+
+| Fokontany | Bank | Distance to PA | Role | Treatment |
+|---|---|---|---|---|
+| Bepako | East | 5.2 km | Treated | From 2003 |
+| Madiromiongana | East | 11.7 km | Treated | From 2003 |
+| Ampijoroa | West | 3.5 km (road) / ~18.5 km (effective) | Donor | Never |
+| Maroala | West | 5.8 km (road) / ~20.8 km (effective) | Donor | Never |
+
+: Marovoay site treatment assignments. {#tbl-maro-sites}
+
+The Betsiboka River constitutes a natural treatment barrier. Although the west-bank sites are geographically close to the park, the river makes direct access costly — effectively adding ~15 km of travel. The 2025 resurvey confirms this: 38% of east-bank households report visiting Ankarafantsika, versus 15% on the west bank. East-bank households also report the park as a source of food (23% vs 8%) and wood (24% vs 12%).
+
+## Alaotra / Lac Alaotra (2008) {#sec-treat-ala}
+
+The Lac Alaotra new protected area (425 km², IUCN Category VI) was created in stages: a temporary protection decree in 2007, followed by intensified CBNRM enforcement by Durrell Wildlife Conservation Trust from approximately 2008. We set the treatment year to **2008**.
+
+Unlike Marovoay, no natural boundary creates differential exposure within the Alaotra observatory. The 2025 resurvey shows uniform PA interaction rates (37–54%) across all hamlets, reflecting the lake-marsh ecosystem's central role in all communities' livelihoods. We therefore treat the **entire observatory as a single treated unit**, aggregated to a site-level mean.
+
+## Extensions (2006–2007) {#sec-treat-ext}
+
+Three additional observatory–PA pairs provide shorter treatment windows (see [Chapter 5](05_extensions.qmd)):
+
+- **Farafangana / CFAV** (IUCN VI, 2006) — Corridor Forestier Ambositra-Vondrozo
+- **Toliara North / Amoron'i Onilahy** (IUCN VI, 2007)
+- **Fénérive East / Tampolo** (IUCN IV, 2007) — coastal forest reserve
 
 # Donor pool selection {#sec-donor-pool}
 
-<!-- 
-Content to develop:
-- Initial pool: 9 donor observatories
-- PA exposure audit (summary from Ch. 13 / Appendix B)
-- Contaminated donors: Antsohihy (12), Farafangana (15), Toliara (23), Fénérive East (24)
-- Clean donors: {{< var clean_donors >}}
-- How contaminated obs become treated units in the extension (Ch. 5)
--->
+The generalized synthetic control method requires that donor units be **unexposed to treatment**. We start with 9 donor observatories (Antsirabe, Antsohihy, Tsiroanomandidy, Farafangana, Ambovombe, Toliara North, Fénérive East, Mahanoro, Itasy), providing approximately 60 donor sites.
+
+A systematic spatial audit ([Appendix B](A2_donor_validity.qmd)) checks whether these donors are themselves adjacent to active PAs during the study period. Using a dynamic WDPA layer that records when each PA became legally operative, we flag any donor commune within 20 km of an active PA boundary as **contaminated**.
+
+| Status | Observatories | Reason |
+|---|---|---|
+| **Clean** | Antsirabe (02), Tsiroanomandidy (13), Ambovombe (16), Mahanoro (25), Itasy (41) | No active PA within 20 km during 1999–2014 |
+| **Contaminated** | Antsohihy (12), Farafangana (15), Toliara North (23), Fénérive East (24) | PA created within 20 km during study period |
+
+: Donor pool PA exposure classification. {#tbl-donor-status}
+
+The main results use the full 9-donor pool; robustness checks ([Appendix C](A3_robustness.qmd)) confirm that restricting to the 5 clean donors does not materially change the estimates. In the extension analysis ([Chapter 5](05_extensions.qmd)), the contaminated donors become *treated* units with their own PA exposure — a design feature rather than a threat.
 
 # Generalized synthetic control {#sec-gsynth}
 
-<!-- 
-Content to develop:
-- Why gsynth? Interactive fixed effects relax parallel trends
-- Site-level aggregation (median equivalised income)
-- Cross-validation for factor selection
-- Inference: parametric bootstrap
-- Brief formal model (detail in Appendix D)
--->
+We use the generalized synthetic control method (gsynth) of @Xu2017 to estimate treatment effects. For each treated unit $i$ in post-treatment period $t$, gsynth models the outcome as:
+
+$$
+Y_{it} = \alpha_i + \xi_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + D_{it} \cdot \delta_{it} + \varepsilon_{it}
+$$
+
+where $\alpha_i$ are unit fixed effects, $\xi_t$ are time fixed effects, $\boldsymbol{\lambda}_i$ are unit-specific factor loadings, $\boldsymbol{f}_t$ are common time factors, and $D_{it}$ is the treatment indicator. The interactive fixed effects ($\boldsymbol{\lambda}_i' \boldsymbol{f}_t$) relax the parallel trends assumption by allowing units to follow heterogeneous time paths driven by unobserved factors.
+
+Key implementation choices:
+
+- **Unit of analysis** — site-level (*fokontany*) medians of log equivalised income. The rotating panel design makes household-level panel estimation unreliable; site-level aggregation preserves cross-sectional representativeness.
+- **Factor selection** — leave-one-out cross-validation over $r \in \{0, 1, 2, 3\}$.
+- **Inference** — parametric bootstrap with 200 replications.
+- **Minimum pre-treatment periods** — $\text{min.T0} = 3$ to ensure adequate pre-treatment fit.
+
+We estimate **two separate models**: one for Marovoay (2 treated sites, ~60 donors) and one for Alaotra (1 treated unit, ~60 donors). The Alaotra model reduces to an interactive fixed-effects synthetic control with a single treated unit.
+
+## Inference with few treated units {#sec-inference}
+
+A fundamental constraint is the small number of treated units: 2 sites for Marovoay, 1 for Alaotra. With so few clusters, conventional asymptotic inference is unreliable.
+
+For Marovoay, a Fisher permutation test over the 4 observable sites (2 treated among 4) yields $\binom{4}{2} = 6$ possible allocations, so the **minimum achievable p-value** is $1/6 \approx 0.167$. When Alaotra sites are included as additional donors, this falls to $1/\binom{7}{2} \approx 0.048$.
+
+We report bootstrap confidence intervals and p-values but interpret them in light of this power ceiling. Failure to reject the null at conventional thresholds reflects design constraints, not necessarily absence of an effect. Placebo-in-space tests ([Appendix C](A3_robustness.qmd)) provide complementary evidence on the uniqueness of estimated effects.
 
 # Towards household-level DiD {#sec-did-roadmap}
 
-<!-- 
-Content to develop (forward-looking):
-- Limitation of gsynth: site-level aggregation
-- CS-DiD at household level with staggered treatment
-- What 2026 data will enable (4 treatment cohorts)
-- Sun-Abraham as complementary estimator
--->
+The gsynth approach is well-suited to the current data but has an important limitation: it operates at the site level, discarding within-site household heterogeneity. The 2026 survey wave will enable a richer design:
+
+- **Callaway–Sant'Anna DiD** at the household level, exploiting four staggered treatment cohorts (Ankarafantsika 2003, Farafangana/Toliara/Fénérive 2006–07, Alaotra 2008, plus never-treated).
+- **Not-yet-treated controls** — Alaotra households observed in 2003–2007 (before their own treatment) serve as additional controls for the Ankarafantsika cohort.
+- **Household covariates** for conditional parallel trends (demographics, pre-treatment income, agricultural dependence).
+- **Sun–Abraham event studies** via `fixest::sunab()` as a complementary estimator.
+
+This forward-looking design is discussed further in [Chapter 6](06_discussion.qmd).
