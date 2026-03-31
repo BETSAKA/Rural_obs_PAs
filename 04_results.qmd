@@ -3,7 +3,7 @@ title: "Results"
 subtitle: "Strict vs. multipurpose conservation impacts on household income"
 ---
 
-```{r setup}
+```{r}
 #| label: setup
 source("R/load_data.R")
 source("R/gsynth_helpers.R")

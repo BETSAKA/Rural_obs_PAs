@@ -3,14 +3,14 @@ title: "Extensions"
 subtitle: "Three additional observatory–PA pairs"
 ---
 
-```{r setup}
+```{r}
 #| label: setup
 source("R/load_data.R")
 source("R/gsynth_helpers.R")
 source("R/plot_themes.R")
 ```
 
-The two-case comparison in @sec-results --- strict enforcement at Ankarafantsika versus participatory conservation at Lac Alaotra --- limits external validity. This chapter extends the analysis to three additional rural observatories that the donor-pool audit (@sec-donor-validity) flagged as themselves adjacent to PAs created during the study period:
+The two-case comparison in [Chapter 4](04_results.qmd) --- strict enforcement at Ankarafantsika versus participatory conservation at Lac Alaotra --- limits external validity. This chapter extends the analysis to three additional rural observatories that the donor-pool audit ([Appendix B](A2_donor_validity.qmd)) flagged as themselves adjacent to PAs created during the study period:
 
 - **Farafangana** (obs. 15): adjacent to the Corridor Forestier Ambositra-Vondrozo (IUCN V, September 2006), a large highland corridor under light-touch regulation. Survey window: 1999--2008 (3 post-treatment years only).
 - **Toliara North** (obs. 23): adjacent to Amoron'i Onilahy (IUCN V, January 2007), Mikea National Park (IUCN II, April 2007), and Ranobe PK 32 (IUCN V, December 2008) --- a rapid cascade of coastal and dry-forest protections. Survey window: 1999--2014.
@@ -18,7 +18,7 @@ The two-case comparison in @sec-results --- strict enforcement at Ankarafantsika
 
 These three observatories move from liabilities in the donor pool to informative treated units. Together with Marovoay and Alaotra, they enable a five-case examination of how conservation governance type, enforcement intensity, and PA size shape household-income outcomes.
 
-A critical methodological change: the **donor pool is restricted to five clean observatories** (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy) as identified in @sec-donor-validity. The four contaminated donors used in @sec-results are now treated units here. Marovoay and Alaotra ATT estimates will therefore differ slightly from their Chapter 4 counterparts.
+A critical methodological change: the **donor pool is restricted to five clean observatories** (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy) as identified in [Appendix B](A2_donor_validity.qmd). The four contaminated donors used in [Chapter 4](04_results.qmd) are now treated units here. Marovoay and Alaotra ATT estimates will therefore differ slightly from their Chapter 4 counterparts.
 
 
 # Study sites {#sec-additional-sites}
@@ -89,11 +89,11 @@ Treatment year is **{{< var treat_year_fen >}}**. The survey has 8 pre-treatment
 
 # Results by observatory {#sec-ext-results}
 
-The identification strategy and estimator are identical to @sec-results. We estimate the gsynth ATT separately for each treated observatory. Each model specifies $D_{it} = 1$ only for the target observatory's treated unit(s) from its treatment year onward; all other units carry $D_{it} = 0$ and serve as additional factors for counterfactual construction. This within-model use of other treated observatories as donors is consistent with the interactive FE framework so long as treatment timing differs across observatories [@xu2017]. The number of latent factors $r$ is selected by leave-one-out cross-validation; inference is parametric bootstrap with 200 replications.
+The identification strategy and estimator are identical to [Chapter 4](04_results.qmd). We estimate the gsynth ATT separately for each treated observatory. Each model specifies $D_{it} = 1$ only for the target observatory's treated unit(s) from its treatment year onward; all other units carry $D_{it} = 0$ and serve as additional factors for counterfactual construction. This within-model use of other treated observatories as donors is consistent with the interactive FE framework so long as treatment timing differs across observatories [@Xu2017]. The number of latent factors $r$ is selected by leave-one-out cross-validation; inference is parametric bootstrap with 200 replications.
 
 ## Ankarafantsika (clean donors) {#sec-ext-maro}
 
-Re-estimating the Marovoay east-bank model with the restricted donor pool yields an average post-treatment ATT of **{{< var att_maro >}} log points** ($\approx$ {{< var att_maro_pct >}}), consistent with the full-donor estimate in @sec-results. The point estimate is slightly attenuated because the smaller donor pool supports fewer latent factors, but the qualitative conclusion is unchanged: strict enforcement is associated with a persistent, statistically significant income decline.
+Re-estimating the Marovoay east-bank model with the restricted donor pool yields an average post-treatment ATT of **{{< var att_maro >}} log points** ($\approx$ {{< var att_maro_pct >}}), consistent with the full-donor estimate in [Chapter 4](04_results.qmd). The point estimate is slightly attenuated because the smaller donor pool supports fewer latent factors, but the qualitative conclusion is unchanged: strict enforcement is associated with a persistent, statistically significant income decline.
 
 ```{r}
 #| label: fig-att-maro-clean
@@ -188,7 +188,7 @@ The Fénérive East ATT shows a near-zero effect with a moderately narrow confid
 
 The five-case comparison reveals three patterns:
 
-**Pattern 1 --- Negative income effect under strict enforcement.** Ankarafantsika (Marovoay) shows the largest and most persistent negative ATT, statistically significant and --- as shown in @sec-results --- deepening through the 2025 resurvey. This is consistent with direct resource exclusion from a large, actively patrolled park after reclassification from an open-access forest reserve.
+**Pattern 1 --- Negative income effect under strict enforcement.** Ankarafantsika (Marovoay) shows the largest and most persistent negative ATT, statistically significant and --- as shown in [Chapter 4](04_results.qmd) --- deepening through the 2025 resurvey. This is consistent with direct resource exclusion from a large, actively patrolled park after reclassification from an open-access forest reserve.
 
 **Pattern 2 --- Near-zero effect under participatory/multipurpose conservation.** Lac Alaotra, Toliara North, and (tentatively) Farafangana show point estimates clustered near zero. None produces a statistically significant effect. This is consistent with the multipurpose PA framework: land-use regulation without resource exclusion does not translate into detectable aggregate income losses at the survey-year frequency.
 
@@ -202,6 +202,6 @@ Several limitations temper interpretation of the extended comparison:
 
 1. **Farafangana power**: with only 3 post-treatment years, the Farafangana estimate is unreliable and should not be compared numerically to the others.
 2. **Toliara North treatment complexity**: the three-PA cascade (January 2007 + April 2007 + December 2008) means the ATT estimates a composite treatment rather than a clean single event.
-3. **Clean donor pool size**: using only five donors (vs. nine in @sec-results) reduces counterfactual precision. Comparisons between Chapter 4 and Chapter 5 ATT estimates for Marovoay and Alaotra may partly reflect this difference.
+3. **Clean donor pool size**: using only five donors (vs. nine in [Chapter 4](04_results.qmd)) reduces counterfactual precision. Comparisons between Chapter 4 and Chapter 5 ATT estimates for Marovoay and Alaotra may partly reflect this difference.
 4. **No 2025 validation for new sites**: identification for the three new observatories rests on decree dates and proximity without the behavioural validation available for Marovoay and Alaotra. These estimates are best treated as exploratory.
 5. **Single-unit power floor**: each observatory-level model has exactly one treated unit. The permutation $p$-value floor is $\approx 1/N_{\text{donors}}$; with \~50--60 donor sites, effects smaller than \~20% are difficult to distinguish from zero.

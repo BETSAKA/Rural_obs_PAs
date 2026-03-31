@@ -3,7 +3,7 @@ title: "Data"
 subtitle: "Rural Observatory Surveys, georeferencing, and variable construction"
 ---
 
-```{r setup}
+```{r}
 #| label: setup
 source("R/load_data.R")
 source("R/plot_themes.R")

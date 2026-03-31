@@ -3,14 +3,14 @@ title: "Appendix D: Methodology"
 subtitle: "Technical details on estimation methods"
 ---
 
-This appendix provides formal descriptions of the estimation methods used in this paper. The main text (@sec-strategy, @sec-results) describes the methods at the level needed to follow the argument; this appendix gives the technical details needed for replication and methodological evaluation.
+This appendix provides formal descriptions of the estimation methods used in this paper. The main text ([Chapter 3](03_strategy.qmd), [Chapter 4](04_results.qmd)) describes the methods at the level needed to follow the argument; this appendix gives the technical details needed for replication and methodological evaluation.
 
 
 # Generalised synthetic control {#sec-d-gsynth}
 
 ## Interactive fixed-effects model
 
-The generalised synthetic control method [@xu2017] extends the standard synthetic control framework to accommodate multiple treated units and allows for estimation of treatment effects in the presence of unobserved time-varying confounders. The data-generating process is:
+The generalised synthetic control method [@Xu2017] extends the standard synthetic control framework to accommodate multiple treated units and allows for estimation of treatment effects in the presence of unobserved time-varying confounders. The data-generating process is:
 
 $$
 Y_{it} = \delta_{it} D_{it} + \mathbf{x}_{it}'\boldsymbol{\beta} + \boldsymbol{\lambda}_i' \mathbf{f}_t + \varepsilon_{it}
@@ -40,14 +40,14 @@ We use parametric bootstrap with 200 replications, as implemented in the `gsynth
 
 ## Relationship to standard synthetic control
 
-When there is a single treated unit and $r$ is chosen to minimise pre-treatment fit, gsynth nests the Abadie, Diamond & Hainmueller [-@abadie2010] synthetic control estimator. The advantage of gsynth is that it (i) selects $r$ via cross-validation rather than exact pre-treatment matching, (ii) accommodates multiple treated units, and (iii) provides valid frequentist inference via the bootstrap rather than relying on permutation $p$-values.
+When there is a single treated unit and $r$ is chosen to minimise pre-treatment fit, gsynth nests the Abadie, Diamond & Hainmueller [-@Abadie2010] synthetic control estimator. The advantage of gsynth is that it (i) selects $r$ via cross-validation rather than exact pre-treatment matching, (ii) accommodates multiple treated units, and (iii) provides valid frequentist inference via the bootstrap rather than relying on permutation $p$-values.
 
 
 # Callaway--Sant'Anna staggered DiD {#sec-d-csdid}
 
 ## Group-time ATT framework
 
-The Callaway & Sant'Anna [-@callaway2021] estimator is designed for settings with staggered treatment adoption. Define $G_i$ as the first period in which unit $i$ is treated ($G_i = \infty$ for never-treated units). The target parameter is the **group-time ATT**:
+The Callaway & Sant'Anna [-@CallawayS2021] estimator is designed for settings with staggered treatment adoption. Define $G_i$ as the first period in which unit $i$ is treated ($G_i = \infty$ for never-treated units). The target parameter is the **group-time ATT**:
 
 $$
 ATT(g, t) = \mathbb{E}[Y_t(g) - Y_t(\infty) \mid G = g]
@@ -79,7 +79,7 @@ We will use the `did` R package with doubly-robust estimation (inverse-probabili
 
 ## Framework
 
-SDID [@arkhangelsky2021] combines unit reweighting (synthetic control) with time reweighting (DiD):
+SDID [@Arkhangelsky2021] combines unit reweighting (synthetic control) with time reweighting (DiD):
 
 $$
 \hat{\tau}^{sdid} = \sum_{i: D_i = 1} \sum_{t: \text{post}} \left( Y_{it} - \hat{\omega}_0' Y_{\text{co},t} - \hat{\lambda}_0 - \hat{\lambda}_t' \mathbf{1} \right)
@@ -93,7 +93,7 @@ Both SDID and gsynth generalise the parallel-trends assumption via latent factor
 
 ## Inference
 
-We use the placebo method (Algorithm 4 of @arkhangelsky2021): for each control unit, the SDID estimator is re-computed treating that unit as if it were treated. The distribution of placebo effects yields a standard error estimate. This is valid even when $N_{tr} = 1$, as in our observatory-level models.
+We use the placebo method (Algorithm 4 of @Arkhangelsky2021): for each control unit, the SDID estimator is re-computed treating that unit as if it were treated. The distribution of placebo effects yields a standard error estimate. This is valid even when $N_{tr} = 1$, as in our observatory-level models.
 
 
 # Inference with few clusters {#sec-d-inference}
@@ -106,7 +106,7 @@ Each observatory-level gsynth model has exactly one treated unit. Standard asymp
 
 2. **Permutation inference**: for each control unit, re-estimate gsynth treating that unit as if it were treated. The $p$-value is the fraction of placebo ATTs exceeding the true ATT. With $N$ donor units, the minimum achievable $p$-value is $1/N$. With \~50--60 donor sites, this gives a floor of $\approx 0.017$ --- sufficient to detect large effects but limiting for moderate ones.
 
-3. **Wild cluster bootstrap** (planned for DiD): the Cameron, Gelbach & Miller [-@cameron2008] wild bootstrap applies to the few-cluster problem in DiD estimation. With 43 site-level clusters (5 treated observatories + 38 control sites), inference is feasible though conservative.
+3. **Wild cluster bootstrap** (planned for DiD): the Cameron, Gelbach & Miller [-@Cameron2008] wild bootstrap applies to the few-cluster problem in DiD estimation. With 43 site-level clusters (5 treated observatories + 38 control sites), inference is feasible though conservative.
 
 ## Practical implications
 
@@ -114,7 +114,7 @@ The power constraints imply that:
 
 - The **Ankarafantsika negative effect** (large, \~27% of income) is detectable even with one treated unit and permutation-based inference.
 - The **Alaotra null result** may reflect insufficient power rather than a true zero. Effects smaller than \~15--20% would be undetectable with the available sample.
-- The **three extension sites** (@sec-extensions) face the same power floor. Near-zero point estimates should not be over-interpreted as evidence of "no effect" --- they are consistent with both a true null and a moderate effect below the detection threshold.
+- The **three extension sites** ([Chapter 5](05_extensions.qmd)) face the same power floor. Near-zero point estimates should not be over-interpreted as evidence of "no effect" --- they are consistent with both a true null and a moderate effect below the detection threshold.
 
 
 # References {.unnumbered}

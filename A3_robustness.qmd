@@ -3,13 +3,13 @@ title: "Appendix C: Robustness Tests"
 subtitle: "Alternative specifications and sensitivity analysis"
 ---
 
-```{r setup}
+```{r}
 #| label: setup
 source("R/load_data.R")
 source("R/gsynth_helpers.R")
 ```
 
-This appendix presents three robustness tests for the main gsynth results (@sec-results). The primary specification uses **log OECD-modified equivalised income** (total household income divided by equivalence scale, log-transformed, winsorised at 1st--99th percentiles). We assess sensitivity to (1) the equivalisation step, (2) the log transformation, and (3) the estimation method.
+This appendix presents three robustness tests for the main gsynth results ([Chapter 4](04_results.qmd)). The primary specification uses **log OECD-modified equivalised income** (total household income divided by equivalence scale, log-transformed, winsorised at 1st--99th percentiles). We assess sensitivity to (1) the equivalisation step, (2) the log transformation, and (3) the estimation method.
 
 
 # Unadjusted log income {#sec-c-unadj}
@@ -61,7 +61,7 @@ The levels-based Ankarafantsika ATT translates to a negative effect in thousands
 
 # Synthetic Difference-in-Differences {#sec-c-sdid}
 
-Synthetic Difference-in-Differences [SDID; @arkhangelsky2021] provides a doubly-robust alternative: it constructs **unit weights** $\hat{\omega}$ to balance pre-treatment trajectories (like synthetic control) and **time weights** $\hat{\lambda}$ to concentrate comparisons on the most informative pre-treatment periods (like DiD). Under the latent factor model $Y_{it}(0) = \alpha_i + \beta_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + \varepsilon_{it}$, SDID is consistent if either dimension of reweighting succeeds. Inference uses Algorithm 4 (placebo method) from @arkhangelsky2021, valid even with $N_{tr} = 1$.
+Synthetic Difference-in-Differences [SDID; @Arkhangelsky2021] provides a doubly-robust alternative: it constructs **unit weights** $\hat{\omega}$ to balance pre-treatment trajectories (like synthetic control) and **time weights** $\hat{\lambda}$ to concentrate comparisons on the most informative pre-treatment periods (like DiD). Under the latent factor model $Y_{it}(0) = \alpha_i + \beta_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + \varepsilon_{it}$, SDID is consistent if either dimension of reweighting succeeds. Inference uses Algorithm 4 (placebo method) from @Arkhangelsky2021, valid even with $N_{tr} = 1$.
 
 ## Ankarafantsika (SDID)
 

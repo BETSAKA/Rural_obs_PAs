@@ -3,7 +3,7 @@ title: "Identification Strategy"
 subtitle: "Treatment definitions, donor pool, and estimation methods"
 ---
 
-```{r setup}
+```{r}
 #| label: setup
 source("R/load_data.R")
 source("R/gsynth_helpers.R")

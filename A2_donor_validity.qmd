@@ -3,12 +3,12 @@ title: "Appendix B: Donor Pool Validity"
 subtitle: "Are donor observatories truly unexposed to conservation interventions?"
 ---
 
-```{r setup}
+```{r}
 #| label: setup
 source("R/load_data.R")
 ```
 
-The generalised synthetic control estimator requires that **donor pool units are never exposed to the treatment of interest**. In this study, the nine donor observatories used in the primary analysis (@sec-results) should not themselves be adjacent to protected areas that became actively enforced during the 1999--2014 study period. This assumption is plausible by design --- ROS observatories were chosen for agricultural monitoring, not PA proximity --- but has never been systematically verified. This appendix provides a spatial audit.
+The generalised synthetic control estimator requires that **donor pool units are never exposed to the treatment of interest**. In this study, the nine donor observatories used in the primary analysis ([Chapter 4](04_results.qmd)) should not themselves be adjacent to protected areas that became actively enforced during the 1999--2014 study period. This assumption is plausible by design --- ROS observatories were chosen for agricultural monitoring, not PA proximity --- but has never been systematically verified. This appendix provides a spatial audit.
 
 
 # Why static PA boundaries are insufficient {#sec-b-static}
@@ -114,7 +114,7 @@ The contamination audit has two consequences:
 
 ## For the extended analysis
 
-The four contaminated donors become **treated units** in the extended analysis (@sec-extensions). Antsohihy is excluded (insufficient post-treatment coverage). Farafangana, Toliara North, and Fénérive East are viable treated cases with ≥3 post-treatment years and plausible identification stories. Their reclassification from donors to treated units simultaneously:
+The four contaminated donors become **treated units** in the extended analysis ([Chapter 5](05_extensions.qmd)). Antsohihy is excluded (insufficient post-treatment coverage). Farafangana, Toliara North, and Fénérive East are viable treated cases with ≥3 post-treatment years and plausible identification stories. Their reclassification from donors to treated units simultaneously:
 
 - Purifies the donor pool (removing contaminated units).
 - Enriches the treated sample (five observatory--PA pairs instead of two).

@@ -5,7 +5,7 @@ subtitle: "Policy implications, limitations, and next steps"
 
 # Summary of findings {#sec-summary}
 
-This paper estimates the causal effect of protected-area creation on household income in rural Madagascar using the generalised synthetic control method [@xu2017] across five observatory--PA pairs spanning the 1999--2014 study period, with a long-run extension to 2025 for the Marovoay case.
+This paper estimates the causal effect of protected-area creation on household income in rural Madagascar using the generalised synthetic control method [@Xu2017] across five observatory--PA pairs spanning the 1999--2014 study period, with a long-run extension to 2025 for the Marovoay case.
 
 **Two models, two patterns.** The core finding from the two primary sites is a sharp divergence:
 
@@ -23,7 +23,7 @@ This paper estimates the causal effect of protected-area creation on household i
 
 The primary policy implication is that **how** a PA is governed matters at least as much as **whether** it is created. The two variables that predict negative income effects in these data are (i) strict IUCN category (II vs. V/VI) and (ii) large PA size that constrains broad livelihood activities across an observable area. The multipurpose framework --- which allows regulated use of natural resources under community co-management --- does not translate into detectable aggregate income losses at the survey-year frequency.
 
-This finding aligns with a growing body of evidence that conservation-income trade-offs are not automatic but depend on governance design [@ferraro2011; @sims2019; @oldekop2016]. It lends support to the architecture of Madagascar's post-2003 SAPM expansion, which emphasised community-based approaches and multipurpose categories alongside strict protection.
+This finding aligns with a growing body of evidence that conservation-income trade-offs are not automatic but depend on governance design [@Ferraro2011; @Sims2010; @Oldekop2016]. It lends support to the architecture of Madagascar's post-2003 SAPM expansion, which emphasised community-based approaches and multipurpose categories alongside strict protection.
 
 ## Compensation and livelihood integration
 
@@ -81,8 +81,8 @@ A crucial structural advantage: **not-yet-treated units serve as controls.** Ala
 
 When the 2026 survey round becomes available, we plan:
 
-1. **Primary specification**: Callaway & Sant'Anna [-@callaway2021] staggered DiD at the household level, with doubly-robust estimation, household-level covariates, and clustering at the site level.
-2. **Complementary**: Sun & Abraham [-@sun2021] interaction-weighted estimator via `fixest::sunab()`, providing transparent event-study syntax.
+1. **Primary specification**: Callaway & Sant'Anna [-@CallawayS2021] staggered DiD at the household level, with doubly-robust estimation, household-level covariates, and clustering at the site level.
+2. **Complementary**: Sun & Abraham [-@SunAbraham2021] interaction-weighted estimator via `fixest::sunab()`, providing transparent event-study syntax.
 3. **Robustness**: the gsynth estimates from Chapters 4--5 serve as a check that relaxes parallel trends to an interactive fixed-effects model. If gsynth and DiD agree, the evidence is strong regardless of which identifying assumption is correct.
 4. **Fénérive distance design**: if the 2026 resurvey covers Fénérive East, the small footprint of Réserve de Tampolo (\~7.3 km²) enables a **within-observatory distance design** --- near-PA vs. far-PA sites --- adding a third independent geographic context alongside Marovoay and Alaotra.
 

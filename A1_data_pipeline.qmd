@@ -3,12 +3,12 @@ title: "Appendix A: Data Pipeline"
 subtitle: "Georeferencing, PA overlaps, and variable harmonisation"
 ---
 
-```{r setup}
+```{r}
 #| label: setup
 source("R/load_data.R")
 ```
 
-This appendix documents the full reproducible data pipeline from raw ROS survey files to the consolidated household-level panel dataset. The paper chapter (@sec-data) provides a condensed summary; this appendix gives all details needed for reproducibility.
+This appendix documents the full reproducible data pipeline from raw ROS survey files to the consolidated household-level panel dataset. The paper chapter ([Chapter 2](02_data.qmd)) provides a condensed summary; this appendix gives all details needed for reproducibility.
 
 
 # Georeferencing ROS localities {#sec-a-georef}
@@ -113,7 +113,7 @@ Official creation years were cross-checked against the Madagascar legal database
 
 ## Priority pairs
 
-The spatial and temporal overlay identifies Marovoay--Ankarafantsika and Alaotra--Lac Alaotra as the most promising pairs for causal analysis (long panels, clear treatment dates). Farafangana, Toliara North, and Fénérive East are secondary candidates explored in @sec-extensions. A 10 km buffer (CRS EPSG:29701, Laborde Madagascar) around PAs is used for the proximity screening.
+The spatial and temporal overlay identifies Marovoay--Ankarafantsika and Alaotra--Lac Alaotra as the most promising pairs for causal analysis (long panels, clear treatment dates). Farafangana, Toliara North, and Fénérive East are secondary candidates explored in [Chapter 5](05_extensions.qmd). A 10 km buffer (CRS EPSG:29701, Laborde Madagascar) around PAs is used for the proximity screening.
 
 ::: {.callout-note}
 ROS observatories were selected for agricultural and socio-economic monitoring, not proximity to PAs. Overlaps are partly coincidental and require cautious interpretation.

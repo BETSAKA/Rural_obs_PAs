@@ -28,7 +28,15 @@ pa_multipurpose_iucn: "VI"
 
 # -- Key results (update after re-estimation) ----------------------------------
 att_maro: "-0.31"
+att_maro_pct: "27%"
 att_ala: "+0.01"
+
+# -- Proximity threshold -------------------------------------------------------
+threshold_km: 20
+
+# -- Aliases used in appendices ------------------------------------------------
+n_hh_obs: 101253
+n_obs: 11
 
 # -- Clean donor observatories -------------------------------------------------
 clean_donors: "Antsirabe (02), Tsiroanomandidy (13), Ambovombe (16), Mahanoro (25), Itasy (41)"
