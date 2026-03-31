@@ -15,6 +15,7 @@ book:
     - 02_Overlaps_PAs_observatories.qmd
     - 03_Variable_computation.qmd
     - 04_Marovoay-Ankarafantsika.qmd
+    - 14_extended_five_observatories.qmd
 bibliography: references.bib
 
 format:

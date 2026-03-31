@@ -54,3 +54,4 @@ data/*
 extensions.json
 settings.json
 air.toml
+**/*.quarto_ipynb

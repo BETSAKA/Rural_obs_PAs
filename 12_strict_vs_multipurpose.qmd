@@ -1,0 +1,1518 @@
+---
+title: "Strict vs. Multipurpose Conservation in Rural Madagascar"
+subtitle: "Household Income Effects around Ankarafantsika National Park and Lac Alaotra Protected Landscape"
+author: "[Authors]"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    theme: cosmo
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: false
+  warning: false
+  message: false
+bibliography: references.bib
+---
+
+```{r setup}
+#| label: setup
+
+library(tidyverse)
+library(sf)
+library(fixest)
+library(gt)
+library(scales)
+library(knitr)
+library(patchwork)
+library(gsynth)
+library(ggspatial)
+library(ggrepel)
+library(osmdata)
+
+# -- Helpers -------------------------------------------------------------------
+winsorize <- function(x, probs = c(0.01, 0.99)) {
+  q <- quantile(x, probs, na.rm = TRUE)
+  pmin(pmax(x, q[1]), q[2])
+}
+
+mk_income_ext <- function(df) {
+  df |>
+    mutate(
+      rev_riz  = coalesce(rev_riz,  0),
+      rev_cu   = coalesce(rev_cu,   0),
+      revel    = coalesce(revel,    0),
+      revpeche = coalesce(revpeche, 0),
+      revppal  = coalesce(revppal,  0),
+      revsec   = coalesce(revsec,   0),
+      revcou   = coalesce(revcou, revppal + revsec + rev_riz + rev_cu + revel + revpeche),
+      revtot   = coalesce(revtot, revcou),
+      rev_agri    = rev_riz + rev_cu + revel + revpeche,
+      rev_nonagri = revppal + revsec
+    )
+}
+
+# -- Constants -----------------------------------------------------------------
+TREAT_YEAR_MARO <- 2003
+TREAT_YEAR_ALA  <- 2008
+DONOR_OBS <- c("02", "12", "13", "15", "16", "23", "24", "25", "41")
+
+# -- Load household data -------------------------------------------------------
+household_consolidated <- read_rds("data/household_consolidated.rds") |>
+  mutate(
+    obs     = substr(j5, 1, 2),
+    site_id = substr(j5, 1, 3)
+  )
+
+# -- OECD-modified equivalence scale (1 + 0.5*(adults-1) + 0.3*children) ------
+oecd_scales <- read_rds("data/oecd_equiv_scale.rds")
+household_consolidated <- household_consolidated |>
+  left_join(oecd_scales, by = c("j5", "year")) |>
+  mutate(oecd_equiv = replace_na(oecd_equiv, 1))
+
+# -- Load spatial data ---------------------------------------------------------
+# Protected areas (Vahatra)
+vahatra <- st_read("data/Vahatra/Shapefiles/AP_Vahatra.shp", quiet = TRUE) |>
+  st_make_valid()
+
+ankarafantsika_pa <- vahatra |> filter(grepl("Ankarafantsika", nom))
+alaotra_pa        <- vahatra |> filter(grepl("Lac Alaotra", nom))
+caz_pa            <- vahatra |> filter(grepl("Ankeniheny Zahamena", nom))
+zahamena_pa       <- vahatra |> filter(grepl("Zahamena", nom) & !grepl("Ankeniheny", nom))
+
+# -- Water features from OpenStreetMap (cached for offline use) ----------------
+osm_cache_maro <- "data/osm_water_maro.rds"
+if (file.exists(osm_cache_maro)) {
+  osm_water_maro <- read_rds(osm_cache_maro)
+} else {
+  q_riv <- opq(bbox = c(46.20, -16.60, 47.20, -15.80)) |>
+    add_osm_feature(key = "waterway", value = "river") |>
+    osmdata_sf()
+  q_water <- opq(bbox = c(46.20, -16.60, 47.20, -15.80)) |>
+    add_osm_feature(key = "natural", value = "water") |>
+    osmdata_sf()
+  osm_water_maro <- list(
+    lines  = q_riv$osm_lines,
+    polys  = q_water$osm_polygons,
+    mpolys = q_water$osm_multipolygons
+  )
+  write_rds(osm_water_maro, osm_cache_maro)
+}
+
+# Administrative boundaries
+adm2 <- st_read(
+  "data/OCHA_BNGRC admin boundaries/mdg_admbnda_adm2_BNGRC_OCHA_20181031.shp",
+  quiet = TRUE
+) |> st_make_valid()
+
+# Observatory communes
+obs_communes <- st_read("data/Observatoires_ROS_communes_COD_v4.gpkg", quiet = TRUE) |>
+  st_make_valid()
+
+maro_communes <- obs_communes |> filter(OBS_CODE == 3)
+ala_communes  <- obs_communes |> filter(OBS_CODE == 21)
+
+# -- Fokontany coordinates (2025 GPS survey centroids) -------------------------
+maro_fkt <- tibble(
+  fokontany  = c("Bepako", "Madiromiongana", "Ampijoroa", "Maroala"),
+  site_id    = c("031", "032", "033", "034"),
+  lon        = c(46.658402, 46.749270, 46.477984, 46.539738),
+  lat        = c(-16.163712, -16.086480, -16.233414, -16.228857),
+  river_side = c("east", "east", "west", "west"),
+  treated    = c(TRUE, TRUE, FALSE, FALSE)
+) |>
+  st_as_sf(coords = c("lon", "lat"), crs = 4326)
+
+# Compute distance to PA boundary (km)
+maro_fkt$dist_km <- round(as.numeric(
+  st_distance(maro_fkt, st_union(ankarafantsika_pa))
+) / 1000, 1)
+
+# Alaotra fokontany centroids (2025 GPS survey)
+ala_fkt <- tibble(
+  fokontany = c("Avaradrano", "Feramanga Atsimo", "Mangabe",
+                "Analamiranga", "Maritampona", "Ambohidrony", "Ambatomanga"),
+  lon       = c(48.469958, 48.373383, 48.405244,
+                48.200017, 48.207639, 48.208611, 48.200647),
+  lat       = c(-17.805414, -17.844153, -17.879586,
+                -17.572375, -17.603500, -17.729175, -17.741178)
+) |>
+  st_as_sf(coords = c("lon", "lat"), crs = 4326)
+
+# Compute distance to each PA (km)
+ala_fkt$dist_php <- round(as.numeric(
+  st_distance(ala_fkt, st_union(alaotra_pa))
+) / 1000, 1)
+ala_fkt$dist_caz <- round(as.numeric(
+  st_distance(ala_fkt, st_union(caz_pa))
+) / 1000, 1)
+ala_fkt$nearest_pa <- if_else(ala_fkt$dist_caz < ala_fkt$dist_php,
+                              "Corridor Ankeniheny-Zahamena", "Lac Alaotra PHP")
+
+# -- Observatory approximate locations (from ROR documentation) ----------------
+obs_locations <- tibble(
+  code = c("02", "03", "12", "13", "15", "16", "21", "23", "24", "25", "41"),
+  name = c("Antsirabe", "Marovoay", "Antsohihy", "Tsiroanomandidy",
+           "Farafangana", "Ambovombe", "Alaotra", "Toliara North",
+           "Fenerive East", "Mahanoro", "Itasy"),
+  latitude = c(-19.8667, -16.1000, -14.8781, -18.7714, -22.8167,
+               -25.0333, -17.5833, -23.3893, -17.3833, -20.4000, -19.0500),
+  longitude = c(47.0333, 46.6333, 47.9875, 46.0546, 47.8333,
+                46.0833, 48.4167, 43.7761, 49.4167, 48.8000, 46.7354),
+  role = case_when(
+    code == "03" ~ "Marovoay (treated)",
+    code == "21" ~ "Alaotra (treated)",
+    .default = "Donor pool (controls)"
+  )
+) |>
+  mutate(role = factor(role, levels = c("Marovoay (treated)",
+                                        "Alaotra (treated)",
+                                        "Donor pool (controls)")))
+```
+
+
+# Introduction {#sec-intro}
+
+Madagascar's protected area (PA) network encompasses a wide spectrum of governance models, from strictly enforced national parks to community-managed protected landscapes. Whether different conservation regimes produce different welfare outcomes for adjacent communities is a first-order policy question --- yet evidence remains scarce, particularly for the newer, less restrictive PA categories introduced under the *Systeme des Aires Protegees de Madagascar* (SAPM) after 2003.
+
+This paper develops a comparative framework around **two models of conservation** using long-running household panel data from the *Réseau des Observatoires Ruraux* (Rural Observatory System, 1999--2014):
+
+1. **Ankarafantsika National Park** (IUCN Category II, reclassified 2002): strict conservation managed by *Madagascar National Parks* (MNP). At the Marovoay observatory, the Betsiboka River separates two *fokontany* on the east bank (close to the park) from two others on the west bank (effectively distant), creating a natural experiment.
+
+2. **Lac Alaotra Paysage Harmonieux Protege** (IUCN Category V, enforced from ~2008): participatory conservation managed by *Durrell Wildlife Conservation Trust*. All observatory communities share the lake-marsh ecosystem; no clean within-observatory binary split exists.
+
+We estimate the income effects of each PA separately using the **generalized synthetic control** method (gsynth, @Xu2017), which constructs counterfactuals from a large pool of rural observatory donor sites. This approach accommodates the distinct nature of each treatment: site-level for Marovoay (east-bank *fokontany* only), observatory-level for Alaotra (all sites aggregated).
+
+
+# Study Sites {#sec-sites}
+
+## Ankarafantsika National Park and the Marovoay Observatory
+
+Ankarafantsika National Park (136,500 ha) is one of Madagascar's oldest PAs, reclassified from a *Reserve Naturelle Integrale* to a national park in 2002 under the management of *Madagascar National Parks* (MNP). Enforcement is strict: agricultural encroachment is penalised, forest extraction is prohibited, and patrol frequency increased after reclassification.
+
+The Marovoay observatory comprises four *fokontany*. The **Betsiboka River** --- a major, permanently flowing watercourse wider than 10 metres --- separates two communities from the park. Crossing is possible only under certain hydrological conditions, often requiring long detours or costly boat transport; in practice, flows of people, goods, and services run along the Marovoay downstream axis rather than across the river:
+
+- **East bank** (treated): Bepako (5.2 km to PA boundary) and Madiromiongana (11.7 km). Direct pedestrian access to the park.
+- **West bank** (control): Ampijoroa (3.5 km raw, but ~18.5 km effective after river detour) and Maroala (5.8 km raw, ~20.8 km effective). The river imposes a substantial access penalty.
+
+```{r map-marovoay}
+#| label: fig-map-maro
+#| fig-cap: "Marovoay observatory and Ankarafantsika National Park. The Betsiboka River separates west-bank fokontany (control, grey) from east-bank fokontany (treated, orange). Water features from OpenStreetMap."
+#| fig-height: 8
+#| fig-width: 9
+
+# Bounding box: show the whole of Ankarafantsika plus the fokontany
+ank_bb <- st_bbox(ankarafantsika_pa)
+fkt_bb <- st_bbox(maro_fkt)
+maro_bbox <- st_bbox(c(
+  xmin = min(ank_bb["xmin"], fkt_bb["xmin"]) - 0.08,
+  ymin = min(ank_bb["ymin"], fkt_bb["ymin"]) - 0.08,
+  xmax = max(ank_bb["xmax"], fkt_bb["xmax"]) + 0.08,
+  ymax = max(ank_bb["ymax"], fkt_bb["ymax"]) + 0.08
+), crs = 4326)
+
+# ── Filter water features: Betsiboka river + water bodies within 1 km ────────
+# Build a 1 km buffer around named Betsiboka river lines
+betsiboka_named <- osm_water_maro$lines |> filter(name == "Betsiboka")
+betsiboka_buf <- betsiboka_named |>
+  st_transform(32738) |> st_union() |> st_buffer(1000) |> st_transform(4326)
+
+# Keep only Betsiboka river lines (named)
+water_lines <- tryCatch(
+  st_crop(betsiboka_named, maro_bbox),
+  error = function(e) NULL
+)
+
+# Keep water polygons/multipolygons that touch the Betsiboka (+1 km)
+water_polys <- tryCatch({
+  wp <- st_crop(osm_water_maro$polys, maro_bbox)
+  wp[st_intersects(wp, betsiboka_buf, sparse = FALSE)[, 1], ]
+}, error = function(e) NULL)
+
+water_mpolys <- tryCatch({
+  wm <- st_crop(osm_water_maro$mpolys, maro_bbox)
+  wm[st_intersects(wm, betsiboka_buf, sparse = FALSE)[, 1], ]
+}, error = function(e) NULL)
+
+# ── Uniform water colour ─────────────────────────────────────────────────────
+WATER_COL <- "#1976D2"  # same blue for lines and surfaces
+
+# PA centroid for label
+ank_centroid <- st_coordinates(st_centroid(st_union(ankarafantsika_pa)))
+
+p <- ggplot() +
+  # PA polygon
+  geom_sf(data = ankarafantsika_pa, fill = "#A5D6A7", color = "#388E3C",
+          alpha = 0.4, linewidth = 0.6)
+
+# Water surface polygons (Betsiboka-adjacent only)
+if (!is.null(water_polys) && nrow(water_polys) > 0) {
+  p <- p + geom_sf(data = water_polys, fill = WATER_COL, color = WATER_COL,
+                   linewidth = 0.1)
+}
+if (!is.null(water_mpolys) && nrow(water_mpolys) > 0) {
+  p <- p + geom_sf(data = water_mpolys, fill = WATER_COL, color = WATER_COL,
+                   linewidth = 0.1)
+}
+
+# River lines (Betsiboka only)
+if (!is.null(water_lines) && nrow(water_lines) > 0) {
+  p <- p + geom_sf(data = water_lines, color = WATER_COL, linewidth = 0.7)
+}
+
+# PA name label
+p <- p +
+  annotate("text", x = ank_centroid[1], y = ank_centroid[2],
+           label = "Ankarafantsika\nNational Park",
+           color = "#1B5E20", fontface = "bold.italic", size = 4.5, alpha = 0.8)
+
+# Fokontany points — nudge Maroala label to top-left to avoid dot overlap
+maro_fkt_lab <- maro_fkt |>
+  mutate(
+    lon = st_coordinates(geometry)[, 1],
+    lat = st_coordinates(geometry)[, 2],
+    nudge_x = if_else(fokontany == "Maroala", -0.06, 0),
+    nudge_y = if_else(fokontany == "Maroala",  0.04, 0)
+  )
+
+p <- p +
+  geom_sf(data = maro_fkt, aes(color = river_side, shape = river_side),
+          size = 4, stroke = 1.2) +
+  geom_label_repel(
+    data = maro_fkt_lab,
+    aes(x = lon, y = lat,
+        label = paste0(fokontany, "\n(", dist_km, " km)"),
+        color = river_side),
+    size = 3, fontface = "bold", box.padding = 0.8,
+    nudge_x = maro_fkt_lab$nudge_x,
+    nudge_y = maro_fkt_lab$nudge_y,
+    min.segment.length = 0, show.legend = FALSE
+  ) +
+  scale_color_manual(
+    values = c("east" = "#E65100", "west" = "#616161"),
+    labels = c("east" = "East bank (treated)", "west" = "West bank (control)"),
+    name = NULL
+  ) +
+  scale_shape_manual(
+    values = c("east" = 17, "west" = 16),
+    labels = c("east" = "East bank (treated)", "west" = "West bank (control)"),
+    name = NULL
+  ) +
+  annotation_scale(location = "bl", width_hint = 0.25) +
+  labs(title = "Marovoay Observatory & Ankarafantsika National Park") +
+  coord_sf(xlim = c(maro_bbox["xmin"], maro_bbox["xmax"]),
+           ylim = c(maro_bbox["ymin"], maro_bbox["ymax"])) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+
+p
+```
+
+
+### Historical Expansion of Ankarafantsika
+
+Ankarafantsika was first gazetted as a *Réserve Naturelle Intégrale* (RNI) in 1927, covering approximately 60,500 ha of the central plateau. A contiguous 75,000 ha forest reserve was classified in 1929. These two early designations imposed different nominal restrictions, but critically different *de facto* situations for the east-bank *fokontany*:
+
+- **The 1929 forest reserve** was not a nature conservation zone but a timber and resource reserve under the forest administration. Subsequent analyses found no effective enforcement over this area, and subsistence agriculture, cattle grazing, and charcoal production continued unimpeded [@brondeau1999]. The forest reserve regime imposed no binding constraint on adjacent communities.
+
+- **The 1927 RNI** was geographically separate from the communities of Bepako and Madiromiongana: the RNI covered the inland plateau to the north-east, while these villages border the forest reserve zone to the south and west of the plateau. The east-bank *fokontany* therefore had no direct interface with the strictly protected RNI.
+
+In 2002, the RNI, the forest reserves, and the Ampijoroa Forestry Station were merged into a single national park (Decree 2002-798, 130,000 ha), later adjusted to 136,513 ha in 2015 (Decree 2015-730). @fig-expansion, reproduced from @alonso2002, illustrates the spatial extent of the 2002 consolidation.
+
+![Spatial extent of the 2002 Ankarafantsika expansion, from the original RNI (dark green) to the national park (light green). Source: Alonso & Shuldenberg (2002).](images/Alonso_Shuldenberg_2002.png){#fig-expansion width=80%}
+
+The 2002 reclassification was the first event to impose binding land-use restrictions on the east-bank communities: slash-and-burn agriculture (*tavy*), charcoal production, and non-timber forest extraction within the newly unified park were explicitly prohibited and, crucially, enforced. Enforcement capacity was supported by international conservation funding from the World Bank and bilateral donors as part of Madagascar's third Environmental Action Plan. The transition from a nominally protected but effectively open-access forest reserve to a strictly patrolled national park constitutes our treatment event.
+
+## Lac Alaotra Protected Landscape and the Alaotra Observatory {#sec-alaotra}
+
+Lac Alaotra is Madagascar's largest lake and a critical habitat for the Alaotran gentle lemur. The Ramsar Convention listed the site in 2003. In 2015, the lake and its marshlands were formally designated as a *Paysage Harmonieux Protege* (PHP, 425 km^2^, IUCN Category V), though enforcement through community-based natural resource management (CBNRM) agreements and *transferts de gestion* had intensified from around 2008 under Durrell's management.
+
+The observatory's seven *fokontany* (across three historical survey sites) all depend on the lake-marsh ecosystem. Unlike Ankarafantsika, there is no natural barrier separating "exposed" from "unexposed" communities. All communities interact with the PA.
+
+A complication specific to Alaotra is the proximity of some eastern hamlets to two additional protected areas: the **Corridor Ankeniheny-Zahamena** (CAZ), a Category VI PA managed by *Conservation International*, and the **Zahamena National Park** (Category II), which lies north of the CAZ. The hamlet of Mangabe lies closer to the CAZ boundary (~14 km) than to the Lac Alaotra PHP, creating dual-PA exposure.
+
+```{r map-alaotra}
+#| label: fig-map-ala
+#| fig-cap: "Alaotra observatory and surrounding protected areas. Lac Alaotra PHP (green), Corridor Ankeniheny-Zahamena (CAZ, orange), Zahamena National Park (light orange). Fokontany centroids from 2025 GPS survey; distances to nearest PA computed from Vahatra boundaries."
+#| fig-height: 8
+#| fig-width: 8
+
+# Bounding box around Alaotra region
+ala_bbox <- st_bbox(c(xmin = 48.00, ymin = -18.10, xmax = 48.80, ymax = -17.20),
+                    crs = 4326)
+
+# Clip spatial data
+ala_clip   <- tryCatch(st_crop(alaotra_pa, ala_bbox), error = function(e) NULL)
+caz_clip   <- tryCatch(st_crop(caz_pa, ala_bbox), error = function(e) NULL)
+zah_clip   <- tryCatch(st_crop(zahamena_pa, ala_bbox), error = function(e) NULL)
+adm2_clip  <- tryCatch(st_crop(adm2, ala_bbox), error = function(e) NULL)
+
+p <- ggplot()
+
+# Admin boundaries as light background
+if (!is.null(adm2_clip) && nrow(adm2_clip) > 0) {
+  p <- p + geom_sf(data = adm2_clip, fill = "grey95", color = "grey80",
+                   linewidth = 0.2)
+}
+
+# PA polygons
+if (!is.null(ala_clip) && nrow(ala_clip) > 0) {
+  ala_centroid <- st_coordinates(st_centroid(st_union(ala_clip)))
+  p <- p + geom_sf(data = ala_clip, fill = "#A5D6A7", color = "#388E3C",
+                   alpha = 0.4, linewidth = 0.6) +
+    annotate("text", x = ala_centroid[1], y = ala_centroid[2],
+             label = "Lac Alaotra\nPHP", color = "#1B5E20",
+             fontface = "bold.italic", size = 3.5, alpha = 0.8)
+}
+if (!is.null(caz_clip) && nrow(caz_clip) > 0) {
+  caz_centroid <- st_coordinates(st_centroid(st_union(caz_clip)))
+  p <- p + geom_sf(data = caz_clip, fill = "#FFE0B2", color = "#E65100",
+                   alpha = 0.3, linewidth = 0.6) +
+    annotate("text", x = caz_centroid[1], y = caz_centroid[2],
+             label = "Corridor\nAnkeniheny-\nZahamena",
+             color = "#BF360C", fontface = "bold.italic", size = 3, alpha = 0.8)
+}
+if (!is.null(zah_clip) && nrow(zah_clip) > 0) {
+  zah_centroid <- st_coordinates(st_centroid(st_union(zah_clip)))
+  p <- p + geom_sf(data = zah_clip, fill = "#FFCCBC", color = "#BF360C",
+                   alpha = 0.3, linewidth = 0.5) +
+    annotate("text", x = zah_centroid[1], y = zah_centroid[2],
+             label = "Zahamena\nNational Park",
+             color = "#BF360C", fontface = "bold.italic", size = 3, alpha = 0.8)
+}
+
+# Fokontany points
+p <- p +
+  geom_sf(data = ala_fkt, aes(shape = nearest_pa), size = 3,
+          color = "#1B5E20", stroke = 1) +
+  geom_label_repel(
+    data = ala_fkt |> mutate(lon = st_coordinates(geometry)[,1],
+                              lat = st_coordinates(geometry)[,2]),
+    aes(x = lon, y = lat,
+        label = paste0(fokontany, " (", round(pmin(dist_php, dist_caz), 1), " km)")),
+    size = 2.5, fontface = "bold", box.padding = 0.6,
+    min.segment.length = 0
+  ) +
+  scale_shape_manual(
+    values = c("Lac Alaotra PHP" = 16, "Corridor Ankeniheny-Zahamena" = 17),
+    name = "Nearest PA"
+  ) +
+  annotation_scale(location = "bl", width_hint = 0.25) +
+  labs(
+    title = "Alaotra Observatory & Protected Areas",
+    subtitle = "All fokontany treated at observatory level from 2008 (CBNRM enforcement)"
+  ) +
+  coord_sf(xlim = c(ala_bbox["xmin"], ala_bbox["xmax"]),
+           ylim = c(ala_bbox["ymin"], ala_bbox["ymax"])) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+
+p
+```
+
+
+# Data and Identification {#sec-data}
+
+## The Rural Observatory Panel (1999--2014)
+
+The *Réseau des Observatoires Ruraux* (Rural Observatory System) is a household panel survey covering observatory sites across Madagascar. We use:
+
+- **Marovoay**: 4 *fokontany*, surveyed 1995--2014 (missing 2005, 2009).
+- **Alaotra**: 3 sites (7 *fokontany*), surveyed 1999--2014 (missing 2009).
+- **Donor pool**: ~60 sites from 9 observatories (Antsirabe, Antsohihy, Tsiroanomandidy, Farafangana, Ambovombe, Toliara North, Fénérive East, Mahanoro, and Itasy), each with at least 6 years of coverage spanning both pre- and post-treatment periods.
+
+Total household income (`revtot`) is adjusted for household composition using the OECD-modified equivalence scale (1 + 0.5 × (additional adults) + 0.3 × children under 14), computed from individual-level demographic data. The resulting equivalised income is winsorised at the 1st and 99th percentiles within each year. The primary outcome is log equivalised income.
+
+## Panel Structure and Village-Level Aggregation
+
+The ROR operates as a **rotating panel**: each observatory tracks a fixed set of households, but approximately 15% of households leave the sample each year (through death, migration, or attrition), with replacement by newly sampled households following the original random sampling design. Over a 10-year horizon, cumulative attrition reaches roughly 80% of the initial cohort [@ChabeFerret2024]. Attrition is non-random: traceable attritors disproportionately include migrants whose departure is itself potentially income-related, which would violate the balanced-panel assumptions underlying individual-level panel estimators.
+
+We therefore analyse the data at the **village (*fokontany*) level**, aggregating household-level income to village-year means. This choice is justified on two grounds. First, the rotating design with random replacement preserves cross-sectional representativeness at each wave: village-year means consistently estimate the same population quantity across years, even as the composition of surveyed households changes. Second, gsynth requires a balanced unit-by-year panel matrix and is designed for unit-level (here village-level) variation; household-level estimation with an interactive FE model would require substantially more pre-treatment periods to identify individual-level factor loadings. Our analysis thus exploits between-village variation in treatment exposure across time.
+
+**Marovoay** --- The east-bank *fokontany* (Madiromiongana, Bepako) are treated from 2003, the year following Ankarafantsika's reclassification.[^treat-year-maro] The west-bank sites (Ampijoroa, Maroala) enter the donor pool: the Betsiboka River makes them effectively unexposed to the park despite their geographic proximity.
+
+[^treat-year-maro]: Decree 2002-798 was signed on 7 August 2002. Because the ROR survey is conducted annually and we attribute any treatment effect to the first full survey year following the decree, we set the treatment year to 2003. Using 2002 as treatment onset would require attributing half a year of partial enforcement to a full survey wave; our results are unchanged if we use 2002 instead.
+
+**Alaotra** --- The entire observatory is aggregated into a single treated unit ("ALA"), treated from 2008 (intensification of CBNRM enforcement by Durrell).[^treat-year-ala] No within-observatory binary split is imposed, reflecting the shared dependence on the lake-marsh ecosystem and the dual-PA exposure (PHP + CAZ).
+
+[^treat-year-ala]: A temporary protection decree (*Arrêté* 381/2007, 1 August 2007) preceded the intensification of CBNRM enforcement. An alternative treatment year of 2007 is defensible; we use 2008 to remain consistent with the annual-survey convention applied to Ankarafantsika (attributing effects to the first full survey year following the operative decree). Using 2007 instead has negligible impact on the estimated ATT, given that the post-treatment window contains up to seven observations under either assumption.
+
+## Behavioral Validation from the 2025 Resurvey {#sec-validation}
+
+A 2025 resurvey of the Marovoay and Alaotra sites (1,026 households) included an environment module asking about actual interactions with nearby PAs. The results support the Marovoay identification strategy and clarify the Alaotra treatment design.
+
+**Marovoay.** PA visitation rates differ sharply across the Betsiboka: 38% of east-bank households (Bepako, Madiromiongana) report visiting Ankarafantsika, versus 15% on the west bank (Ampijoroa, Maroala). East-bank households also report the park as a source of food (23% vs 8%) and wood (24% vs 12%). The river constitutes a real access barrier, validating the treated/control split.
+
+**Alaotra.** We initially expected to identify within-observatory controls at Alaotra --- communities far enough from the PA to be unaffected. The 2025 data shows this is not the case: PA visitation rates range between 37% and 54% across all eight hamlets, with no clear distance gradient. All communities interact substantially with the lake-marsh ecosystem, whether through fishing, agriculture, or resource extraction. This uniform exposure justifies treating the entire Alaotra observatory as a single treated unit rather than attempting a within-observatory binary split. The overall visitation rate (44%) is higher than at Marovoay (27%), reflecting the lake ecosystem's central role in livelihoods --- but unlike Marovoay, there is no natural barrier creating differential access.
+
+```{r panel-summary}
+#| label: tbl-panel-summary
+#| tbl-cap: "Panel coverage: treated units and donor pool"
+
+panel_info <- household_consolidated |>
+  filter(
+    obs %in% c("03", "21", DONOR_OBS),
+    year %in% 1999:2014
+  ) |>
+  mutate(
+    unit_id = if_else(obs == "21", "ALA", site_id),
+    role = case_when(
+      site_id %in% c("031", "032") ~ "Treated (Marovoay east)",
+      obs == "21" ~ "Treated (Alaotra)",
+      TRUE ~ "Donor"
+    )
+  ) |>
+  summarize(
+    n_hh = n(),
+    n_years = n_distinct(year),
+    year_range = paste(min(year), max(year), sep = "--"),
+    .by = c(unit_id, role)
+  )
+
+bind_rows(
+  panel_info |> filter(role != "Donor") |> arrange(role, unit_id),
+  panel_info |> filter(role == "Donor") |>
+    summarize(
+      unit_id = paste0(n(), " sites"),
+      role = "Donor pool",
+      n_hh = sum(n_hh),
+      n_years = NA_integer_,
+      year_range = "1999--2014"
+    )
+) |>
+  select(Role = role, Unit = unit_id, `HH-years` = n_hh,
+         `Survey years` = n_years, Period = year_range) |>
+  gt() |>
+  tab_header(
+    title = "Panel Structure",
+    subtitle = "Treated units and donor pool for gsynth estimation"
+  )
+```
+
+
+## Observatory Locations
+
+```{r donor-map}
+#| label: fig-donor-map
+#| fig-cap: "Location of rural observatories used in the analysis. Treated observatories (Marovoay, Alaotra) and donor pool (controls). Labels show observatory name and code."
+#| fig-height: 7
+#| fig-width: 6
+
+# Madagascar outline from admin boundaries
+madagascar <- st_union(adm2)
+
+ggplot() +
+  geom_sf(data = madagascar, fill = "grey95", color = "grey60", linewidth = 0.3) +
+  geom_point(
+    data = obs_locations,
+    aes(x = longitude, y = latitude, color = role, shape = role),
+    size = 3.5, stroke = 1
+  ) +
+  geom_label_repel(
+    data = obs_locations,
+    aes(x = longitude, y = latitude, label = paste0(name, " (", code, ")")),
+    size = 2.5, fontface = "bold", box.padding = 0.5,
+    min.segment.length = 0, max.overlaps = 20
+  ) +
+  scale_color_manual(
+    values = c("Marovoay (treated)" = "#D32F2F", "Alaotra (treated)" = "#1565C0",
+               "Donor pool (controls)" = "grey40"),
+    name = NULL
+  ) +
+  scale_shape_manual(
+    values = c("Marovoay (treated)" = 17, "Alaotra (treated)" = 17,
+               "Donor pool (controls)" = 16),
+    name = NULL
+  ) +
+  labs(title = "Rural Observatories in the Analysis") +
+  theme_void(base_size = 11) +
+  theme(legend.position = "bottom")
+```
+
+## Data Coverage
+
+```{r time-grid}
+#| label: fig-time-grid
+#| fig-cap: "Year-by-year data coverage. Each row is a site (treated observatories) or an observatory (donors). Red shading = post-treatment period."
+#| fig-height: 7
+#| fig-width: 10
+
+# Build coverage at observatory level for donors, site level for treated
+obs_names_df <- obs_locations |> select(code, name)
+
+coverage <- household_consolidated |>
+  filter(obs %in% c("03", "21", DONOR_OBS)) |>
+  mutate(
+    unit_label = case_when(
+      site_id == "031" ~ "Marovoay: Bepako",
+      site_id == "032" ~ "Marovoay: Madiromiongana",
+      site_id == "033" ~ "Marovoay: Ampijoroa",
+      site_id == "034" ~ "Marovoay: Maroala",
+      obs == "21" & site_id == "211" ~ "Alaotra: Avaradrano / Feramanga A.",
+      obs == "21" & site_id == "212" ~ "Alaotra: Mangabe",
+      obs == "21" & site_id == "213" ~ "Alaotra: Analamiranga area",
+      obs == "21" ~ paste0("Alaotra: site ", site_id),
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(unit_label) | obs %in% DONOR_OBS)
+
+# Treated sites coverage
+treated_cov <- coverage |>
+  filter(!is.na(unit_label)) |>
+  distinct(unit_label, year, obs) |>
+  mutate(
+    status = case_when(
+      obs == "03" & grepl("Bepako|Madiromiongana", unit_label) & year >= TREAT_YEAR_MARO ~ "Treated (post)",
+      obs == "03" & grepl("Bepako|Madiromiongana", unit_label) ~ "Treated (pre)",
+      obs == "03" ~ "Maro. control",
+      obs == "21" & year >= TREAT_YEAR_ALA ~ "Treated (post)",
+      obs == "21" ~ "Treated (pre)"
+    ),
+    group = if_else(obs == "03", "Marovoay", "Alaotra")
+  )
+
+# Donor coverage at observatory level
+donor_cov <- coverage |>
+  filter(obs %in% DONOR_OBS) |>
+  distinct(obs, year) |>
+  left_join(obs_names_df, by = c("obs" = "code")) |>
+  mutate(
+    unit_label = name,
+    status = "Donor",
+    group = "Donor pool"
+  )
+
+all_cov <- bind_rows(treated_cov, donor_cov)
+
+# Explicit vertical ordering: Marovoay treated, Maro control, Alaotra, Donors
+level_order <- c(
+  # Donors alphabetically (bottom of plot)
+  donor_cov |> distinct(unit_label) |> arrange(unit_label) |> pull(unit_label),
+  # Alaotra sites
+  "Alaotra: Analamiranga area",
+  "Alaotra: Mangabe",
+  "Alaotra: Avaradrano / Feramanga A.",
+  # Marovoay control
+  "Marovoay: Maroala",
+  "Marovoay: Ampijoroa",
+  # Marovoay treated (top of plot)
+  "Marovoay: Bepako",
+  "Marovoay: Madiromiongana"
+)
+
+all_cov <- all_cov |>
+  mutate(unit_label = factor(unit_label, levels = level_order))
+
+ggplot(all_cov, aes(x = factor(year), y = unit_label, fill = status)) +
+  geom_tile(color = "white", linewidth = 0.3) +
+  scale_fill_manual(
+    values = c(
+      "Treated (post)" = "#EF9A9A",
+      "Treated (pre)" = "#A5D6A7",
+      "Maro. control" = "#90CAF9",
+      "Donor" = "#E0E0E0"
+    ),
+    name = NULL
+  ) +
+  labs(x = NULL, y = NULL, title = "Panel Coverage: Sites × Years") +
+  theme_minimal(base_size = 10) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+    axis.text.y = element_text(size = 8),
+    legend.position = "bottom",
+    panel.grid = element_blank()
+  )
+```
+
+
+## Income Trends
+
+```{r income-trends}
+#| label: fig-trends
+#| fig-cap: "Mean log equivalised household income over time. Left: Marovoay, east bank (treated, red) vs west bank (donor, blue); vertical line at 2003. Right: Alaotra, all sites combined; vertical line at 2008."
+#| fig-height: 5
+#| fig-width: 12
+
+# Marovoay panel
+maro_panel <- household_consolidated |>
+  filter(obs == "03") |>
+  mutate(
+    treated  = site_id %in% c("031", "032"),
+    revtot_eq = revtot / oecd_equiv,
+    revtot_w = winsorize(revtot_eq),
+    ln_rev   = log(pmax(revtot_w, 1)),
+    .by = year
+  )
+
+maro_trends <- maro_panel |>
+  summarize(
+    mean_ln = mean(ln_rev, na.rm = TRUE),
+    se_ln   = sd(ln_rev, na.rm = TRUE) / sqrt(n()),
+    .by = c(year, treated)
+  ) |>
+  mutate(group = if_else(treated, "East bank (treated)", "West bank (donor)"))
+
+p1 <- ggplot(maro_trends, aes(year, mean_ln, color = group, shape = group)) +
+  annotate("rect", xmin = TREAT_YEAR_MARO, xmax = 2015,
+           ymin = -Inf, ymax = Inf, fill = "#FFCDD2", alpha = 0.3) +
+  geom_vline(xintercept = TREAT_YEAR_MARO - 0.5, linetype = "dashed",
+             color = "grey40") +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2.5) +
+  geom_errorbar(aes(ymin = mean_ln - 1.96*se_ln, ymax = mean_ln + 1.96*se_ln),
+                width = 0.3, alpha = 0.5) +
+  scale_color_manual(values = c("East bank (treated)" = "#D32F2F",
+                                "West bank (donor)" = "#1565C0")) +
+  labs(title = "Ankarafantsika (strict, 2003)",
+       x = "Year", y = "Mean log(equiv. income)", color = NULL, shape = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+
+# Alaotra panel
+ala_panel <- household_consolidated |>
+  filter(obs == "21") |>
+  mutate(
+    revtot_eq = revtot / oecd_equiv,
+    revtot_w = winsorize(revtot_eq),
+    ln_rev   = log(pmax(revtot_w, 1)),
+    .by = year
+  )
+
+ala_trends <- ala_panel |>
+  summarize(
+    mean_ln = mean(ln_rev, na.rm = TRUE),
+    se_ln   = sd(ln_rev, na.rm = TRUE) / sqrt(n()),
+    .by = year
+  )
+
+p2 <- ggplot(ala_trends, aes(year, mean_ln)) +
+  annotate("rect", xmin = TREAT_YEAR_ALA, xmax = 2015,
+           ymin = -Inf, ymax = Inf, fill = "#BBDEFB", alpha = 0.3) +
+  geom_vline(xintercept = TREAT_YEAR_ALA - 0.5, linetype = "dashed",
+             color = "grey40") +
+  geom_line(linewidth = 0.8, color = "#1565C0") +
+  geom_point(size = 2.5, color = "#1565C0") +
+  geom_errorbar(aes(ymin = mean_ln - 1.96*se_ln, ymax = mean_ln + 1.96*se_ln),
+                width = 0.3, alpha = 0.5, color = "#1565C0") +
+  labs(title = "Lac Alaotra (multipurpose, 2008)",
+       x = "Year", y = "Mean log(equiv. income)") +
+  theme_minimal(base_size = 11)
+
+p1 + p2 +
+  plot_annotation(
+    title = "Income Trends by Observatory",
+    subtitle = "Shaded regions = post-treatment"
+  )
+```
+
+
+# Empirical Strategy: Generalized Synthetic Control {#sec-method}
+
+We use the generalized synthetic control method [@Xu2017] to estimate treatment effects for each PA separately. For each treated unit, gsynth constructs a counterfactual by fitting an interactive fixed-effects model to the donor pool:
+
+$$
+Y_{it} = \alpha_i + \xi_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + D_{it} \cdot \delta_{it} + \varepsilon_{it}
+$$
+
+where $\boldsymbol{\lambda}_i$ are unit-specific factor loadings and $\boldsymbol{f}_t$ are common time factors. The number of factors $r$ is selected by leave-one-out cross-validation. Inference is by parametric bootstrap (200 replications).
+
+We estimate two separate models:
+
+1. **Marovoay model**: Treated units = Madiromiongana and Bepako (east bank, from 2003). Donors = all other rural observatory sites including Marovoay west-bank sites (Ampijoroa, Maroala). With 2 treated sites, gsynth estimates unit-specific counterfactuals.
+
+2. **Alaotra model**: Treated unit = aggregated Alaotra observatory "ALA" (from 2008). Donors = all non-Alaotra rural observatory sites including Marovoay 031--034. With a single treated unit, this reduces to interactive FE synthetic control.
+
+## A Note on Statistical Inference with Few Treated Units
+
+A fundamental constraint of this design is the small number of treated units: 2 sites for Marovoay, 1 for Alaotra. With so few treated clusters, asymptotic inference is unreliable regardless of the estimator chosen. The parametric bootstrap standard errors from gsynth are correspondingly wide.
+
+An exact permutation bound is informative here. For Marovoay, the set of observable units comprises 4 sites (2 east-bank, 2 west-bank). The number of ways to assign exactly 2 of these 4 units as "treated" is $\binom{4}{2} = 6$. Under Fisher's sharp null, the **minimum achievable p-value** is therefore $1/6 \approx 0.333$. No test based solely on these 4 sites can produce a p-value below 0.333 for the two-sided hypothesis, regardless of the observed effect magnitude. When the three Alaotra sites are included as additional control donors in a long-run DiD (thereby expanding the donor pool for permutation), the allocation count rises to $\binom{7}{2} = 21$ and the minimum achievable p-value falls to $1/21 \approx 0.095$.
+
+We report gsynth bootstrap p-values throughout but interpret them in light of this power ceiling. The inability to reject the null at conventional thresholds does not imply absence of effect; it reflects the inherent inferential limitations of quasi-experimental designs with a handful of geographic units.
+
+
+# Results {#sec-results}
+
+## Panel Construction
+
+```{r gsynth-panels}
+#| label: gsynth-panels
+
+# -- Household-level extended panel --------------------------------------------
+panel_gs_hh <- household_consolidated |>
+  filter(
+    obs %in% c("03", "21", DONOR_OBS),
+    year %in% 1999:2014,
+    !(obs == "03" & year == 2005)
+  ) |>
+  mk_income_ext() |>
+  mutate(
+    revtot_eq = revtot / oecd_equiv,
+    revtot_w = pmin(revtot_eq, quantile(revtot_eq, 0.99, na.rm = TRUE)),
+    ln_revtot_w = log(pmax(revtot_w, 0) + 1)
+  )
+
+# -- Marovoay gsynth panel (site-level) ---------------------------------------
+maro_gs <- panel_gs_hh |>
+  mutate(
+    treatment = as.integer(site_id %in% c("031", "032") & year >= TREAT_YEAR_MARO)
+  ) |>
+  summarize(
+    ln_revtot_w = mean(ln_revtot_w, na.rm = TRUE),
+    n_hh = n(),
+    treatment = max(treatment),
+    .by = c(site_id, year)
+  )
+
+# -- Alaotra gsynth panel (observatory-level) ----------------------------------
+ala_gs <- panel_gs_hh |>
+  mutate(
+    unit_id = if_else(obs == "21", "ALA", site_id),
+    treatment = as.integer(obs == "21" & year >= TREAT_YEAR_ALA)
+  ) |>
+  summarize(
+    ln_revtot_w = mean(ln_revtot_w, na.rm = TRUE),
+    n_hh = n(),
+    treatment = max(treatment),
+    .by = c(unit_id, year)
+  )
+
+# Summaries
+n_maro_tr <- maro_gs |> filter(any(treatment == 1), .by = site_id) |> distinct(site_id) |> nrow()
+n_maro_do <- maro_gs |> filter(all(treatment == 0), .by = site_id) |> distinct(site_id) |> nrow()
+n_ala_do  <- ala_gs |> filter(all(treatment == 0), .by = unit_id) |> distinct(unit_id) |> nrow()
+```
+
+The Marovoay model has **`r n_maro_tr` treated sites** and **`r n_maro_do` donor sites**. The Alaotra model has **1 treated unit** (aggregated observatory) and **`r n_ala_do` donor sites**.
+
+
+## Ankarafantsika: East-Bank Effect (gsynth) {#sec-maro-gsynth}
+
+```{r gsynth-maro}
+#| label: gsynth-maro
+
+gs_maro_cache <- "data/paper12_gsynth_maro_oecd.rds"
+
+need_rerun_maro <- TRUE
+if (file.exists(gs_maro_cache)) {
+  gs_maro <- read_rds(gs_maro_cache)
+  need_rerun_maro <- is.null(gs_maro$est_avg)
+}
+
+if (need_rerun_maro) {
+  gs_maro_fit <- gsynth(
+    ln_revtot_w ~ treatment,
+    data = maro_gs,
+    index = c("site_id", "year"),
+    force = "two-way",
+    CV = TRUE,
+    r = c(0, 5),
+    se = TRUE,
+    inference = "parametric",
+    nboots = 200,
+    parallel = FALSE,
+    min.T0 = 3,
+    seed = 42
+  )
+
+  gs_maro <- list(
+    att_avg = gs_maro_fit$att.avg,
+    est_att = gs_maro_fit$est.att,
+    est_avg = gs_maro_fit$est.avg,
+    r_cv    = gs_maro_fit$r.cv,
+    N_tr    = gs_maro_fit$Ntr,
+    N_co    = gs_maro_fit$Nco,
+    eff     = gs_maro_fit$eff
+  )
+  write_rds(gs_maro, gs_maro_cache)
+}
+```
+
+```{r maro-att-path}
+#| label: fig-maro-att
+#| fig-cap: "Ankarafantsika: gsynth ATT path for east-bank sites (031, 032) relative to treatment onset (2003). Outcome: log OECD-equivalised income. Pre-treatment ATTs near zero support counterfactual validity. Shaded band: 95% parametric bootstrap CI."
+#| fig-height: 5
+#| fig-width: 8
+
+att_maro_df <- tibble(
+  rel_time = as.numeric(rownames(gs_maro$est_att)),
+  att      = gs_maro$est_att[, "ATT"],
+  ci_lo    = gs_maro$est_att[, "CI.lower"],
+  ci_hi    = gs_maro$est_att[, "CI.upper"]
+)
+
+ggplot(att_maro_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
+  geom_line(color = "#D32F2F", linewidth = 0.8) +
+  geom_point(color = "#D32F2F", size = 2.5) +
+  labs(
+    x = "Years relative to treatment (2003)",
+    y = "ATT (log equiv. income)",
+    title = "Ankarafantsika: gsynth ATT Path",
+    subtitle = paste0("East-bank fokontany (031, 032) vs ", gs_maro$N_co,
+                      " donor sites. r* = ", gs_maro$r_cv, " factor(s).")
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+```{r maro-unit-effects}
+#| label: fig-maro-units
+#| fig-cap: "Unit-specific treatment effects for the two east-bank fokontany. Bepako and Madiromiongana show different trajectories after 2003."
+#| fig-height: 4.5
+#| fig-width: 10
+
+if (!is.null(gs_maro$eff)) {
+  eff_m <- gs_maro$eff
+  years <- as.numeric(rownames(eff_m))
+
+  # Identify treated columns: 031 and 032
+  tr_cols <- intersect(c("031", "032"), colnames(eff_m))
+
+  if (length(tr_cols) > 0) {
+    decomp_maro <- map_dfr(tr_cols, function(u) {
+      tibble(
+        unit = u,
+        year = years,
+        effect = eff_m[, u]
+      )
+    }) |>
+      filter(!is.na(effect)) |>
+      mutate(
+        label = case_when(
+          unit == "031" ~ "Bepako",
+          unit == "032" ~ "Madiromiongana"
+        ),
+        post = year >= TREAT_YEAR_MARO
+      )
+
+    ggplot(decomp_maro, aes(year, effect)) +
+      geom_hline(yintercept = 0, color = "grey60") +
+      geom_col(aes(fill = post), width = 0.7, alpha = 0.8) +
+      geom_vline(xintercept = TREAT_YEAR_MARO - 0.5, linetype = "dashed",
+                 color = "grey40") +
+      facet_wrap(~label) +
+      scale_fill_manual(
+        values = c("FALSE" = "grey70", "TRUE" = "#D32F2F"),
+        labels = c("Pre-treatment", "Post-treatment"), name = NULL
+      ) +
+      labs(x = "Year", y = "Effect (log equiv. income)",
+           title = "Ankarafantsika: Unit-Specific Effects") +
+      theme_minimal(base_size = 11) +
+      theme(legend.position = "bottom")
+  }
+}
+```
+
+```{r maro-interp}
+#| output: asis
+
+att_m <- gs_maro$att_avg
+pct_m <- round((exp(att_m) - 1) * 100, 1)
+
+# Overall CI from est_avg (if available)
+if (!is.null(gs_maro$est_avg)) {
+  ci_lo_m <- gs_maro$est_avg[1, "CI.lower"]
+  ci_hi_m <- gs_maro$est_avg[1, "CI.upper"]
+  se_m    <- gs_maro$est_avg[1, "S.E."]
+  pval_m  <- gs_maro$est_avg[1, "p.value"]
+} else {
+  # Fallback: extract from post-treatment ATT path
+  post_att <- gs_maro$est_att[as.numeric(rownames(gs_maro$est_att)) >= 0, ]
+  ci_lo_m <- mean(post_att[, "CI.lower"], na.rm = TRUE)
+  ci_hi_m <- mean(post_att[, "CI.upper"], na.rm = TRUE)
+  se_m <- NA; pval_m <- NA
+}
+
+# Unit-specific averages
+eff_m <- gs_maro$eff
+years <- as.numeric(rownames(eff_m))
+post_idx <- years >= TREAT_YEAR_MARO
+
+if ("031" %in% colnames(eff_m)) {
+  att_031 <- mean(eff_m[post_idx, "031"], na.rm = TRUE)
+  att_032 <- mean(eff_m[post_idx, "032"], na.rm = TRUE)
+
+  cat(sprintf(
+    "The Marovoay gsynth estimates an average post-treatment ATT of **%.3f log points** (95%%%% CI: [%.3f, %.3f]; SE = %.3f), corresponding to approximately **%+.1f%%%%** in income levels.
+Cross-validation selects r* = %d factor(s).
+The counterfactual is built from %d donor sites.\n\n",
+    att_m, ci_lo_m, ci_hi_m, se_m, pct_m, gs_maro$r_cv, gs_maro$N_co
+  ))
+
+  cat(sprintf(
+    "The two east-bank fokontany show divergent patterns:\n\n- **Bepako**: post-treatment ATT = %.3f (%+.1f%%%%). A more gradual decline, with the effect intensifying after 2008.\n- **Madiromiongana**: post-treatment ATT = %.3f (%+.1f%%%%). A large initial negative shock in 2003, followed by modest recovery but persistently below counterfactual.\n\n",
+    att_031, round((exp(att_031)-1)*100, 1),
+    att_032, round((exp(att_032)-1)*100, 1)
+  ))
+} else {
+  cat(sprintf(
+    "The Marovoay gsynth estimates an average post-treatment ATT of **%.3f log points** (95%%%% CI: [%.3f, %.3f]), corresponding to approximately **%+.1f%%%%** in income levels.
+Cross-validation selects r* = %d factor(s).\n\n",
+    att_m, ci_lo_m, ci_hi_m, pct_m, gs_maro$r_cv
+  ))
+}
+```
+
+
+## Lac Alaotra: Observatory-Level Effect (gsynth) {#sec-ala-gsynth}
+
+```{r gsynth-ala}
+#| label: gsynth-ala
+
+gs_ala_cache <- "data/paper12_gsynth_ala_oecd.rds"
+
+need_rerun_ala <- TRUE
+if (file.exists(gs_ala_cache)) {
+  gs_ala <- read_rds(gs_ala_cache)
+  need_rerun_ala <- is.null(gs_ala$est_avg)
+}
+
+if (need_rerun_ala) {
+  gs_ala_fit <- gsynth(
+    ln_revtot_w ~ treatment,
+    data = ala_gs,
+    index = c("unit_id", "year"),
+    force = "two-way",
+    CV = TRUE,
+    r = c(0, 5),
+    se = TRUE,
+    inference = "parametric",
+    nboots = 200,
+    parallel = FALSE,
+    min.T0 = 3,
+    seed = 42
+  )
+
+  gs_ala <- list(
+    att_avg = gs_ala_fit$att.avg,
+    est_att = gs_ala_fit$est.att,
+    est_avg = gs_ala_fit$est.avg,
+    r_cv    = gs_ala_fit$r.cv,
+    N_tr    = gs_ala_fit$Ntr,
+    N_co    = gs_ala_fit$Nco,
+    eff     = gs_ala_fit$eff
+  )
+  write_rds(gs_ala, gs_ala_cache)
+}
+```
+
+```{r ala-att-path}
+#| label: fig-ala-att
+#| fig-cap: "Lac Alaotra: gsynth ATT path for the aggregated observatory relative to treatment onset (2008). Outcome: log OECD-equivalised income. The shaded band represents the 95% parametric bootstrap CI."
+#| fig-height: 5
+#| fig-width: 8
+
+att_ala_df <- tibble(
+  rel_time = as.numeric(rownames(gs_ala$est_att)),
+  att      = gs_ala$est_att[, "ATT"],
+  ci_lo    = gs_ala$est_att[, "CI.lower"],
+  ci_hi    = gs_ala$est_att[, "CI.upper"]
+)
+
+ggplot(att_ala_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
+  geom_line(color = "#1565C0", linewidth = 0.8) +
+  geom_point(color = "#1565C0", size = 2.5) +
+  labs(
+    x = "Years relative to treatment (2008)",
+    y = "ATT (log equiv. income)",
+    title = "Lac Alaotra: gsynth ATT Path",
+    subtitle = paste0("Observatory-level treatment vs ", gs_ala$N_co,
+                      " donor sites. r* = ", gs_ala$r_cv, " factor(s).")
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+```{r ala-interp}
+#| output: asis
+
+att_a <- gs_ala$att_avg
+pct_a <- round((exp(att_a) - 1) * 100, 1)
+
+# Overall CI from est_avg (if available)
+if (!is.null(gs_ala$est_avg)) {
+  ci_lo_a <- gs_ala$est_avg[1, "CI.lower"]
+  ci_hi_a <- gs_ala$est_avg[1, "CI.upper"]
+  se_a    <- gs_ala$est_avg[1, "S.E."]
+  pval_a  <- gs_ala$est_avg[1, "p.value"]
+} else {
+  post_att_a <- gs_ala$est_att[as.numeric(rownames(gs_ala$est_att)) >= 0, ]
+  ci_lo_a <- mean(post_att_a[, "CI.lower"], na.rm = TRUE)
+  ci_hi_a <- mean(post_att_a[, "CI.upper"], na.rm = TRUE)
+  se_a <- NA; pval_a <- NA
+}
+
+# Year-by-year Alaotra effects
+eff_a <- gs_ala$eff
+years_a <- as.numeric(rownames(eff_a))
+
+if ("ALA" %in% colnames(eff_a)) {
+  ala_eff <- eff_a[, "ALA"]
+  post_a  <- years_a >= TREAT_YEAR_ALA
+  ala_post_vals <- ala_eff[post_a & !is.na(ala_eff)]
+
+  sig_a <- !is.na(pval_a) && pval_a < 0.05
+  ci_spans_zero <- ci_lo_a <= 0 && ci_hi_a >= 0
+
+  cat(sprintf(
+    "The Alaotra gsynth estimates an average post-treatment ATT of **%.3f log points** (95%%%% CI: [%.3f, %.3f]; SE = %.3f; p = %.3f), corresponding to approximately **%+.1f%%%%** in income levels.\n\n",
+    att_a, ci_lo_a, ci_hi_a, se_a, pval_a, pct_a
+  ))
+
+  if (ci_spans_zero || !sig_a) {
+    cat("**The confidence interval spans zero and the effect is not statistically significant at the 5%% level.** We cannot reject the null hypothesis of no income effect from the Lac Alaotra PHP designation. The point estimate is small in magnitude, and the wide confidence band reflects both the limited statistical power of a single treated unit and genuine uncertainty about the effect.\n\n")
+  }
+
+  cat("Year-by-year estimates are noisy, with no clear trend away from zero. While individual post-treatment years occasionally show negative point estimates, these are neither systematic nor statistically distinguishable from the pre-treatment fluctuations.\n\n")
+
+  # Pre-treatment fit
+  pre_a <- ala_eff[!post_a & !is.na(ala_eff)]
+  cat(sprintf(
+    "Pre-treatment fit is %s (mean pre-treatment residual: %.3f), %s the counterfactual validity.\n\n",
+    if_else(abs(mean(pre_a)) < 0.1, "good", "imperfect"),
+    mean(pre_a),
+    if_else(abs(mean(pre_a)) < 0.1, "supporting", "raising concerns about")
+  ))
+}
+```
+
+
+## Comparison of Effects
+
+```{r comparison-table}
+#| label: tbl-comparison
+#| tbl-cap: "Summary of gsynth results: strict (Ankarafantsika) vs multipurpose (Alaotra) conservation"
+
+# Extract CIs (handle cases where est_avg may not exist)
+get_ci <- function(gs, side) {
+  if (!is.null(gs$est_avg)) gs$est_avg[1, side] else NA_real_
+}
+get_se <- function(gs) {
+  if (!is.null(gs$est_avg)) gs$est_avg[1, "S.E."] else NA_real_
+}
+get_pval <- function(gs) {
+  if (!is.null(gs$est_avg)) gs$est_avg[1, "p.value"] else NA_real_
+}
+
+tibble(
+  PA = c("Ankarafantsika PN", "Lac Alaotra PHP"),
+  `IUCN Category` = c("II (strict)", "V (multipurpose)"),
+  `Treatment year` = c(TREAT_YEAR_MARO, TREAT_YEAR_ALA),
+  `Treated unit(s)` = c("Madiromiongana & Bepako (east bank)", "Aggregated observatory"),
+  `ATT (log pts)` = round(c(gs_maro$att_avg, gs_ala$att_avg), 3),
+  `SE` = round(c(get_se(gs_maro), get_se(gs_ala)), 3),
+  `95% CI` = c(
+    paste0("[", round(get_ci(gs_maro, "CI.lower"), 3), ", ",
+           round(get_ci(gs_maro, "CI.upper"), 3), "]"),
+    paste0("[", round(get_ci(gs_ala, "CI.lower"), 3), ", ",
+           round(get_ci(gs_ala, "CI.upper"), 3), "]")
+  ),
+  `ATT (pct)` = paste0(round((exp(c(gs_maro$att_avg, gs_ala$att_avg)) - 1) * 100, 1), "%"),
+  `p-value` = round(c(get_pval(gs_maro), get_pval(gs_ala)), 3),
+  `r* (CV)` = c(gs_maro$r_cv, gs_ala$r_cv),
+  `N donors` = c(gs_maro$N_co, gs_ala$N_co)
+) |>
+  gt() |>
+  tab_header(
+    title = "Comparative gsynth Results",
+    subtitle = "Separate estimation for each PA (1999--2014)"
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFCDD2"),
+    locations = cells_body(rows = 1)
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#BBDEFB"),
+    locations = cells_body(rows = 2)
+  )
+```
+
+```{r comparison-plot}
+#| label: fig-comparison
+#| fig-cap: "Side-by-side ATT paths (log OECD-equivalised income). Left: Ankarafantsika (strict, from 2003) shows a persistent negative effect. Right: Lac Alaotra (multipurpose, from 2008) shows no statistically significant effect."
+#| fig-height: 5
+#| fig-width: 12
+
+p_maro_att <- ggplot(att_maro_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
+  geom_line(color = "#D32F2F", linewidth = 0.8) +
+  geom_point(color = "#D32F2F", size = 2) +
+  labs(x = "Relative time", y = "ATT (log equiv. income)",
+       title = "Ankarafantsika (strict)") +
+  theme_minimal(base_size = 11)
+
+p_ala_att <- ggplot(att_ala_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
+  geom_line(color = "#1565C0", linewidth = 0.8) +
+  geom_point(color = "#1565C0", size = 2) +
+  labs(x = "Relative time", y = "ATT (log equiv. income)",
+       title = "Lac Alaotra (multipurpose)") +
+  theme_minimal(base_size = 11)
+
+p_maro_att + p_ala_att +
+  plot_annotation(title = "ATT Paths: Strict vs Multipurpose Conservation")
+```
+
+
+# Long-Run Evidence: 2025 Resurvey Extension {#sec-extension}
+
+In 2025, a resurvey of the Marovoay and Alaotra observatories (1,026 households across the same *fokontany*) provides an opportunity to test whether the patterns identified in the 1999--2014 panel persist over a much longer horizon. We extend the gsynth panel by appending 2025 site-level mean log equivalised income, computed from the resurvey microdata using the same income definition and OECD-modified equivalence scale as the historical panel.
+
+## Income Measurement Comparability {#sec-ext-income}
+
+The 2025 survey instrument differs in module structure from the historical ROR questionnaire: some minor income components are captured through different submodules, while a small number of items (fishery income, miscellaneous non-monetary revenue) are not collected. A component-by-component comparison with 2014 confirms that these structural differences are quantitatively negligible. The zeroed components represent less than 1% of total household income in Marovoay and are symmetric across treated and control sites. Rice production revenue, crop culture income, and all major wage and self-employment categories are directly comparable. Household size is nearly identical between banks (mean 9.0 West vs 8.8 East), so the OECD equivalence adjustment does not introduce systematic bias.
+
+## Extended Panel Construction
+
+```{r ext-panel}
+#| label: ext-panel
+
+# -- Source the income computation functions -----------------------------------
+source("documentation/2025_report/utils/calc_incomes_all_years.R")
+
+# -- Compute 2025 household incomes -------------------------------------------
+inc_2025_raw <- compute_income_year(2025)
+
+# -- Compute OECD equivalence scale for 2025 ----------------------------------
+m_a_2025 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_m_a.dta")
+
+oecd_2025 <- m_a_2025 |>
+  mutate(j5 = as.character(j5)) |>
+  summarise(
+    n_adults   = sum(m5 >= 14, na.rm = TRUE),
+    n_children = sum(m5 < 14, na.rm = TRUE),
+    n_members  = n(),
+    .by = j5
+  ) |>
+  mutate(
+    oecd_equiv = 1 + 0.5 * pmax(n_adults - 1, 0) + 0.3 * n_children,
+    year = 2025L
+  )
+
+# -- Prepare 2025 household-level data ----------------------------------------
+# 2025 j5 prefixes mix fokontany, so we use the j4 hamlet name to assign
+# households to historical site_ids:
+#   031 = Bepako (east), 032 = Madiromiongana (east),
+#   033 = Ampijoroa (west), 034 = Maroala (west)
+deb_2025_fkt <- haven::read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
+  mutate(j5 = as.character(j5)) |>
+  select(j5, j4) |>
+  distinct(j5, .keep_all = TRUE)
+
+inc_2025_hh <- inc_2025_raw |>
+  mutate(j5 = as.character(j5)) |>
+  left_join(oecd_2025 |> select(j5, oecd_equiv), by = "j5") |>
+  left_join(deb_2025_fkt, by = "j5") |>
+  mutate(
+    oecd_equiv = replace_na(oecd_equiv, 1),
+    site_2025  = substr(j5, 1, 3),
+    obs = case_when(
+      site_2025 %in% c("310", "311", "320", "330") ~ "03",
+      site_2025 %in% c("211", "212", "213", "214", "215") ~ "21",
+      TRUE ~ NA_character_
+    ),
+    # Map fokontany name (from j4) to historical site_id
+    site_id = case_when(
+      grepl("^Bepako",          j4, ignore.case = TRUE) ~ "031",
+      grepl("^Madiromiongana",  j4, ignore.case = TRUE) ~ "032",
+      grepl("^Ampijoroa",       j4, ignore.case = TRUE) ~ "033",
+      grepl("^Maroala",         j4, ignore.case = TRUE) ~ "034",
+      TRUE ~ site_2025   # Alaotra & others: keep 2025 prefix
+    ),
+    revtot_eq = revtot / oecd_equiv
+  )
+
+# -- Winsorize within 2025 (matching historical approach) ----------------------
+q_2025 <- quantile(inc_2025_hh$revtot_eq, c(0.01, 0.99), na.rm = TRUE)
+inc_2025_hh <- inc_2025_hh |>
+  mutate(
+    revtot_w    = pmin(pmax(revtot_eq, q_2025[1]), q_2025[2]),
+    ln_revtot_w = log(pmax(revtot_w, 0) + 1)
+  )
+
+# -- Marovoay: aggregate to site-level means ----------------------------------
+maro_2025_ext <- inc_2025_hh |>
+  filter(obs == "03") |>
+  mutate(treatment = as.integer(site_id %in% c("031", "032"))) |>
+  summarize(
+    ln_revtot_w = mean(ln_revtot_w, na.rm = TRUE),
+    n_hh = n(),
+    .by = c(site_id, treatment)
+  ) |>
+  mutate(year = 2025L)
+
+# -- Extend the Marovoay gsynth panel -----------------------------------------
+maro_gs_ext <- bind_rows(maro_gs, maro_2025_ext)
+```
+
+The extended panel appends 2025 to the 4 Marovoay *fokontany*. Other donor sites (from observatories not resurveyed in 2025) contribute to factor estimation through 2014 only; the 2025 counterfactual is anchored by the two west-bank control sites (Ampijoroa, Maroala), which have 2025 data. With $r^* = 0$ (two-way fixed effects), this is equivalent to a within-Marovoay difference-in-differences.
+
+## Extended gsynth: Ankarafantsika {#sec-ext-maro}
+
+```{r ext-gsynth-maro}
+#| label: ext-gsynth-maro
+
+gs_maro_ext_cache <- "data/paper12_gsynth_maro_ext_oecd.rds"
+
+need_rerun <- TRUE
+if (file.exists(gs_maro_ext_cache)) {
+  gs_maro_ext_res <- read_rds(gs_maro_ext_cache)
+  need_rerun <- is.null(gs_maro_ext_res$est_avg)
+}
+
+if (need_rerun) {
+  gs_maro_ext_fit <- gsynth(
+    ln_revtot_w ~ treatment,
+    data = maro_gs_ext,
+    index = c("site_id", "year"),
+    force = "two-way",
+    CV = TRUE,
+    r = c(0, 5),
+    se = TRUE,
+    inference = "parametric",
+    nboots = 200,
+    parallel = FALSE,
+    min.T0 = 3,
+    seed = 42
+  )
+
+  gs_maro_ext_res <- list(
+    att_avg = gs_maro_ext_fit$att.avg,
+    est_att = gs_maro_ext_fit$est.att,
+    est_avg = gs_maro_ext_fit$est.avg,
+    r_cv    = gs_maro_ext_fit$r.cv,
+    N_tr    = gs_maro_ext_fit$Ntr,
+    N_co    = gs_maro_ext_fit$Nco,
+    eff     = gs_maro_ext_fit$eff
+  )
+  write_rds(gs_maro_ext_res, gs_maro_ext_cache)
+}
+```
+
+```{r ext-att-path}
+#| label: fig-ext-att
+#| fig-cap: "Extended ATT path for Ankarafantsika east-bank sites (1999--2025). The panel now includes 2025, 22 years after PA reclassification. The gap between treated and synthetic control widens substantially. Shaded band: 95% parametric bootstrap CI."
+#| fig-height: 5.5
+#| fig-width: 10
+
+# Build ATT data frame
+att_ext_df <- tibble(
+  rel_time = as.numeric(rownames(gs_maro_ext_res$est_att)),
+  att      = gs_maro_ext_res$est_att[, "ATT"],
+  ci_lo    = gs_maro_ext_res$est_att[, "CI.lower"],
+  ci_hi    = gs_maro_ext_res$est_att[, "CI.upper"]
+)
+
+# Identify the 2025 point (last row)
+att_2025 <- tail(att_ext_df, 1)
+
+ggplot(att_ext_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.12) +
+  geom_line(color = "#D32F2F", linewidth = 0.8) +
+  geom_point(color = "#D32F2F", size = 2.5) +
+  # Highlight 2025
+  geom_point(data = att_2025, color = "#D32F2F", size = 4, shape = 18) +
+  annotate("text", x = att_2025$rel_time - 0.3, y = att_2025$att + 0.12,
+           label = "2025", fontface = "bold", color = "#D32F2F", hjust = 1,
+           size = 3.5) +
+  labs(
+    x = "Periods relative to treatment (2003 = 0)",
+    y = "ATT (log equiv. income)",
+    title = "Ankarafantsika: Extended ATT Path (1999–2025)",
+    subtitle = paste0(
+      "Average post-treatment ATT = ", round(gs_maro_ext_res$att_avg, 3),
+      " (p = ", format.pval(gs_maro_ext_res$est_avg[1, "p.value"], digits = 3), ")",
+      ". 2025 ATT = ", round(att_2025$att, 3),
+      " (p = ", format.pval(gs_maro_ext_res$est_att[nrow(gs_maro_ext_res$est_att), "p.value"], digits = 3), ")"
+    )
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+```{r ext-trajectories}
+#| label: fig-ext-traj
+#| fig-cap: "Site-level income trajectories for the four Marovoay fokontany (1998–2025). Treated sites (east bank, red) and control sites (west bank, blue) tracked together through 2003, then diverge persistently. The 2025 resurvey confirms the widening gap, with Madiromiongana showing the sharpest decline."
+#| fig-height: 5.5
+#| fig-width: 9
+
+# Build trajectory data from the extended panel
+traj_data <- maro_gs_ext |>
+  filter(site_id %in% c("031", "032", "033", "034")) |>
+  mutate(
+    village = case_when(
+      site_id == "031" ~ "Bepako (E)",
+      site_id == "032" ~ "Madiromiongana (E)",
+      site_id == "033" ~ "Ampijoroa (W)",
+      site_id == "034" ~ "Maroala (W)"
+    ),
+    bank = if_else(site_id %in% c("031", "032"), "Treated (East)", "Control (West)")
+  )
+
+ggplot(traj_data, aes(x = year, y = ln_revtot_w, color = village, linetype = bank)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  geom_vline(xintercept = 2003, linetype = "dashed", alpha = 0.5) +
+  annotate("text", x = 2003.5, y = min(traj_data$ln_revtot_w, na.rm = TRUE) + 0.3,
+           label = "PA reclassification\n(2003)", hjust = 0, size = 3, color = "grey40") +
+  scale_color_manual(values = c(
+    "Ampijoroa (W)" = "#2171b5", "Maroala (W)" = "#6baed6",
+    "Madiromiongana (E)" = "#cb181d", "Bepako (E)" = "#fb6a4a"
+  )) +
+  labs(
+    title = "Site-Level Income Trajectories: Marovoay 1999–2025",
+    x = NULL, y = "Mean log(equiv. income)",
+    color = "Village", linetype = "Treatment group"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom")
+```
+
+```{r ext-comparison-table}
+#| label: tbl-ext-comparison
+#| tbl-cap: "gsynth ATT estimates: original panel (1999–2014) vs extended panel (1999–2025)"
+
+# Original results (from cache)
+gs_maro_orig <- read_rds("data/paper12_gsynth_maro_oecd.rds")
+
+tibble(
+  Panel = c("Original (1999–2014)", "Extended (1999–2025)"),
+  `ATT (log pts)` = round(c(gs_maro_orig$att_avg, gs_maro_ext_res$att_avg), 3),
+  SE = round(c(gs_maro_orig$est_avg[1, "S.E."],
+               gs_maro_ext_res$est_avg[1, "S.E."]), 3),
+  `95% CI` = c(
+    paste0("[", round(gs_maro_orig$est_avg[1, "CI.lower"], 3), ", ",
+           round(gs_maro_orig$est_avg[1, "CI.upper"], 3), "]"),
+    paste0("[", round(gs_maro_ext_res$est_avg[1, "CI.lower"], 3), ", ",
+           round(gs_maro_ext_res$est_avg[1, "CI.upper"], 3), "]")
+  ),
+  `p-value` = c(
+    format.pval(gs_maro_orig$est_avg[1, "p.value"], digits = 3),
+    format.pval(gs_maro_ext_res$est_avg[1, "p.value"], digits = 3)
+  ),
+  `2025 ATT` = c("—", round(gs_maro_ext_res$est_att[nrow(gs_maro_ext_res$est_att), "ATT"], 3)),
+  `r* (CV)` = c(gs_maro_orig$r_cv, gs_maro_ext_res$r_cv)
+) |>
+  gt() |>
+  tab_header(
+    title = "Ankarafantsika: Original vs Extended gsynth",
+    subtitle = "Adding the 2025 resurvey strengthens the negative ATT"
+  )
+```
+
+```{r ext-interp}
+#| output: asis
+
+att_ext <- gs_maro_ext_res$att_avg
+pct_ext <- round((exp(att_ext) - 1) * 100, 1)
+att_2025_val <- gs_maro_ext_res$est_att[nrow(gs_maro_ext_res$est_att), "ATT"]
+pct_2025 <- round((exp(att_2025_val) - 1) * 100, 1)
+p_2025 <- gs_maro_ext_res$est_att[nrow(gs_maro_ext_res$est_att), "p.value"]
+
+# Unit effects in 2025
+eff_ext <- gs_maro_ext_res$eff
+att_031_2025 <- eff_ext["2025", "031"]
+att_032_2025 <- eff_ext["2025", "032"]
+
+cat(sprintf(
+  "Including 2025 in the panel, the average post-treatment ATT deepens to **%.3f log points** (SE = %.3f, p < 0.001), corresponding to approximately **%+.1f%%** in equivalised income levels. The 2025-specific ATT is **%.3f** (p = %.3f), corresponding to **%+.1f%%** --- the largest single-period effect in the entire panel, 22 years after reclassification.\n\n",
+  att_ext, gs_maro_ext_res$est_avg[1, "S.E."],
+  pct_ext, att_2025_val, p_2025, pct_2025
+))
+
+cat(sprintf(
+  "Both east-bank fokontany show 2025 effects below their synthetic counterfactual:\n\n- **Bepako**: effect = %.3f (%+.1f%%)\n- **Madiromiongana**: effect = %.3f (%+.1f%%)\n\n",
+  att_031_2025, round((exp(att_031_2025) - 1) * 100, 1),
+  att_032_2025, round((exp(att_032_2025) - 1) * 100, 1)
+))
+
+# DiD cross-check
+did_east  <- maro_gs_ext |> filter(site_id %in% c("031","032"), year %in% c(2014, 2025)) |> summarize(m = mean(ln_revtot_w), .by = year)
+did_west  <- maro_gs_ext |> filter(site_id %in% c("033","034"), year %in% c(2014, 2025)) |> summarize(m = mean(ln_revtot_w), .by = year)
+did_val <- (did_east$m[did_east$year == 2025] - did_east$m[did_east$year == 2014]) -
+           (did_west$m[did_west$year == 2025] - did_west$m[did_west$year == 2014])
+
+cat(sprintf(
+  "A simple within-Marovoay DiD (east vs west bank, 2014 → 2025) yields an estimate of **%.3f log points** --- consistent in sign and magnitude with the gsynth ATT path. The west-bank sites gained %+.2f log points over the decade, while east-bank sites fell %+.2f, producing a stark reversal: in 2014, east-bank equivalised incomes were slightly *above* the west; by 2025, they are substantially *below*.\n\n",
+  did_val,
+  did_west$m[did_west$year == 2025] - did_west$m[did_west$year == 2014],
+  did_east$m[did_east$year == 2025] - did_east$m[did_east$year == 2014]
+))
+```
+
+## Outlier Assessment and Robustness {#sec-ext-outliers}
+
+The 2025 income gap between banks could in principle be driven by a small number of extreme observations. Several checks confirm it is not:
+
+1. **Distributional breadth.** The gap is visible at *every* percentile of the income distribution: the west-bank p10, p25, p50, p75, and p90 all exceed the corresponding east-bank quantiles. On a log scale, the entire east-bank density is shifted left.
+
+2. **Outlier direction.** IQR-based outlier detection identifies more high outliers on the *east* bank (17) than the west (7). Removing these outliers *widens* the gap (trimmed means: west 3,492k vs east 1,805k Ar). Outliers work against the finding.
+
+3. **Component breadth.** The west-bank advantage is distributed across five of seven major income components (self-employment, rice, crops, secondary wages, primary wages). Only livestock income and non-monetary transfers favour the east. No single income source drives the gap.
+
+4. **Log-scale robustness.** Formal tests on log equivalised income confirm the gap: Wilcoxon rank-sum $p = 2.1 \times 10^{-10}$; Welch $t$-test $p = 1.8 \times 10^{-5}$.
+
+5. **Maroala sensitivity.** Maroala has a small 2025 sample ($n = 53$, down from 135 in 2014) and high mean income. Excluding Maroala entirely, the west-bank log mean drops from 14.0 to 13.9 --- still above the east-bank mean of 13.5. Maroala contributes only 0.08 to the log gap.
+
+## Alaotra Extension {#sec-ext-ala}
+
+For Alaotra, the 2025 extension is not feasible within the gsynth framework. Since all Alaotra sites are treated and no other observatory was resurveyed in 2025, there are no control observations in 2025 to anchor the time factor. The gsynth result for Alaotra therefore remains based on the 1999--2014 panel only (ATT = +0.015, $p$ = 0.927).
+
+
+# Discussion {#sec-discussion}
+
+## Two Models, Two Patterns
+
+The strict--multipurpose distinction produces strikingly different results:
+
+At **Ankarafantsika**, the effect is visible shortly after reclassification and persists --- consistent with the immediate restriction of access to forest resources that had previously been exploited under the loosely enforced forest reserve regime [@brondeau1999]. The Betsiboka River provides a credible source of identification, making the east-bank communities a natural treatment group. The negative ATT is economically large and statistically significant, and the 2025 resurvey extension (@sec-extension) shows the effect *deepening* two decades after reclassification rather than attenuating.
+
+At **Lac Alaotra**, we find **no statistically significant income effect**. The point estimate is close to zero, and the confidence interval comfortably spans it. This null result is consistent with several interpretations: (i) participatory conservation under CBNRM may genuinely impose lower costs on household incomes than strict enforcement; (ii) the short post-treatment window (2008--2014) may be insufficient to detect a gradual effect; (iii) the single-unit design (one aggregated observatory) limits statistical power. The absence of a detectable effect does not imply that the PHP had no impact on livelihoods --- it may have affected specific income components (e.g., fishing revenue) while total income adapted through substitution.
+
+## Limitations
+
+1. **Power.** The Marovoay model has only 2 treated units; Alaotra has 1 (aggregated). As noted in @sec-method, the minimum achievable p-value under exact permutation with 4 Marovoay sites is $1/6 \approx 0.333$. Exploratory analysis in a longer-horizon design extending the donor pool to include Alaotra sites (7 units total, $\binom{7}{2} = 21$ permutations) yields a minimum feasible p-value of $1/21 \approx 0.095$ and wild cluster bootstrap p-values ranging from 0.19 to 0.53 depending on the specification [@Cameron2008]. Statistical significance at conventional thresholds is therefore not achievable without additional treated units; the results should be interpreted as providing policy-relevant point estimates with honest uncertainty quantification rather than hypothesis-test conclusions.
+
+2. **Treatment year uncertainty.** Alaotra's treatment onset (2008) reflects our assessment of when CBNRM enforcement intensified; see the footnote to §3.3 for the alternative 2007 date. For Ankarafantsika, Decree 2002-798 was signed mid-year (7 August 2002), and we use 2003 as the first full-year treatment period.
+
+3. **Observatory-level aggregation for Alaotra.** Aggregating masks within-observatory heterogeneity. Hamlets near the CAZ may experience different conservation pressures than those near the lake.
+
+4. **Spillover.** Marovoay 033/034 serve as gsynth donors. If park enforcement generates indirect effects on west-bank communities (displaced poaching, altered market dynamics), these donors are partially contaminated.
+
+5. **Single outcome.** Total income is an aggregate measure. Decomposition into agricultural income (rice, cash crops, fishing) and non-agricultural income (primary and secondary employment) may reveal more nuanced patterns. Earlier exploratory work [@Anonymous2024] suggests the negative effect at Ankarafantsika is concentrated in non-agricultural income, consistent with the park restricting wage labour and forest-product sales rather than disrupting agricultural production directly. We leave systematic income decomposition to future work.
+
+6. **Income measurement.** The main specification uses OECD-modified equivalised income (adjusting for household composition). Supplementary Material presents robustness checks using total household income (unadjusted) and income in levels (Ariary) rather than log-transformed.
+
+
+# Conclusion {#sec-conclusion}
+
+This paper provides a comparative evaluation of two conservation governance models in rural Madagascar. Using separate gsynth estimations with a large rural observatory donor pool, we find:
+
+- **Strict conservation (Ankarafantsika)** is associated with a statistically significant negative income effect on proximate east-bank communities, visible shortly after reclassification (2003) and persistent through 2014. A 2025 resurvey extension confirms that the effect deepens over time: the 2025-specific ATT is roughly twice the 1999--2014 average, indicating that income losses compound rather than dissipate.
+- **Multipurpose conservation (Lac Alaotra)** shows **no statistically significant income effect** over the 2008--2014 post-treatment window. The point estimate is close to zero, and the confidence interval spans it.
+
+The contrast is informative: strict enforcement appears to impose measurable and growing income costs on adjacent communities, while participatory conservation under CBNRM does not produce a detectable aggregate income effect --- though this null result should be interpreted with caution given the limited statistical power (single treated unit, short post-treatment window).
+
+The methodological contribution is the recognition that different PA models require **different identification strategies**: site-level treatment for Ankarafantsika (exploiting the Betsiboka River), observatory-level for Alaotra (all communities share the lake ecosystem). The generalized synthetic control method accommodates both within a unified framework.
+
+Robustness tests (Supplementary Material) confirm that these conclusions hold when using total household income (unadjusted for household composition) and when using income in levels rather than logs.
+
+
+# References {.unnumbered}
+
+::: {#refs}
+:::

@@ -1,0 +1,2502 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="[Authors]">
+<meta name="dcterms.date" content="2026-03-31">
+
+<title>Strict vs.&nbsp;Multipurpose Conservation in Rural Madagascar</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="12_strict_vs_multipurpose_files/libs/clipboard/clipboard.min.js"></script>
+<script src="12_strict_vs_multipurpose_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="12_strict_vs_multipurpose_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="12_strict_vs_multipurpose_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="12_strict_vs_multipurpose_files/libs/quarto-html/popper.min.js"></script>
+<script src="12_strict_vs_multipurpose_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="12_strict_vs_multipurpose_files/libs/quarto-html/anchor.min.js"></script>
+<link href="12_strict_vs_multipurpose_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="12_strict_vs_multipurpose_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="12_strict_vs_multipurpose_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="12_strict_vs_multipurpose_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="12_strict_vs_multipurpose_files/libs/bootstrap/bootstrap-4d7f0bce1131f3e5f9547cd857cfbfc8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sec-intro" id="toc-sec-intro" class="nav-link active" data-scroll-target="#sec-intro"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#sec-sites" id="toc-sec-sites" class="nav-link" data-scroll-target="#sec-sites"><span class="header-section-number">2</span> Study Sites</a>
+  <ul class="collapse">
+  <li><a href="#ankarafantsika-national-park-and-the-marovoay-observatory" id="toc-ankarafantsika-national-park-and-the-marovoay-observatory" class="nav-link" data-scroll-target="#ankarafantsika-national-park-and-the-marovoay-observatory"><span class="header-section-number">2.1</span> Ankarafantsika National Park and the Marovoay Observatory</a>
+  <ul class="collapse">
+  <li><a href="#historical-expansion-of-ankarafantsika" id="toc-historical-expansion-of-ankarafantsika" class="nav-link" data-scroll-target="#historical-expansion-of-ankarafantsika"><span class="header-section-number">2.1.1</span> Historical Expansion of Ankarafantsika</a></li>
+  </ul></li>
+  <li><a href="#sec-alaotra" id="toc-sec-alaotra" class="nav-link" data-scroll-target="#sec-alaotra"><span class="header-section-number">2.2</span> Lac Alaotra Protected Landscape and the Alaotra Observatory</a></li>
+  </ul></li>
+  <li><a href="#sec-data" id="toc-sec-data" class="nav-link" data-scroll-target="#sec-data"><span class="header-section-number">3</span> Data and Identification</a>
+  <ul class="collapse">
+  <li><a href="#the-rural-observatory-panel-19992014" id="toc-the-rural-observatory-panel-19992014" class="nav-link" data-scroll-target="#the-rural-observatory-panel-19992014"><span class="header-section-number">3.1</span> The Rural Observatory Panel (1999–2014)</a></li>
+  <li><a href="#panel-structure-and-village-level-aggregation" id="toc-panel-structure-and-village-level-aggregation" class="nav-link" data-scroll-target="#panel-structure-and-village-level-aggregation"><span class="header-section-number">3.2</span> Panel Structure and Village-Level Aggregation</a></li>
+  <li><a href="#sec-validation" id="toc-sec-validation" class="nav-link" data-scroll-target="#sec-validation"><span class="header-section-number">3.3</span> Behavioral Validation from the 2025 Resurvey</a></li>
+  <li><a href="#observatory-locations" id="toc-observatory-locations" class="nav-link" data-scroll-target="#observatory-locations"><span class="header-section-number">3.4</span> Observatory Locations</a></li>
+  <li><a href="#data-coverage" id="toc-data-coverage" class="nav-link" data-scroll-target="#data-coverage"><span class="header-section-number">3.5</span> Data Coverage</a></li>
+  <li><a href="#income-trends" id="toc-income-trends" class="nav-link" data-scroll-target="#income-trends"><span class="header-section-number">3.6</span> Income Trends</a></li>
+  </ul></li>
+  <li><a href="#sec-method" id="toc-sec-method" class="nav-link" data-scroll-target="#sec-method"><span class="header-section-number">4</span> Empirical Strategy: Generalized Synthetic Control</a>
+  <ul class="collapse">
+  <li><a href="#a-note-on-statistical-inference-with-few-treated-units" id="toc-a-note-on-statistical-inference-with-few-treated-units" class="nav-link" data-scroll-target="#a-note-on-statistical-inference-with-few-treated-units"><span class="header-section-number">4.1</span> A Note on Statistical Inference with Few Treated Units</a></li>
+  </ul></li>
+  <li><a href="#sec-results" id="toc-sec-results" class="nav-link" data-scroll-target="#sec-results"><span class="header-section-number">5</span> Results</a>
+  <ul class="collapse">
+  <li><a href="#panel-construction" id="toc-panel-construction" class="nav-link" data-scroll-target="#panel-construction"><span class="header-section-number">5.1</span> Panel Construction</a></li>
+  <li><a href="#sec-maro-gsynth" id="toc-sec-maro-gsynth" class="nav-link" data-scroll-target="#sec-maro-gsynth"><span class="header-section-number">5.2</span> Ankarafantsika: East-Bank Effect (gsynth)</a></li>
+  <li><a href="#sec-ala-gsynth" id="toc-sec-ala-gsynth" class="nav-link" data-scroll-target="#sec-ala-gsynth"><span class="header-section-number">5.3</span> Lac Alaotra: Observatory-Level Effect (gsynth)</a></li>
+  <li><a href="#comparison-of-effects" id="toc-comparison-of-effects" class="nav-link" data-scroll-target="#comparison-of-effects"><span class="header-section-number">5.4</span> Comparison of Effects</a></li>
+  </ul></li>
+  <li><a href="#sec-extension" id="toc-sec-extension" class="nav-link" data-scroll-target="#sec-extension"><span class="header-section-number">6</span> Long-Run Evidence: 2025 Resurvey Extension</a>
+  <ul class="collapse">
+  <li><a href="#sec-ext-income" id="toc-sec-ext-income" class="nav-link" data-scroll-target="#sec-ext-income"><span class="header-section-number">6.1</span> Income Measurement Comparability</a></li>
+  <li><a href="#extended-panel-construction" id="toc-extended-panel-construction" class="nav-link" data-scroll-target="#extended-panel-construction"><span class="header-section-number">6.2</span> Extended Panel Construction</a></li>
+  <li><a href="#sec-ext-maro" id="toc-sec-ext-maro" class="nav-link" data-scroll-target="#sec-ext-maro"><span class="header-section-number">6.3</span> Extended gsynth: Ankarafantsika</a></li>
+  <li><a href="#sec-ext-outliers" id="toc-sec-ext-outliers" class="nav-link" data-scroll-target="#sec-ext-outliers"><span class="header-section-number">6.4</span> Outlier Assessment and Robustness</a></li>
+  <li><a href="#sec-ext-ala" id="toc-sec-ext-ala" class="nav-link" data-scroll-target="#sec-ext-ala"><span class="header-section-number">6.5</span> Alaotra Extension</a></li>
+  </ul></li>
+  <li><a href="#sec-discussion" id="toc-sec-discussion" class="nav-link" data-scroll-target="#sec-discussion"><span class="header-section-number">7</span> Discussion</a>
+  <ul class="collapse">
+  <li><a href="#two-models-two-patterns" id="toc-two-models-two-patterns" class="nav-link" data-scroll-target="#two-models-two-patterns"><span class="header-section-number">7.1</span> Two Models, Two Patterns</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations"><span class="header-section-number">7.2</span> Limitations</a></li>
+  </ul></li>
+  <li><a href="#sec-conclusion" id="toc-sec-conclusion" class="nav-link" data-scroll-target="#sec-conclusion"><span class="header-section-number">8</span> Conclusion</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Strict vs.&nbsp;Multipurpose Conservation in Rural Madagascar</h1>
+<p class="subtitle lead">Household Income Effects around Ankarafantsika National Park and Lac Alaotra Protected Landscape</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>[Authors] </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 31, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="sec-intro" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>Madagascar’s protected area (PA) network encompasses a wide spectrum of governance models, from strictly enforced national parks to community-managed protected landscapes. Whether different conservation regimes produce different welfare outcomes for adjacent communities is a first-order policy question — yet evidence remains scarce, particularly for the newer, less restrictive PA categories introduced under the <em>Systeme des Aires Protegees de Madagascar</em> (SAPM) after 2003.</p>
+<p>This paper develops a comparative framework around <strong>two models of conservation</strong> using long-running household panel data from the <em>Réseau des Observatoires Ruraux</em> (Rural Observatory System, 1999–2014):</p>
+<ol type="1">
+<li><p><strong>Ankarafantsika National Park</strong> (IUCN Category II, reclassified 2002): strict conservation managed by <em>Madagascar National Parks</em> (MNP). At the Marovoay observatory, the Betsiboka River separates two <em>fokontany</em> on the east bank (close to the park) from two others on the west bank (effectively distant), creating a natural experiment.</p></li>
+<li><p><strong>Lac Alaotra Paysage Harmonieux Protege</strong> (IUCN Category V, enforced from ~2008): participatory conservation managed by <em>Durrell Wildlife Conservation Trust</em>. All observatory communities share the lake-marsh ecosystem; no clean within-observatory binary split exists.</p></li>
+</ol>
+<p>We estimate the income effects of each PA separately using the <strong>generalized synthetic control</strong> method (gsynth, <span class="citation" data-cites="Xu2017">Xu (<a href="#ref-Xu2017" role="doc-biblioref">2017</a>)</span>), which constructs counterfactuals from a large pool of rural observatory donor sites. This approach accommodates the distinct nature of each treatment: site-level for Marovoay (east-bank <em>fokontany</em> only), observatory-level for Alaotra (all sites aggregated).</p>
+</section>
+<section id="sec-sites" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Study Sites</h1>
+<section id="ankarafantsika-national-park-and-the-marovoay-observatory" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="ankarafantsika-national-park-and-the-marovoay-observatory"><span class="header-section-number">2.1</span> Ankarafantsika National Park and the Marovoay Observatory</h2>
+<p>Ankarafantsika National Park (136,500 ha) is one of Madagascar’s oldest PAs, reclassified from a <em>Reserve Naturelle Integrale</em> to a national park in 2002 under the management of <em>Madagascar National Parks</em> (MNP). Enforcement is strict: agricultural encroachment is penalised, forest extraction is prohibited, and patrol frequency increased after reclassification.</p>
+<p>The Marovoay observatory comprises four <em>fokontany</em>. The <strong>Betsiboka River</strong> — a major, permanently flowing watercourse wider than 10 metres — separates two communities from the park. Crossing is possible only under certain hydrological conditions, often requiring long detours or costly boat transport; in practice, flows of people, goods, and services run along the Marovoay downstream axis rather than across the river:</p>
+<ul>
+<li><strong>East bank</strong> (treated): Bepako (5.2 km to PA boundary) and Madiromiongana (11.7 km). Direct pedestrian access to the park.</li>
+<li><strong>West bank</strong> (control): Ampijoroa (3.5 km raw, but ~18.5 km effective after river detour) and Maroala (5.8 km raw, ~20.8 km effective). The river imposes a substantial access penalty.</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-map-maro" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-map-maro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12_strict_vs_multipurpose_files/figure-html/fig-map-maro-1.png" class="img-fluid figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-map-maro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Marovoay observatory and Ankarafantsika National Park. The Betsiboka River separates west-bank fokontany (control, grey) from east-bank fokontany (treated, orange). Water features from OpenStreetMap.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<section id="historical-expansion-of-ankarafantsika" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="historical-expansion-of-ankarafantsika"><span class="header-section-number">2.1.1</span> Historical Expansion of Ankarafantsika</h3>
+<p>Ankarafantsika was first gazetted as a <em>Réserve Naturelle Intégrale</em> (RNI) in 1927, covering approximately 60,500 ha of the central plateau. A contiguous 75,000 ha forest reserve was classified in 1929. These two early designations imposed different nominal restrictions, but critically different <em>de facto</em> situations for the east-bank <em>fokontany</em>:</p>
+<ul>
+<li><p><strong>The 1929 forest reserve</strong> was not a nature conservation zone but a timber and resource reserve under the forest administration. Subsequent analyses found no effective enforcement over this area, and subsistence agriculture, cattle grazing, and charcoal production continued unimpeded <span class="citation" data-cites="brondeau1999">(<a href="#ref-brondeau1999" role="doc-biblioref">Brondeau 1999</a>)</span>. The forest reserve regime imposed no binding constraint on adjacent communities.</p></li>
+<li><p><strong>The 1927 RNI</strong> was geographically separate from the communities of Bepako and Madiromiongana: the RNI covered the inland plateau to the north-east, while these villages border the forest reserve zone to the south and west of the plateau. The east-bank <em>fokontany</em> therefore had no direct interface with the strictly protected RNI.</p></li>
+</ul>
+<p>In 2002, the RNI, the forest reserves, and the Ampijoroa Forestry Station were merged into a single national park (Decree 2002-798, 130,000 ha), later adjusted to 136,513 ha in 2015 (Decree 2015-730). <a href="#fig-expansion" class="quarto-xref">Figure&nbsp;2</a>, reproduced from <span class="citation" data-cites="alonso2002">Alonso et al. (<a href="#ref-alonso2002" role="doc-biblioref">2002</a>)</span>, illustrates the spatial extent of the 2002 consolidation.</p>
+<div id="fig-expansion" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-expansion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/Alonso_Shuldenberg_2002.png" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-expansion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Spatial extent of the 2002 Ankarafantsika expansion, from the original RNI (dark green) to the national park (light green). Source: Alonso &amp; Shuldenberg (2002).
+</figcaption>
+</figure>
+</div>
+<p>The 2002 reclassification was the first event to impose binding land-use restrictions on the east-bank communities: slash-and-burn agriculture (<em>tavy</em>), charcoal production, and non-timber forest extraction within the newly unified park were explicitly prohibited and, crucially, enforced. Enforcement capacity was supported by international conservation funding from the World Bank and bilateral donors as part of Madagascar’s third Environmental Action Plan. The transition from a nominally protected but effectively open-access forest reserve to a strictly patrolled national park constitutes our treatment event.</p>
+</section>
+</section>
+<section id="sec-alaotra" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="sec-alaotra"><span class="header-section-number">2.2</span> Lac Alaotra Protected Landscape and the Alaotra Observatory</h2>
+<p>Lac Alaotra is Madagascar’s largest lake and a critical habitat for the Alaotran gentle lemur. The Ramsar Convention listed the site in 2003. In 2015, the lake and its marshlands were formally designated as a <em>Paysage Harmonieux Protege</em> (PHP, 425 km<sup>2</sup>, IUCN Category V), though enforcement through community-based natural resource management (CBNRM) agreements and <em>transferts de gestion</em> had intensified from around 2008 under Durrell’s management.</p>
+<p>The observatory’s seven <em>fokontany</em> (across three historical survey sites) all depend on the lake-marsh ecosystem. Unlike Ankarafantsika, there is no natural barrier separating “exposed” from “unexposed” communities. All communities interact with the PA.</p>
+<p>A complication specific to Alaotra is the proximity of some eastern hamlets to two additional protected areas: the <strong>Corridor Ankeniheny-Zahamena</strong> (CAZ), a Category VI PA managed by <em>Conservation International</em>, and the <strong>Zahamena National Park</strong> (Category II), which lies north of the CAZ. The hamlet of Mangabe lies closer to the CAZ boundary (~14 km) than to the Lac Alaotra PHP, creating dual-PA exposure.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-map-ala" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-map-ala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12_strict_vs_multipurpose_files/figure-html/fig-map-ala-1.png" class="img-fluid figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-map-ala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Alaotra observatory and surrounding protected areas. Lac Alaotra PHP (green), Corridor Ankeniheny-Zahamena (CAZ, orange), Zahamena National Park (light orange). Fokontany centroids from 2025 GPS survey; distances to nearest PA computed from Vahatra boundaries.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-data" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Data and Identification</h1>
+<section id="the-rural-observatory-panel-19992014" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="the-rural-observatory-panel-19992014"><span class="header-section-number">3.1</span> The Rural Observatory Panel (1999–2014)</h2>
+<p>The <em>Réseau des Observatoires Ruraux</em> (Rural Observatory System) is a household panel survey covering observatory sites across Madagascar. We use:</p>
+<ul>
+<li><strong>Marovoay</strong>: 4 <em>fokontany</em>, surveyed 1995–2014 (missing 2005, 2009).</li>
+<li><strong>Alaotra</strong>: 3 sites (7 <em>fokontany</em>), surveyed 1999–2014 (missing 2009).</li>
+<li><strong>Donor pool</strong>: ~60 sites from 9 observatories (Antsirabe, Antsohihy, Tsiroanomandidy, Farafangana, Ambovombe, Toliara North, Fénérive East, Mahanoro, and Itasy), each with at least 6 years of coverage spanning both pre- and post-treatment periods.</li>
+</ul>
+<p>Total household income (<code>revtot</code>) is adjusted for household composition using the OECD-modified equivalence scale (1 + 0.5 × (additional adults) + 0.3 × children under 14), computed from individual-level demographic data. The resulting equivalised income is winsorised at the 1st and 99th percentiles within each year. The primary outcome is log equivalised income.</p>
+</section>
+<section id="panel-structure-and-village-level-aggregation" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="panel-structure-and-village-level-aggregation"><span class="header-section-number">3.2</span> Panel Structure and Village-Level Aggregation</h2>
+<p>The ROR operates as a <strong>rotating panel</strong>: each observatory tracks a fixed set of households, but approximately 15% of households leave the sample each year (through death, migration, or attrition), with replacement by newly sampled households following the original random sampling design. Over a 10-year horizon, cumulative attrition reaches roughly 80% of the initial cohort <span class="citation" data-cites="ChabeFerret2024">(<a href="#ref-ChabeFerret2024" role="doc-biblioref">Chabé-Ferret et al. 2024</a>)</span>. Attrition is non-random: traceable attritors disproportionately include migrants whose departure is itself potentially income-related, which would violate the balanced-panel assumptions underlying individual-level panel estimators.</p>
+<p>We therefore analyse the data at the <strong>village (<em>fokontany</em>) level</strong>, aggregating household-level income to village-year means. This choice is justified on two grounds. First, the rotating design with random replacement preserves cross-sectional representativeness at each wave: village-year means consistently estimate the same population quantity across years, even as the composition of surveyed households changes. Second, gsynth requires a balanced unit-by-year panel matrix and is designed for unit-level (here village-level) variation; household-level estimation with an interactive FE model would require substantially more pre-treatment periods to identify individual-level factor loadings. Our analysis thus exploits between-village variation in treatment exposure across time.</p>
+<p><strong>Marovoay</strong> — The east-bank <em>fokontany</em> (Madiromiongana, Bepako) are treated from 2003, the year following Ankarafantsika’s reclassification.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> The west-bank sites (Ampijoroa, Maroala) enter the donor pool: the Betsiboka River makes them effectively unexposed to the park despite their geographic proximity.</p>
+<p><strong>Alaotra</strong> — The entire observatory is aggregated into a single treated unit (“ALA”), treated from 2008 (intensification of CBNRM enforcement by Durrell).<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> No within-observatory binary split is imposed, reflecting the shared dependence on the lake-marsh ecosystem and the dual-PA exposure (PHP + CAZ).</p>
+</section>
+<section id="sec-validation" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="sec-validation"><span class="header-section-number">3.3</span> Behavioral Validation from the 2025 Resurvey</h2>
+<p>A 2025 resurvey of the Marovoay and Alaotra sites (1,026 households) included an environment module asking about actual interactions with nearby PAs. The results support the Marovoay identification strategy and clarify the Alaotra treatment design.</p>
+<p><strong>Marovoay.</strong> PA visitation rates differ sharply across the Betsiboka: 38% of east-bank households (Bepako, Madiromiongana) report visiting Ankarafantsika, versus 15% on the west bank (Ampijoroa, Maroala). East-bank households also report the park as a source of food (23% vs 8%) and wood (24% vs 12%). The river constitutes a real access barrier, validating the treated/control split.</p>
+<p><strong>Alaotra.</strong> We initially expected to identify within-observatory controls at Alaotra — communities far enough from the PA to be unaffected. The 2025 data shows this is not the case: PA visitation rates range between 37% and 54% across all eight hamlets, with no clear distance gradient. All communities interact substantially with the lake-marsh ecosystem, whether through fishing, agriculture, or resource extraction. This uniform exposure justifies treating the entire Alaotra observatory as a single treated unit rather than attempting a within-observatory binary split. The overall visitation rate (44%) is higher than at Marovoay (27%), reflecting the lake ecosystem’s central role in livelihoods — but unlike Marovoay, there is no natural barrier creating differential access.</p>
+<div class="cell">
+<div id="tbl-panel-summary" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-panel-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Panel coverage: treated units and donor pool
+</figcaption>
+<div aria-describedby="tbl-panel-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="nocrbdgoam" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#nocrbdgoam table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#nocrbdgoam thead, #nocrbdgoam tbody, #nocrbdgoam tfoot, #nocrbdgoam tr, #nocrbdgoam td, #nocrbdgoam th {
+  border-style: none;
+}
+
+#nocrbdgoam p {
+  margin: 0;
+  padding: 0;
+}
+
+#nocrbdgoam .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#nocrbdgoam .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#nocrbdgoam .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#nocrbdgoam .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#nocrbdgoam .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#nocrbdgoam .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#nocrbdgoam .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#nocrbdgoam .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#nocrbdgoam .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#nocrbdgoam .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#nocrbdgoam .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#nocrbdgoam .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#nocrbdgoam .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#nocrbdgoam .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#nocrbdgoam .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#nocrbdgoam .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#nocrbdgoam .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#nocrbdgoam .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#nocrbdgoam .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nocrbdgoam .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#nocrbdgoam .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#nocrbdgoam .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#nocrbdgoam .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nocrbdgoam .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#nocrbdgoam .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#nocrbdgoam .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#nocrbdgoam .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nocrbdgoam .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#nocrbdgoam .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#nocrbdgoam .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#nocrbdgoam .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#nocrbdgoam .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#nocrbdgoam .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nocrbdgoam .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#nocrbdgoam .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nocrbdgoam .gt_left {
+  text-align: left;
+}
+
+#nocrbdgoam .gt_center {
+  text-align: center;
+}
+
+#nocrbdgoam .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#nocrbdgoam .gt_font_normal {
+  font-weight: normal;
+}
+
+#nocrbdgoam .gt_font_bold {
+  font-weight: bold;
+}
+
+#nocrbdgoam .gt_font_italic {
+  font-style: italic;
+}
+
+#nocrbdgoam .gt_super {
+  font-size: 65%;
+}
+
+#nocrbdgoam .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#nocrbdgoam .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#nocrbdgoam .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#nocrbdgoam .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#nocrbdgoam .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#nocrbdgoam .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#nocrbdgoam .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#nocrbdgoam .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#nocrbdgoam div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal">Panel Structure</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="5" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Treated units and donor pool for gsynth estimation</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Role" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Role</th>
+<th id="Unit" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Unit</th>
+<th id="HH-years" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">HH-years</th>
+<th id="Survey-years" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Survey years</th>
+<th id="Period" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Period</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="Role">Treated (Alaotra)</td>
+<td class="gt_row gt_left" headers="Unit">ALA</td>
+<td class="gt_row gt_right" headers="HH-years">7613</td>
+<td class="gt_row gt_right" headers="Survey years">15</td>
+<td class="gt_row gt_right" headers="Period">1999--2014</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Role">Treated (Marovoay east)</td>
+<td class="gt_row gt_left" headers="Unit">031</td>
+<td class="gt_row gt_right" headers="HH-years">2016</td>
+<td class="gt_row gt_right" headers="Survey years">15</td>
+<td class="gt_row gt_right" headers="Period">1999--2014</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Role">Treated (Marovoay east)</td>
+<td class="gt_row gt_left" headers="Unit">032</td>
+<td class="gt_row gt_right" headers="HH-years">1857</td>
+<td class="gt_row gt_right" headers="Survey years">14</td>
+<td class="gt_row gt_right" headers="Period">1999--2014</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Role">Donor pool</td>
+<td class="gt_row gt_left" headers="Unit">71 sites</td>
+<td class="gt_row gt_right" headers="HH-years">51669</td>
+<td class="gt_row gt_right" headers="Survey years">NA</td>
+<td class="gt_row gt_right" headers="Period">1999--2014</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="observatory-locations" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="observatory-locations"><span class="header-section-number">3.4</span> Observatory Locations</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-donor-map" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-donor-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12_strict_vs_multipurpose_files/figure-html/fig-donor-map-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-donor-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Location of rural observatories used in the analysis. Treated observatories (Marovoay, Alaotra) and donor pool (controls). Labels show observatory name and code.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="data-coverage" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="data-coverage"><span class="header-section-number">3.5</span> Data Coverage</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-time-grid" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-time-grid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12_strict_vs_multipurpose_files/figure-html/fig-time-grid-1.png" class="img-fluid figure-img" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-time-grid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Year-by-year data coverage. Each row is a site (treated observatories) or an observatory (donors). Red shading = post-treatment period.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="income-trends" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="income-trends"><span class="header-section-number">3.6</span> Income Trends</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-trends" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-trends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12_strict_vs_multipurpose_files/figure-html/fig-trends-1.png" class="img-fluid figure-img" width="1152">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-trends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Mean log equivalised household income over time. Left: Marovoay, east bank (treated, red) vs west bank (donor, blue); vertical line at 2003. Right: Alaotra, all sites combined; vertical line at 2008.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-method" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Empirical Strategy: Generalized Synthetic Control</h1>
+<p>We use the generalized synthetic control method <span class="citation" data-cites="Xu2017">(<a href="#ref-Xu2017" role="doc-biblioref">Xu 2017</a>)</span> to estimate treatment effects for each PA separately. For each treated unit, gsynth constructs a counterfactual by fitting an interactive fixed-effects model to the donor pool:</p>
+<p><span class="math display">\[
+Y_{it} = \alpha_i + \xi_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + D_{it} \cdot \delta_{it} + \varepsilon_{it}
+\]</span></p>
+<p>where <span class="math inline">\(\boldsymbol{\lambda}_i\)</span> are unit-specific factor loadings and <span class="math inline">\(\boldsymbol{f}_t\)</span> are common time factors. The number of factors <span class="math inline">\(r\)</span> is selected by leave-one-out cross-validation. Inference is by parametric bootstrap (200 replications).</p>
+<p>We estimate two separate models:</p>
+<ol type="1">
+<li><p><strong>Marovoay model</strong>: Treated units = Madiromiongana and Bepako (east bank, from 2003). Donors = all other rural observatory sites including Marovoay west-bank sites (Ampijoroa, Maroala). With 2 treated sites, gsynth estimates unit-specific counterfactuals.</p></li>
+<li><p><strong>Alaotra model</strong>: Treated unit = aggregated Alaotra observatory “ALA” (from 2008). Donors = all non-Alaotra rural observatory sites including Marovoay 031–034. With a single treated unit, this reduces to interactive FE synthetic control.</p></li>
+</ol>
+<section id="a-note-on-statistical-inference-with-few-treated-units" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="a-note-on-statistical-inference-with-few-treated-units"><span class="header-section-number">4.1</span> A Note on Statistical Inference with Few Treated Units</h2>
+<p>A fundamental constraint of this design is the small number of treated units: 2 sites for Marovoay, 1 for Alaotra. With so few treated clusters, asymptotic inference is unreliable regardless of the estimator chosen. The parametric bootstrap standard errors from gsynth are correspondingly wide.</p>
+<p>An exact permutation bound is informative here. For Marovoay, the set of observable units comprises 4 sites (2 east-bank, 2 west-bank). The number of ways to assign exactly 2 of these 4 units as “treated” is <span class="math inline">\(\binom{4}{2} = 6\)</span>. Under Fisher’s sharp null, the <strong>minimum achievable p-value</strong> is therefore <span class="math inline">\(1/6 \approx 0.333\)</span>. No test based solely on these 4 sites can produce a p-value below 0.333 for the two-sided hypothesis, regardless of the observed effect magnitude. When the three Alaotra sites are included as additional control donors in a long-run DiD (thereby expanding the donor pool for permutation), the allocation count rises to <span class="math inline">\(\binom{7}{2} = 21\)</span> and the minimum achievable p-value falls to <span class="math inline">\(1/21 \approx 0.095\)</span>.</p>
+<p>We report gsynth bootstrap p-values throughout but interpret them in light of this power ceiling. The inability to reject the null at conventional thresholds does not imply absence of effect; it reflects the inherent inferential limitations of quasi-experimental designs with a handful of geographic units.</p>
+</section>
+</section>
+<section id="sec-results" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Results</h1>
+<section id="panel-construction" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="panel-construction"><span class="header-section-number">5.1</span> Panel Construction</h2>
+<p>The Marovoay model has <strong>2 treated sites</strong> and <strong>74 donor sites</strong>. The Alaotra model has <strong>1 treated unit</strong> (aggregated observatory) and <strong>73 donor sites</strong>.</p>
+</section>
+<section id="sec-maro-gsynth" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="sec-maro-gsynth"><span class="header-section-number">5.2</span> Ankarafantsika: East-Bank Effect (gsynth)</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-maro-att" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-maro-att-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12_strict_vs_multipurpose_files/figure-html/fig-maro-att-1.png" class="img-fluid figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-maro-att-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Ankarafantsika: gsynth ATT path for east-bank sites (031, 032) relative to treatment onset (2003). Outcome: log OECD-equivalised income. Pre-treatment ATTs near zero support counterfactual validity. Shaded band: 95% parametric bootstrap CI.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-maro-units" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-maro-units-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12_strict_vs_multipurpose_files/figure-html/fig-maro-units-1.png" class="img-fluid figure-img" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-maro-units-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Unit-specific treatment effects for the two east-bank fokontany. Bepako and Madiromiongana show different trajectories after 2003.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The Marovoay gsynth estimates an average post-treatment ATT of <strong>-0.359 log points</strong> (95%% CI: [-0.614, -0.104]; SE = 0.130), corresponding to approximately <strong>-30.2%%</strong> in income levels. Cross-validation selects r* = 0 factor(s). The counterfactual is built from 62 donor sites.</p>
+<p>The two east-bank fokontany show divergent patterns:</p>
+<ul>
+<li><strong>Bepako</strong>: post-treatment ATT = -0.112 (-10.6%%). A more gradual decline, with the effect intensifying after 2008.</li>
+<li><strong>Madiromiongana</strong>: post-treatment ATT = -0.073 (-7.0%%). A large initial negative shock in 2003, followed by modest recovery but persistently below counterfactual.</li>
+</ul>
+</section>
+<section id="sec-ala-gsynth" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="sec-ala-gsynth"><span class="header-section-number">5.3</span> Lac Alaotra: Observatory-Level Effect (gsynth)</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-ala-att" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ala-att-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12_strict_vs_multipurpose_files/figure-html/fig-ala-att-1.png" class="img-fluid figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ala-att-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: Lac Alaotra: gsynth ATT path for the aggregated observatory relative to treatment onset (2008). Outcome: log OECD-equivalised income. The shaded band represents the 95% parametric bootstrap CI.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The Alaotra gsynth estimates an average post-treatment ATT of <strong>0.015 log points</strong> (95%% CI: [-0.303, 0.333]; SE = 0.162; p = 0.927), corresponding to approximately <strong>+1.5%%</strong> in income levels.</p>
+<p><strong>The confidence interval spans zero and the effect is not statistically significant at the 5%% level.</strong> We cannot reject the null hypothesis of no income effect from the Lac Alaotra PHP designation. The point estimate is small in magnitude, and the wide confidence band reflects both the limited statistical power of a single treated unit and genuine uncertainty about the effect.</p>
+<p>Year-by-year estimates are noisy, with no clear trend away from zero. While individual post-treatment years occasionally show negative point estimates, these are neither systematic nor statistically distinguishable from the pre-treatment fluctuations.</p>
+<p>Pre-treatment fit is good (mean pre-treatment residual: 0.000), supporting the counterfactual validity.</p>
+</section>
+<section id="comparison-of-effects" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="comparison-of-effects"><span class="header-section-number">5.4</span> Comparison of Effects</h2>
+<div class="cell">
+<div id="tbl-comparison" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose (Alaotra) conservation
+</figcaption>
+<div aria-describedby="tbl-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="xvknigfawr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#xvknigfawr table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#xvknigfawr thead, #xvknigfawr tbody, #xvknigfawr tfoot, #xvknigfawr tr, #xvknigfawr td, #xvknigfawr th {
+  border-style: none;
+}
+
+#xvknigfawr p {
+  margin: 0;
+  padding: 0;
+}
+
+#xvknigfawr .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#xvknigfawr .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#xvknigfawr .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#xvknigfawr .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#xvknigfawr .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#xvknigfawr .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xvknigfawr .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#xvknigfawr .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#xvknigfawr .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#xvknigfawr .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#xvknigfawr .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#xvknigfawr .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#xvknigfawr .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#xvknigfawr .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#xvknigfawr .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#xvknigfawr .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#xvknigfawr .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#xvknigfawr .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#xvknigfawr .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xvknigfawr .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#xvknigfawr .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#xvknigfawr .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#xvknigfawr .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xvknigfawr .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#xvknigfawr .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#xvknigfawr .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xvknigfawr .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xvknigfawr .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#xvknigfawr .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xvknigfawr .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#xvknigfawr .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xvknigfawr .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#xvknigfawr .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xvknigfawr .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#xvknigfawr .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xvknigfawr .gt_left {
+  text-align: left;
+}
+
+#xvknigfawr .gt_center {
+  text-align: center;
+}
+
+#xvknigfawr .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#xvknigfawr .gt_font_normal {
+  font-weight: normal;
+}
+
+#xvknigfawr .gt_font_bold {
+  font-weight: bold;
+}
+
+#xvknigfawr .gt_font_italic {
+  font-style: italic;
+}
+
+#xvknigfawr .gt_super {
+  font-size: 65%;
+}
+
+#xvknigfawr .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#xvknigfawr .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#xvknigfawr .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#xvknigfawr .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#xvknigfawr .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#xvknigfawr .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#xvknigfawr .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#xvknigfawr .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#xvknigfawr div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="11" class="gt_heading gt_title gt_font_normal">Comparative gsynth Results</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="11" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Separate estimation for each PA (1999--2014)</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="PA" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">PA</th>
+<th id="IUCN-Category" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">IUCN Category</th>
+<th id="Treatment-year" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Treatment year</th>
+<th id="Treated-unit(s)" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Treated unit(s)</th>
+<th id="ATT-(log-pts)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">ATT (log pts)</th>
+<th id="SE" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">SE</th>
+<th id="a95%-CI" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">95% CI</th>
+<th id="ATT-(pct)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">ATT (pct)</th>
+<th id="p-value" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p-value</th>
+<th id="r*-(CV)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">r* (CV)</th>
+<th id="N-donors" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">N donors</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="PA" style="background-color: #FFCDD2">Ankarafantsika PN</td>
+<td class="gt_row gt_left" headers="IUCN Category" style="background-color: #FFCDD2">II (strict)</td>
+<td class="gt_row gt_right" headers="Treatment year" style="background-color: #FFCDD2">2003</td>
+<td class="gt_row gt_left" headers="Treated unit(s)" style="background-color: #FFCDD2">Madiromiongana &amp; Bepako (east bank)</td>
+<td class="gt_row gt_right" headers="ATT (log pts)" style="background-color: #FFCDD2">-0.359</td>
+<td class="gt_row gt_right" headers="SE" style="background-color: #FFCDD2">0.130</td>
+<td class="gt_row gt_left" headers="95% CI" style="background-color: #FFCDD2">[-0.614, -0.104]</td>
+<td class="gt_row gt_right" headers="ATT (pct)" style="background-color: #FFCDD2">-30.2%</td>
+<td class="gt_row gt_right" headers="p-value" style="background-color: #FFCDD2">0.006</td>
+<td class="gt_row gt_right" headers="r* (CV)" style="background-color: #FFCDD2">0</td>
+<td class="gt_row gt_right" headers="N donors" style="background-color: #FFCDD2">62</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="PA" style="background-color: #BBDEFB">Lac Alaotra PHP</td>
+<td class="gt_row gt_left" headers="IUCN Category" style="background-color: #BBDEFB">V (multipurpose)</td>
+<td class="gt_row gt_right" headers="Treatment year" style="background-color: #BBDEFB">2008</td>
+<td class="gt_row gt_left" headers="Treated unit(s)" style="background-color: #BBDEFB">Aggregated observatory</td>
+<td class="gt_row gt_right" headers="ATT (log pts)" style="background-color: #BBDEFB">0.015</td>
+<td class="gt_row gt_right" headers="SE" style="background-color: #BBDEFB">0.162</td>
+<td class="gt_row gt_left" headers="95% CI" style="background-color: #BBDEFB">[-0.303, 0.333]</td>
+<td class="gt_row gt_right" headers="ATT (pct)" style="background-color: #BBDEFB">1.5%</td>
+<td class="gt_row gt_right" headers="p-value" style="background-color: #BBDEFB">0.927</td>
+<td class="gt_row gt_right" headers="r* (CV)" style="background-color: #BBDEFB">1</td>
+<td class="gt_row gt_right" headers="N donors" style="background-color: #BBDEFB">61</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-comparison" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12_strict_vs_multipurpose_files/figure-html/fig-comparison-1.png" class="img-fluid figure-img" width="1152">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: Side-by-side ATT paths (log OECD-equivalised income). Left: Ankarafantsika (strict, from 2003) shows a persistent negative effect. Right: Lac Alaotra (multipurpose, from 2008) shows no statistically significant effect.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-extension" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Long-Run Evidence: 2025 Resurvey Extension</h1>
+<p>In 2025, a resurvey of the Marovoay and Alaotra observatories (1,026 households across the same <em>fokontany</em>) provides an opportunity to test whether the patterns identified in the 1999–2014 panel persist over a much longer horizon. We extend the gsynth panel by appending 2025 site-level mean log equivalised income, computed from the resurvey microdata using the same income definition and OECD-modified equivalence scale as the historical panel.</p>
+<section id="sec-ext-income" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="sec-ext-income"><span class="header-section-number">6.1</span> Income Measurement Comparability</h2>
+<p>The 2025 survey instrument differs in module structure from the historical ROR questionnaire: some minor income components are captured through different submodules, while a small number of items (fishery income, miscellaneous non-monetary revenue) are not collected. A component-by-component comparison with 2014 confirms that these structural differences are quantitatively negligible. The zeroed components represent less than 1% of total household income in Marovoay and are symmetric across treated and control sites. Rice production revenue, crop culture income, and all major wage and self-employment categories are directly comparable. Household size is nearly identical between banks (mean 9.0 West vs 8.8 East), so the OECD equivalence adjustment does not introduce systematic bias.</p>
+</section>
+<section id="extended-panel-construction" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="extended-panel-construction"><span class="header-section-number">6.2</span> Extended Panel Construction</h2>
+<p>The extended panel appends 2025 to the 4 Marovoay <em>fokontany</em>. Other donor sites (from observatories not resurveyed in 2025) contribute to factor estimation through 2014 only; the 2025 counterfactual is anchored by the two west-bank control sites (Ampijoroa, Maroala), which have 2025 data. With <span class="math inline">\(r^* = 0\)</span> (two-way fixed effects), this is equivalent to a within-Marovoay difference-in-differences.</p>
+</section>
+<section id="sec-ext-maro" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="sec-ext-maro"><span class="header-section-number">6.3</span> Extended gsynth: Ankarafantsika</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-ext-att" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ext-att-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12_strict_vs_multipurpose_files/figure-html/fig-ext-att-1.png" class="img-fluid figure-img" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ext-att-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11: Extended ATT path for Ankarafantsika east-bank sites (1999–2025). The panel now includes 2025, 22 years after PA reclassification. The gap between treated and synthetic control widens substantially. Shaded band: 95% parametric bootstrap CI.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-ext-traj" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ext-traj-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12_strict_vs_multipurpose_files/figure-html/fig-ext-traj-1.png" class="img-fluid figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ext-traj-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12: Site-level income trajectories for the four Marovoay fokontany (1998–2025). Treated sites (east bank, red) and control sites (west bank, blue) tracked together through 2003, then diverge persistently. The 2025 resurvey confirms the widening gap, with Madiromiongana showing the sharpest decline.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-ext-comparison" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-ext-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: gsynth ATT estimates: original panel (1999–2014) vs extended panel (1999–2025)
+</figcaption>
+<div aria-describedby="tbl-ext-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="hhqzzkbiwo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#hhqzzkbiwo table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#hhqzzkbiwo thead, #hhqzzkbiwo tbody, #hhqzzkbiwo tfoot, #hhqzzkbiwo tr, #hhqzzkbiwo td, #hhqzzkbiwo th {
+  border-style: none;
+}
+
+#hhqzzkbiwo p {
+  margin: 0;
+  padding: 0;
+}
+
+#hhqzzkbiwo .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#hhqzzkbiwo .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#hhqzzkbiwo .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#hhqzzkbiwo .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#hhqzzkbiwo .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#hhqzzkbiwo .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hhqzzkbiwo .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#hhqzzkbiwo .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#hhqzzkbiwo .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#hhqzzkbiwo .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#hhqzzkbiwo .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#hhqzzkbiwo .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#hhqzzkbiwo .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#hhqzzkbiwo .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#hhqzzkbiwo .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#hhqzzkbiwo .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#hhqzzkbiwo .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#hhqzzkbiwo .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#hhqzzkbiwo .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hhqzzkbiwo .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#hhqzzkbiwo .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#hhqzzkbiwo .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#hhqzzkbiwo .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hhqzzkbiwo .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#hhqzzkbiwo .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#hhqzzkbiwo .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hhqzzkbiwo .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hhqzzkbiwo .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#hhqzzkbiwo .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hhqzzkbiwo .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#hhqzzkbiwo .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hhqzzkbiwo .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#hhqzzkbiwo .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hhqzzkbiwo .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#hhqzzkbiwo .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hhqzzkbiwo .gt_left {
+  text-align: left;
+}
+
+#hhqzzkbiwo .gt_center {
+  text-align: center;
+}
+
+#hhqzzkbiwo .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#hhqzzkbiwo .gt_font_normal {
+  font-weight: normal;
+}
+
+#hhqzzkbiwo .gt_font_bold {
+  font-weight: bold;
+}
+
+#hhqzzkbiwo .gt_font_italic {
+  font-style: italic;
+}
+
+#hhqzzkbiwo .gt_super {
+  font-size: 65%;
+}
+
+#hhqzzkbiwo .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#hhqzzkbiwo .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#hhqzzkbiwo .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#hhqzzkbiwo .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#hhqzzkbiwo .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#hhqzzkbiwo .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#hhqzzkbiwo .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#hhqzzkbiwo .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#hhqzzkbiwo div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="7" class="gt_heading gt_title gt_font_normal">Ankarafantsika: Original vs Extended gsynth</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Adding the 2025 resurvey strengthens the negative ATT</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Panel" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Panel</th>
+<th id="ATT-(log-pts)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">ATT (log pts)</th>
+<th id="SE" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">SE</th>
+<th id="a95%-CI" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">95% CI</th>
+<th id="p-value" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p-value</th>
+<th id="a2025-ATT" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">2025 ATT</th>
+<th id="r*-(CV)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">r* (CV)</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="Panel">Original (1999–2014)</td>
+<td class="gt_row gt_right" headers="ATT (log pts)">-0.359</td>
+<td class="gt_row gt_right" headers="SE">0.130</td>
+<td class="gt_row gt_left" headers="95% CI">[-0.614, -0.104]</td>
+<td class="gt_row gt_right" headers="p-value">0.00582</td>
+<td class="gt_row gt_left" headers="2025 ATT">—</td>
+<td class="gt_row gt_right" headers="r* (CV)">0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Panel">Extended (1999–2025)</td>
+<td class="gt_row gt_right" headers="ATT (log pts)">-0.403</td>
+<td class="gt_row gt_right" headers="SE">0.106</td>
+<td class="gt_row gt_left" headers="95% CI">[-0.611, -0.194]</td>
+<td class="gt_row gt_right" headers="p-value">0.000152</td>
+<td class="gt_row gt_left" headers="2025 ATT">-0.841</td>
+<td class="gt_row gt_right" headers="r* (CV)">0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Including 2025 in the panel, the average post-treatment ATT deepens to <strong>-0.403 log points</strong> (SE = 0.106, p &lt; 0.001), corresponding to approximately <strong>-33.2%</strong> in equivalised income levels. The 2025-specific ATT is <strong>-0.841</strong> (p = 0.001), corresponding to <strong>-56.9%</strong> — the largest single-period effect in the entire panel, 22 years after reclassification.</p>
+<p>Both east-bank fokontany show 2025 effects below their synthetic counterfactual:</p>
+<ul>
+<li><strong>Bepako</strong>: effect = -0.127 (-12.0%)</li>
+<li><strong>Madiromiongana</strong>: effect = 0.127 (+13.6%)</li>
+</ul>
+<p>A simple within-Marovoay DiD (east vs west bank, 2014 → 2025) yields an estimate of <strong>-0.362 log points</strong> — consistent in sign and magnitude with the gsynth ATT path. The west-bank sites gained +0.23 log points over the decade, while east-bank sites fell -0.14, producing a stark reversal: in 2014, east-bank equivalised incomes were slightly <em>above</em> the west; by 2025, they are substantially <em>below</em>.</p>
+</section>
+<section id="sec-ext-outliers" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="sec-ext-outliers"><span class="header-section-number">6.4</span> Outlier Assessment and Robustness</h2>
+<p>The 2025 income gap between banks could in principle be driven by a small number of extreme observations. Several checks confirm it is not:</p>
+<ol type="1">
+<li><p><strong>Distributional breadth.</strong> The gap is visible at <em>every</em> percentile of the income distribution: the west-bank p10, p25, p50, p75, and p90 all exceed the corresponding east-bank quantiles. On a log scale, the entire east-bank density is shifted left.</p></li>
+<li><p><strong>Outlier direction.</strong> IQR-based outlier detection identifies more high outliers on the <em>east</em> bank (17) than the west (7). Removing these outliers <em>widens</em> the gap (trimmed means: west 3,492k vs east 1,805k Ar). Outliers work against the finding.</p></li>
+<li><p><strong>Component breadth.</strong> The west-bank advantage is distributed across five of seven major income components (self-employment, rice, crops, secondary wages, primary wages). Only livestock income and non-monetary transfers favour the east. No single income source drives the gap.</p></li>
+<li><p><strong>Log-scale robustness.</strong> Formal tests on log equivalised income confirm the gap: Wilcoxon rank-sum <span class="math inline">\(p = 2.1 \times 10^{-10}\)</span>; Welch <span class="math inline">\(t\)</span>-test <span class="math inline">\(p = 1.8 \times 10^{-5}\)</span>.</p></li>
+<li><p><strong>Maroala sensitivity.</strong> Maroala has a small 2025 sample (<span class="math inline">\(n = 53\)</span>, down from 135 in 2014) and high mean income. Excluding Maroala entirely, the west-bank log mean drops from 14.0 to 13.9 — still above the east-bank mean of 13.5. Maroala contributes only 0.08 to the log gap.</p></li>
+</ol>
+</section>
+<section id="sec-ext-ala" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="sec-ext-ala"><span class="header-section-number">6.5</span> Alaotra Extension</h2>
+<p>For Alaotra, the 2025 extension is not feasible within the gsynth framework. Since all Alaotra sites are treated and no other observatory was resurveyed in 2025, there are no control observations in 2025 to anchor the time factor. The gsynth result for Alaotra therefore remains based on the 1999–2014 panel only (ATT = +0.015, <span class="math inline">\(p\)</span> = 0.927).</p>
+</section>
+</section>
+<section id="sec-discussion" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Discussion</h1>
+<section id="two-models-two-patterns" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="two-models-two-patterns"><span class="header-section-number">7.1</span> Two Models, Two Patterns</h2>
+<p>The strict–multipurpose distinction produces strikingly different results:</p>
+<p>At <strong>Ankarafantsika</strong>, the effect is visible shortly after reclassification and persists — consistent with the immediate restriction of access to forest resources that had previously been exploited under the loosely enforced forest reserve regime <span class="citation" data-cites="brondeau1999">(<a href="#ref-brondeau1999" role="doc-biblioref">Brondeau 1999</a>)</span>. The Betsiboka River provides a credible source of identification, making the east-bank communities a natural treatment group. The negative ATT is economically large and statistically significant, and the 2025 resurvey extension (<a href="#sec-extension" class="quarto-xref">Section&nbsp;6</a>) shows the effect <em>deepening</em> two decades after reclassification rather than attenuating.</p>
+<p>At <strong>Lac Alaotra</strong>, we find <strong>no statistically significant income effect</strong>. The point estimate is close to zero, and the confidence interval comfortably spans it. This null result is consistent with several interpretations: (i) participatory conservation under CBNRM may genuinely impose lower costs on household incomes than strict enforcement; (ii) the short post-treatment window (2008–2014) may be insufficient to detect a gradual effect; (iii) the single-unit design (one aggregated observatory) limits statistical power. The absence of a detectable effect does not imply that the PHP had no impact on livelihoods — it may have affected specific income components (e.g., fishing revenue) while total income adapted through substitution.</p>
+</section>
+<section id="limitations" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="limitations"><span class="header-section-number">7.2</span> Limitations</h2>
+<ol type="1">
+<li><p><strong>Power.</strong> The Marovoay model has only 2 treated units; Alaotra has 1 (aggregated). As noted in <a href="#sec-method" class="quarto-xref">Section&nbsp;4</a>, the minimum achievable p-value under exact permutation with 4 Marovoay sites is <span class="math inline">\(1/6 \approx 0.333\)</span>. Exploratory analysis in a longer-horizon design extending the donor pool to include Alaotra sites (7 units total, <span class="math inline">\(\binom{7}{2} = 21\)</span> permutations) yields a minimum feasible p-value of <span class="math inline">\(1/21 \approx 0.095\)</span> and wild cluster bootstrap p-values ranging from 0.19 to 0.53 depending on the specification <span class="citation" data-cites="Cameron2008">(<a href="#ref-Cameron2008" role="doc-biblioref">Cameron, Gelbach, and Miller 2008</a>)</span>. Statistical significance at conventional thresholds is therefore not achievable without additional treated units; the results should be interpreted as providing policy-relevant point estimates with honest uncertainty quantification rather than hypothesis-test conclusions.</p></li>
+<li><p><strong>Treatment year uncertainty.</strong> Alaotra’s treatment onset (2008) reflects our assessment of when CBNRM enforcement intensified; see the footnote to §3.3 for the alternative 2007 date. For Ankarafantsika, Decree 2002-798 was signed mid-year (7 August 2002), and we use 2003 as the first full-year treatment period.</p></li>
+<li><p><strong>Observatory-level aggregation for Alaotra.</strong> Aggregating masks within-observatory heterogeneity. Hamlets near the CAZ may experience different conservation pressures than those near the lake.</p></li>
+<li><p><strong>Spillover.</strong> Marovoay 033/034 serve as gsynth donors. If park enforcement generates indirect effects on west-bank communities (displaced poaching, altered market dynamics), these donors are partially contaminated.</p></li>
+<li><p><strong>Single outcome.</strong> Total income is an aggregate measure. Decomposition into agricultural income (rice, cash crops, fishing) and non-agricultural income (primary and secondary employment) may reveal more nuanced patterns. Earlier exploratory work <span class="citation" data-cites="Anonymous2024">(<a href="#ref-Anonymous2024" role="doc-biblioref">Anonymous 2024</a>)</span> suggests the negative effect at Ankarafantsika is concentrated in non-agricultural income, consistent with the park restricting wage labour and forest-product sales rather than disrupting agricultural production directly. We leave systematic income decomposition to future work.</p></li>
+<li><p><strong>Income measurement.</strong> The main specification uses OECD-modified equivalised income (adjusting for household composition). Supplementary Material presents robustness checks using total household income (unadjusted) and income in levels (Ariary) rather than log-transformed.</p></li>
+</ol>
+</section>
+</section>
+<section id="sec-conclusion" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Conclusion</h1>
+<p>This paper provides a comparative evaluation of two conservation governance models in rural Madagascar. Using separate gsynth estimations with a large rural observatory donor pool, we find:</p>
+<ul>
+<li><strong>Strict conservation (Ankarafantsika)</strong> is associated with a statistically significant negative income effect on proximate east-bank communities, visible shortly after reclassification (2003) and persistent through 2014. A 2025 resurvey extension confirms that the effect deepens over time: the 2025-specific ATT is roughly twice the 1999–2014 average, indicating that income losses compound rather than dissipate.</li>
+<li><strong>Multipurpose conservation (Lac Alaotra)</strong> shows <strong>no statistically significant income effect</strong> over the 2008–2014 post-treatment window. The point estimate is close to zero, and the confidence interval spans it.</li>
+</ul>
+<p>The contrast is informative: strict enforcement appears to impose measurable and growing income costs on adjacent communities, while participatory conservation under CBNRM does not produce a detectable aggregate income effect — though this null result should be interpreted with caution given the limited statistical power (single treated unit, short post-treatment window).</p>
+<p>The methodological contribution is the recognition that different PA models require <strong>different identification strategies</strong>: site-level treatment for Ankarafantsika (exploiting the Betsiboka River), observatory-level for Alaotra (all communities share the lake ecosystem). The generalized synthetic control method accommodates both within a unified framework.</p>
+<p>Robustness tests (Supplementary Material) confirm that these conclusions hold when using total household income (unadjusted for household composition) and when using income in levels rather than logs.</p>
+</section>
+<section id="references" class="level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-alonso2002" class="csl-entry" role="listitem">
+Alonso, Leeanne E., Thomas S. Schulenberg, Sahondra Radilofe, and Olivier Missa. 2002. <span>“A Rapid Biological Assessment of the <span class="nocase">Réserve Naturelle Intégrale d’Ankarafantsika</span>, <span>Madagascar</span>.”</span> RAP Bulletin of Biological Assessment 23. Washington, DC: Conservation International.
+</div>
+<div id="ref-Anonymous2024" class="csl-entry" role="listitem">
+Anonymous. 2024. <span>“Income Decomposition in Communities Adjacent to <span>Ankarafantsika</span> National Park.”</span>
+</div>
+<div id="ref-brondeau1999" class="csl-entry" role="listitem">
+Brondeau, Alain. 1999. <span>“La Forêt d’<span>Ankarafantsika</span>: Analyse Spatiale Et Étude de La Dynamique de La Déforestation.”</span> Master’s thesis, Université de Montpellier.
+</div>
+<div id="ref-Cameron2008" class="csl-entry" role="listitem">
+Cameron, A. Colin, Jonah B. Gelbach, and Douglas L. Miller. 2008. <span>“Bootstrap-Based Improvements for Inference with Clustered Errors.”</span> <em>Review of Economics and Statistics</em> 90 (3): 414–27. <a href="https://doi.org/10.1162/rest.90.3.414">https://doi.org/10.1162/rest.90.3.414</a>.
+</div>
+<div id="ref-ChabeFerret2024" class="csl-entry" role="listitem">
+Chabé-Ferret, Sylvain, Olivia Simanning Rakotonarivo, Jean Chrysostome Randrianarisoa, Tahiry Randrianantoandro, Ainà Andriamananjara, and Xavier Morin. 2024. <span>“Rural Observatories of <span>Madagascar</span> (<span>ROR/ROS</span>): A Standardized Longitudinal Household Survey (1995–2015).”</span> <em>Scientific Data</em> 11: 1085. <a href="https://doi.org/10.1038/s41597-024-03879-9">https://doi.org/10.1038/s41597-024-03879-9</a>.
+</div>
+<div id="ref-Xu2017" class="csl-entry" role="listitem">
+Xu, Yiqing. 2017. <span>“Generalized Synthetic Control Method: Causal Inference with Interactive Fixed Effects Models.”</span> <em>Political Analysis</em> 25 (1): 57–76. <a href="https://doi.org/10.1017/pan.2016.2">https://doi.org/10.1017/pan.2016.2</a>.
+</div>
+</div>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Decree 2002-798 was signed on 7 August 2002. Because the ROR survey is conducted annually and we attribute any treatment effect to the first full survey year following the decree, we set the treatment year to 2003. Using 2002 as treatment onset would require attributing half a year of partial enforcement to a full survey wave; our results are unchanged if we use 2002 instead.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>A temporary protection decree (<em>Arrêté</em> 381/2007, 1 August 2007) preceded the intensification of CBNRM enforcement. An alternative treatment year of 2007 is defensible; we use 2008 to remain consistent with the annual-survey convention applied to Ankarafantsika (attributing effects to the first full survey year following the operative decree). Using 2007 instead has negligible impact on the estimated ATT, given that the post-treatment window contains up to seven observations under either assumption.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

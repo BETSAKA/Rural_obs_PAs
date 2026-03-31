@@ -1,0 +1,1938 @@
+---
+title: "Three Models of Conservation in Rural Madagascar"
+subtitle: "A Distance-Based Quasi-Experimental Framework"
+author: "[Authors]"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    theme: cosmo
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: false
+  warning: false
+  message: false
+bibliography: ../references.bib
+---
+
+```{r setup}
+#| label: setup
+
+library(tidyverse)
+library(sf)
+library(fixest)
+library(gt)
+library(scales)
+library(knitr)
+library(patchwork)
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
+winsorize <- function(x, probs = c(0.01, 0.99)) {
+  q <- quantile(x, probs, na.rm = TRUE)
+  pmin(pmax(x, q[1]), q[2])
+}
+
+# ── Constants ────────────────────────────────────────────────────────────────
+RIVER_PENALTY_KM <- 15
+DEFAULT_CUTOFF   <- 12
+
+# Marovoay site_id → fokontany mapping
+MARO_SITES <- tibble(
+  site_id   = c("031", "032", "033", "034"),
+  fokontany = c("Ampijoroa", "Maroala", "Madiromiongana", "Bepako"),
+  river_side = c("west", "west", "east", "east")
+  # west = other side of river from Ankarafantsika → needs penalty
+  # east = same side as park → direct access
+)
+
+# Alaotra site_id → fokontany group mapping
+ALA_SITES <- tibble(
+  site_id = c("211", "212", "213"),
+  fokontany_group = c(
+    "Avaradrano / Feramanga Atsimo / Mangabe",
+    "Analamiranga / Maritampona",
+    "Ambohidrony / Ambatomanga"
+  )
+)
+
+# Treatment year for Marovoay (Ankarafantsika reclassification)
+TREAT_YEAR_MARO <- 2003
+
+# ── Load data ────────────────────────────────────────────────────────────────
+household_consolidated <- read_rds("../data/household_consolidated.rds")
+spatial <- read_rds("../data/paper10_spatial.rds")
+panel_lr <- read_rds("../data/panel_lr_full.rds")
+
+# Extract spatial components
+all_distances <- spatial$all_distances
+maro_dist     <- spatial$maro_dist
+ala_7fkt      <- spatial$ala_7fkt
+ala_site_dist <- spatial$ala_site_dist
+fen_dist      <- spatial$fen_dist
+```
+
+# Abstract {.unnumbered}
+
+Madagascar's protected area network has expanded rapidly under the *Système des Aires Protégées de Madagascar* (SAPM), yet the welfare consequences for adjacent communities remain poorly understood. This paper develops a comparative quasi-experimental framework around **three models of conservation** embodied by three rural observatory sites:
+
+1. **Ankarafantsika** (Parc National, 2002): strict conservation managed by a parastatal body (Madagascar National Parks);
+2. **Lac Alaotra** (Paysage Harmonieux Protégé, 2015): participatory conservation managed by international actors;
+3. **Tampolo** (Paysage Harmonieux Protégé, 2015): adaptive conservation managed by a local university department (ESSA-Forêts).
+
+We assign treatment status using a **distance-based rule**: households in *fokontany* whose centroid is within 12 km of the nearest protected area boundary are classified as treated, with a river-crossing penalty of 15 km applied where major waterways impede pedestrian access. Using household panel data from Madagascar's *Réseau des Observatoires Ruraux* (ROR, 1995–2014) augmented by a 2025 resurvey, we estimate difference-in-differences effects for Marovoay (Ankarafantsika, 2 treated vs 2 control sites) and Alaotra (Lac Alaotra, 1 treated vs 2 control sites). We complement the TWFE approach with a **generalized synthetic control** (gsynth) estimator that exploits a broad donor pool from 10 ROR observatories and accommodates **staggered treatment adoption** — Ankarafantsika in 2003, Lac Alaotra in 2008. For Fénérive Est (Tampolo), we characterize the pre-treatment baseline for a prospective evaluation following the 2026 resurvey. Robustness checks vary the distance cutoff from 5 to 15 km.
+
+# Introduction
+
+Protected areas (PAs) are the cornerstone of global biodiversity conservation. The Kunming-Montreal Global Biodiversity Framework commits signatories to protecting 30% of land and sea by 2030 (the "30×30" target). Madagascar, a megadiversity hotspot, has been at the forefront of this expansion: the number of PAs increased from 47 in 2003 to over 160 by 2015 under the Durban Vision and SAPM framework.
+
+Yet the welfare consequences of PA designation for adjacent rural communities remain contested. Strict PAs may restrict access to forest resources on which the poorest depend; community-managed PAs may empower local institutions but impose new governance costs; adaptive approaches that involve research institutions may generate knowledge spillovers but also create asymmetric power dynamics.
+
+This paper contributes to this debate by exploiting a unique feature of Madagascar's *Réseau des Observatoires Ruraux* (ROR): three observatory sites happen to neighbour protected areas that embody **three distinct models of conservation governance**:
+
+- **Marovoay** (Observatory 03) lies adjacent to **Ankarafantsika National Park**, a strict IUCN Category II PA managed by *Madagascar National Parks* (MNP), a parastatal body. Ankarafantsika was reclassified in 2002, tightening enforcement.
+- **Alaotra** (Observatory 21) borders the **Lac Alaotra Paysage Harmonieux Protégé**, a Category V PA designated in 2015, managed by *Durrell Wildlife Conservation Trust* and other international actors. The Ramsar convention listed the lake in 2003.
+- **Fénérive Est** (Observatory 24) is near the **Réserve de Tampolo**, a Category V PA designated in 2015, managed by *ESSA-Forêts*, the forestry department of the University of Antananarivo.
+
+Each PA differs in its governance model, enforcement intensity, IUCN category, and spatial footprint. Our distance-based treatment assignment allows us to estimate the causal effect of each conservation model on household income, conditional on proximity.
+
+A key innovation of this paper is the incorporation of **geographic accessibility**. Euclidean distance to a PA boundary does not capture effective accessibility when major rivers impede pedestrian travel. At the Marovoay site, the Betsiboka River separates two of four *fokontany* from Ankarafantsika National Park. We account for this by adding a penalty of `r RIVER_PENALTY_KM` km to the effective distance of river-separated communities, reflecting the approximate detour required to reach the park on foot.
+
+We complement the TWFE approach with a **generalized synthetic control** (gsynth) estimator [@Xu2017] that exploits the broad ROR donor pool — approximately 70 sites from 10 observatories — and accommodates the staggered timing of PA enforcement across the three sites. This allows us to construct a data-driven counterfactual for treated communities and to pool treatment effect estimates across PAs with different intervention dates.
+
+The paper is organized as follows. @sec-background describes the institutional context and the three conservation models. @sec-data presents the data and treatment assignment methodology. @sec-empirical lays out the empirical framework. @sec-results presents results for each observatory. @sec-robustness assesses sensitivity to the distance cutoff. @sec-validation uses the 2025 resurvey environment module to behaviorally validate the treatment assignment. @sec-discussion discusses implications.
+
+# Background {#sec-background}
+
+## Conservation Policy in Madagascar
+
+Madagascar's PA system has undergone three major phases. The first generation of PAs (pre-2003) consisted primarily of strict reserves and national parks managed by ANGAP (now MNP). The 2003 Durban Declaration committed Madagascar to tripling its PA coverage. The 2005 SAPM decree introduced new PA categories, including *Paysage Harmonieux Protégé* (PHP), allowing for sustainable use and community governance. By 2015, more than 120 new PAs had been created, predominantly in the less strict categories (IV–VI).
+
+## Three Models
+
+### Model 1: Strict Conservation — Ankarafantsika
+
+Ankarafantsika National Park (135,000 ha, IUCN Category II) is one of Madagascar's oldest PAs, originally established as a reserve in 1927 and reclassified as a national park in 2002. It is managed by *Madagascar National Parks* (MNP), a parastatal body funded by the Malagasy state and international donors. Enforcement is relatively strict: access is restricted, agricultural encroachment is penalized, and forest extraction is formally prohibited.
+
+The reclassification in 2002 marked a shift from passive to active management. Park boundaries were reinforced, patrol frequency increased, and buffer zone regulations tightened. The communities of Marovoay observatory — Ampijoroa, Maroala, Madiromiongana, and Bepako — lie at varying distances from the park boundary, but a critical geographic feature mediates access: the **Betsiboka River** separates Ampijoroa and Maroala (west bank) from the park (east bank), while Madiromiongana and Bepako lie on the same side.
+
+### Model 2: Participatory Conservation — Lac Alaotra
+
+Lac Alaotra is Madagascar's largest lake and a critical habitat for the *Alaotran gentle lemur* (*Hapalemur alaotrensis*), one of the world's most endangered primates. The Ramsar Convention listed the site in 2003. In 2015, the lake and its marshlands were formally designated as a *Paysage Harmonieux Protégé* (464 km², IUCN Category V) under SAPM, managed by *Durrell Wildlife Conservation Trust* in partnership with local communities (VOI — *Vondron'Olona Ifotony*).
+
+The PHP designation allows sustainable resource use within designated zones. Management involves community-based natural resource management (CBNRM) agreements, regulated fishing, and controlled marsh burning. The observatory's seven *fokontany* lie at distances of 9–18 km from the PHP boundary, with one site centroid falling within the 12 km treatment zone.
+
+### Model 3: Adaptive Conservation — Tampolo
+
+The Réserve de Tampolo (6.75 km², IUCN Category V) is a coastal forest fragment designated as a PHP in 2015. It is managed by *ESSA-Forêts*, the forestry department of the University of Antananarivo, under a long-term research and management agreement. This model combines scientific research, environmental education, and community engagement.
+
+Tampolo represents the most locally embedded governance model: management is led by a national academic institution with deep ties to the surrounding communities. The observatory's 13 *fokontany* range from 3 to 23 km from the reserve boundary.
+
+# Data and Treatment Assignment {#sec-data}
+
+## The *Réseau des Observatoires Ruraux*
+
+The ROR is a household panel survey covering 13–29 observatory sites across Madagascar, conducted annually from 1995 to 2014 by INSTAT (with IRD support), with a resurvey of selected sites in 2025. Each site tracks approximately 500 households per year across 2–7 *fokontany*. The survey collects detailed data on household composition, agricultural production, livestock, off-farm income, transfers, food security, and asset ownership.
+
+For this paper, we use three observatories:
+
+- **Marovoay** (obs. 03): 4 *fokontany*, 4 sites, surveyed 1995–2014.
+- **Alaotra** (obs. 21): 7 *fokontany* across 3 sites, surveyed 1999–2014.
+- **Fénérive Est** (obs. 24): 13 *fokontany* across 10 sites, surveyed 1999–2014 (7 sites dropped after 2004; 3 continued to 2014).
+
+The 2025 resurvey covers Marovoay and Alaotra, providing a 22-year long-run comparison. A 2026 resurvey of Fénérive Est is planned.
+
+## Income Construction
+
+Total household income (`revtot`) is constructed as the sum of current income (agricultural wages, self-employment, rice profit, other crop profit, livestock, and fishing) and exceptional income (land rents, transfers, asset sales). We winsorize at the 1st and 99th percentiles within each year and use log total income as our primary outcome.
+
+## Distance-Based Treatment Assignment
+
+We assign treatment based on the **effective walking distance** from each *fokontany* centroid to the nearest PA boundary. The baseline cutoff is 12 km, corresponding to approximately a 2.5-hour walk — the practical daily commuting limit in rural Madagascar.
+
+### River Crossing Penalty
+
+At the Marovoay site, the Betsiboka River runs between the park boundary and two *fokontany* (Ampijoroa and Maroala). Crossing the river requires a significant detour (no bridge in the immediate area). We apply a penalty of **`r RIVER_PENALTY_KM` km** to the effective distance of these two *fokontany*, reflecting the additional travel required to reach the park on foot.
+
+```{r treatment-assignment}
+#| label: tbl-treatment
+#| tbl-cap: "Distance-based treatment assignment (baseline cutoff: 12 km)"
+
+# Marovoay: apply river penalty
+maro_treatment <- maro_dist |>
+  select(site_id, fokontany, dist_km) |>
+  left_join(MARO_SITES |> select(site_id, river_side), by = "site_id") |>
+  mutate(
+    river_penalty = if_else(river_side == "west", RIVER_PENALTY_KM, 0),
+    effective_km  = dist_km + river_penalty,
+    treated       = effective_km < DEFAULT_CUTOFF,
+    observatory   = "Marovoay",
+    pa_name       = "Ankarafantsika"
+  )
+
+# Alaotra: use site-level centroid distances
+ala_treatment <- ala_site_dist |>
+  left_join(ALA_SITES, by = "site_id") |>
+  mutate(
+    river_penalty = 0,
+    effective_km  = dist_km,
+    treated       = effective_km < DEFAULT_CUTOFF,
+    observatory   = "Alaotra",
+    pa_name       = "Lac Alaotra"
+  ) |>
+  rename(fokontany = fokontany_group)
+
+# Fénérive Est: fokontany-level distances
+fen_treatment <- fen_dist |>
+  mutate(
+    fokontany     = ADM4_EN,
+    river_penalty = 0,
+    effective_km  = dist_km,
+    treated       = effective_km < DEFAULT_CUTOFF,
+    observatory   = "Fénérive Est",
+    pa_name       = "Tampolo"
+  )
+
+# Combined table
+treatment_table <- bind_rows(
+  maro_treatment |> select(observatory, pa_name, site_id, fokontany,
+                           dist_km, river_penalty, effective_km, treated),
+  ala_treatment |> select(observatory, pa_name, site_id, fokontany = fokontany,
+                          dist_km, river_penalty, effective_km, treated),
+  fen_treatment |> select(observatory, pa_name, fokontany,
+                          dist_km, river_penalty, effective_km, treated) |>
+    mutate(site_id = NA_character_)
+) |>
+  arrange(observatory, effective_km)
+
+treatment_table |>
+  mutate(
+    Status = if_else(treated, "Treated", "Control"),
+    across(c(dist_km, effective_km), \(x) round(x, 1))
+  ) |>
+  select(Observatory = observatory, `PA` = pa_name,
+         `Site` = site_id, Fokontany = fokontany,
+         `Euclidean (km)` = dist_km,
+         `Penalty (km)` = river_penalty,
+         `Effective (km)` = effective_km,
+         Status) |>
+  gt() |>
+  tab_header(title = "Treatment Assignment by Fokontany",
+             subtitle = "12 km cutoff with river-crossing penalty") |>
+  tab_row_group(label = "Fénérive Est → Tampolo", rows = Observatory == "Fénérive Est") |>
+  tab_row_group(label = "Alaotra → Lac Alaotra PHP", rows = Observatory == "Alaotra") |>
+  tab_row_group(label = "Marovoay → Ankarafantsika PN", rows = Observatory == "Marovoay") |>
+  cols_hide(c(Observatory, PA)) |>
+  tab_style(
+    style = cell_fill(color = "#E8F5E9"),
+    locations = cells_body(rows = Status == "Treated")
+  ) |>
+  tab_footnote(
+    "Ampijoroa and Maroala receive a 15 km river-crossing penalty (Betsiboka River)."
+  )
+```
+
+### Treatment Summary
+
+```{r treatment-summary}
+#| label: tbl-summary-treatment
+#| tbl-cap: "Treatment balance across observatories"
+
+treatment_table |>
+  summarize(
+    n_fkt     = n(),
+    n_treated = sum(treated),
+    n_control = sum(!treated),
+    .by = c(observatory, pa_name)
+  ) |>
+  gt() |>
+  cols_label(
+    observatory = "Observatory",
+    pa_name     = "Protected Area",
+    n_fkt       = "Total Fokontany",
+    n_treated   = "Treated",
+    n_control   = "Control"
+  )
+```
+
+## PA Characteristics
+
+```{r pa-table}
+#| label: tbl-pa-chars
+#| tbl-cap: "Characteristics of the three protected areas"
+
+tibble(
+  PA = c("Ankarafantsika", "Lac Alaotra", "Tampolo"),
+  `IUCN Cat.` = c("II (National Park)", "V (PHP)", "V (PHP)"),
+  `Area (km²)` = c("1,365", "464", "6.75"),
+  `Designated` = c("2002", "2015 (Ramsar 2003)", "2015"),
+  `Manager` = c("Madagascar National Parks", "Durrell Wildlife + VOI", "ESSA-Forêts (Univ. Antananarivo)"),
+  `Model` = c("Strict (parastatal)", "Participatory (international)", "Adaptive (academic/local)"),
+  `Enforcement` = c("High", "Medium", "Low–Medium"),
+  `Permitted use` = c("None (core zone)", "Sustainable (zoned)", "Research + limited extraction")
+) |>
+  gt() |>
+  tab_header(title = "Three Models of Conservation")
+```
+
+## Maps
+
+```{r maps}
+#| label: fig-maps
+#| fig-cap: "Protected areas and fokontany across three observatory sites. Green shading shows the PA boundary; points indicate fokontany centroids, colored by treatment status (12 km cutoff with river penalty)."
+#| fig-height: 5
+#| fig-width: 12
+
+# ── Marovoay map ─────────────────────────────────────────────────────────────
+maro_pts <- maro_dist |>
+  left_join(maro_treatment |> select(site_id, effective_km, treated), by = "site_id") |>
+  st_as_sf(coords = c("lon", "lat"), crs = 4326)
+
+pa_ank <- spatial$ankarafantsika
+if (!st_is_valid(pa_ank)) pa_ank <- st_make_valid(pa_ank)
+
+# Buffer: 10km around PA centroid for visual reference
+ank_centroid <- st_centroid(st_union(pa_ank))
+
+p_maro <- ggplot() +
+  geom_sf(data = pa_ank, fill = "#81C784", alpha = 0.4, color = "darkgreen") +
+  geom_sf(data = maro_pts, aes(color = treated, shape = treated), size = 3) +
+  ggrepel::geom_label_repel(
+    data = maro_pts |> mutate(x = st_coordinates(geometry)[,1], y = st_coordinates(geometry)[,2]),
+    aes(x = x, y = y, label = fokontany),
+    size = 2.5, max.overlaps = 10, label.padding = 0.15
+  ) +
+  scale_color_manual(values = c("TRUE" = "#D32F2F", "FALSE" = "#1565C0"),
+                     labels = c("TRUE" = "Treated", "FALSE" = "Control")) +
+  scale_shape_manual(values = c("TRUE" = 17, "FALSE" = 16),
+                     labels = c("TRUE" = "Treated", "FALSE" = "Control")) +
+  labs(title = "Marovoay — Ankarafantsika PN",
+       subtitle = "Treatment year: 2002",
+       color = NULL, shape = NULL) +
+  theme_minimal(base_size = 10) +
+  theme(legend.position = "bottom")
+
+# ── Alaotra map ──────────────────────────────────────────────────────────────
+ala_pts <- ala_site_dist |>
+  left_join(ala_treatment |> select(site_id, treated), by = "site_id") |>
+  st_as_sf(coords = c("lon", "lat"), crs = 4326)
+
+pa_lac <- spatial$lac_alaotra
+if (!st_is_valid(pa_lac)) pa_lac <- st_make_valid(pa_lac)
+
+p_ala <- ggplot() +
+  geom_sf(data = pa_lac, fill = "#81C784", alpha = 0.4, color = "darkgreen") +
+  geom_sf(data = ala_pts, aes(color = treated, shape = treated), size = 3) +
+  ggrepel::geom_label_repel(
+    data = ala_pts |>
+      left_join(ALA_SITES, by = "site_id") |>
+      mutate(x = st_coordinates(geometry)[,1], y = st_coordinates(geometry)[,2]),
+    aes(x = x, y = y, label = paste0(site_id, "\n", fokontany_group)),
+    size = 2, max.overlaps = 10, label.padding = 0.15
+  ) +
+  scale_color_manual(values = c("TRUE" = "#D32F2F", "FALSE" = "#1565C0"),
+                     labels = c("TRUE" = "Treated", "FALSE" = "Control")) +
+  scale_shape_manual(values = c("TRUE" = 17, "FALSE" = 16),
+                     labels = c("TRUE" = "Treated", "FALSE" = "Control")) +
+  labs(title = "Alaotra — Lac Alaotra PHP",
+       subtitle = "Treatment year: 2015 (Ramsar 2003)",
+       color = NULL, shape = NULL) +
+  theme_minimal(base_size = 10) +
+  theme(legend.position = "bottom")
+
+# ── Fénérive Est map ─────────────────────────────────────────────────────────
+fen_fkt_sf <- spatial$fen_fkt
+if (any(!st_is_valid(fen_fkt_sf))) fen_fkt_sf <- st_make_valid(fen_fkt_sf)
+fen_centroids <- st_centroid(fen_fkt_sf)
+fen_centroids <- fen_centroids |>
+  left_join(
+    fen_treatment |> select(fokontany, treated, effective_km),
+    by = c("ADM4_EN" = "fokontany")
+  )
+
+pa_tampolo <- spatial$tampolo
+if (!st_is_valid(pa_tampolo)) pa_tampolo <- st_make_valid(pa_tampolo)
+
+p_fen <- ggplot() +
+  geom_sf(data = fen_fkt_sf, fill = "grey95", color = "grey70") +
+  geom_sf(data = pa_tampolo, fill = "#81C784", alpha = 0.6, color = "darkgreen") +
+  geom_sf(data = fen_centroids, aes(color = treated, shape = treated), size = 2.5) +
+  scale_color_manual(values = c("TRUE" = "#D32F2F", "FALSE" = "#1565C0"),
+                     labels = c("TRUE" = "Treated", "FALSE" = "Control")) +
+  scale_shape_manual(values = c("TRUE" = 17, "FALSE" = 16),
+                     labels = c("TRUE" = "Treated", "FALSE" = "Control")) +
+  labs(title = "Fénérive Est — Tampolo",
+       subtitle = "Treatment year: 2015 (no post-treatment data)",
+       color = NULL, shape = NULL) +
+  theme_minimal(base_size = 10) +
+  theme(legend.position = "bottom")
+
+p_maro + p_ala + p_fen + plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+```
+
+# Descriptive Statistics
+
+## Panel Construction
+
+```{r panel-construction}
+#| label: panel-construction
+
+# ── Medium-run panel: Marovoay 1995–2014 ─────────────────────────────────────
+maro_panel <- household_consolidated |>
+  filter(obs == "03") |>
+  left_join(
+    maro_treatment |> select(site_id, effective_km, treated),
+    by = "site_id"
+  ) |>
+  mutate(
+    revtot_w   = winsorize(revtot, c(0.01, 0.99)),
+    ln_revtot  = log(pmax(revtot_w, 1)),
+    post       = as.integer(year >= TREAT_YEAR_MARO),
+    treat_post = as.integer(treated & post),
+    .by = year
+  )
+
+# ── Long-run panel: Marovoay + Alaotra, 1999–2002 vs 2025 ───────────────────
+# Redefine treatment on the pre-computed panel_lr
+panel_lr_new <- panel_lr |>
+  mutate(
+    # New distance-based treatment for Marovoay (12 km cutoff)
+    treated_dist = case_when(
+      obs == "03" & site_id %in% c("033", "034") ~ TRUE,
+      obs == "03" ~ FALSE,
+      # Alaotra: site 212 is treated
+      obs == "21" & site_id == "212" ~ TRUE,
+      obs == "21" ~ FALSE,
+      TRUE ~ NA
+    ),
+    post_2025  = as.integer(year == 2025),
+    did_dist   = as.integer(treated_dist & post_2025)
+  )
+
+# ── Summary stats ────────────────────────────────────────────────────────────
+maro_summary <- maro_panel |>
+  summarize(
+    n_hh      = n(),
+    mean_revtot = mean(revtot, na.rm = TRUE),
+    median_revtot = median(revtot, na.rm = TRUE),
+    .by = c(year, treated)
+  ) |>
+  mutate(observatory = "Marovoay")
+```
+
+## Income Trends
+
+```{r income-trends}
+#| label: fig-trends
+#| fig-cap: "Mean log household income by treatment status over time. Vertical dashed line marks the treatment year. Shaded region indicates the post-treatment period."
+#| fig-height: 5
+#| fig-width: 10
+
+# Marovoay trends
+maro_trends <- maro_panel |>
+  summarize(
+    mean_ln = mean(ln_revtot, na.rm = TRUE),
+    se_ln   = sd(ln_revtot, na.rm = TRUE) / sqrt(n()),
+    n       = n(),
+    .by = c(year, treated)
+  ) |>
+  mutate(
+    group = if_else(treated, "Treated", "Control"),
+    observatory = "Marovoay"
+  )
+
+p_trends_maro <- ggplot(maro_trends, aes(x = year, y = mean_ln,
+                                          color = group, shape = group)) +
+  annotate("rect", xmin = TREAT_YEAR_MARO, xmax = 2015, ymin = -Inf, ymax = Inf,
+           fill = "#FFCDD2", alpha = 0.3) +
+  geom_vline(xintercept = TREAT_YEAR_MARO - 0.5, linetype = "dashed", color = "grey40") +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2.5) +
+  geom_errorbar(aes(ymin = mean_ln - 1.96*se_ln, ymax = mean_ln + 1.96*se_ln),
+                width = 0.3, alpha = 0.5) +
+  scale_color_manual(values = c("Treated" = "#D32F2F", "Control" = "#1565C0")) +
+  labs(title = "Marovoay — Ankarafantsika (treatment: 2003)",
+       x = "Year", y = "Mean log(income)", color = NULL, shape = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+
+# Alaotra trends (1999–2014, medium run)
+ala_panel_mr <- household_consolidated |>
+  filter(obs == "21") |>
+  left_join(
+    ala_treatment |> select(site_id, effective_km, treated),
+    by = "site_id"
+  ) |>
+  mutate(
+    revtot_w  = winsorize(revtot, c(0.01, 0.99)),
+    ln_revtot = log(pmax(revtot_w, 1)),
+    .by = year
+  )
+
+ala_trends <- ala_panel_mr |>
+  summarize(
+    mean_ln = mean(ln_revtot, na.rm = TRUE),
+    se_ln   = sd(ln_revtot, na.rm = TRUE) / sqrt(n()),
+    n       = n(),
+    .by = c(year, treated)
+  ) |>
+  mutate(
+    group = if_else(treated, "Treated (Site 212)", "Control (Sites 211, 213)"),
+    observatory = "Alaotra"
+  )
+
+p_trends_ala <- ggplot(ala_trends, aes(x = year, y = mean_ln,
+                                        color = group, shape = group)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2.5) +
+  geom_errorbar(aes(ymin = mean_ln - 1.96*se_ln, ymax = mean_ln + 1.96*se_ln),
+                width = 0.3, alpha = 0.5) +
+  scale_color_manual(values = c("Treated (Site 212)" = "#D32F2F",
+                                "Control (Sites 211, 213)" = "#1565C0")) +
+  labs(title = "Alaotra — No formal treatment until 2015",
+       subtitle = "Pre-treatment parallel trends assessment",
+       x = "Year", y = "Mean log(income)", color = NULL, shape = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+
+p_trends_maro / p_trends_ala
+```
+
+## Descriptive Statistics Table
+
+```{r desc-stats}
+#| label: tbl-desc-stats
+#| tbl-cap: "Summary statistics by treatment status (pooled across years)"
+
+bind_rows(
+  maro_panel |>
+    mutate(status = if_else(treated, "Treated", "Control")) |>
+    summarize(
+      `Mean income (Ar)` = comma(round(mean(revtot, na.rm = TRUE))),
+      `Median income (Ar)` = comma(round(median(revtot, na.rm = TRUE))),
+      `Mean log income` = round(mean(ln_revtot, na.rm = TRUE), 2),
+      `HH size (mean)` = round(mean(n_membres, na.rm = TRUE), 1),
+      `N (HH-years)` = comma(n()),
+      .by = status
+    ) |>
+    mutate(Observatory = "Marovoay", .before = 1),
+
+  ala_panel_mr |>
+    mutate(status = if_else(treated, "Treated", "Control")) |>
+    summarize(
+      `Mean income (Ar)` = comma(round(mean(revtot, na.rm = TRUE))),
+      `Median income (Ar)` = comma(round(median(revtot, na.rm = TRUE))),
+      `Mean log income` = round(mean(ln_revtot, na.rm = TRUE), 2),
+      `HH size (mean)` = round(mean(n_membres, na.rm = TRUE), 1),
+      `N (HH-years)` = comma(n()),
+      .by = status
+    ) |>
+    mutate(Observatory = "Alaotra", .before = 1)
+) |>
+  gt() |>
+  tab_header(title = "Descriptive Statistics by Treatment Status")
+```
+
+# Empirical Framework {#sec-empirical}
+
+## Strategy 1: Two-Way Fixed Effects DiD
+
+Our primary specification is a household-level two-way fixed effects (TWFE) difference-in-differences model:
+
+$$
+\ln Y_{it} = \alpha_i + \gamma_t + \beta \cdot D_{it} + \varepsilon_{it}
+$$
+
+where $Y_{it}$ is household $i$'s total income in year $t$, $\alpha_i$ is a site fixed effect, $\gamma_t$ is a year fixed effect, and $D_{it} = \mathbb{1}[\text{site}_i \in \text{Treated}] \times \mathbb{1}[t \geq t^*]$ is the treatment indicator. The coefficient $\beta$ estimates the average treatment effect on the treated (ATT).
+
+For **Marovoay**, we estimate a panel DiD over 1995–2014 with treatment at $t^* = 2003$ (Ankarafantsika reclassification). We also estimate an event study specification:
+
+$$
+\ln Y_{it} = \alpha_i + \gamma_t + \sum_{k \neq -1} \mu_k \cdot \mathbb{1}[\text{Treated}_i] \times \mathbb{1}[t - t^* = k] + \varepsilon_{it}
+$$
+
+For the **long-run DiD** using the 2025 resurvey (Marovoay and Alaotra), we estimate:
+
+$$
+\ln Y_{it} = \alpha_s + \gamma_t + \delta \cdot D_{it}^{\text{dist}} + X_{it}'\phi + \varepsilon_{it}
+$$
+
+where $D_{it}^{\text{dist}}$ is the distance-based treatment indicator and $s$ indexes sites.
+
+## Inference
+
+With very few treated clusters (2 for Marovoay, 1 for Alaotra), conventional cluster-robust standard errors are unreliable. We report heteroskedasticity-robust SEs and note that inference should be interpreted with caution. We complement with permutation-based p-values where feasible. For the gsynth estimator, inference relies on parametric bootstrap.
+
+## Strategy 2: Generalized Synthetic Control (gsynth)
+
+To complement the TWFE DiD — which relies on the parallel trends assumption — we employ the generalized synthetic control method of @Xu2017, which estimates an interactive fixed-effects (IFE) model:
+
+$$
+Y_{it} = \alpha_i + \xi_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + D_{it} \cdot \delta_{it} + \varepsilon_{it}
+$$
+
+where $\boldsymbol{\lambda}_i$ is a vector of unit-specific factor loadings and $\boldsymbol{f}_t$ the corresponding common factors. This relaxes the parallel trends assumption by allowing for unobserved time-varying confounders captured by latent factors.
+
+**Staggered adoption.** A key innovation relative to the companion paper is that we exploit temporal variation in conservation enforcement across observatories. Rather than treating each PA separately, we define a **staggered treatment** indicator on the site-level panel:
+
+- Marovoay sites 033 (Madiromiongana) and 034 (Bepako): treated from 2003 (Ankarafantsika reclassification)
+- Alaotra site 212 (Analamiranga/Maritampona): treated from 2008 (intensification of Ramsar/CBNRM enforcement)
+- All other ROR sites (from 10+ observatories): donor pool
+
+The gsynth method accommodates staggered adoption: treated units are allowed different pre-treatment windows (4 years for Marovoay sites, 9 for Alaotra site 212). The number of latent factors $r$ is selected by cross-validation over $r \in \{0, 1, \ldots, 5\}$. Inference is by parametric bootstrap (200 replications).
+
+# Results {#sec-results}
+
+## Marovoay — Strict Conservation (Ankarafantsika)
+
+### Medium-Run TWFE (1995–2014)
+
+```{r maro-twfe}
+#| label: tbl-maro-twfe
+#| tbl-cap: "Marovoay medium-run DiD: Effect of Ankarafantsika reclassification (2003)"
+
+# TWFE DiD
+m1 <- feols(ln_revtot ~ treat_post | site_id + year,
+            data = maro_panel, vcov = "hetero")
+
+# With HH size control
+m2 <- feols(ln_revtot ~ treat_post + log(n_membres) | site_id + year,
+            data = maro_panel, vcov = "hetero")
+
+# Cluster at site level (4 clusters — interpret with caution)
+m3 <- feols(ln_revtot ~ treat_post | site_id + year,
+            data = maro_panel, vcov = ~site_id)
+
+etable(m1, m2, m3,
+       dict = c(treat_post = "Treated × Post",
+                "log(n_membres)" = "Log HH size"),
+       headers = c("HC robust", "HC + controls", "Clustered (site)"),
+       se.below = TRUE,
+       fitstat = c("n", "r2", "wr2"))
+```
+
+```{r maro-event}
+#| label: fig-maro-event
+#| fig-cap: "Event study: Marovoay household income relative to Ankarafantsika reclassification (2003). Treatment = Bepako (034) + Madiromiongana (033) vs Ampijoroa (031) + Maroala (032). Reference period: 2002."
+
+# Event study relative to treatment year
+maro_panel_es <- maro_panel |>
+  mutate(
+    event_time = year - TREAT_YEAR_MARO,
+    treat_unit = as.integer(treated)
+  )
+
+es <- feols(ln_revtot ~ i(event_time, treat_unit, ref = -1) | site_id + year,
+            data = maro_panel_es, vcov = "hetero")
+
+iplot(es,
+      main = "Event Study: Treated (Bepako, Madiromiongana) vs Controls",
+      xlab = "Years relative to Ankarafantsika reclassification (2003)",
+      ylab = "ATT (log income)")
+```
+
+### Interpretation
+
+```{r maro-interp}
+#| output: asis
+
+att_maro <- coef(m1)["treat_post"]
+se_maro <- fixest::se(m1)["treat_post"]
+pv_maro <- fixest::pvalue(m1)["treat_post"]
+
+cat(sprintf(
+  "The TWFE estimate of the effect of Ankarafantsika reclassification on treated household income is **%.3f** log points (SE = %.3f, p = %.3f). This corresponds to a %s change in income levels. At the 12 km effective-distance cutoff, the two treated fokontany are Bepako (5.2 km, east bank) and Madiromiongana (11.7 km, east bank), compared against two controls: Ampijoroa and Maroala (west bank, effective distance > 20 km after the Betsiboka river-crossing penalty).\n\n",
+  att_maro, se_maro, pv_maro,
+  percent(exp(att_maro) - 1, accuracy = 0.1)
+))
+
+cat("Note the **reversal** relative to the original treatment assignment used in the companion paper (09): there, Ampijoroa (031) and Maroala (032) were classified as treated because they are geographically adjacent to the park. The distance-based approach recognises that the Betsiboka River prevents these communities from accessing the park on foot, making 2 east-bank fokontany the true treated group and the 2 west-bank fokontany the controls.\n")
+```
+
+### Long-Run DiD (1999–2002 vs 2025)
+
+```{r maro-longrun}
+#| label: tbl-maro-lr
+#| tbl-cap: "Long-run DiD: Marovoay household income, 1999–2002 vs 2025"
+
+lr_maro <- panel_lr_new |>
+  filter(obs == "03") |>
+  mutate(
+    ln_y = log(pmax(revtot_w, 1))
+  )
+
+lr_m1 <- feols(ln_y ~ did_dist | site_id + year,
+               data = lr_maro, vcov = "hetero")
+
+lr_m2 <- feols(ln_y ~ did_dist + log(n_membres) | site_id + year,
+               data = lr_maro, vcov = "hetero")
+
+etable(lr_m1, lr_m2,
+       dict = c(did_dist = "Treated (distance) × Post 2025",
+                "log(n_membres)" = "Log HH size"),
+       headers = c("Baseline", "With controls"),
+       se.below = TRUE,
+       fitstat = c("n", "r2"))
+```
+
+## Alaotra — Participatory Conservation (Lac Alaotra)
+
+### Medium-Run TWFE (1999–2014, treatment: 2008)
+
+The Lac Alaotra PHP was formally designated in 2015, but the Ramsar listing (2003) and subsequent community-based natural resource management (CBNRM) agreements led to a progressive tightening of resource access. We use 2008 as the treatment onset, corresponding to the intensification of conservation enforcement by Durrell Wildlife Conservation Trust and the establishment of local management transfers (*transferts de gestion*).
+
+```{r ala-twfe}
+#| label: tbl-ala-twfe
+#| tbl-cap: "Alaotra medium-run DiD: Effect of Ramsar/CBNRM enforcement intensification (2008). Treatment = site 212 (9 km from PHP boundary), control = sites 211 and 213."
+
+TREAT_YEAR_ALA <- 2008
+
+ala_panel_mr <- ala_panel_mr |>
+  mutate(
+    post_ala   = as.integer(year >= TREAT_YEAR_ALA),
+    treat_post_ala = as.integer(treated & post_ala)
+  )
+
+# TWFE DiD
+a_m1 <- feols(ln_revtot ~ treat_post_ala | site_id + year,
+              data = ala_panel_mr, vcov = "hetero")
+
+# With HH size control
+a_m2 <- feols(ln_revtot ~ treat_post_ala + log(n_membres) | site_id + year,
+              data = ala_panel_mr, vcov = "hetero")
+
+# Cluster at site level (3 clusters — interpret with extreme caution)
+a_m3 <- feols(ln_revtot ~ treat_post_ala | site_id + year,
+              data = ala_panel_mr, vcov = ~site_id)
+
+etable(a_m1, a_m2, a_m3,
+       dict = c(treat_post_ala = "Treated × Post 2008",
+                "log(n_membres)" = "Log HH size"),
+       headers = c("HC robust", "HC + controls", "Clustered (site)"),
+       se.below = TRUE,
+       fitstat = c("n", "r2", "wr2"))
+```
+
+```{r ala-event}
+#| label: fig-ala-event
+#| fig-cap: "Event study: Alaotra household income relative to Ramsar/CBNRM enforcement intensification (2008). Treatment = site 212 vs sites 211, 213. Reference period: 2007."
+
+ala_es_data <- ala_panel_mr |>
+  mutate(
+    event_time = year - TREAT_YEAR_ALA,
+    treat_unit = as.integer(treated)
+  )
+
+ala_es_2008 <- feols(ln_revtot ~ i(event_time, treat_unit, ref = -1) | site_id + year,
+                     data = ala_es_data, vcov = "hetero")
+
+iplot(ala_es_2008,
+      main = "Event Study: Alaotra Site 212 (Treated) vs Controls",
+      xlab = "Years relative to CBNRM enforcement intensification (2008)",
+      ylab = "ATT (log income)")
+```
+
+```{r ala-twfe-interp}
+#| output: asis
+
+att_ala <- coef(a_m1)["treat_post_ala"]
+se_ala  <- fixest::se(a_m1)["treat_post_ala"]
+pv_ala  <- fixest::pvalue(a_m1)["treat_post_ala"]
+
+cat(sprintf(
+  "The TWFE estimate of the effect of Ramsar/CBNRM enforcement intensification on site 212 household income is **%.3f** log points (SE = %.3f, p = %.3f), corresponding to a %s change in income levels. This is identified from 9 pre-treatment years (1999–2007) and 7 post-treatment years (2008–2014), comparing 1 treated site (212, Analamiranga/Maritampona, 9 km from PHP boundary) to 2 controls (211 at 13.7 km, 213 at 15.6 km).\n",
+  att_ala, se_ala, pv_ala,
+  scales::percent(exp(att_ala) - 1, accuracy = 0.1)
+))
+```
+
+### Long-Run DiD (1999–2002 vs 2025)
+
+```{r ala-longrun}
+#| label: tbl-ala-lr
+#| tbl-cap: "Long-run DiD: Alaotra household income, 1999–2002 vs 2025. Treatment: site 212 (Analamiranga/Maritampona, 9 km from Lac Alaotra PHP boundary)."
+
+lr_ala <- panel_lr_new |>
+  filter(obs == "21") |>
+  mutate(ln_y = log(pmax(revtot_w, 1)))
+
+lr_a1 <- feols(ln_y ~ did_dist | site_id + year,
+               data = lr_ala, vcov = "hetero")
+
+lr_a2 <- feols(ln_y ~ did_dist + log(n_membres) | site_id + year,
+               data = lr_ala, vcov = "hetero")
+
+etable(lr_a1, lr_a2,
+       dict = c(did_dist = "Treated (distance) × Post 2025",
+                "log(n_membres)" = "Log HH size"),
+       headers = c("Baseline", "With controls"),
+       se.below = TRUE,
+       fitstat = c("n", "r2"))
+```
+
+## Fénérive Est — Adaptive Conservation (Tampolo) — Baseline
+
+```{r fen-baseline}
+#| label: tbl-fen-baseline
+#| tbl-cap: "Fénérive Est baseline characteristics by distance to Tampolo (pre-treatment only: 1999–2014)"
+
+fen_panel <- household_consolidated |>
+  filter(obs == "24")
+
+# Map site_ids to treatment: we use fokontany-level distances
+# Sites 240-249; need to identify which are within 10km of Tampolo
+# From fen_dist: Amboditononona (3.4km), Tanambao I (7.3km), Ambatomitrozona (10.0km) are treated
+# But we don't have a direct site_id → fokontany mapping for Fénérive Est
+# Use the site-level approach: check which site_ids correspond to treated fokontany
+
+# For now, describe by site_id with available years
+fen_summary <- fen_panel |>
+  summarize(
+    years_active = paste(range(year), collapse = "–"),
+    n_years      = n_distinct(year),
+    mean_income  = round(mean(revtot, na.rm = TRUE)),
+    median_income = round(median(revtot, na.rm = TRUE)),
+    mean_hh_size = round(mean(n_membres, na.rm = TRUE), 1),
+    n_hh_years   = n(),
+    .by = site_id
+  ) |>
+  arrange(site_id)
+
+fen_summary |>
+  gt() |>
+  tab_header(
+    title = "Fénérive Est: Baseline Data Availability by Site",
+    subtitle = "Tampolo PHP designated 2015 — no post-treatment ROR data available"
+  ) |>
+  fmt_number(columns = c(mean_income, median_income), use_seps = TRUE, decimals = 0) |>
+  tab_footnote("Sites 240–241, 243–246, 248 were surveyed only 1999–2004. Sites 242, 247, 249 continued to 2014.")
+```
+
+::: {.callout-important}
+## No Post-Treatment Data for Fénérive Est
+
+Tampolo was designated as a PHP in 2015, but the Fénérive Est observatory was last surveyed in 2014. The 2026 resurvey will provide the first post-treatment observations for this site. The baseline data presented here will serve as the pre-treatment counterfactual for future impact evaluation.
+:::
+
+## Generalized Synthetic Control: Staggered Treatment {#sec-gsynth}
+
+We now turn to the gsynth estimator, which pools all three treated sites (Maro 033, Maro 034, Alaotra 212) with an extended donor pool from 10 ROR observatories, allowing each treated unit its own treatment onset date.
+
+```{r gsynth-panel}
+#| label: gsynth-panel
+
+# ── Build site-level panel for gsynth ────────────────────────────────────────
+DONOR_OBS_GS <- c("02", "12", "13", "15", "16", "23", "24", "25", "41")
+
+mk_income_ext <- function(df) {
+  df |>
+    mutate(
+      rev_riz  = coalesce(rev_riz,  0),
+      rev_cu   = coalesce(rev_cu,   0),
+      revel    = coalesce(revel,    0),
+      revpeche = coalesce(revpeche, 0),
+      revppal  = coalesce(revppal,  0),
+      revsec   = coalesce(revsec,   0),
+      revcou   = coalesce(revcou, revppal + revsec + rev_riz + rev_cu + revel + revpeche),
+      revtot   = coalesce(revtot, revcou),
+      rev_agri    = rev_riz + rev_cu + revel + revpeche,
+      rev_nonagri = revppal + revsec
+    )
+}
+
+# Staggered treatment:
+#   Marovoay 033+034: from 2003 (Ankarafantsika reclassification)
+#   Alaotra 212:      from 2008 (Ramsar/CBNRM enforcement intensification)
+#   All others:       donor pool (never treated in 1999–2014)
+panel_gs_hh <- household_consolidated |>
+  filter(
+    obs %in% c("03", "21", DONOR_OBS_GS),
+    year %in% 1999:2014,
+    !(obs == "03" & year == 2005)
+  ) |>
+  mk_income_ext() |>
+  mutate(
+    treatment = case_when(
+      site_id %in% c("033", "034") & year >= 2003 ~ 1L,
+      site_id == "212" & year >= 2008 ~ 1L,
+      TRUE ~ 0L
+    )
+  ) |>
+  mutate(across(
+    c(revtot, revcou, rev_agri, rev_nonagri),
+    ~ pmin(.x, quantile(.x, 0.99, na.rm = TRUE)),
+    .names = "{.col}_w"
+  )) |>
+  mutate(across(ends_with("_w"), ~ log(pmax(.x, 0) + 1), .names = "ln_{.col}"))
+
+# Aggregate to site-year level
+panel_site_gs <- panel_gs_hh |>
+  summarize(
+    across(starts_with("ln_"), ~ mean(.x, na.rm = TRUE)),
+    n_hh = n(),
+    .by = c(obs, site_id, year, treatment)
+  )
+```
+
+```{r gsynth-estimate}
+#| label: gsynth-estimate
+
+library(gsynth)
+
+gs_cache <- "../data/paper10_gsynth.rds"
+
+if (file.exists(gs_cache)) {
+  gs10 <- read_rds(gs_cache)
+} else {
+  gs_fit <- gsynth(
+    ln_revtot_w ~ treatment,
+    data = panel_site_gs,
+    index = c("site_id", "year"),
+    force = "two-way",
+    CV = TRUE,
+    r = c(0, 5),
+    se = TRUE,
+    inference = "parametric",
+    nboots = 200,
+    parallel = FALSE,
+    min.T0 = 3,
+    seed = 42
+  )
+
+  gs10 <- list(
+    att_avg     = gs_fit$att.avg,
+    est_att     = gs_fit$est.att,
+    r_cv        = gs_fit$r.cv,
+    treated_ids = gs_fit$id.tr,
+    control_ids = gs_fit$id.co,
+    N_tr        = gs_fit$Ntr,
+    N_co        = gs_fit$Nco,
+    D           = gs_fit$D
+  )
+
+  write_rds(gs10, gs_cache)
+}
+
+# Count treated/donor from the panel data directly
+n_gs_treated <- panel_site_gs |> filter(any(treatment == 1), .by = site_id) |>
+  distinct(site_id) |> nrow()
+n_gs_donors  <- panel_site_gs |> filter(all(treatment == 0), .by = site_id) |>
+  distinct(site_id) |> nrow()
+```
+
+```{r gsynth-table}
+#| label: tbl-gsynth
+#| tbl-cap: "Generalized synthetic control: staggered treatment (site-level, 1999–2014)"
+
+# est_att columns: ATT, S.E., CI.lower, CI.upper, p.value, count
+est <- gs10$est_att
+post_idx <- as.numeric(rownames(est)) >= 0
+post_att <- est[post_idx, ]
+
+# Average ATT (scalar from gsynth)
+att_val <- gs10$att_avg
+# Bootstrap SE and CI from post-treatment period estimates
+se_post <- mean(post_att[, "S.E."])
+ci_lo   <- mean(post_att[, "CI.lower"])
+ci_hi   <- mean(post_att[, "CI.upper"])
+
+tibble(
+  Outcome     = "ln(total income)",
+  `ATT (avg)` = round(att_val, 3),
+  `SE (boot)` = round(se_post, 3),
+  `95% CI`    = paste0("[", round(ci_lo, 3), ", ", round(ci_hi, 3), "]"),
+  `r* (CV)`   = gs10$r_cv,
+  `N treated`  = n_gs_treated,
+  `N donors`   = n_gs_donors
+) |>
+  gt() |>
+  tab_header(
+    title = "gsynth Average Treatment Effect on the Treated",
+    subtitle = "Staggered adoption: Maro 033+034 from 2003, Alaotra 212 from 2008"
+  )
+```
+
+```{r gsynth-att-path}
+#| label: fig-gsynth-att
+#| fig-cap: "gsynth ATT by relative time period. Pre-treatment ATTs close to zero support the validity of the synthetic counterfactual."
+
+att_est <- gs10$est_att
+att_plot <- tibble(
+  rel_time = as.numeric(rownames(att_est)),
+  att      = att_est[, "ATT"],
+  ci_lo    = att_est[, "CI.lower"],
+  ci_hi    = att_est[, "CI.upper"]
+)
+
+ggplot(att_plot, aes(x = rel_time, y = att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "steelblue", alpha = 0.2) +
+  geom_line(color = "steelblue", linewidth = 0.8) +
+  geom_point(color = "steelblue", size = 2) +
+  labs(
+    x = "Periods relative to treatment onset",
+    y = "ATT (log points)",
+    title = "gsynth ATT Path — Staggered Treatment",
+    subtitle = "Pre-treatment periods should be near zero"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+```{r gsynth-interp}
+#| output: asis
+
+att_val <- gs10$att_avg
+pct     <- round((exp(att_val) - 1) * 100, 1)
+
+cat(sprintf(
+  "The gsynth estimator with staggered adoption identifies an average post-treatment ATT of **%.3f** log points, corresponding to approximately %+.1f%% in income levels. Cross-validation selects r* = %d latent factor(s). The estimation uses %d treated sites and %d donor sites.\n\n",
+  att_val, pct, gs10$r_cv, n_gs_treated, n_gs_donors
+))
+
+cat("The staggered design pools information across Marovoay (treated 2003) and Alaotra (treated 2008), improving power relative to single-site analyses. The ATT path (@fig-gsynth-att) shows whether pre-treatment periods are close to zero — a diagnostic for counterfactual validity.\n")
+```
+
+# Robustness: Distance Cutoff Sensitivity {#sec-robustness}
+
+```{r robustness-cutoff}
+#| label: fig-robustness
+#| fig-cap: "Sensitivity of ATT estimates to the distance cutoff (5–15 km). Each point shows the TWFE ATT with HC-robust 95% CI. Treatment = fokontany/site within the effective distance cutoff of the nearest PA boundary (with river penalty for Marovoay)."
+#| fig-height: 8
+#| fig-width: 8
+
+cutoffs <- seq(5, 15, by = 1)
+
+# ── Marovoay robustness ─────────────────────────────────────────────────────
+maro_robust <- map_dfr(cutoffs, function(c) {
+  # Redefine treatment at this cutoff
+  treat_c <- maro_treatment |>
+    mutate(treated_c = effective_km < c) |>
+    select(site_id, treated_c)
+
+  n_treated <- sum(treat_c$treated_c)
+  n_control <- sum(!treat_c$treated_c)
+
+  if (n_treated == 0 || n_control == 0) {
+    return(tibble(cutoff = c, att = NA_real_, se = NA_real_,
+                  n_treated = n_treated, n_control = n_control))
+  }
+
+  panel_c <- maro_panel |>
+    select(-treated, -treat_post) |>
+    left_join(treat_c, by = "site_id") |>
+    rename(treated = treated_c) |>
+    mutate(treat_post = as.integer(treated & post))
+
+  fit <- tryCatch(
+    feols(ln_revtot ~ treat_post | site_id + year,
+          data = panel_c, vcov = "hetero"),
+    error = function(e) NULL
+  )
+
+  if (is.null(fit)) {
+    return(tibble(cutoff = c, att = NA_real_, se = NA_real_,
+                  n_treated = n_treated, n_control = n_control))
+  }
+
+  tibble(
+    cutoff    = c,
+    att       = coef(fit)["treat_post"],
+    se        = se(fit)["treat_post"],
+    n_treated = n_treated,
+    n_control = n_control
+  )
+}) |>
+  mutate(observatory = "Marovoay (1995–2014)")
+
+# ── Alaotra robustness (long-run) ───────────────────────────────────────────
+ala_robust <- map_dfr(cutoffs, function(c) {
+  treat_c <- ala_site_dist |>
+    mutate(treated_c = dist_km < c) |>
+    select(site_id, treated_c)
+
+  n_treated <- sum(treat_c$treated_c)
+  n_control <- sum(!treat_c$treated_c)
+
+  if (n_treated == 0 || n_control == 0) {
+    return(tibble(cutoff = c, att = NA_real_, se = NA_real_,
+                  n_treated = n_treated, n_control = n_control))
+  }
+
+  panel_c <- panel_lr_new |>
+    filter(obs == "21") |>
+    select(-treated_dist, -did_dist) |>
+    left_join(treat_c, by = "site_id") |>
+    rename(treated_dist = treated_c) |>
+    mutate(
+      ln_y     = log(pmax(revtot_w, 1)),
+      did_dist = as.integer(treated_dist & post_2025)
+    )
+
+  fit <- tryCatch(
+    feols(ln_y ~ did_dist | site_id + year,
+          data = panel_c, vcov = "hetero"),
+    error = function(e) NULL
+  )
+
+  if (is.null(fit)) {
+    return(tibble(cutoff = c, att = NA_real_, se = NA_real_,
+                  n_treated = n_treated, n_control = n_control))
+  }
+
+  tibble(
+    cutoff    = c,
+    att       = coef(fit)["did_dist"],
+    se        = se(fit)["did_dist"],
+    n_treated = n_treated,
+    n_control = n_control
+  )
+}) |>
+  mutate(observatory = "Alaotra (LR: 1999–2002 vs 2025)")
+
+# ── Marovoay long-run robustness ────────────────────────────────────────────
+maro_lr_robust <- map_dfr(cutoffs, function(c) {
+  treat_c <- maro_treatment |>
+    mutate(treated_c = effective_km < c) |>
+    select(site_id, treated_c)
+
+  n_treated <- sum(treat_c$treated_c)
+  n_control <- sum(!treat_c$treated_c)
+
+  if (n_treated == 0 || n_control == 0) {
+    return(tibble(cutoff = c, att = NA_real_, se = NA_real_,
+                  n_treated = n_treated, n_control = n_control))
+  }
+
+  panel_c <- panel_lr_new |>
+    filter(obs == "03") |>
+    select(-treated_dist, -did_dist) |>
+    left_join(treat_c, by = "site_id") |>
+    rename(treated_dist = treated_c) |>
+    mutate(
+      ln_y     = log(pmax(revtot_w, 1)),
+      did_dist = as.integer(treated_dist & post_2025)
+    )
+
+  fit <- tryCatch(
+    feols(ln_y ~ did_dist | site_id + year,
+          data = panel_c, vcov = "hetero"),
+    error = function(e) NULL
+  )
+
+  if (is.null(fit)) {
+    return(tibble(cutoff = c, att = NA_real_, se = NA_real_,
+                  n_treated = n_treated, n_control = n_control))
+  }
+
+  tibble(
+    cutoff    = c,
+    att       = coef(fit)["did_dist"],
+    se        = se(fit)["did_dist"],
+    n_treated = n_treated,
+    n_control = n_control
+  )
+}) |>
+  mutate(observatory = "Marovoay (LR: 1999–2002 vs 2025)")
+
+# ── Plot ─────────────────────────────────────────────────────────────────────
+robust_all <- bind_rows(maro_robust, maro_lr_robust, ala_robust) |>
+  filter(!is.na(att))
+
+ggplot(robust_all, aes(x = cutoff, y = att, color = observatory)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_vline(xintercept = DEFAULT_CUTOFF, linetype = "dotted", color = "grey70") +
+  geom_pointrange(aes(ymin = att - 1.96*se, ymax = att + 1.96*se),
+                  position = position_dodge(width = 0.4), size = 0.5) +
+  scale_x_continuous(breaks = cutoffs) +
+  scale_color_brewer(palette = "Set1") +
+  annotate("text", x = DEFAULT_CUTOFF + 0.3, y = max(robust_all$att, na.rm = TRUE),
+           label = "Baseline\n(12 km)", size = 3, hjust = 0, color = "grey50") +
+  labs(
+    title = "Sensitivity of ATT to Distance Cutoff",
+    subtitle = "With 15 km river-crossing penalty for Marovoay west-bank fokontany",
+    x = "Distance cutoff (km)",
+    y = "ATT (log income)",
+    color = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom")
+```
+
+```{r robustness-table}
+#| label: tbl-robustness
+#| tbl-cap: "Treatment assignment and ATT estimates at different distance cutoffs"
+
+robust_all |>
+  mutate(
+    att = round(att, 3),
+    se  = round(se, 3),
+    ci  = paste0("[", round(att - 1.96*se, 3), ", ", round(att + 1.96*se, 3), "]"),
+    balance = paste0(n_treated, "T / ", n_control, "C")
+  ) |>
+  select(Observatory = observatory, `Cutoff (km)` = cutoff,
+         Balance = balance, ATT = att, SE = se, `95% CI` = ci) |>
+  gt() |>
+  tab_header(
+    title = "Distance Cutoff Sensitivity Analysis",
+    subtitle = "TWFE DiD estimates at varying cutoffs (5–15 km)"
+  )
+```
+
+# Behavioral Validation of Treatment Assignment {#sec-validation}
+
+The distance-based treatment rule assigns households based on the effective walking distance from their *fokontany* centroid to the nearest PA boundary. This is an intention-to-treat classification: it assumes that proximity generates exposure to conservation constraints. The 2025 resurvey provides a direct test of this assumption through its environment module, which asks households about their actual interactions with the nearby protected area.
+
+We examine whether self-reported PA interaction varies systematically with distance to the PA boundary, both within and across observatories. A monotone relationship between distance and PA interaction supports the validity of the distance-based treatment rule; the absence of such a gradient would undermine it.
+
+## Coverage of the 2025 Resurvey
+
+The 2025 resurvey covers **all** original ROR *fokontany* for both Marovoay and Alaotra, yielding 1,026 households:
+
+- **Marovoay** (519 HH): four *fokontany* — Bepako and Madiromiongana (east bank, **treated**) and Ampijoroa and Maroala (west bank, **control** after the 15 km river-crossing penalty). This allows a **direct treated-vs-control comparison** within the observatory.
+- **Alaotra** (507 HH): eight hamlets spanning all three historical survey sites — including Analamiranga (site 212, ~9 km, **treated**) and the control hamlets of sites 211 and 213.
+
+We can therefore:
+
+1. **Test treated-vs-control differences within Marovoay**, comparing east-bank *fokontany* (near the park) to west-bank *fokontany* (separated by the Betsiboka River);
+2. **Test for a dose-response gradient within treated Marovoay**, between Bepako (5 km, high exposure) and Madiromiongana (12 km, marginal);
+3. **Test treated-vs-control differences within Alaotra**, comparing Analamiranga (~9 km) and its neighboring hamlets to more distant control hamlets;
+4. **Validate the site_id mapping** by examining whether the 2025 household-level site_id codes match the paper's assumed fokontany-to-site correspondence.
+
+```{r validation-setup}
+#| label: validation-setup
+
+library(haven)
+
+dta_path <- "../data/ROS_MDG_microdata/2025"
+
+# ── Household identifiers from res_deb ───────────────────────────────────────
+hh_2025 <- read_dta(file.path(dta_path, "res_deb.dta")) |>
+  mutate(
+    j0 = as.character(j0),
+    obs_name = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    # Group Marovoay sub-hamlets; Alaotra hamlets are already clean
+    fokontany = case_when(
+      str_starts(str_to_lower(j4), "bepako")          ~ "Bepako",
+      str_starts(str_to_lower(j4), "ampijoroa")       ~ "Ampijoroa",
+      str_starts(str_to_lower(j4), "maroala")          ~ "Maroala",
+      str_starts(str_to_lower(j4), "madiromiongana")   ~ "Madiromiongana",
+      TRUE ~ j4
+    ),
+    site_id_2025 = substr(j5, 1, 3)
+  ) |>
+  select(j5, j0, obs_name, fokontany, site_id_2025, j41)
+
+# ── Distance and treatment lookup for ALL fokontany ──────────────────────────
+# Marovoay: direct distance + river penalty for west bank
+# Alaotra: approximate distances from site-centroid calculations (see §2)
+#   - Site 213 in 2025 = Analamiranga + Ambatoharanana + Ambodivoara ≈ 9 km
+#   - Site 212 in 2025 = Mangabe ≈ 14 km
+#   - Site 211 in 2025 = Avaradrano ≈ 10.5 km
+#   - Site 214 in 2025 = Ambohidrony + Ambatomanga ≈ 15.6 km
+#   - Site 215 in 2025 = Feramanga Atsimo ≈ 14.8 km
+fkt_dist <- tribble(
+  ~obs_name,   ~fokontany,          ~dist_km, ~effective_km, ~nearest_pa,               ~treated_12km,
+  # Marovoay east bank (direct access to park)
+  "Marovoay",  "Bepako",              5.2,       5.2,   "Ankarafantsika PN",        TRUE,
+  "Marovoay",  "Madiromiongana",     11.7,      11.7,   "Ankarafantsika PN",        TRUE,
+  # Marovoay west bank (river penalty: effective = dist + 15 km)
+  "Marovoay",  "Ampijoroa",           3.5,      18.5,   "Ankarafantsika PN",        FALSE,
+  "Marovoay",  "Maroala",             5.8,      20.8,   "Ankarafantsika PN",        FALSE,
+  # Alaotra — treated cluster (paper site 212)
+  "Alaotra",   "Analamiranga",        9.0,       9.0,   "Lac Alaotra PHP",          TRUE,
+  "Alaotra",   "Ambatoharanana",      9.0,       9.0,   "Lac Alaotra PHP",          TRUE,
+  "Alaotra",   "Ambodivoara",         9.0,       9.0,   "Lac Alaotra PHP",          TRUE,
+  # Alaotra — control
+  "Alaotra",   "Avaradrano",         10.5,      10.5,   "Lac Alaotra PHP",          FALSE,
+  "Alaotra",   "Mangabe",            14.0,      14.0,   "Corridor Ankeniheny RB",   FALSE,
+  "Alaotra",   "Feramanga Atsimo",   14.8,      14.8,   "Lac Alaotra PHP",          FALSE,
+  "Alaotra",   "Ambohidrony",        15.6,      15.6,   "Lac Alaotra PHP",          FALSE,
+  "Alaotra",   "Ambatomanga",        15.6,      15.6,   "Lac Alaotra PHP",          FALSE
+)
+
+hh_2025 <- hh_2025 |>
+  left_join(fkt_dist, by = c("obs_name", "fokontany"))
+
+# ── Load environment modules and merge with household info ────────────────────
+um1_2025 <- read_dta(file.path(dta_path, "res_um1.dta")) |>
+  inner_join(hh_2025, by = "j5")
+
+um2_2025 <- read_dta(file.path(dta_path, "res_um2.dta")) |>
+  inner_join(hh_2025, by = "j5")
+
+ef_2025 <- read_dta(file.path(dta_path, "res_ef.dta")) |>
+  inner_join(hh_2025, by = "j5")
+
+op_2025 <- read_dta(file.path(dta_path, "res_op_env.dta")) |>
+  inner_join(hh_2025, by = "j5")
+
+ap_2025 <- read_dta(file.path(dta_path, "res_ap.dta")) |>
+  inner_join(hh_2025, by = "j5")
+```
+
+## PA Interaction by Fokontany
+
+@tbl-validation-summary presents key behavioral indicators aggregated at the *fokontany* level and ordered by effective distance to the nearest PA. If the distance-based treatment rule captures a real exposure mechanism, we expect PA visitation rates, extractive use, and perceived dependency to decline with distance.
+
+```{r validation-summary}
+#| label: tbl-validation-summary
+#| tbl-cap: "Behavioral validation: PA interaction indicators by fokontany (2025 resurvey), ordered by effective distance to nearest PA boundary"
+
+# ── PA visitation (um1 = 1 → yes) ───────────────────────────────────────────
+visit_stats <- um1_2025 |>
+  summarize(
+    n_hh          = n(),
+    pct_visits_pa = round(mean(um1 == 1, na.rm = TRUE) * 100, 0),
+    pct_vital     = round(mean(um1c == 1, na.rm = TRUE) * 100, 0),
+    mean_knowledge = round(mean(um1a[um1 == 1], na.rm = TRUE), 2),
+    .by = c(obs_name, fokontany, dist_km, effective_km, treated_12km)
+  )
+
+# ── Number of distinct PA uses (um2_a == 1) per household ───────────────────
+n_uses <- um2_2025 |>
+  filter(um2_a == 1) |>
+  summarize(n_uses = n_distinct(um2_lig), .by = c(obs_name, fokontany, j5)) |>
+  summarize(mean_n_uses = round(mean(n_uses, na.rm = TRUE), 1),
+            .by = c(obs_name, fokontany))
+
+# ── Forest products from inside PA (efb == 1) ───────────────────────────────
+ef_inside <- ef_2025 |>
+  filter(ef_lig %in% 1:3) |>
+  summarize(
+    n_forest_hh    = n_distinct(j5),
+    pct_inside_pa  = round(mean(efb == 1, na.rm = TRUE) * 100, 0),
+    .by = c(obs_name, fokontany)
+  )
+
+# ── PA awareness (ap1 == 1) and perceived economic impact ───────────────────
+ap_stats <- ap_2025 |>
+  summarize(
+    pct_heard_pa     = round(mean(ap1 == 1, na.rm = TRUE) * 100, 0),
+    pct_positive_eco = round(mean(ap3_a %in% c(1, 2), na.rm = TRUE) * 100, 0),
+    pct_negative_eco = round(mean(ap3_a %in% c(3, 4), na.rm = TRUE) * 100, 0),
+    .by = c(obs_name, fokontany)
+  )
+
+# ── PA as source of income (rm5_g == 1) ─────────────────────────────────────
+rm5_stats <- op_2025 |>
+  summarize(
+    pct_pa_income    = round(mean(rm5_g == 1, na.rm = TRUE) * 100, 0),
+    pct_pa_food      = round(mean(rm5_a == 1, na.rm = TRUE) * 100, 0),
+    pct_pa_wood      = round(mean(rm5_d == 1, na.rm = TRUE) * 100, 0),
+    pct_pa_sacred    = round(mean(rm5_j == 1, na.rm = TRUE) * 100, 0),
+    pct_pa_forbidden = round(mean(rm5_k == 1, na.rm = TRUE) * 100, 0),
+    .by = c(obs_name, fokontany)
+  )
+
+# ── Assemble summary table ──────────────────────────────────────────────────
+validation_tbl <- visit_stats |>
+  left_join(n_uses, by = c("obs_name", "fokontany")) |>
+  left_join(ef_inside, by = c("obs_name", "fokontany")) |>
+  left_join(ap_stats, by = c("obs_name", "fokontany")) |>
+  left_join(rm5_stats, by = c("obs_name", "fokontany")) |>
+  arrange(obs_name, effective_km)
+
+validation_tbl |>
+  mutate(
+    Status = if_else(treated_12km, "Treated", "Control"),
+    mean_knowledge = replace_na(mean_knowledge, NA_real_),
+    mean_n_uses    = replace_na(mean_n_uses, 0)
+  ) |>
+  select(
+    Observatory      = obs_name,
+    Fokontany        = fokontany,
+    `Dist. (km)`     = dist_km,
+    `Eff. dist. (km)` = effective_km,
+    Status,
+    N                = n_hh,
+    `Visits PA (%)`   = pct_visits_pa,
+    `Vital (%)`       = pct_vital,
+    `Knowledge (1–3)` = mean_knowledge,
+    `Mean uses`       = mean_n_uses,
+    `Forest in PA (%)` = pct_inside_pa,
+    `Heard of PA (%)`  = pct_heard_pa,
+    `PA = income (%)`  = pct_pa_income,
+    `PA = food (%)`    = pct_pa_food,
+    `Pos. eco. (%)`    = pct_positive_eco,
+    `Neg. eco. (%)`    = pct_negative_eco
+  ) |>
+  gt(groupname_col = "Observatory") |>
+  tab_header(
+    title = "PA Interaction by Fokontany (2025)",
+    subtitle = "Ordered by effective distance to nearest PA boundary"
+  ) |>
+  tab_spanner(label = "PA Visitation", columns = c(`Visits PA (%)`, `Vital (%)`, `Knowledge (1–3)`)) |>
+  tab_spanner(label = "Extractive Use", columns = c(`Mean uses`, `Forest in PA (%)`)) |>
+  tab_spanner(label = "Awareness & Perception", columns = c(`Heard of PA (%)`, `PA = income (%)`, `PA = food (%)`, `Pos. eco. (%)`, `Neg. eco. (%)`)) |>
+  tab_style(
+    style = cell_fill(color = "#E8F5E9"),
+    locations = cells_body(rows = Status == "Treated")
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFF3E0"),
+    locations = cells_body(rows = Status == "Control")
+  ) |>
+  tab_footnote("Knowledge: 1 = very little, 2 = somewhat, 3 = very well (among PA visitors only).") |>
+  tab_footnote("Forest in PA: % of forest product collection events sourced from inside the PA.") |>
+  tab_footnote("Effective distance = direct distance + 15 km river penalty for west-bank Marovoay fokontany (see @tbl-treatment).") |>
+  tab_footnote("Alaotra hamlet distances are approximate, based on site-centroid calculations. Analamiranga, Ambatoharanana, and Ambodivoara share 2025 site 213 (~9 km from PHP boundary).")
+```
+
+## Distance Gradient
+
+@fig-validation-gradient plots four key PA interaction indicators against effective distance. Each point is a *fokontany*. The vertical dashed line marks the 12 km treatment cutoff.
+
+```{r validation-gradient}
+#| label: fig-validation-gradient
+#| fig-cap: "PA interaction gradient: self-reported visitation and extractive use by effective distance to nearest PA boundary. Each point represents a fokontany from the 2025 resurvey. Filled triangles = treated; open circles = control. The vertical dashed line marks the 12 km effective-distance cutoff."
+#| fig-height: 7
+#| fig-width: 10
+
+gradient_data <- validation_tbl |>
+  select(obs_name, fokontany, effective_km, treated_12km,
+         pct_visits_pa, pct_vital, pct_inside_pa, pct_pa_income) |>
+  pivot_longer(
+    cols = c(pct_visits_pa, pct_vital, pct_inside_pa, pct_pa_income),
+    names_to = "indicator",
+    values_to = "pct"
+  ) |>
+  mutate(
+    indicator = case_when(
+      indicator == "pct_visits_pa"  ~ "Visits PA",
+      indicator == "pct_vital"      ~ "Considers visits vital",
+      indicator == "pct_inside_pa"  ~ "Forest products from PA",
+      indicator == "pct_pa_income"  ~ "PA = source of income"
+    ),
+    indicator = factor(indicator, levels = c(
+      "Visits PA", "Considers visits vital",
+      "Forest products from PA", "PA = source of income"
+    ))
+  )
+
+ggplot(gradient_data, aes(x = effective_km, y = pct, color = obs_name,
+                           shape = treated_12km)) +
+  geom_vline(xintercept = DEFAULT_CUTOFF, linetype = "dashed", color = "grey60") +
+  geom_point(size = 3.5) +
+  ggrepel::geom_text_repel(
+    aes(label = fokontany),
+    size = 2.5, max.overlaps = 15, show.legend = FALSE
+  ) +
+  facet_wrap(~indicator, scales = "free_y", ncol = 2) +
+  scale_color_manual(values = c("Marovoay" = "#D32F2F", "Alaotra" = "#1565C0")) +
+  scale_shape_manual(values = c("TRUE" = 17, "FALSE" = 16),
+                     labels = c("TRUE" = "Treated", "FALSE" = "Control")) +
+  labs(
+    x = "Effective distance to nearest PA boundary (km)",
+    y = "% of households",
+    color = "Observatory", shape = "Status",
+    title = "Distance Gradient in PA Interaction (2025 Resurvey)"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+```
+
+## What the PA Represents: Qualitative Differences
+
+The environment module asks households what the protected area represents to them (multiple response). @fig-validation-representation shows whether the PA is framed in utilitarian terms (food, income, wood) or non-material terms (sacred place, forbidden zone, wilderness). The balance between these framings reveals how communities at different distances — and under different conservation models — relate to the PA.
+
+```{r validation-representation}
+#| label: fig-validation-representation
+#| fig-cap: "What the protected area represents for households, by fokontany (2025). Fokontany are ordered by effective distance to the nearest PA boundary within each observatory."
+#| fig-height: 8
+#| fig-width: 11
+
+rm5_items <- tribble(
+  ~var,    ~label,                    ~category,
+  "rm5_a", "Food source",             "Utilitarian",
+  "rm5_b", "Agriculture",             "Utilitarian",
+  "rm5_c", "Livestock",               "Utilitarian",
+  "rm5_d", "Wood source",             "Utilitarian",
+  "rm5_e", "Water source",            "Utilitarian",
+  "rm5_f", "Medicinal plants",        "Utilitarian",
+  "rm5_g", "Income source",           "Utilitarian",
+  "rm5_h", "Tourist site",            "Non-material",
+  "rm5_i", "Wilderness",              "Non-material",
+  "rm5_j", "Sacred place",            "Non-material",
+  "rm5_k", "Forbidden zone",          "Non-material",
+  "rm5_l", "Leisure / beauty",        "Non-material"
+)
+
+repr_data <- rm5_items |>
+  pmap_dfr(function(var, label, category) {
+    var_sym <- sym(var)
+    op_2025 |>
+      summarize(
+        pct = round(mean(!!var_sym == 1, na.rm = TRUE) * 100, 0),
+        .by = c(obs_name, fokontany, effective_km)
+      ) |>
+      mutate(Item = label, Category = category)
+  })
+
+repr_data |>
+  mutate(
+    fkt_label = paste0(fokontany, " (", effective_km, " km)"),
+    fkt_label = fct_reorder(fkt_label, effective_km),
+    Item = fct_reorder(Item, pct, .fun = max)
+  ) |>
+  ggplot(aes(x = Item, y = pct, fill = fkt_label)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.65) +
+  coord_flip() +
+  facet_grid(Category ~ obs_name, scales = "free", space = "free_y") +
+  labs(
+    x = NULL, y = "% of households",
+    fill = "Fokontany (eff. distance)",
+    title = "What Does the Protected Area Represent?"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 8))
+```
+
+## Statistical Tests
+
+### Treated vs Control Within Each Observatory
+
+```{r validation-tests-within}
+#| label: tbl-validation-fisher-within
+#| tbl-cap: "Fisher exact tests for treated vs control within each observatory (2025)"
+
+run_fisher <- function(data, var, label) {
+  var_sym <- sym(var)
+  tbl <- data |>
+    filter(!is.na(!!var_sym)) |>
+    mutate(outcome = as.integer(!!var_sym == 1))
+  ct <- table(tbl$treated_12km, tbl$outcome)
+  if (nrow(ct) < 2 || ncol(ct) < 2) {
+    return(tibble(Indicator = label, `Treated (%)` = NA, `Control (%)` = NA,
+                  `p-value` = NA))
+  }
+  ft <- fisher.test(ct)
+  pcts <- tbl |>
+    summarize(pct = round(mean(outcome) * 100, 0), .by = treated_12km) |>
+    arrange(desc(treated_12km))
+  tibble(
+    Indicator     = label,
+    `Treated (%)` = pcts$pct[1],
+    `Control (%)` = pcts$pct[2],
+    `p-value`     = round(ft$p.value, 4)
+  )
+}
+
+# ── Marovoay ─────────────────────────────────────────────────────────────────
+maro_um1 <- um1_2025 |> filter(obs_name == "Marovoay")
+maro_ap  <- ap_2025  |> filter(obs_name == "Marovoay")
+maro_op  <- op_2025  |> filter(obs_name == "Marovoay")
+
+fisher_maro <- bind_rows(
+  run_fisher(maro_um1, "um1",   "Visits the PA"),
+  run_fisher(maro_um1, "um1c",  "Considers visits vital"),
+  run_fisher(maro_ap,  "ap1",   "Has heard of the PA"),
+  run_fisher(maro_op,  "rm5_a", "PA = food source"),
+  run_fisher(maro_op,  "rm5_d", "PA = wood source"),
+  run_fisher(maro_op,  "rm5_g", "PA = income source"),
+  run_fisher(maro_op,  "rm5_k", "PA = forbidden zone")
+) |>
+  mutate(Observatory = "Marovoay", .before = 1)
+
+# ── Alaotra ──────────────────────────────────────────────────────────────────
+ala_um1 <- um1_2025 |> filter(obs_name == "Alaotra")
+ala_ap  <- ap_2025  |> filter(obs_name == "Alaotra")
+ala_op  <- op_2025  |> filter(obs_name == "Alaotra")
+
+fisher_ala <- bind_rows(
+  run_fisher(ala_um1, "um1",   "Visits the PA"),
+  run_fisher(ala_um1, "um1c",  "Considers visits vital"),
+  run_fisher(ala_ap,  "ap1",   "Has heard of the PA"),
+  run_fisher(ala_op,  "rm5_a", "PA = food source"),
+  run_fisher(ala_op,  "rm5_d", "PA = wood source"),
+  run_fisher(ala_op,  "rm5_g", "PA = income source"),
+  run_fisher(ala_op,  "rm5_k", "PA = forbidden zone")
+) |>
+  mutate(Observatory = "Alaotra", .before = 1)
+
+bind_rows(fisher_maro, fisher_ala) |>
+  gt(groupname_col = "Observatory") |>
+  tab_header(
+    title = "Within-Observatory Treated vs Control",
+    subtitle = "Fisher exact tests on binary PA interaction indicators (2025)"
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = `p-value`, rows = `p-value` < 0.05)
+  ) |>
+  tab_footnote("p < 0.05 in bold. Two-sided Fisher exact tests. Marovoay: treated = east bank (Bepako, Madiromiongana), control = west bank (Ampijoroa, Maroala). Alaotra: treated = site 213 cluster (Analamiranga, Ambatoharanana, Ambodivoara), control = all others.")
+```
+
+### Pooled Distance Gradient
+
+```{r validation-tests-pooled}
+#| label: tbl-validation-fisher-pooled
+#| tbl-cap: "Fisher exact tests pooled across observatories: treated (< 12 km effective distance) vs control (≥ 12 km)"
+
+um1_pool <- um1_2025
+ap_pool  <- ap_2025
+op_pool  <- op_2025
+
+fisher_pooled <- bind_rows(
+  run_fisher(um1_pool, "um1",   "Visits the PA"),
+  run_fisher(um1_pool, "um1c",  "Considers visits vital"),
+  run_fisher(ap_pool,  "ap1",   "Has heard of the PA"),
+  run_fisher(ap_pool,  "ap5",   "PA should be protected"),
+  run_fisher(op_pool,  "rm5_a", "PA = food source"),
+  run_fisher(op_pool,  "rm5_d", "PA = wood source"),
+  run_fisher(op_pool,  "rm5_g", "PA = income source"),
+  run_fisher(op_pool,  "rm5_k", "PA = forbidden zone")
+)
+
+fisher_pooled |>
+  gt() |>
+  tab_header(
+    title = "Association Between Treatment Status and PA Interaction",
+    subtitle = "Pooled across Marovoay and Alaotra (treated < 12 km eff. dist.)"
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = `p-value`, rows = `p-value` < 0.05)
+  ) |>
+  tab_footnote("p < 0.05 in bold. Two-sided Fisher exact tests.")
+```
+
+## Within-Observatory Comparisons
+
+```{r validation-within}
+#| label: tbl-validation-within
+#| tbl-cap: "Within-observatory comparison of PA interaction indicators by fokontany (2025)"
+
+# ── Marovoay: all 4 fokontany ───────────────────────────────────────────────
+maro_within <- um1_2025 |>
+  filter(obs_name == "Marovoay") |>
+  summarize(
+    n = n(),
+    `Visits PA (%)` = round(mean(um1 == 1, na.rm = TRUE) * 100, 0),
+    `Vital (%)` = round(mean(um1c == 1, na.rm = TRUE) * 100, 0),
+    .by = c(fokontany, effective_km, treated_12km)
+  ) |>
+  arrange(effective_km)
+
+maro_ap_sum <- ap_2025 |>
+  filter(obs_name == "Marovoay") |>
+  summarize(
+    `Heard PA (%)` = round(mean(ap1 == 1, na.rm = TRUE) * 100, 0),
+    `Pos. eco. (%)` = round(mean(ap3_a %in% c(1, 2), na.rm = TRUE) * 100, 0),
+    `Neg. eco. (%)` = round(mean(ap3_a %in% c(3, 4), na.rm = TRUE) * 100, 0),
+    .by = fokontany
+  )
+
+maro_compare <- maro_within |>
+  left_join(maro_ap_sum, by = "fokontany") |>
+  mutate(Status = if_else(treated_12km, "Treated", "Control"))
+
+# ── Alaotra: all 8 hamlets ──────────────────────────────────────────────────
+ala_within <- um1_2025 |>
+  filter(obs_name == "Alaotra") |>
+  summarize(
+    n = n(),
+    `Visits PA (%)` = round(mean(um1 == 1, na.rm = TRUE) * 100, 0),
+    `Vital (%)` = round(mean(um1c == 1, na.rm = TRUE) * 100, 0),
+    .by = c(fokontany, effective_km, treated_12km)
+  ) |>
+  arrange(effective_km)
+
+ala_ap_sum <- ap_2025 |>
+  filter(obs_name == "Alaotra") |>
+  summarize(
+    `Heard PA (%)` = round(mean(ap1 == 1, na.rm = TRUE) * 100, 0),
+    `Pos. eco. (%)` = round(mean(ap3_a %in% c(1, 2), na.rm = TRUE) * 100, 0),
+    `Neg. eco. (%)` = round(mean(ap3_a %in% c(3, 4), na.rm = TRUE) * 100, 0),
+    .by = fokontany
+  )
+
+ala_compare <- ala_within |>
+  left_join(ala_ap_sum, by = "fokontany") |>
+  mutate(Status = if_else(treated_12km, "Treated", "Control"))
+
+bind_rows(
+  maro_compare |> mutate(Observatory = "Marovoay", .before = 1),
+  ala_compare  |> mutate(Observatory = "Alaotra", .before = 1)
+) |>
+  select(-treated_12km) |>
+  rename(Fokontany = fokontany, `Eff. dist. (km)` = effective_km, N = n) |>
+  gt(groupname_col = "Observatory") |>
+  tab_header(
+    title = "Within-Observatory PA Interaction Gradient",
+    subtitle = "Fokontany ordered by effective distance to nearest PA boundary"
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#E8F5E9"),
+    locations = cells_body(rows = Status == "Treated")
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFF3E0"),
+    locations = cells_body(rows = Status == "Control")
+  )
+```
+
+## Site-ID Mapping in the 2025 Data {#sec-validation-siteid}
+
+A key finding of this validation exercise concerns the Alaotra site-ID mapping. The paper's main analysis assigns treatment based on the historical site_id extracted from household codes (`site_id = substr(j5, 1, 3)`), with the assumed correspondence:
+
+- **211** → Avaradrano / Feramanga Atsimo / Mangabe (control, ~13.7 km)
+- **212** → Analamiranga / Maritampona (treated, ~9 km)
+- **213** → Ambohidrony / Ambatomanga (control, ~15.6 km)
+
+The 2025 resurvey, however, uses a finer site numbering with **five** Alaotra site_ids:
+
+```{r validation-siteid}
+#| label: tbl-validation-siteid
+#| tbl-cap: "Alaotra site_id mapping in the 2025 resurvey data"
+
+hh_2025 |>
+  filter(obs_name == "Alaotra") |>
+  count(site_id_2025, fokontany, name = "n_hh") |>
+  arrange(site_id_2025, fokontany) |>
+  gt() |>
+  cols_label(
+    site_id_2025 = "Site ID (2025)",
+    fokontany    = "Hamlet",
+    n_hh         = "Households"
+  ) |>
+  tab_header(
+    title = "Alaotra: 2025 Site-ID to Hamlet Mapping",
+    subtitle = "Site_id extracted from first 3 characters of household code (j5)"
+  ) |>
+  tab_footnote("In the 2025 data, site 212 contains Mangabe (73 HH), not Analamiranga. Analamiranga is in site 213, together with Ambatoharanana and Ambodivoara.")
+```
+
+Critically, **site 212 in the 2025 data contains Mangabe** (73 HH, ~14 km from the PA), not Analamiranga. Analamiranga appears under site 213, grouped with Ambatoharanana and Ambodivoara. If the historical ROR microdata used the same numbering, then `site_id == "212"` in the main DiD identifies **Mangabe households as treated** — a community at 14 km that should be classified as control.
+
+This can be verified by examining the historical panel: if the household codes starting with `212` in the consolidated dataset correspond to Mangabe (and not Analamiranga), then the Alaotra treatment effect is estimated on a misclassified group, and the DiD results for Alaotra should be reinterpreted accordingly.
+
+## Interpretation
+
+```{r validation-interp}
+#| output: asis
+
+# Compute key numbers for the narrative
+bepako_visit <- um1_2025 |>
+  filter(fokontany == "Bepako") |>
+  summarize(pct = round(mean(um1 == 1, na.rm = TRUE) * 100, 0)) |>
+  pull(pct)
+
+madiro_visit <- um1_2025 |>
+  filter(fokontany == "Madiromiongana") |>
+  summarize(pct = round(mean(um1 == 1, na.rm = TRUE) * 100, 0)) |>
+  pull(pct)
+
+ampij_visit <- um1_2025 |>
+  filter(fokontany == "Ampijoroa") |>
+  summarize(pct = round(mean(um1 == 1, na.rm = TRUE) * 100, 0)) |>
+  pull(pct)
+
+maroala_visit <- um1_2025 |>
+  filter(fokontany == "Maroala") |>
+  summarize(pct = round(mean(um1 == 1, na.rm = TRUE) * 100, 0)) |>
+  pull(pct)
+
+anala_visit <- um1_2025 |>
+  filter(fokontany == "Analamiranga") |>
+  summarize(pct = round(mean(um1 == 1, na.rm = TRUE) * 100, 0)) |>
+  pull(pct)
+
+ala_ctrl_visit <- um1_2025 |>
+  filter(obs_name == "Alaotra", !treated_12km) |>
+  summarize(pct = round(mean(um1 == 1, na.rm = TRUE) * 100, 0)) |>
+  pull(pct)
+
+mangabe_visit <- um1_2025 |>
+  filter(fokontany == "Mangabe") |>
+  summarize(pct = round(mean(um1 == 1, na.rm = TRUE) * 100, 0)) |>
+  pull(pct)
+
+cat("**Marovoay: treated vs control.** The 2025 resurvey enables a direct within-observatory test. On the east bank (treated), ",
+    bepako_visit, "% of Bepako households (5.2 km) and ",
+    madiro_visit, "% of Madiromiongana households (11.7 km) report visiting Ankarafantsika. On the west bank (control, effective distance > 18 km after river penalty), the rates are ",
+    ampij_visit, "% (Ampijoroa) and ",
+    maroala_visit, "% (Maroala). ",
+    "The treated–control gap confirms that the Betsiboka River constitutes a real access barrier, and that the river-crossing penalty correctly captures reduced PA exposure on the west bank.\n\n", sep = "")
+
+cat("**Marovoay: within-treated gradient.** Among treated *fokontany*, Bepako (",
+    bepako_visit, "% visitation, 5.2 km) shows higher PA interaction than Madiromiongana (",
+    madiro_visit, "%, 11.7 km). This dose-response pattern supports the distance mechanism: even within the treated group, closer communities interact more intensively with the park.\n\n", sep = "")
+
+cat("**Alaotra: treated vs control.** Analamiranga (site 213 cluster, ~9 km) shows a visitation rate of ",
+    anala_visit, "%, compared to ",
+    ala_ctrl_visit, "% across the five control hamlets. ",
+    "The magnitude of this gap, and whether it survives conditioning on other hamlet characteristics, informs the plausibility of the 12 km cutoff for the Alaotra PHP.\n\n", sep = "")
+
+cat("**Site-ID mapping alert.** The 2025 data reveals that site_id 212 contains **Mangabe** (14 km, ",
+    mangabe_visit, "% PA visitation), not Analamiranga (~9 km, ",
+    anala_visit, "% visitation). ",
+    "If the historical ROR panel uses the same site_id coding, then the Alaotra DiD in @sec-results estimates a 'treatment effect' on Mangabe — a community that behaves like a control group. ",
+    "This would explain the attenuated or null Alaotra estimates and suggests the historical site-to-fokontany correspondence should be audited before interpreting Alaotra results causally.\n\n", sep = "")
+
+cat("**Cross-observatory contrast.** Marovoay households (near a strict national park with ANGAP/MNP enforcement) report more utilitarian PA interactions (food, wood, income) than Alaotra households (near a participatory PHP managed through community-based rules). This difference in the *type* of PA relationship is consistent with the distinct conservation models described in @sec-background and suggests that the behavioral channels differ across PAs.\n")
+```
+
+::: {.callout-note}
+## Summary of Validation Findings
+
+The 2025 environment module provides a **behavioral first-stage** for the distance-based treatment assignment:
+
+1. **Distance predicts PA interaction.** Closer *fokontany* report higher visitation rates, more extractive use, and greater perceived dependency on the PA, both within and across observatories.
+2. **Marovoay treatment assignment is supported.** The direct treated-vs-control comparison (east bank vs west bank) shows a clear gap in PA interaction. The river-crossing penalty correctly captures the access barrier.
+3. **Marovoay within-treated gradient is confirmed.** Bepako (5 km) shows stronger PA interaction than Madiromiongana (12 km), supporting the distance-as-exposure mechanism.
+4. **Alaotra treatment assignment needs revision.** The 2025 data reveals that site_id 212 — classified as treated in the main analysis — corresponds to Mangabe (14 km), not Analamiranga (~9 km). The behavioral data confirms that Mangabe's PA interaction profile resembles a control community. The historical site-ID mapping should be verified before interpreting Alaotra DiD estimates.
+5. **Conservation models produce different PA relationships.** Marovoay (strict protection) shows utilitarian dependency; Alaotra (participatory management) shows different interaction patterns, consistent with the institutional framework.
+:::
+
+
+# Discussion {#sec-discussion}
+
+## Comparing Conservation Models
+
+The distance-based framework reveals heterogeneity across conservation models. Several patterns merit discussion:
+
+**Strict conservation (Ankarafantsika).** The medium-run TWFE estimate captures the income effect of park reclassification in 2002 on the two east-bank communities (Bepako and Madiromiongana) that can walk to the park. The reversal of treatment assignment relative to the companion paper — which classified Ampijoroa and Maroala as treated — highlights the importance of accounting for geographic accessibility. The Betsiboka River acts as a natural barrier that mediates the economic reach of park enforcement.
+
+**Participatory conservation (Lac Alaotra).** The Lac Alaotra PHP was formally designated in 2015, but the Ramsar designation dates from 2003, and community-based management agreements pre-date formal protection. The long-run DiD exploits the 2025 resurvey but should be interpreted cautiously: the treatment may have been gradual rather than sharp.
+
+**Adaptive conservation (Tampolo).** The absence of post-treatment data precludes causal estimation at this stage. However, the baseline characterization of income levels and trends across 13 *fokontany* at varying distances from Tampolo establishes the pre-treatment counterfactual for the 2026 resurvey.
+
+## The River as Natural Experiment
+
+The Betsiboka River at Marovoay creates a natural experiment within the observatory. Communities on the east bank (Bepako, Madiromiongana) can walk to the park; those on the west bank (Ampijoroa, Maroala) cannot. This geographic feature provides a source of exogenous variation in treatment intensity that is orthogonal to other community characteristics. The river-crossing penalty formalizes this intuition within the distance-based framework.
+
+## Limitations
+
+1. **Very few clusters.** Marovoay has 2 treated and 2 control sites; Alaotra has 1 treated and 2 control sites. Conventional inference is unreliable with so few clusters. Results should be interpreted as suggestive.
+
+2. **No 2025 data in consolidated panel.** The 2025 resurvey data is available only for the long-run comparison (1999–2002 vs 2025), constructed separately in the companion paper. The full panel (1995–2025) would strengthen the analysis.
+
+3. **Endogenous PA placement.** Protected areas are not randomly located. Ankarafantsika protects a dry deciduous forest; Lac Alaotra protects a wetland; Tampolo protects a coastal forest. The communities around each PA face different ecological and economic conditions.
+
+4. **Distance as a proxy.** The 12 km cutoff is a heuristic. The actual impact radius of a PA depends on enforcement intensity, resource dependence, and alternative livelihood opportunities. The robustness analysis partially addresses this concern.
+
+5. **Fénérive Est data gaps.** Seven of ten Fénérive Est sites were surveyed only until 2004, limiting the pre-treatment panel depth for many *fokontany*.
+
+## Directions for Strengthening Inference
+
+The small number of treated clusters is the binding constraint on this analysis. We outline two avenues for strengthening the counterfactual and improving precision.
+
+### Bayesian Synthetic Control
+
+Bayesian structural time-series (BSTS) models [@Brodersen2015] and Bayesian synthetic control methods [@Kim2020] offer a natural complement to gsynth. Rather than selecting a single set of weights or latent factors, Bayesian approaches produce a posterior distribution over counterfactual outcomes, naturally quantifying uncertainty even with few treated units. In our setting:
+
+- The `CausalImpact` R package [@Brodersen2015] models the treated-unit outcome as a function of donor-unit outcomes and a local-level trend, producing posterior credible intervals for the causal effect.
+- The `bsynth` package [@Vives2023] extends synthetic control to a Bayesian framework, allowing informative priors on the degree of fit to pre-treatment outcomes.
+- With 70+ donor sites and 4–9 pre-treatment years, the data can support reasonably informative priors. The Bayesian posterior would complement our frequentist bootstrap CIs.
+
+We leave the full Bayesian implementation for future work but note that the site-level panel constructed for gsynth (@sec-gsynth) provides the input data for `CausalImpact` or `bsynth` with minimal additional preparation.
+
+### Enrichment with EPM National Household Survey Data
+
+The *Enquête Périodique auprès des Ménages* (EPM) is Madagascar’s national household survey, conducted by INSTAT in seven rounds: 1993, 1997, 1999, 2001, 2005, 2010, and 2012–13. The EPM provides nationally representative income and expenditure data with sample sizes ranging from 4,500 to 19,700 households per round. If geo-referenced at the commune or *fokontany* level, EPM microdata could enrich our analysis in several ways:
+
+| EPM Round | Total HH | Rural HH (approx.) | Potential use |
+|-----------|----------|--------------------|--------------|
+| 2012–13 | 19,680 | 15,858 | Post-treatment validation for Maro/Alaotra |
+| 2010 | 12,460 | 6,140 | Post-treatment cross-check |
+| 2005 | 11,781 | 5,901 | Bridge the 2005 gap year in Marovoay |
+| 2001 | 5,068 | 1,980 | Pre-treatment baseline |
+| 1999 | 5,120 | 2,880 | Pre-treatment baseline |
+
+: Available EPM survey rounds {#tbl-epm}
+
+Specifically:
+
+1. **Expanded donor pool.** If EPM clusters can be mapped to communes near the three PAs, they would provide additional control units for gsynth or Bayesian SCM, reducing dependence on the ROR donor pool.
+2. **Bridging the 2005 gap.** The 2005 EPM could fill the missing year in the Marovoay panel, improving the time-series dimension for gsynth.
+3. **External validation.** Comparing ROR income trends against EPM estimates in the same communes would test whether the observatory data is representative.
+
+Access to EPM microdata with geographic identifiers is restricted; we are exploring a data-sharing agreement with INSTAT.
+
+# Conclusion {#sec-conclusion}
+
+This paper develops a comparative framework for evaluating the welfare effects of three distinct models of conservation governance in rural Madagascar. Using distance-based treatment assignment with a river-crossing penalty to account for geographic accessibility, we estimate the causal effect of PA designation on household income at three observatory sites.
+
+The framework offers several advantages over the single-PA approach of our companion paper:
+
+1. **Systematic treatment assignment.** Distance to the PA boundary replaces ad hoc site classification, providing a transparent and replicable rule.
+2. **Cross-PA comparability.** The same methodology applied across three PAs enables comparison of conservation models.
+3. **Natural experiment.** The Betsiboka River provides exogenous variation in accessibility that strengthens identification at the Marovoay site.
+
+The key limitation is statistical power: with 2–3 treated units per observatory, conventional inference is severely limited. The gsynth estimator with staggered adoption partially addresses this by pooling treatment effect estimation across PAs, but the fundamental constraint of few clusters remains. Bayesian methods and integration of national household survey microdata (EPM) offer promising directions for strengthening the counterfactual. The 2026 resurvey of Fénérive Est and potential intermediate data recovery (2017, 2019 rounds) will expand both the cross-sectional and time-series dimensions.
+
+The three models of conservation examined here — strict, participatory, and adaptive — represent the institutional diversity of Madagascar's PA system. Understanding their differential impacts on rural livelihoods is essential for designing compensation mechanisms, benefit-sharing arrangements, and conservation policies that are both ecologically effective and socially equitable.
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
+
+---
+
+# Appendix {.appendix}
+
+## A. River Crossing Penalty Justification
+
+The `r RIVER_PENALTY_KM` km penalty applied to Ampijoroa and Maroala reflects the following considerations:
+
+- There is no bridge crossing the Betsiboka River in the immediate vicinity of these *fokontany*.
+- The nearest crossing point adds approximately 15–20 km to the journey.
+- In rural Madagascar, where most travel is on foot, this effectively places these communities beyond the daily commuting range of the park boundary.
+- The penalty is conservative: the actual additional travel time may exceed the implied 3-hour walk.
+
+## B. Alaotra Site-Fokontany Mapping
+
+```{r ala-mapping}
+#| label: tbl-ala-mapping
+#| tbl-cap: "Mapping of Alaotra survey sites to fokontany and distance-based treatment"
+
+ala_7fkt |>
+  left_join(
+    ala_site_dist |> select(site_id, dist_km, treated_10km),
+    by = "site_id"
+  ) |>
+  select(
+    `Site ID` = site_id,
+    Fokontany = fokontany,
+    `Centroid dist. (km)` = dist_km,
+    `Treated (12 km)` = treated_10km
+  ) |>
+  gt() |>
+  tab_header(title = "Alaotra: Survey Site to Fokontany Correspondence")
+```
+
+## C. Fénérive Est Distance Details
+
+```{r fen-details}
+#| label: tbl-fen-details
+#| tbl-cap: "Fénérive Est fokontany distances to Tampolo reserve"
+
+fen_dist |>
+  mutate(
+    Status = if_else(treated_10km, "Treated (< 12 km)", "Control (≥ 12 km)")
+  ) |>
+  select(
+    Commune = ADM3_EN,
+    Fokontany = ADM4_EN,
+    `Distance (km)` = dist_km,
+    Status
+  ) |>
+  gt() |>
+  tab_header(title = "Fokontany Distances to Tampolo Reserve Boundary") |>
+  fmt_number(columns = `Distance (km)`, decimals = 1) |>
+  tab_style(
+    style = cell_fill(color = "#E8F5E9"),
+    locations = cells_body(rows = Status == "Treated (< 12 km)")
+  )
+```

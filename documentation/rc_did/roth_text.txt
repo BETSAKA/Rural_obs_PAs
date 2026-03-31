@@ -1,0 +1,2720 @@
+Roth file: Roth et al_2023_What’s trending in difference-in-differences.pdf
+
+
+=== ROTH ET AL. 2023 ===
+Total pages: 58
+
+--- PAGE 1 ---
+3202
+naJ
+9
+]ME.noce[
+3v49110.1022:viXra
+What’s Trending in Difference-in-Differences?
+A Synthesis of the Recent Econometrics Literature∗
+Jonathan Roth† Pedro H. C. Sant’Anna‡ Alyssa Bilinski§ John Poe¶
+January 11, 2023
+Abstract
+Thispapersynthesizesrecentadvancesintheeconometricsofdifference-in-differences
+(DiD) and provides concrete recommendations for practitioners. We begin by articu-
+lating a simple set of “canonical” assumptions under which the econometrics of DiD are
+well-understood. We then argue that recent advances in DiD methods can be broadly
+classified as relaxing some components of the canonical DiD setup, with a focus on piq
+multiple periods and variation in treatment timing, piiq potential violations of parallel
+trends, or piiiq alternative frameworks for inference. Our discussion highlights the dif-
+ferentwaysthattheDiDliteraturehasadvancedbeyondthecanonicalmodel,andhelps
+to clarify when each of the papers will be relevant for empirical work. We conclude by
+discussing some promising areas for future research.
+1 Introduction
+Differences-in-differences (DiD) is one of the most popular methods in the social sciences for
+estimating causal effects in non-experimental settings. The last few years have seen a dizzy-
+ing array of new methodological papers on DiD and related designs, making it challenging
+for practitioners to keep up with rapidly evolving best practices. Furthermore, the recent
+literature has addressed a variety of different components of DiD analyses, which has made
+it difficult even for experts in the field to understand how all of the new developments fit
+∗WethankBrantCallaway,BrunoFerman,AndreasHagemann,KevinLang,DavidMcKenzie,andDavid
+Schönholzer for helpful comments, and Scott Barkowskifor suggesting the title.
+†Brown University. jonathanroth@brown.edu
+‡Microsoft and Vanderbilt University. pedro.h.santanna@vanderbilt.edu
+§Brown University. alyssa_bilinski@brown.edu
+¶University of Michigan. john@johndavidpoe.com
+1
+
+--- PAGE 2 ---
+together. In this paper, we attempt to synthesize some of the recent advances on DiD and
+related designs and to provide concrete recommendations for practitioners.
+Our starting point in Section 2 is the “canonical” difference-in-differences model, where
+two timeperiodsareavailable, thereisatreatedpopulationofunits thatreceives atreatment
+of interest beginning inthesecond period, anda comparison populationthatdoes not receive
+the treatment in either period. The key identifying assumption is that the average outcome
+among the treated and comparison populations would have followed “parallel trends” in
+the absence of treatment. We also assume that the treatment has no causal effect before
+its implementation (no anticipation). Together, these assumptions allow us to identify the
+average treatment effect on the treated (ATT). If we observe a large number of independent
+clustersfromthetreatedandcomparisonpopulations, theATTcanbeconsistently estimated
+using a two-way fixed effects (TWFE) regression specification, and clustered standard errors
+provide asymptotically valid inference.
+Inpractice, DiDapplicationstypicallydonotmeetalloftherequirements ofthecanonical
+DiD setup. The recent wave of DiD papers have each typically focused on relaxing one or
+two of the key assumptions in the canonical framework while preserving the others. We
+taxonomize the recent DiD literature by characterizing which of the key assumptions in
+the canonical model are relaxed. We focus on recent advances that i allow for multiple
+p q
+periods and variation in treatment timing (Section 3); ii consider potential violations of
+p q
+parallel trends (Section 4); or iii depart from the assumption of observing a sample of
+p q
+many independent clusters sampled from a super-population (Section 5). Section 6 briefly
+summarizes some other areas of innovation. In the remainder of the Introduction, we briefly
+describe each of these strands of literature.
+Multiple periods and variation in treatment timing: One strand of the DiD
+literature has focused on settings where there are more than two time periods and units are
+treated at different point in times. Multiple authors have noted that the coefficients from
+standard TWFE models may not represent a straightforward weighted average of unit-level
+treatment effects when treatment effects are allowed to be heterogeneous. In short, TWFE
+regressions make both “clean” comparisons between treated and not-yet-treated units as well
+as “forbidden” comparisons between units who are both already-treated. When treatment
+effects are heterogeneous, these “forbidden” comparisons potentially lead to severe drawbacks
+such as TWFE coefficients having the opposite sign of all individual-level treatment effects
+due to “negative weighting” problems. Even if all of the weights are positive, the weights
+“chosen” by TWFE regressions may not correspond with the most policy-relevant parameter.
+We discuss a variety of straightforward-to-implement strategies that have been proposed
+to bypass the limitations associated with TWFE regressions and estimate causal parameters
+2
+
+--- PAGE 3 ---
+of interest under rich sources of treatment effect heterogeneity. These procedures rely on
+generalizations of the parallel trends assumption to the multi-period setting. A common
+theme is that these new estimators isolate “clean” comparisons between treated and not-yet-
+treated groups, and then aggregate them using user-specified weights to estimate a target
+parameter of economic interest. We discuss differences between some of the recent proposals
+— such as the exact comparison group used and the generalization of the parallel trends
+assumption needed for validity — and provide concrete recommendations for practitioners.
+We also briefly discuss extensions to more complicated settings such as when treatments
+turn on-and-off over time or are non-binary.
+Non-parallel trends: A second strand of the DiD literature focuses on the possibility
+that the parallel trends assumption may be violated. One set of papers considers the set-
+ting where parallel trends holds only conditional on observed covariates, and proposes new
+estimators that are valid under a conditional parallel trends assumption. However, even if
+one conditions on observable covariates, there are often concerns that the necessary parallel
+trends assumption may be violated due to time-varying unobserved confounding factors. It
+is therefore common practice to test for pre-treatment differences in trends (“pre-trends”)
+as a test of the plausibility of the (conditional) parallel trends assumption. While intuitive,
+researchers have identified at least three issues with this pre-testing approach. First, the
+absence of a significant pre-trend does not necessarily imply that parallel trends holds; in
+fact, these tests often have low power. Second, conditioning the analysis on the result of
+a pre-test can introduce additional statistical distortions from a selection effect known as
+pre-test bias. Third, if a significant difference in trends is detected, we may still wish to
+learn something about the treatment effect of interest.
+Several recent papers have therefore suggested alternative methods for settings where
+there is concern that parallel trends may be violated. One class of solutions involves modifi-
+cations to the common practice of pre-trends testing to ensure that the power of pre-tests is
+high against relevant violations of parallel trends. A second class of solutions has proposed
+methods that remain valid under certain types of violations of parallel trends, such as when
+the post-treatment violation of parallel trends is assumed to be no larger than the maximal
+pre-treatment violation of parallel trends, or when there are non-treated groups that are
+known to be more/less affected by the confounds as the treated group. These approaches
+allow for a variety of robustness and sensitivity analyses which are useful in a wide range of
+empirical settings, and we discuss them in detail.
+Alternative sampling assumptions: A third strand of the DiD literature discusses
+alternatives to the classical “sampling-based” approach to inference with a large number of
+clusters. One topic of interest is inference procedures in settings with a small number of
+3
+
+--- PAGE 4 ---
+treated clusters. Standard cluster-robust methods assume that there is a large number of
+both treated and untreated clusters, and thus can perform poorly in this case. A variety of
+alternatives with better properties have been proposed for this case, including permutation
+and bootstrap procedures. These methods typically either model the dependence of errors
+across clusters, or alternatively place restrictions on the treatment assignment mechanism.
+We briefly highlight these approaches and discuss the different assumptions needed for them
+to perform well.
+Another direction that has been explored relates to conducting “design-based” inference
+for DiD. Canonical approaches to inference suppose that we have access to a sample of
+independently-drawn clusters from an infinite super-population. However, it is not always
+clear how to define the super-population, or to determine the appropriate level of clustering.
+Design-based approaches address these issues by instead treating the source of randomness
+in the data as coming from the stochastic assignment of treatment, rather than sampling
+from an infinite super-population. Although design-based approaches have typically been
+employed inthe case of randomized experiments, recent work hasextended thisto the case of
+“quasi-experimental” strategies like DiD. Luckily, the message of this literature is positive, in
+the sense that methods that are valid from the canonical sampling-based view are typically
+also valid from the design-based view as well. The design-based approach also yields the
+clear recommendation that it is appropriate to cluster standard errors at the level at which
+treatment is independently assigned.
+Other topics: We conclude by briefly touching on some other areas of focus within the
+DiD literature, as well ashighlighting some areasfor futureresearch. Examples include using
+DiD to estimate distributional treatment effects; settings with quasi-random treatment tim-
+ing; spillover effects; estimating heterogeneous treatment effects; and connections between
+DiD and other panel data methods.
+Overall, the growing DiD econometrics literature emphasizes the importance of clarity
+and precision in a researcher’s discussion of his or her assumptions, comparison group and
+time frame selection, causal estimands, estimation methods, and robustness checks. When
+used in combination with context-specific information, these new methods can both improve
+the validity and interpretability of DiD results and more clearly delineate their limitations.
+Given thevast literature onDiD, our goalis not to be comprehensive, but rather to give a
+cleanpresentationofsomeofthemostimportantdirectionstheliteraturehasgone. Wherever
+possible, we try to give clear practical guidance for applied researchers, concluding each
+section with practical recommendations for applied researchers. For reference, we include
+4
+
+--- PAGE 5 ---
+Table 1, which contains a checklist for a practitioner implementing a DiD analysis, and Table
+2, which lists R and Stata packages for implementing many of the methods described in this
+paper.
+2 The Basic Model
+This section describes a simple two-period setting in which the econometrics of DiD are well-
+understood. Although this “canonical” setting is arguably too simple for most applications,
+clearlyarticulatingtheassumptions inthissetupserves asausefulbaselineforunderstanding
+recent innovations in the DiD literature.
+2.1 Treatment Assignment and Timing
+Consider a model in which there are two time periods, t 1,2. Units indexed by i are
+“
+drawn from one of two populations. Units from the treated population D 1 receive a
+i
+p “ q
+treatment of interest between period t 1 and t 2, whereas units from the untreated
+“ “
+(a.k.a. comparison or control) population D 0 remain untreated in both time periods.
+i
+p “ q
+The econometrician observes an outcome Y and treatment status D for a panel of units,
+i,t i
+i 1,...,N and t 1,2. For example Y could be the fraction of people with insurance
+i,t
+“ “
+coverage in state i in year t, while D could be an indicator for whether the state expanded
+i
+Medicaid in year 2. Although DiD methods also accommodate the case where only repeated
+cross-sectional data is available, or where the panel is unbalanced, we focus on the simpler
+setup with balanced panel data for ease of exposition.
+2.2 Potential Outcomes and Target Parameter
+We adopt a potential outcomes framework for the observed outcome, as in, e.g., Rubin
+(1974) and Robins (1986). Let Y 0,0 denote unit i’s potential outcome in period t if i
+i,t
+p q
+remains untreated in both periods. Likewise, let Y 0,1 denotes unit i’s potential outcome
+i,t
+p q
+in period t if i is untreated in the first period but exposed to treatment by the second period.
+To simplify notation we will write Y 0 Y 0,0 and Y 1 Y 0,1 , but it will be
+i,t i,t i,t i,t
+p q “ p q p q “ p q
+useful for our later discussion to make clear that these potential outcomes in fact correspond
+with a path of treatments. As is usually the case, due to the fundamental problem of causal
+inference (Holland, 1986), we only observe one of the two potential outcomes for each unit
+i. That is, the observed outcome is given by Y D Y 1 1 D Y 0 . This potential
+i,t i i,t i i,t
+“ p q`p ´ q p q
+outcomesframeworkimplicitlyencodesthestableunittreatmentvalueassumption(SUTVA)
+5
+
+--- PAGE 6 ---
+that unit i’s outcomes do not depend on the treatment status of unit j i, which rules out
+‰
+spillover and general equilibrium effects.
+The causal estimand of primary interest in the canonical DiD setup is the average treat-
+ment effect on the treated (ATT) in period t 2,
+“
+τ E Y 1 Y 0 D 1 .
+2 i,2 i,2 i
+“ r p q´ p q| “ s
+It simply measures the average causal effect on treated units in the period that they are
+treated (t 2). In our motivating example, τ 2 would be the average effect of Medicaid
+“
+expansion on insurance coverage in period 2 for the states who expanded Medicaid.
+2.3 The Parallel Trends Assumption and Identification
+The challenge in identifying τ 2 is that the untreated potential outcomes, Y i,2 0 , are never
+p q
+observed for the treated group (D 1). Difference-in-differences methods overcome this
+i
+“
+identification challenge via assumptions that allow us to impute the mean counterfactual
+untreated outcomes for the treated group by using (a) the change in outcomes for the un-
+treated group and (b) the baseline outcomes for the treated group. The key assumption for
+identifying τ 2 is the parallel trends assumption, which intuitively states that the average out-
+come for the treated and untreated populations would have evolved in parallel if treatment
+had not occurred.
+Assumption 1 (Parallel Trends).
+E Y i,2 0 Y i,1 0 D i 1 E Y i,2 0 Y i,1 0 D i 0 . (1)
+r p q´ p q| “ s “ r p q´ p q| “ s
+In our motivating example, the parallel trends assumption says that the average change in
+insurance coverage for expansion and non-expansion states would have been the same in the
+absence of the Medicaid expansion.
+The parallel trends assumption can be rationalized by imposing a particular generative
+model for the untreated potential outcomes. If Y 0 α φ ǫ , where ǫ is mean-
+i,t i t i,t i,t
+p q “ ` `
+independent of D , then Assumption 1 holds. Note that this model allows treatment to be
+i
+assigned non-randomly based on characteristics that affect the level of the outcome α , but
+i
+p q
+requires the treatment assignment to be mean-independent of variables that affect the trend
+in the outcome (ǫ ). In other words, parallel trends allows for the presence of selection bias,
+i,t
+but the bias from selecting into treatment must be the same in period t 1 as it is in period
+“
+t 2.
+“
+6
+
+--- PAGE 7 ---
+Another important and often hidden assumption required for identification of τ 2 is the
+no-anticipation assumption, which states that the treatment has no causal effect prior to its
+implementation. This is important for identification of τ 2, since otherwise the changes in the
+outcome for the treated group between period 1 and 2 could reflect not just the causal effect
+in period t 2 but also the anticipatory effect in period t 1 (Abbring and van den Berg,
+“ “
+2003; Malani and Reif, 2015).
+Assumption 2 (No anticipatory effects). Y i,1 0 Y i,1 1 for all i with D i 1.
+p q “ p q “
+In our ongoing example, this implies that in years prior to Medicaid expansion, insurance
+coverage in states that expanded Medicaid was not affected by the upcoming Medicaid
+expansion.
+Under the parallel trends and no-anticipation assumptions, the ATT in period 2 (τ 2) is
+identified. To see why this is the case, observe that by re-arranging terms in the parallel
+trends assumption (see equation (1)), we obtain
+E Y 0 D 1 E Y 0 D 1 E Y 0 Y 0 D 0 .
+i,2 i i,1 i i,2 i,1 i
+r p q| “ s “ r p q| “ s` r p q´ p q| “ s
+Further, by the no anticipation assumption, E Y i,1 0 D i 1 E Y i,1 1 D i 1 .1 It
+r p q| “ s “ r p q| “ s
+follows that
+E Y 0 D 1 E Y 1 D 1 E Y 0 Y 0 D 0
+i,2 i i,1 i i,2 i,1 i
+r p q| “ s “ r p q| “ s` r p q´ p q| “ s
+E Y D 1 E Y Y D 0 ,
+i,1 i i,2 i,1 i
+“ r | “ s` r ´ | “ s
+where the second equality uses the fact that we observe Y 1 for treated units and Y 0 for
+p q p q
+untreated units. The previous display shows that we can infer the counterfactual average
+outcome for the treated group by taking its observed pre-treatment mean and adding the
+changeinmeanfortheuntreatedgroup. Sinceweobserve Y 1 forthetreatedgroupdirectly,
+p q
+it follows that τ 2 E Y i,2 1 Y i,2 0 D i 1 is identified as
+“ r p q´ p q| “ s
+τ 2 E Y i,2 Y i,1 D i 1 E Y i,2 Y i,1 D i 0 , (2)
+“ r ´ | “ s´ r ´ | “ s
+ChangeforDi“1 ChangeforDi“0
+loooooooooooomoooooooooooon loooooooooooomoooooooooooon
+i.e. the “difference-in-differences” of population means!
+1For the identification argument, it suffices to impose only that ErY i,1p0q|D
+i
+“1s “ ErY i,1p1q|D
+i
+“1s
+directly, i.e. that there is no anticipation on average,which is slightly weaker than Assumption 2. We focus
+on Assumption 2 for ease of exposition (especially when we extend it to the staggeredcase below).
+7
+
+--- PAGE 8 ---
+2.4 Estimation and Inference
+Equation (2) gives an expression for τ 2 in terms of a “difference-in-differences” of population
+expectations. Therefore, a natural way to estimate τ 2 is to replace expectations with their
+sample analogs,
+τ Y Y Y Y ,
+2 t“2,D“1 t“1,D“1 t“2,D“0 t“1,D“0
+“ p ´ q´p ´ q
+where Y t“t1,D“d is thpe sample mean of Y for treatment group d in period t1.
+Although these sample means could be computed “by hand”, an analogous way of com-
+puting τ 2, which facilitates the computation of standard errors, is to use the two-way fixed
+effects (TWFE) regression specification
+p
+Y α φ 1 t 2 D β ǫ , (3)
+i,t i t i i,t
+“ ` `p r “ s¨ q `
+which regresses the outcome Y on an individual fixed effect, a time fixed effect, and an
+i,t
+interaction of a post-treatment indicator with treatment status.2 In this canonical DiD
+setup, it is straightforward to show that the ordinary least squares (OLS) coefficient β is
+equivalent to τ 2.
+p
+OLS estimates of β from (3) provide consistent estimates and asymptotically valid con-
+fidence interva p ls of τ 2 when Assumptions 1 and 2 are combined with the assumption of
+p
+independent sampling.
+Assumption 3. Let W i Y i,2 ,Y i,1 ,D i 1 denote the vector of outcomes and treatment status
+“ p q
+for unit i. We observe a sample of N i.i.d. draws W F for some distribution F satisfying
+i
+„
+parallel trends.
+Under Assumptions 1-3 and mild regularity conditions,
+?n β τ N 0, σ 2 ,
+2 d
+p ´ q Ñ
+in the asymptotic as N and T is fixed. Th ` e var ˘ iance σ2 is consistently estimable
+p
+Ñ 8
+using standard clustering methods that allow for arbitrary serial correlation at the unit level
+(Liang and Zeger,1986;Arellano,1987;Wooldridge,2003;Bertrand, Duflo and Mullainathan,
+2 With a balanced panel, the OLS coefficient on β is also numerically identical to the coefficient from a
+regression that replaces the fixes effects with a constant, a treatment indicator, a second-period indicator,
+and the treatment ˆ second-period interaction,
+Y “α`D θ`1rt“2sζ`p1rt“2s¨D qβ`ε .
+i,t i i i,t
+The latter regressiongeneralizes to repeated cross-sectionaldata.
+8
+
+--- PAGE 9 ---
+2004). The same logic easily extends to cases where the observations are individual units
+who are members of independently-sampled clusters (e.g. states), and the standard errors
+are clustered at the appropriate level, provided that the number of treated and untreated
+clusters both grow large. Constructing consistent point estimates and asymptotically valid
+confidence intervals is thus straightforward via OLS.
+Having introduced all of the components of the “canonical” DiD model, we now discuss
+the ways that different strands of the recent DiD have relaxed each of these components.
+3 Relaxing assumptions on treatment assignment and
+timing
+Several recent papers have focused primarily on relaxing the baseline assumptions about
+treatment assignment and timing discussed in Section 2. A topic of considerable attention
+has been settings where there are more than two periods, and units adopt a treatment
+of interest at different points in time. For example, in practice different states expanded
+Medicaid in different years. We provide an overview of some of the key developments in the
+literature, and refer the reader to the review by de Chaisemartin and D’Haultfœuille (2022)
+for additional details.
+3.1 Generalized model with staggered treatment adoption
+Several recent papers have focused on relaxing the timing assumptions discussed in Section
+2, while preserving the remaining structure of the stylized model (i.e., parallel trends, no
+anticipation, and independent sampling). Since most of the recent literature considers a
+setup in which treatment is an absorbing state, we start with that framework; in Section
+3.4, we discuss extensions to the case where treatment can turn on and off or is non-binary.
+We introduce the following assumptions and notation, which captures the primary setting
+studied in this literature.
+Treatment timing. There are T periods indexed by t 1,...,T, and units can receive a
+“
+binary treatment of interest in any of the periods t 1. Treatment is an absorbing state, so
+ą
+that once a unit is treated they remain treated for the remainder of the panel. We denote by
+D an indicator for whether unit i receives treatment in period t, and G min t : D 1
+i,t i i,t
+“ t “ u
+the earliest period at which unit i has received treatment. If i is never treated during the
+sample, then G . Treatment is an absorbing state, so that D 1 for all t G .
+i i,t i
+“ 8 “ ě
+Thus, for example, a state that first expanded Medicaid in 2014 would have G 2014, a
+i
+“
+9
+
+--- PAGE 10 ---
+state that first expanded Medicaid in 2015 would have G 2015, and a state that has not
+i
+“
+expanded Medicaid by time t T would have G .
+i
+“ “ 8
+Potential outcomes. We extend the potential outcomes framework introduced above to
+the multi-period setting. Let 0 and 1 denote s-dimensional vectors of zeros and ones,
+s s
+respectively. We denote unit i’s potential outcome in period t if they were first treated at
+time g by Y i,t 0 g´1 ,1 T´g`1 , and denote by Y i,t 0 T their “never-treated” potential outcome.
+p q p q
+This notation again makes explicit that potential outcomes can depend on the entire path of
+treatment assignments. Since we have assumed that treatment “stays on” once it is turned
+on, the entire path of potential outcomes is summarized by the first treatment date g ,
+p q
+and so to simplify notation we can index potential outcomes by treatment starting time:
+Y i,t g Y i,t 0 g´1 ,1 T´g`1 and Y i,t Y i,t 0 T .3 Thus, for example, Y i,2016 2014 would
+p q “ p q p8q “ p q p q
+represent the insurance coverage in state i in 2016 if they had first expanded Medicaid in
+2014.
+Parallel trends. Thereareseveralwaystoextendthecanonicalparalleltrendsassumption
+to the staggered setting. The simplest extension of the parallel trends assumption to the
+staggered case requires that the two-group, two-period version of parallel trends holds for all
+combinations of periods and all combinations of “groups” treated at different times.
+Assumption 4 (Parallel trends for staggered setting). For all t t1 and g g1,
+‰ ‰
+E Y i,t Y i,t1 G i g E Y i,t Y i,t1 G i g1 . (4)
+r p8q´ p8q| “ s “ r p8q´ p8q| “ s
+This assumption imposes that in the counterfactual where treatment had not occurred, the
+average outcomes for all adoption groups would have evolved in parallel. Thus, for example,
+Assumption 4 would imply that — if there had been no Medicaid expansions — insurance
+rates would have evolved in parallel on average for all groups of states that adopted Medicaid
+expansion in different years, including those who never expanded Medicaid.
+Several variants of Assumption 4 have been considered in the literature. For example,
+Callaway and Sant’Anna (2021) consider a relaxation of Assumption 4 that imposes (4) only
+for years after some units are treated:
+3If one were to map this staggered potential outcome notation to the one used in canonical DiD setups,
+we would write Y p2q and Y p8q instead of Y p1q and Y p0q as defined in Section 2.2, respectively. We
+i,t i,t i,t i,t
+usetheY p0q,Y p1qnotationinSection2.2becauseitislikelymorefamiliartothereader,andwidelyused
+i,t i,t
+in the literature on the canonical model.
+10
+
+--- PAGE 11 ---
+Assumption 4.a (Parallel trends for staggered setting - post-treatment only).
+E Y i,t Y i,t1 G i g E Y i,t Y i,t1 G i g1 .
+r p8q´ p8q| “ s “ r p8q´ p8q| “ s
+for all t,t1 g 1, where g minG is the first period where a unit is treated.
+min min
+ě ´ “
+This would require, for example, that groups of states that expanded Medicaid at different
+times have parallel trends in Y after Medicaid expansion began, but does not necessar-
+i,t
+p8q
+ily impose parallel trends in the pre-treatment period. Likewise, several papers, including
+Callaway and Sant’Anna (2021) and Sun and Abraham (2021), consider versions that im-
+pose (4) only for groups that are eventually treated, and not for the never-treated group (i.e.
+excluding g ). This would impose, for example, parallel trends among states that even-
+“ 8
+tually expanded Medicaid, but not between eventually-adopting and never-adopting states.
+There are tradeoffs between the different forms of Assumption 4: imposing parallel trends
+for all groups and all periods is a stronger assumption and thus may be less plausible; on the
+other hand, it may allow one to obtain more precise estimates.4 We return to these tradeoffs
+in our discussion of different estimators for the staggered case below.5
+No anticipation. The no-anticipation assumption from the canonical model also extends
+in a straightforward way to the staggered setting. Intuitively, it imposes that if a unit is
+untreated in period t, their outcome does not depend on what time period they will be
+treated in the future — that is, units do not act on the knowledge of their future treatment
+date before treatment starts.
+Assumption 5 (Staggerednoanticipationassumption). Y g Y for all i and t g.
+i,t i,t
+p q “ p8q ă
+3.2 Interpreting the estimand of two-way fixed effects models
+Recall that in the simple two-period model, the estimand (population coefficient) of the two-
+way fixed effects specification (3) corresponds with the ATT under the parallel trends and
+no anticipation assumptions. A substantial focus of the recent literature has been whether
+the estimand of commonly-used generalizations of this TWFE model to the multi-period,
+4Ifallunitsareeventuallytreated,thenimposingparalleltrendsonlyamongtreatedunits alsolimits the
+number of periods for which the ATT is identified.
+5In this paper, we specify the parallel trends assumption based on groups defined by the treatment
+startingdate. Itisalsopossibletoadoptalternativedefinitionsofparalleltrendsusinggroupsthataremore
+disaggregatedthan our G. For instance, one could impose parallel trends for all pairs of states, rather than
+for groups of states with the same treatment start date. Using a more disaggregated definition of a group
+strengthens the paralleltrends assumption, but couldpotentially enable more efficientestimators. We focus
+on the group-level version of parallel trends for simplicity.
+11
+
+--- PAGE 12 ---
+staggered timing case have a similar, intuitive causal interpretation. In short, the literature
+has shown that the estimand of TWFE specifications in the staggered setting often does
+not correspond with an intuitive causal parameter even under the natural extensions of the
+parallel trends and no-anticipation assumptions described above.
+Static TWFE. We begin with a discussion of the “static” TWFE specification, which
+regresses the outcome on individual and period fixed effects and an indicator for whether
+the unit i is treated in period t,
+Y α φ D β ǫ . (5)
+i,t i t i,t post i,t
+“ ` ` `
+The static specification yields a sensible estimand when there is no heterogeneity in
+treatment effects across either time or units. Formally, let τ g Y g Y . Suppose
+i,t i,t i,t
+p q “ p q´ p8q
+that for all units i, τ g τ whenever t g. This imposes that (1) all units have the
+i,t
+p q “ ě
+same treatment effect, and (2) the treatment has the same effect regardless of how long it
+has been since treatment started. In our ongoing example, this would impose that the effect
+of Medicaid expansion on insurance coverage is the same both across states and across time.
+Then, under a suitable generalization of the parallel trends assumption (e.g. Assumption 4)
+and no anticipation assumption (Assumption 5), the population regression coefficient β
+post
+from (5) is equal to τ.
+Issues arise with the static specification, however, when there is heterogeneity of treat-
+menteffectsovertime,asshowninBorusyak and Jaravel(2018),de Chaisemartin and D’Haultfœuille
+(2020), and Goodman-Bacon (2021), among others. Suppose first that there is heterogeneity
+in time since treatment only. That is, τ g τ 1 t g s , so all units have treat-
+i,t
+p q “
+sě0 s
+r ´ “ s
+ment effect τ in the s-th period after they receive treatment. In this case, β corresponds
+s ř post
+with a potentially non-convex weighted average of the parameters τ , i.e. β ω τ ,
+s post “ s s s
+where the weights ω sum to 1 but may be negative. The possibility of negative weights
+s ř
+is concerning because, for instance, all of the τ could be positive and yet the coefficient
+s
+β may be negative! In particular, longer-run treatment effects will often receive negative
+post
+weights. Thus, for example, it is possible that the effect of Medicaid expansion on insurance
+coverage is positive and grows over time since the expansion, and yet β in (5) will be
+post
+negative. More generally, if treatment effects vary across both time and units, then τ g
+i,t
+p q
+may get negative weight in the TWFE estimand for some combinations of t and g.6
+Goodman-Bacon (2021) provides some helpful intuition to understand this phenomenon.
+6We focus in this section on decompositions of the static TWFE model in a standard, sampling-based
+framework. Athey and Imbens (2022) study the static specification in a finite-sample randomization-based
+framework.
+12
+
+--- PAGE 13 ---
+He shows that β can be written as a convex weighted average of differences-in-differences
+post
+comparisons between pairs of units and time periods in which one unit changed its treat-
+p
+ment status and the other did not. Counterintuitively, however, this decomposition includes
+difference-in-differences that use as a “control” group units who were treated in earlier peri-
+ods. For example, in 2016, a state that first expanded Medicaid in 2014 might be used as the
+“control group” for a state that first adopted Medicaid in 2016. Hence, an early-treated unit
+canget negative weights if itappears asa“control” formany later-treatedunits. This decom-
+position further highlights that β may not be a sensible estimand when treatment effects
+post
+differ across either units or time, because of its inclusion of these “forbidden comparisons”.7
+Wenowgivesomemoremathematicalintuitionforwhyweighting issues ariseinthestatic
+specification with heterogeneity. From the Frisch-Waugh-Lovell theorem, the coefficient β
+post
+from(5)isequivalent tothecoefficient fromaunivariateregressionofY onD D , where
+i,t i,t i,t
+´
+D is the predicted value from a regression of D on the other right-hand side variables in
+i,t i,t
+˜ p
+(5), D α˜ φ u . However, a well-known issue with OLS with binary outcomes is that
+i,t i t i,t
+p “ ` `
+its predictions may fall outside the unit interval. If the predicted value D is greater than
+i,t
+1, then D D will be negative even when a unit is treated, and thus that unit’s outcome
+i,t i,t
+´ p
+will get negative weight in β . To see this more formally, we can apply the formula for
+post
+p
+univariate OLS coefficients to obtain that
+p
+D D Y
+β i,tp i,t ´ i,t q i,t . (6)
+post
+“ D D 2
+ř i,tp i,t ´p i,t q
+p
+The denominator is positive, and so theřweight that β places on Y is proportional to
+p post i,t
+D D . Thus, if D 1 and D D 0, then β will be decreasing in Y even
+i,t i,t i,t i,t i,t post i,t
+´ “ ´ ă p
+though unit i is treated at period t. But because Y Y τ g , it follows that τ g
+i,t i,t i,t i,t
+p p “ pp8q` p q p q
+gets negative weight in β .
+post
+These negative weights will tend to arise for early-treated units in periods late in the
+p
+sample. To see why this isthecase, we notethatsome algebra shows that D D D D,
+i,t i t
+“ ` ´
+where D T´1 D is the time average of D for unit i, D N´1 D is the cross-
+sectional
+i
+a
+“
+verage o
+t
+f D
+i,t
+for period t, and D NT
+´1
+D
+t “
+is the av
+p
+e
+i
+rag
+i,
+e
+t
+of D across
+ř “ p q i,t i,t ř
+both periods and units. It follows that if we have a unit that has been treated for almost all
+ř
+periods (D 1) and a period in which almost all units have been treated (D 1), then
+i t
+« «
+D 2 D, which will be strictly greater than 1 if there is a non-substantial fraction of
+i,t
+« ´
+non-treated units in some period D 1 . We thus see that β will tend to put negative
+post
+p p ă q
+weight on τ for early-adopters in late periods within the sample. This decomposition makes
+i,t
+p
+7To the best of our knowledge, the phrase “forbidden comparisons” was introduced in
+Borusyak and Jaravel(2018).
+13
+
+--- PAGE 14 ---
+clear that the static OLS coefficient β is not aggregating natural comparisons of units,
+post
+and thus will not produce a sensible estimand when there is arbitrary heterogeneity. When
+p
+treatment effects are homogeneous – i.e. τ g τ – the negative weights on τ for some
+i,t
+p q ”
+units cancel out the positive weights on other units, and thus β recovers the causal effect
+post
+under a suitable generalization of parallel trends.
+Dynamic TWFE. Next, we turn our attention to the “dynamic specification” that re-
+gresses the outcome on individual and period fixed effects, as well as dummies for time
+relative to treatment
+Y α φ 1 R r β ǫ , (7)
+i,t i t i,t r i,t
+“ ` ` r “ s `
+r‰0
+ÿ
+where R t G 1 is the time relative to treatment (e.g. R 1 in the first treated
+i,t i i,t
+“ ´ ` “
+period for unit i), and the summation runs over all possible values of R except for 0.
+it
+Unlike the static specification, the dynamic specification yields a sensible causal esti-
+mand when there is heterogeneity only in time since treatment. In particular, the re-
+sults in Borusyak and Jaravel (2018) and Sun and Abraham (2021) imply that if τ g
+i,t
+p q “
+τ 1 t g s , so all units have treatment effect τ in the s-th period after treatment,
+sě0 s
+r ´ “ s
+s
+thenβ τ under suitablegeneralizations oftheparalleltrends andno anticipationassump-
+ř s s
+“
+tions, such as Assumptions 4 and 5.8 Thus, specification (7) will yield sensible estimates for
+the dynamic effect of Medicaid expansion if the effect r years after Medicaid expansion is
+the same (on average) regardless of what year the state initially expanded coverage (for each
+r 1,2,...).
+“
+Sun and Abraham (2021) show, however, that when there are heterogeneous dynamic
+treatment effects across adoption cohorts, the coefficients from specification (7) become
+difficult to interpret. Thus, for example, problems may arise if the average treatment effect
+in the first year after adoption is different for states that adopted Medicaid in 2014 as
+it is for states that adopted in 2015.9 There are two issues. First, as with the “static”
+regression specification above, the coefficient β may put negative weight on the treatment
+r
+effect r periods after treatment for some units. Thus, for example, the treatment effect
+for some states two years after Medicaid expansion may enter β 2 negatively. Second, the
+8We note that the homogeneity assumption can be relaxed so that all adoption cohorts have the same
+expected treatment effect, i.e. Erτ i,g`s pgq|G“gs ” τ s for all s and g. Additionally, these results as-
+sume that all possible relative time indicators are included. As discussed in Sun and Abraham (2021),
+Baker, Larcker and Wang (2022), and Schmidheiny and Siegloch (2020), among others, problems may arise
+if one “bins” endpoints (e.g. includes a dummy for 5` years since treatment).
+9Thatis, ifthe effect in2015forthe 2014adoptioncohortis differentfromthe effectin2016for the 2015
+adoption cohort.
+14
+
+--- PAGE 15 ---
+coefficient β can put non-zero weight on treatment effects at lags r1 r, so there is cross-lag
+r
+‰
+“contamination.” Thus, for example, the coefficient β 2 may be influenced by the treatment
+effect for some states three periods after Medicaid expansion.
+Likethestaticspecification, thedynamicspecificationthusfailstoyieldsensibleestimates
+of dynamic causal effects under heterogeneity across cohorts. The derivation of this result
+is mathematically more complex, and so we do not pursue it here. The intuition is that, as
+in the static case, the dynamic OLS specification does not aggregate natural comparisons of
+units and includes “forbidden comparisons” between sets of units both of which have already
+been treated. An important implication of the results derived by Sun and Abraham (2021)
+is that if treatment effects are heterogeneous, the “treatment lead” coefficients from (7) are
+not guaranteed to be zero even if parallel trends is satisfied in all periods (and vice versa),
+and thus evaluation of pre-trends based on these coefficients can be very misleading.
+3.2.1 Diagnostic approaches
+Several recent papers introduce diagnostic approaches for understanding the extent of the
+aggregation issues under staggered treatment timing, with a focus on the static specification
+(5). de Chaisemartin and D’Haultfœuille (2020) propose reporting the number/fraction of
+group-time ATTs that receive negative weights, as well as the degree of heterogeneity in
+treatment effects that would be necessary for the estimated treatment effect to have the
+“wrong sign.” Goodman-Bacon (2021) proposes reporting the weights that β places on
+post
+the different 2-group, 2-period difference-in-differences, which allows one to evaluate how
+p
+much weight is being placed on “forbidden” comparisons of already-treated units and how
+removing the comparisons would change the estimate. Jakiela (2021) proposes evaluating
+both whether TWFE places negative weights on some treated units and whether the data
+rejects the constant treatment effects assumption.
+3.3 New Estimators For Staggered Timing
+Several recent papers have proposed alternative estimators that more sensibly aggregate
+heterogeneous treatment effects in settings with staggered treatment timing. The derivation
+of each of these estimators follows a similar logic to the derivation of the DiD estimator in
+the motivating example in Section 2. We begin by specifying a causal parameter of interest
+(analogous to the ATT τ 2). With the help of the (generalized) parallel trends and no-
+anticipation assumptions, we can infer the counterfactual outcomes for treated units using
+trends inoutcomes for anappropriatelychosen “clean” control groupofuntreated units. This
+allows us to express the target parameter in terms of identified expectations, analogous to
+15
+
+--- PAGE 16 ---
+equation (2). Finally, we replace population expectations with sample averages to form an
+estimator of the target parameter.
+The Callaway and Sant’Anna estimator. Wefirstdescribeindetailtheapproachtaken
+by Callaway and Sant’Anna (2021), and then discuss the connections to other approaches.
+They consider as a building block the group-time average treatment effect on the treated,
+ATT g,t E Y g Y G g , which gives the average treatment effect at time t
+i,t i,t i
+p q “ r p q´ p8q| “ s
+for the cohort first treated in time g. For example ATT 2014,2016 would be the average
+p q
+treatment effect in 2016 for states who first expanded Medicaid in 2014. They then consider
+identification and estimation under generalizations of the parallel trends assumption to the
+staggered setting.10 Intuitively, under the staggered versions of the parallel trends and no
+anticipation assumptions, we can identify ATT g,t by comparing the expected change in
+p q
+outcome for cohort g between periods g 1 and t to that for a control group not-yet treated
+´
+at period t. Formally, under Assumption 4.a,
+ATT g,t E Y i,t Y i,g´1 G i g E Y i,t Y i,g´1 G i g1 , for any g1 t
+p q “ r ´ | “ s´ r ´ | “ s ą
+which can be viewed as the multi-period analog of the identification result in equation (2).
+Since this holds for any comparison group g1 t, it also holds if we average over some set of
+ą
+comparisons G such that g1 t for all g1 G ,
+comp comp
+ą P
+ATT g,t E Y Y G g E Y Y G G .
+i,t i,g´1 i i,t i,g´1 i comp
+p q “ r ´ | “ s´ r ´ | P s
+We can then estimate ATT g,t by replacing expectations with their sample analogs,
+p q
+1 1
+ATT g,t Y i,t Y i,g´1 Y i,t Y i,g´1 . (8)
+p q “ N r ´ s´ N r ´ s
+g i: ÿ Gi“g G comp i:Giÿ PG comp
+z
+Specifically, Callaway and Sant’Anna (2021) consider two options for G . The first uses
+comp
+onlynever-treated units(G )andthesecond uses allnot-yet-treatedunits (G
+comp comp
+“ t8u “
+g1 : g1 t ).11 When there are a relatively small number of periods and treatment cohorts,
+t ą u
+reporting ATT g,t for all relevant g,t may be reasonable.
+p q p q
+Whentherearemanytreatedperiodsand/orcohorts,however, reportingalltheATT g,t
+z p q
+may be cumbersome, and each one may be imprecisely estimated. Thankfully, the method
+z
+10Callaway and Sant’Anna(2021)alsoconsidergeneralizationswheretheparalleltrendsassumptionholds
+only conditionaloncovariates. We discuss this extensioninSection4.2 below,but focus fornow onthe case
+without covariates.
+11We note that if the never-treatedunits are not included in the comparisongroup (i.e. 8RG ), then
+comp
+one can rely on a weaker version of Assumption 4.a that excludes the never-treated group.
+16
+
+--- PAGE 17 ---
+described above extends easily to estimating any weighted average of the ATT g,t . For in-
+p q
+stance, we may be interested in an“event-study” parameter that gives the (weighted) average
+of the treatment effect l periods after adoption across different adoption cohorts,
+ATTw w ATT g,g l . (9)
+l g
+“ p ` q
+g
+ÿ
+Theweightsw couldbechosentoweightdifferentcohortsequally,orintermsoftheirrelative
+g
+frequenciesinthetreatedpopulation. ItisstraightforwardtoformestimatesforATTw byav-
+l
+eragingtheestimatesATT g,t discussedabove. WereferthereadertoCallaway and Sant’Anna
+p q
+(2021) for a discussion of a variety of other weighted averages that may be economically rele-
+z
+vant. Inference is straightforward using either the delta method or a bootstrap, as described
+in Callaway and Sant’Anna (2021).
+This alternative approach to estimation has two primary advantages over standard static
+or dynamic TWFE regressions. The first is that it provides sensible estimands even under
+arbitrary heterogeneity of treatment effects. By sensible we mean both that the approach
+avoids negative weighting, but also that the weighting of effects across cohorts is specified
+by the researcher (e.g. proportional to cohort size) rather than determined by OLS (i.e.
+proportional to the variance of the treatment indicator). The second advantage is that
+it makes transparent exactly which units are being used as a control group to infer the
+unobserved potential outcomes. This contrasts with standard TWFE models, which we
+have seen make unintuitive comparisons under staggered timing.
+Imputation estimators. Borusyak, Jaravel and Spiess(2021)introducearelatedapproach
+which theyrefer toasanimputationestimator (see, also, Gardner(2021), Liu, Wang and Xu
+(2022) and Wooldridge (2021) for similar proposals). Specifically, they fit a TWFE regres-
+sion, Y α λ ǫ , using observations only for units and time periods that are
+i,t i t i,t
+p8q “ ` `
+not-yet-treated. They then infer the never-treated potential outcome for each treated unit
+using the predicted value from this regression, Y . This provides an estimate of the
+i,t
+p8q
+treatment effect for each treated unit, Y Y , and these individual-level estimates can
+i,t i,t
+´ p8pq
+be aggregated to form estimates of summary parameters like the ATT g,t described above.
+p p q
+These approaches yield valid estimates when parallel trends holds for all groups and time
+periods and there is no anticipation (Assumptions 4 and 5).
+Comparison ofCS andBJSapproaches. HowdoestheapproachproposedbyCallaway and Sant’Anna
+(2021, CS) compare to that proposed by Borusyak et al. (2021, BJS)? For simplicity, it is in-
+structive to consider a simple non-staggeredsetting where there arethree periods(t 1,2,3)
+“
+17
+
+--- PAGE 18 ---
+and units are either treated in period 3 or never-treated (G 3, ). In this case, the CS
+“ t 8u
+estimator for the treated group in period 3 (i.e. ATT 3,3 ) is simply a DiD comparing the
+p q
+treated/untreated units between periods 2 and 3,
+ATT 3,3 Y ¯ Y ¯ Y ¯ Y ¯ ,
+3,3 3,8 2,3 2,8
+p q “ p ´ q´p ´ q
+Diffatt“3 Diffatt“2
+z
+loooooomoooooon loooooomoooooon
+¯
+where Y is the average outcome in period t for units with G g. By contrast, the BJS
+t,g i
+“
+estimator runs a similar DiD, except instead of using period 2 as the baseline, the BJS
+estimator uses the average outcome prior to treatment (across periods 1 and 2),
+ATT 3,3 Y ¯ Y ¯ Y ¯ Y ¯ ,
+BJS 3,3 3,8 pre,3 pre,8
+p q “ p ´ q´ p ´ q
+Diffatt“3 AvgDiffinPre-Periods
+z
+¯ 1 ¯ ¯ loooooomoooooon loooooooomoooooooon
+where Y pre,g 2 Y 1,g Y 2,g is the average outcome for cohort g across the two pre-treatment
+“ p ` q
+periods. Thus, we see that the key difference between the CS and BJS estimators is that
+CS makes all comparisons relative to the last pre-treament period, whereas BJS makes com-
+parisons relative to the average of the pre-treatment periods. This primary difference in how
+the two approaches use pre-treatment periods extends beyond this simple case to settings
+with staggered timing, although the math becomes substantially more complicated in the
+staggered case (and thus we do not pursue it).
+What are the pros and cons of using the last pre-treatment period versus the average
+of the pre-treatment periods? In general, there will be tradeoffs between efficiency and
+the strength of the identifying assumption. On the one hand, averaging over multiple pre-
+treatment periods can increase precision. Indeed, BJS prove that when Assumption 4 holds,
+their estimator is efficient under homoskedasticity and serially uncorrelated errors; see also
+Wooldridge (2021). Although these ideal conditions are unlikely to be satisfied exactly, it
+does suggest that their estimator will tend to be more efficient than CS when the outcome
+is not too heteroskedastic or serially correlated.12 On the other hand, the two approaches
+require different identifying assumptions: in the simple example above, CS only relies on
+parallel trends between periods 2 and 3, whereas BJS relies on parallel trends for all three
+periods.13 More generally, the BJS approach imposes parallel trends for all groups and time
+periods (Assumption 4), whereas the CS approach only relies on post-treatment parallel
+trends (Assumption 4.a). Relying on parallel trends over a longer time horizon may lead
+12By contrast,notethatifY
+i,t
+p0qfollowsarandomwalk,thenY i,3p0qisindependent ofY i,1p0qconditional
+on Y i,2p0q, and thus it is efficient to ignore the earlier pre-treatment periods as CS does.
+13Or more precisely, between the average outcome in periods 1 and 2, and period 3. See also
+Marcus and Sant’Anna (2021) for a discussion about different parallel trends assumptions.
+18
+
+--- PAGE 19 ---
+to larger biases if the parallel trends assumption holds only approximately: for example,
+if the average untreated potential outcome is increasing faster among treated units than
+untreated units over time, then the violation of parallel trends is larger when we compare
+periods farther apart, and thus the BJS estimator using periods 1 and 2 as the compari-
+son will have larger bias than the CS estimator using only period 2; see Roth (2018) and
+de Chaisemartin and D’Haultfœuille (2022) for additional discussion. Thus, the BJS esti-
+mator may be preferable in settings where the outcome is not too serially correlated and the
+researcher is confident in parallel trends across all periods; whereas the CS estimator may
+be preferred in settings where serial correlation is high or the researcher is concerned about
+the validity of parallel trends over longer time horizons.14
+Other related approaches. Severalotherrecentpapersproposesimilarestimationstrate-
+gies to those described above — although with some subtle differences in how they con-
+struct the control group and the weights they place on different cohorts/time periods.
+de Chaisemartin and D’Haultfœuille (2020) propose an estimator that can be applied when
+treatment turns on and off (see Section 3.4 below), but in the context of the staggered set-
+ting herecorresponds with theCallaway andSant’Anna estimator forATTw anda particular
+0
+choice ofweights. Sun and Abraham(2021) proposeanestimator thattakes theform(8) but
+uses either the never-treated units (if they exist) or the last-to-be-treated units as the com-
+parison (G max G ), rather than the not-yet-treated. Marcus and Sant’Anna (2021)
+comp i i
+“ t u
+propose a recursive estimator that more efficiently exploits the identifying assumptions in
+Callaway and Sant’Anna (2021). See, also, Imai and Kim (2021) and Strezhnev (2018) for
+closely related ideas. Another related approach is to run a stacked regression where each
+treated unit is matched to ‘clean’ (i.e. not-yet-treated) controls and there are separate fixed
+effects for each set of treated units and its control, as in Cengiz, Dube, Lindner and Zipperer
+(2019) among others. Gardner (2021) shows that this approach estimates a convex weighted
+average of the ATT g,t under parallel trends and no anticipation, although the weights are
+p q
+determined by the number of treated units and variance of treatment within each stacked
+event, rather than by economic considerations.
+3.4 Further extensions to treatment timing/assignment
+Ourdiscussionsofarhasfocusedonthecasewherethereisabinarytreatmentthatisadopted
+at a particular date and remains on afterwards. Several recent papers have studied settings
+14We also note that the BJS and CS estimators incorporate covariates differently. BJS adjust linearly for
+covariates,where CS consider more general adjustments as described in Section 4.2.
+19
+
+--- PAGE 20 ---
+with more complicated forms of treatment assignment. We briefly highlight a few of the re-
+cent contributions, and refer the reader to the review in de Chaisemartin and D’Haultfœuille
+(2022) for more details.
+de Chaisemartin and D’Haultfœuille (2020) and Imai and Kim (2021) consider settings
+where units are treated at different times, but do not necessarily require that treatment is an
+absorbing state. Their estimators intuitively compare changes in outcomes for units whose
+treatment status changed to other units whose treatment status remained constant over the
+same periods. This approach yields an interpretable causal effect under generalizations of
+the parallel trends assumption and and an additional “no carryover” assumption that im-
+poses that the potential outcomes depend only on current treatment status and not on the
+full treatment history. We note that, as described in Bojinov, Rambachan and Shephard
+(2021), the no carryover assumption may be restrictive in many settings — for exam-
+ple, if the treatment is a raise in the minimum wage and the outcome is employment,
+then the no carryover assumption requires that employment in period t depends only on
+whether the minimum wage was raised in period t and not on the history of minimum
+wage changes. Recent work has begun to relax the no carryover assumption: one exam-
+ple is de Chaisemartin and D’Haultfoeuille (2022), who allow potential outcomes to depend
+on the full path of treatments, and instead impose a stronger parallel trends assumption
+that requires parallel trends in untreated potential outcomes regardless of a unit’s path of
+treatment.
+OtherworkhasconsideredDiDsettingswithnon-binarytreatments. de Chaisemartin and D’Haultfœuille
+(2018)study“fuzzy” DiDsettingsinwhichallgroupsaretreatedinbothtimeperiods,butthe
+proportionof units exposed to treatment increases inone groupbut not in theother. Finally,
+de Chaisemartin and D’Haultfœuille (2021) and Callaway, Goodman-Bacon and Sant’Anna
+(2021) study settings with multi-valued or continuous treatments.
+3.5 Recommendations
+Theresults discussed aboveshow thatwhileconventional TWFEspecifications make sensible
+comparisons of treated and untreated units in the canonical two-period DiD setting, in the
+staggered case they typically make “forbidden comparisons” between already-treated units.
+As a result, treatment effects for some units and time periods receive negative weights in the
+TWFE estimand. In extreme cases, this can lead the TWFE estimand to have the “wrong
+sign” —e.g., theestimandmaybenegativeeven ifallthetreatment effectsarepositive. Even
+if the weights are not so extreme as to create sign reversals, it may nevertheless be difficult
+to interpret which comparisons the TWFE estimator is making, as the “control group” is not
+20
+
+--- PAGE 21 ---
+transparent, and the weights it chooses are unlikely to be those most relevant for economic
+policy.
+In our view, if the researcher is not willing to impose assumptions on treatment effect
+heterogeneity, the most direct remedy for this problem is to use the methods discussed
+in Section 3.3 that explicitly specify the comparisons to be made between treatment and
+control groups, as well as the desired weights in the target parameter. These methods allow
+one to estimate a well-defined causal parameter (under parallel trends), with transparent
+weights and transparent comparison groups (e.g. not-yet-treated or never-treated units).
+This approach, in our view, provides a more complete solution to the problem than the
+diagnostic approaches discussed in Section 3.2.1. Although it is certainly valuable to have a
+sense of the extent to which conventional TWFE specifications are making bad comparisons,
+eliminating these undesirable comparisons seems to us a better approach thandiagnosing the
+extent of the issue. Using a TWFE specification may be justified for efficiency reasons if one
+is confident that treatment effects are homogeneous, but researchers will often be unwilling
+to restrict treatment effect heterogeneity.
+The question of which of the many heterogeneity-robust DiD methods discussed in Sec-
+tion 3.3 to use is trickier. As described above, the estimators differ in who they use as the
+comparison group (e.g. not-yet-treated versus never-treated) as well as the pre-treatment
+time periods used in the comparisons (e.g. the whole pre-treatment period versus the final
+untreated period). This leads to some tradeoffs between efficiency and the strength of the
+parallel trends assumption needed for identification, as highlighted in the comparison of BJS
+and CS above. The best estimator to use will therefore depend on the context — partic-
+ularly, on which group is the most sensible comparison, and how confident the researcher
+is in parallel trends for all periods. Nevertheless, it is our practical experience that the
+various heterogeneity-robust DiD estimators typically (although not always) produce similar
+answers. The first-order consideration is therefore to use an approach that makes clear what
+the target parameter is and which groups are being compared for identification. Thankfully,
+there are now statistical packages that make implementing (and comparing) the results from
+these estimators straightforward in practice (see Table 2).
+We acknowledge that these new methods may initially appear complicated to researchers
+accustomed to analyzing seemingly simple regression specifications such as (5) or (7). How-
+ever, while traditional TWFE regressions are easy to specify, as discussed above they are
+actually quite difficult tointerpret, since they make complicated and unintuitive comparisons
+across groups. By contrast, the methods that we recommend have a simple interpretation
+using a coherent comparison group. And while more complex to express in regression format,
+they can be viewed as simple aggregations of comparisons of group means. We suspect that
+21
+
+--- PAGE 22 ---
+once researchers gain experience using the newer heterogeneity-robust DiD methods, they
+will not seem so scary after all!
+4 Relaxing or allowing the parallel trends assumption to
+be violated
+A second strand of the literature has focused on the possibility that the canonical parallel
+trends assumption may not hold exactly. Approaches to this problem include relaxing the
+parallel trends assumption to hold only conditional on covariates, testing for pre-treatment
+violations of the parallel trends assumption, and various tools for robust inference and sen-
+sitivity analysis that explore the possibility that parallel trends may be violated in certain
+ways.
+4.1 Why might parallel trends be violated?
+The canonical parallel trends assumption requires that the mean outcome for the treated
+group would have evolved in parallel with the mean outcome for the untreated group if the
+treatment had not occurred. As discussed in Section 2, this allows for confounding factors
+that affect treatment status, but these must have a constant additive effect on the mean
+outcome.
+In practice, however, we will often be unsure of the validity of the parallel trends assump-
+tion for several reasons. First, there will often be concern about time-varying confounding
+factors. For example, Democratic-leaning states were more likely to adopt Medicaid expan-
+sions but also might be subject to different time-varying macro-economic shocks. A second
+concern relates to the potential sensitivity of the parallel trends assumption to the chosen
+function form of the outcome. If parallel trends holds using the outcome measured in levels,
+Y 0 , then it will generally not be the case that it holds for the outcomes measured in logs
+i,t
+p q
+log Y 0 (or vice versa). Indeed, Roth and Sant’Anna (2022) show that parallel trends
+i,t
+p p qq
+can hold for all monotonic transformations of the outcome g Y 0 essentially only if the
+i,t
+p p qq
+population can be divided into two groups, where the first group is as good as randomly as-
+signed between treatment and control, and the second group has the same potential outcome
+distribution in both periods. Although there are some cases where these conditions may be
+(approximately) met — the most prominent of which is random assignment of treatment —
+they are likely not to hold in most settings where DiD is used, and thus parallel trends will
+be sensitive to functional form. It will often not be obvious that parallel trends should hold
+for the particular functional form chosen for our analysis — e.g. should we use insurance
+22
+
+--- PAGE 23 ---
+rates, or log insurance rates? — and thus we may be skeptical of its validity.
+4.2 Parallel trends conditional on covariates
+Oneway toincrease thecredibility oftheparalleltrendsassumptionistorequire thatitholds
+only conditional on covariates. Indeed, if we condition on a rich enough set of covariates
+X , we may be willing to believe that treatment is nearly randomly assigned conditional on
+i
+X . Imposing only parallel trends conditional on X gives us an extra degree of robustness,
+i i
+since conditional random assignment can fail so long as the remaining unobservables have
+a time-invariant additive effect on the outcome. In the Medicaid expansion example, for
+instance, we may want to condition on a state’s partisan lean.
+In the canonical model discussed in Section 2, the parallel trends assumption can be
+naturally extended to incorporate covariates as follows.
+Assumption 6 (Conditional Parallel Trends).
+E Y i,2 0 Y i,1 0 D i 1,X i E Y i,2 0 Y i,1 0 D i 0,X i (almost surely) , (10)
+r p q´ p q| “ s “ r p q´ p q| “ s
+for X a pre-treatment vector of observable covariates.
+i
+For simplicity, we will focus first on the conditional parallel trends assumption in the canon-
+ical two-period model, although several papers have also extended this idea to the case of
+staggered treatment timing, as we will discuss towards the end of this subsection. We fur-
+thermore focus our discussion on covariates that are measured prior to treatment and that
+are time-invariant (although they may have a time-varying impact on the outcome); relevant
+extensions to this are also discussed below.
+In addition to the conditional parallel trends assumption, we will also impose an overlap
+condition (a.k.a. positivity condition), which guarantees that for each treated unit with
+covariates X , there are at least some untreated units in the population with the same
+i
+value of X . This overlap assumption is particularly important for using standard inference
+i
+procedures (Khan and Tamer, 2010).
+Assumption 7 (Strong overlap). The conditional probability of belonging to the treatment
+group, given observed characteristics, is uniformly bounded away from one, and the propor-
+tion of treated units is bounded away from zero. That is, for some ǫ 0, P D 1 X
+i i
+ą p “ | q ă
+1 ǫ, almost surely, and E D 0.
+´ r s ą
+Giventheconditionalparalleltrendsassumption,noanticipationassumption, andoverlap
+23
+
+--- PAGE 24 ---
+condition, the ATT conditional on X x,
+i
+“
+τ x E Y 1 Y 0 D 1,X x ,
+2 i,2 i,2 i i
+p q “ r p q´ p q| “ “ s
+is identified for all x with P D 1 X x 0. In particular,
+i i
+p “ | “ q ą
+τ 2 x E Y i,2 Y i,1 D i 1,X i x E Y i,2 Y i,1 D i 0,X i x . (11)
+p q “ r ´ | “ “ s´ r ´ | “ “ s
+ChangeforDi“1,Xi“x ChangeforDi“0,Xi“x
+Note that equationlo(oo1o1oo)oooiosooaoonooaoolmogoooouoosootoooooo(o2oo)ooionn thleooocoaoonoooonooiocooaolooommoodooeoolo,ooeooxocooeopootoonit conditions
+on X x. Intuitively, among the sub-population with X x, we have parallel trends,
+i i
+“ “
+and so we can take the same steps as in Section 2 to infer the conditional ATT for that
+sub-population. The unconditional ATT can then be identified by averaging τ 2 x over the
+p q
+distribution of X in the treated population. Using the law of iterated expectations, we have
+i
+τ E Y 1 Y 0 D 1 E E Y 1 Y 0 D 1,X D 1 .
+2 i,2 i,2 i » i,2 i,2 i i i fi
+“ r p q´ p q| “ s “ r p q´ p q| “ s| “
+—
+τ2pXiq
+ffi
+– fl
+loooooooooooooooooomoooooooooooooooooon
+When X is discrete and takes a small number of values — for example, if X is an
+i i
+indicator for whether someone has a college degree – then estimation is straightforward. We
+can just run an unconditional DiD for each value of X , and then aggregate the estimates to
+i
+form an estimate for the overall ATT, using the delta method or bootstrap for the standard
+errors. When X is either continuously distributed or discrete with a very large number of
+i
+support points, estimation becomes more complicated, because we will typically not have a
+largeenoughsampletodoanunconditionalDiDwithineachpossiblevalueofX . Thankfully,
+i
+there are several available econometric approaches to semi-/non-parametrically estimate the
+ATT even with continuous covariates. We first discuss the limitations of using TWFE
+regressions in this setting, and then discuss several alternative approaches.
+Standard linear regression. Given that the TWFE specification (3) yielded consistent
+estimates oftheATTunderAssumptions 1-3inthecanonicalDiDmodel, itmaybetempting
+to augment this specification with controls for a time-by-covariate interaction,
+Y α φ 1 t 2 D β X 1 t 2 γ ε , (12)
+i,t i t i i i,t
+“ ` `p r “ s¨ q `p ¨ r “ sq `
+for estimation under conditional parallel trends. Unfortunately, this augmented specification
+need not yield consistent estimates of the ATT under conditional parallel trends without
+24
+
+--- PAGE 25 ---
+additional homogeneity assumptions. The intuition is that equation (12) implicitly models
+the conditional expectation function (CEF) of Y i,2 Y i,1 as depending on X i with a constant
+´
+slope of γ, regardless of i’s treatment status. If there are heterogeneous treatment effects
+that depend onX — e.g., the ATT varies by ageof participants — the derivative of the CEF
+i
+with respect to X may depend on treatment status D as well. In these practically relevant
+i i
+setups, estimates of β can be biased for the ATT; see Meyer (1995) and Abadie (2005) for
+additionaldiscussion. Fortunately, there are several semi-/non-parametricmethods available
+that allow for consistent estimation of the ATT under conditional parallel trends under
+weaker homogeneity assumptions.
+Regression adjustment. An alternative approach to allow for covariate-specific trends in
+DiDsettingsistheregressionadjustmentprocedureproposedbyHeckman, Ichimura and Todd
+(1997) and Heckman, Ichimura, Smith and Todd (1998). Their main idea exploits the fact
+that under conditional parallel trends, strong overlap, and no anticipation we can write the
+ATT as
+τ E E Y Y D 1,X E Y Y D 0,X D 1 ,
+2 i,2 i,1 i i i,2 i,1 i i i
+“ r r ´ | “ s´ r ´ | “ s| “ s
+E Y Y D 1 E E Y Y D 0,X D 1 ,
+i,2 i,1 i i,2 i,1 i i i
+“ r ´ | “ s´ r r ´ | “ s| “ s
+where the second equality follows from the law of iterated expectations. Thus, to estimate
+the ATT under conditional parallel trends, one simply needs to estimate the conditional
+expectation of the outcome among untreated units, and then average these “predictions”
+using the empirical distribution of X i among treated units. That is, we estimate τ 2 with
+1
+τ 2 Y i,2 Y i,1 E Y i,2 Y i,1 D i 0,X i , (13)
+“ N 1 p ´ q´ r ´ | “ s
+i:D ÿi“1
+´ ¯
+p
+p
+where E Y i,2 Y i,1 D i 0,X i is the estimated conditional expectation function fitted on
+r ´ | “ s
+the control units (but evaluated at X for a treated unit). We note that if one uses a linear
+i
+p
+model for E Y i,2 Y i,1 D i 0,X i , then this would be similar to a modification of (12) that
+r ´ | “ s
+interacts X with both treatment group and time dummies, although the two are not quite
+i
+p
+identical because the outcome regression approach re-weights using the distribution of X
+i
+among units with D 1. The researcher need not restrict themselves to linear models
+i
+“
+for the CEF, however, and can use more flexible semi-/non-parametric methods instead.
+One popular approach in empirical practice is to match each treated unit to a “nearest
+neighbor” untreated unit with similar (or identical) covariate values, and then estimate
+E Y i,2 Y i,1 D i 0,X i using Y lpiq2 Y lpiq1, where l i is the untreated unit matched to i, in
+r ´ | “ s ´ p q
+p
+25
+
+--- PAGE 26 ---
+which case τ 2 reduces to the simple DiD estimator between treated units and the matched
+comparison group.
+p
+The outcome regression approach will generally be consistent for the ATT when the out-
+come model used to estimate E Y i,2 Y i,1 D i 0,X i is correctly specified. Inference can
+r ´ | “ s
+be done using the delta-method for parametric models, and there are also several methods
+p
+available for semi-/non-parametric models (under some additional regularity conditions),
+including the bootstrap, as described in Heckman et al. (1998). Inference is more compli-
+cated, however, when one models the outcome evolution of untreated units using a nearest-
+neighbor approach with a fixed number of matches: the resulting estimator is no longer
+asymptotically linear and thus standard bootstrap procedures are not asymptotically valid
+(e.g.,Abadie and Imbens,2006,2008,2011,2012). Ignoringthematching stepcanalso cause
+problems, and one therefore needs to use inference procedures that accommodate matching
+as described in the aforementioned papers.15
+Inverse probability weighting An alternative to modeling the conditional expectation
+functionistoinsteadmodelthepropensity score, i.e. theconditionalprobabilityofbelonging
+to the treated group given covariates, p X P D 1 X . Indeed, as shown by Abadie
+i i i
+p q “ p “ | q
+(2005), under Assumptions 2, 6 and 7, the ATT is identified using the following inverse
+probability weighting (IPW) formula:
+1 D p X
+E D i ´ p 1 ´ p i q X p i q p Y i,2 ´ Y i,1 q
+i
+τ 2 “ „ˆ ´ E p D q ˙ . (14)
+i
+r s
+As in the regression adjustment approach, researchers can use the “plug-in principle”
+to estimate the ATT by pluging in an estimate of the propensity score to the equation
+above. The propensity score model can be estimated using parametric models or semi-/non-
+parametric models (under suitable regularity conditions). The IPW approach will generally
+be consistent if the model for the propensity scores is correctly specified. Inference can be
+conducted using standard tools; see, e.g., Abadie (2005).
+Doubly-robust estimators TheoutcomeregressionandIPWapproachesdescribedabove
+can also be combined to form “doubly-robust” (DR) methods that are valid if either the out-
+comemodelorthepropensityscoremodeliscorrectlyspecified. Specifically, Sant’Anna and Zhao
+15Although these nearest-neighbor procedures have been formally justified for cross-sectional data, they
+are easily adjustable to the canonical 2x2 DiD setup with balanced panel data. We are not aware of formal
+extensionsthatallowsforunbalancedpaneldata,repeatedcross-sectionaldata,ormoregeneralDiDdesigns.
+Abadie and Spiess (2022)showthat, insomecases,clusteringatthe matchlevelis sufficientwhenmatching
+is done without replacement.
+26
+
+--- PAGE 27 ---
+(2020) show that under Assumptions 2, 6 and 7, the ATT is identified as:
+1 D p X
+i i
+p ´ q p q
+D 1 p X
+τ 2 “ E »¨ E D i ´ 1 ´ D p p i q X ˛ p Y i,2 ´ Y i,1 ´ E r Y i,2 ´ Y i,1 | D i “ 0,X i sq fi(.15)
+i E i i
+r s p ´ q p q
+—˚ 1 p X ‹ ffi
+—˚ „ ´ p i q ‹ ffi
+–˝ ‚ fl
+Asbefore, onecanthenestimatetheATT byplugging inestimates ofboththepropensity
+score and the CEF. The outcome equation and the propensity score can be modeled with
+either parametric or semi-/non-parametric methods, and DR methods will generally be con-
+sistent if either of these models is correctly specified. In addition, Chang (2020) shows that
+data-adaptive/machine-learning methods can also be used with DR methods. Standard in-
+ference tools can be used as well; see, e.g., Sant’Anna and Zhao (2020). Finally, under some
+regularity conditions, the DR estimator achieves the semi-parametric efficiency bound when
+both the outcome and propensity score models are correctly specified (Sant’Anna and Zhao,
+2020).
+Extensions to staggered treatment timing: Although the discussion above focused on
+DiD setups with two groups and two periods, these different procedures have been extended
+to staggered DiD setups when treatments are binary and non-reversible. More precisely,
+Callaway and Sant’Anna (2021) extend the regression adjustment, IPW and DR procedures
+above to estimate the family of ATT g,t ’s discussed in Section 3.3. They then aggre-
+p q
+gate these estimators to form different treatment effect summary measures. Wooldridge
+(2021) proposes an alternative regression adjustment procedure that is suitable for stag-
+gered setups. His proposed estimator differs from the Callaway and Sant’Anna (2021) re-
+gression adjustment estimator as he exploits additional information from pre-treatment
+periods, which, in turn, can lead to improvements in precision. On the other hand, if
+these additional assumptions are violated, Wooldridge (2021)’s estimator may be more bi-
+ased than Callaway and Sant’Anna (2021)’s. de Chaisemartin and D’Haultfœuille (2020);
+de Chaisemartin and D’Haultfoeuille (2022) and Borusyak et al. (2021) consider estimators
+which include covariates in a linear manner.
+Caveats. Throughout, we assume that the covariates X were measured prior to the intro-
+i
+duction of the intervention and are, therefore, unaffected by it. If X can in fact be affected
+i
+by treatment, then conditioning on it induces a “bad control” problem that can induce bias;
+see Zeldow and Hatfield (2021) for additional discussion. Similar issues arise if one condi-
+tions on time-varying covariates X that can be affected by the treatment. If one is willing
+i,t
+27
+
+--- PAGE 28 ---
+to assume that a certain time-varying covariate W is not affected by the treatment, then
+i,t
+in principle the entire time-path of the covariate W i W i,1 ,...,W i,T 1 can be included in
+“ p q
+the conditioning variable X , and thus exogenous time-varying covariates can be incorpo-
+i
+ratedsimilarlytoanypre-treatment covariate. SeeCaetano, Callaway, Payne and Rodrigues
+(2022) for additional discussion of time-varying covariates.
+Another important question relates to whether researchers should condition on pre-
+treatment outcomes. Proponents of including pre-treatment outcomes argue that controlling
+for lagged outcomes can reduce bias from unobserved confounders (Ryan, 2018). It is worth
+noting when lagged outcomes are included in X , the conditional parallel trends assumption
+i
+actually reduces to a conditional mean independence assumption for the untreated potential
+outcome, since the Y i,1 0 terms on both sides of (10) cancel out, and thus we are left with
+p q
+E Y i,2 0 D i 1,X i E Y i,2 0 D i 0,X i (almost surely) .
+r p q| “ s “ r p q| “ s
+Including thelaggedoutcomeintheconditioning variablethus makes sense ifoneis confident
+in the conditional unconfoundedness assumption: i.e., if treatment is as good as randomly
+assigned conditional on the lagged outcome and other elements of X . This may be sensible
+i
+insettings where treatment takeup decisions aremadeonthebasis oflaggedoutcomes. How-
+ever, it is also important to note that conditioning on lagged outcomes need not necessarily
+reduce bias, andcaninfact exacerbate it incertain contexts. Forexample, Daw and Hatfield
+(2018) show that when the treated and comparison groups have different outcome distribu-
+tions but the same trends, matching the treated and control groups on lagged outcomes
+selects control units with a particularly large “shock” in the pre-treatment period. This can
+then induce bias owing to a mean-reversion effect, when in fact not conditioning on lagged
+outcomes would have produced parallel trends. Thus, whether one should include lagged
+outcomes or not depends on whether the researcher prefers the non-nested assumptions of
+conditional unconfoundedness (given the lagged outcome) versus parallel trends. See, also
+Chabé-Ferret (2015), Angrist and Pischke (2009, Chapter 5.4), and Ding and Li (2019) for
+related discussion.
+4.3 Testing for pre-existing trends
+Although conditioning on pre-existing covariates can help increase the plausibility of the
+parallel trends assumption, researchers typically still worry that there remain unobserved
+time-varying confounders. An appealing feature of the DiD design is that it allows for a
+natural plausibility check on the identifying assumptions: did outcomes for the treated and
+comparison groups (possibly conditional on covariates) move in parallel prior to the time
+28
+
+--- PAGE 29 ---
+of treatment? It has therefore become common practice to check, both visually and using
+statistical tests, whether there exist pre-existing differences in trends (“pre-trends”) as a test
+of the plausibility of the parallel trends assumption.
+To fix ideas, consider a simple extension of the canonical non-staggered DiD model in
+Section 2 in which we observe outcomes for an additional period t 0 during which no units
+“
+were treated. (These ideas will extend to the case of staggered treatment or conditional
+parallel trends). By the no-anticipation assumption, Y Y 0 for all units in periods
+i,t i,t
+“ p q
+t 0 and t 1. We can thus check whether the analog to the parallel trends assumption
+“ “
+held between periods 0 and 1 — that is, is
+E Y Y D 1 E Y Y D 0 0?
+i,1 i,0 i i,1 i,0 i
+r ´ | “ s ´ r ´ | “ s “
+Pre-treatment changeforDi“1 Pre-treatment changeforDi“0
+loooooooooooomoooooooooooon loooooooooooomoooooooooooon
+For example, did average insurance rates evolve in parallel for expansion and non-expansion
+states before either of them expanded Medicaid? In the non-staggered setting, this hypoth-
+esis can be conveniently tested using a TWFE specification that includes leads and lags of
+treatment,
+Y α φ 1 R r β ǫ , (16)
+i,t i t i,t r i,t
+“ ` ` r “ s `
+r‰0
+ÿ
+where the coefficient on the lead of treatment β ´1 is given by
+1 1
+p
+β Y Y Y Y .
+´1 i,0 i,1 i,0 i,1
+“ N 1 ´ ´ N 0 ´
+i:D ÿi“1 i:D ÿi“0
+p
+Testingforpre-treatmenttrendsthusisequivalenttotestingthenullhypothesisthatβ
+´1
+0.
+“
+This approach is convenient to implement and extends easily to the case with additional
+pre-treatment periods and non-staggered treatment adoption. When there are multiple pre-
+treatment periods, it is common to plot the β in what is called as an “event-study” plot.
+r
+If all of the pre-treatment coefficients (i.e., β for r 0 are insignificant, this is usually
+r
+p ă q
+interpreted as a sign in favor of the validity of the design, since we cannot reject the null
+p
+that parallel trends was satisfied in the pre-treatment period.
+This pre-testing approach extends easily to settings with staggered adoption and/or con-
+ditional parallel trends assumptions. For example, the Callaway and Sant’Anna (2021) es-
+timator can be used to construct “placebo” estimates of ATTw for l 0, i.e. the ATT
+l ă
+w
+l periods before treatment. The estimates ATT can be plotted for different values of l
+l
+(corresponding to different lengths of time before/after treatment) to form an event-study
+z
+plot analogous to that for the non-staggered case. This illustrates that the idea of testing
+29
+
+--- PAGE 30 ---
+for pre-trends extends easily to the settings with staggered treatment adoption or condi-
+tional parallel trends, since the Callaway and Sant’Anna (2021) can be applied for both of
+these settings. These results are by no means specific to the Callaway and Sant’Anna (2021)
+estimator, though, and event-study plots can be created in a similar fashion using other
+estimators for either staggered or conditional DiD settings. We caution, however, against
+using dynamic TWFE specifications like (16) in settings with staggered adoption, since as
+noted by Sun and Abraham (2021), the coefficients β may be contaminated by treatment
+r
+effects at relative time r1 0, so with heterogeneous treatment effects the pre-trends test
+ą
+may reject even if parallel trends holds in the pre-treatment period (or vice versa).
+4.4 Issues with testing for pre-trends
+Although tests of pre-existing trends are a natural and intuitive plausibility check of the
+parallel trends assumption, recent research has highlighted that they also have several lim-
+itations. First, even if pre-trends are exactly parallel, this need not guarantee that the
+post-treatment parallel trends assumption is satisfied. Kahn-Lang and Lang (2020) give an
+intuitive example: the average height of boys and girls evolves in parallel until about age 13
+and then diverges, but we should not conclude from this that there is a causal effect of bar
+mitzvahs (which occur for boys at age 13) on children’s height!
+A second issue is that even if there are pre-existing differences in trends, the tests de-
+scribedabovemayfailtorejectowingtolowpower(Bilinski and Hatfield,2018;Freyaldenhoven, Hansen and Shapiro,
+2019; Kahn-Lang and Lang, 2020; Roth, 2022). That is, even if there is a pre-existing trend,
+it may not be significant in the data if our pre-treatment estimates are imprecise.
+To develop some intuition for why power may be low, suppose that there is no true
+treatment effect but there is a pre-existing linear difference in trends between the treatment
+andcomparisongroups. Theninthesimple examplefromabove, thepre-treatment andpost-
+treatment event-study coefficients will have the same magnitude, β ´1 β 1 . If the two
+| | “ | |
+estimated coefficients β ´1 and β 1 also have the same sampling variance, then by symmetry
+ˆ
+the probability that the pre-treatment coefficient β ´1 is significant will be the same as the
+p p ˆ
+probability that the post-treatment coefficient β 1 is significant. But this means that a linear
+violation of parallel trends that would be detected only half the time by a pre-trends test will
+alsoleadustospuriously findasignificant treatment effect halfthetime16 —thatis, 10times
+more often than we expect to find a spurious effect using a nominal 95% confidence interval!
+Another intuition for this phenomenon, given by Bilinski and Hatfield (2018), is that pre-
+ˆ
+16This is the unconditional probability that β1 is significant (not conditioning on the result of the pre-
+ˆ ˆ
+test). However,if β1 and β ´1 are independent, then this is also the probability of finding a significant effect
+conditional on passing the pre-test.
+30
+
+--- PAGE 31 ---
+trends tests reverse the traditional roles of type I and type II error: they set the assumption
+of parallel trends (or no placebo pre-intervention effect) as the null hypothesis and only
+“reject” the assumption if there is strong evidence against it. This controls the probability
+of finding a violation when parallel trends holds at 5% (or another chosen α-level), but the
+probability of failing to identify a violation can be much higher, corresponding to type II
+error of the test.
+In addition to being concerning from a theoretical point of view, the possibility of low
+power appears to be relevant in practice: in simulations calibrated to papers published in
+three leading economics journals, Roth (2022) found that linear violations of parallel trends
+that conventional tests would detect only 50% of the time often produce biases as large as
+(or larger than) the estimated treatment effect.
+A third issue with pre-trends testing is that conditioning the analysis on “passing” a pre-
+trends test induces a selection bias known as pre-test bias (Roth, 2022). Intuitively, if there
+is a pre-existing difference in trends in population, the draws from the DGP in which we fail
+to detect a significant pre-trend are a selected sample from the true DGP. Roth (2022) shows
+that in many cases, this additional selection bias can exacerbate the bias from a violation of
+parallel trends.
+A final issue with the current practice of pre-trends testing relates to what happens if
+we do detect a significant pre-trend. In this case, the pre-trends test suggests that parallel
+trendsislikelynottoholdexactly,butresearchersmaystillwishtolearnsomethingaboutthe
+treatment effect of interest. Indeed, it seems likely that with enough precision, we will nearly
+always reject that the parallel trends assumption holds exactly in the pre-treatment period.
+Nevertheless, we may still wish to learn something about the treatment effect, especially if
+the violation of parallel trends is “small” in magnitude. However, the conventional approach
+does not make clear how to proceed in this case.
+4.4.1 Improved diagnostic tools
+Afewpapershaveproposedalternativetoolsfordetectingpre-treatmentviolationsofparallel
+trends thattakeinto account someofthelimitationsdiscussed above. Roth(2022)developed
+tools to conduct power analyses and calculate the likely distortions from pre-testing under
+researcher-hypothesized violations of parallel trends. These tools allow the researcher to
+assess whether the limitations described above are likely to be severe for potential violations
+of parallel trends deemed economically relevant.
+Bilinski and Hatfield (2018) and Dette and Schumann (2020) propose “non-inferiority”
+approaches to pre-testing that help address the issue of low power by reversing the roles of
+the null and alternative hypotheses. That is, rather than test the null that pre-treatment
+31
+
+--- PAGE 32 ---
+trends are zero, they test the null that the pre-treatment trend is large, and reject only
+if the data provides strong evidence that the pre-treatment trend is small. For example,
+Dette and Schumann (2020) consider null hypotheses of the form H 0 : max ră0 β r c,
+| | ě
+where β are the (population) pre-treatment coefficients from regression (16). This ensures
+r
+that the test “detects” a pre-trend with probability at least 1 α when in fact the pre-trend
+´
+is large (i.e. has magnitude at least c).
+These non-inferiority approaches are an improvement over standard pre-testing methods,
+since they guarantee by design that the pre-test is powered against large pre-treatment
+violations of parallel trends. However, using these approaches does not provide any formal
+guarantees that ensure the validity of confidence intervals for the treatment effect, the main
+object of interest. They also do not avoid statistical issues related to pre-testing (Roth,
+2022), and do not provide clear guidance on what to do when the test fails to reject the null
+ofalargepre-trend. Thishasmotivatedmoreformalrobust inferenceandsensitivity analysis
+approaches that consider inference on the ATT when parallel trends may be violated, which
+we discuss next.
+4.5 Robust inference and sensitivity analysis
+Bounds using pre-trends. Rambachan and Roth (2022b) propose an approach for ro-
+bust inference and sensitivity analysis when parallel trends may be violated, building on
+earlier work by Manski and Pepper (2018). Their approach attempts to formalize the in-
+tuition motivating pre-trends testing: that the counterfactual post-treatment trends cannot
+be “too different” from the pre-trends. To fix ideas, consider the non-staggered treatment
+adoption setting described in Section 4.4. Denote by δ 1 the violation of parallel trends in
+the first post-treatment period:
+δ E Y 0 Y 0 D 1 E Y 0 Y 0 D 0 .
+1 i,2 i,1 i i,2 i,1 i
+“ r p q´ p q| “ s´ r p q´ p q| “ s
+This, for example, could be the counterfactual difference in trends in insurance coverage
+between Medicaid expansion and non-expansion states if the expansions had not occurred.
+The bias δ 1 is unfortunately not directly identified, since we do not observe the untreated po-
+tential outcomes, Y i,2 0 , for the treated group. However, by the no anticipation assumption,
+p q
+we can identify the pre-treatment analog to δ 1,
+δ E Y 0 Y 0 D 1 E Y 0 Y 0 D 0 ,
+´1 i,0 i,1 i i,0 i,1 i
+“ r p q´ p q| “ s´ r p q´ p q| “ s
+which looks at pre-treatment differences in trends between the groups, with δ ´1 E β ´1
+“
+” ı
+p
+32
+
+--- PAGE 33 ---
+from the event study regression (16). For example, δ ´1 corresponds to the pre-treatment
+difference in trends between expansion and non-expansion states.
+Rambachan and Roth (2022b) then consider robust inference under assumptions that
+restrict the possible values of δ 1 given the value of δ ´1 — or more generally, given δ ´1 ,...,δ ´K
+if there are K pre-treatment coefficients. For example, one type of restriction they consider
+states that the magnitude of the post-treatment violation of parallel trends can be no larger
+than a constant M ¯ times the maximal pre-treatment violation, i.e. δ 1 M ¯ max ră0 δ r .
+| | ď | |
+If M ¯ 1, for example, then this would impose that post-treatment violations of parallel
+“
+trends are no larger than the largest pre-treatment violation. They also consider restrictions
+that bound the extent that δ 1 can deviate from a linear extrapolation of the pre-treatment
+differences in trends. Rambachan and Roth (2022b) use tools from the partial identification
+and sensitivity analysis literature (Armstrong and Kolesár, 2018; Andrews, Roth and Pakes,
+2022) to construct confidence sets for the ATT that are uniformly valid under the imposed
+restrictions. These confidence sets take into account the fact that we do not observe the true
+pre-treatment difference in trends δ ´1, only an estimate β ´1. In contrast to conventional
+pre-trends tests, the Rambachan and Roth (2022b) confidence sets thus tend to be larger
+p
+when there is more uncertainty about the pre-treatment difference in trends (i.e. when the
+standard error on δ ´1 is large).
+This approach enables a natural form of sensitivity analysis. For example, a researcher
+p
+might report that the conclusion of a positive treatment effect is robust up to the value
+M ¯ 2. This indicates that to invalidate the conclusion of a positive effect, we would need
+“
+to allow for a post-treatment violation of parallel trends two times larger than the maximal
+pre-treatment violation. For example, we could potentially say that Medicaid expansion
+has a significant effect on insurance rates unless we’re willing to allow for post-expansion
+differences in trends that were up to twice as large as the largest difference in trends prior
+to the expansion. Doing so makes precise exactly what needs to be assumed about possible
+violations of parallel trends to reach a particular conclusion.
+It is worth highlighting that although we’ve described these tools in the context of non-
+staggered treatment timing and an unconditional parallel trends assumption, they extend
+easily to the case of staggered treatment timing and conditional parallel trends as well.
+Indeed, under mild regularity conditions, these tools can be used anytime the researcher
+has a treatment effect estimate β and a placebo estimate β , so long as she is willing
+post pre
+to bound the possible bias of β given the expected value of β . For example, in the
+post pre
+p p
+staggered setting, β could be an estimate of ATTw for l 0 using one of the estimators
+post p l ą p
+described in Section 3.3, and β could be placebo estimates of ATTw ,...,ATTw . See
+pre ´1 ´k
+p
+https://github.com/pedrohcgs/CS_RR for examples on how these sensitivity analyses can
+p
+33
+
+--- PAGE 34 ---
+be combined with the Callaway and Sant’Anna (2021) estimator in R.
+Bounds using bracketing. Ye, Keele, Hasegawa and Small (2021) consider an alterna-
+tive partial identification approach where there are two control groups whose trends are as-
+sumed to “bracket” that of the treatment group. Consider the canonical model from Section
+2, and suppose the untreated units can be divided into two control groups, denoted C a
+i
+“
+and C b. For ease of notation, let C trt denote the treated group, i.e. units with
+i i
+“ “
+D i 1. Let ∆ c E Y i,2 0 Y i,1 0 C i c . Instead of the parallel trends assumption,
+“ p q “ r p q´ p q| “ s
+Ye et al. (2021) impose that
+min ∆ a ,∆ b ∆ trt max ∆ a ,∆ b , (17)
+t p q p qu ď p q ď t p q p qu
+so that the trend in Y 0 for the treated group is bounded above and below (“bracketed”)
+p q
+by the minimum and maximum trend in groups a and b. An intuitive example where we
+may have such bracketing is if each of the groups corresponds with a set of industries, and
+one of the control groups (say group a) is more cyclical than the treated group while the
+other (say group b) is less cyclical. If the economy was improving between periods t 1 and
+“
+t 2, then we would expect group a to have the largest change in the outcome and group b
+“
+to have the smallest change; whereas if the economy was getting worse, we would expect the
+opposite. Under equation (17) and the no anticipation assumption, the ATT is bounded,
+E Y Y D 1 max ∆ a ,∆ b τ E Y Y D 1 min ∆ a ,∆ b .
+i,2 i,1 i 2 i,2 i,1 i
+r ´ | “ s´ t p q p qu ď ď r ´ | “ s´ t p q p qu
+This reflects that if we knew the true counterfactual trend for the treated group we could
+learn the ATT exactly, and therefore that bounding this trend means we can obtain bounds
+on the ATT. Ye et al. (2021) further show how one can construct confidence intervals for the
+ATT, and extend this logic to settings with multiple periods (but non-staggered treatment
+timing). See, also, Hasegawa, Webster and Small (2019) for a related, earlier approach.
+4.5.1 Other approaches.
+Keele, Small, Hsu and Fogarty (2019) propose a sensitivity analysis in the canonical two-
+periodDiD modelthat summarizes the strength of confounding factorsthat would beneeded
+to induce a particular bias. Freyaldenhoven, Hansen, Pérez and Shapiro (2021) propose a vi-
+sual sensitivity analysis in which one plots the “smoothest” trend though an event-study plot
+that could rationalize the data under the null of no effect. Finally, Freyaldenhoven et al.
+(2019) propose a GMM-based estimation strategy that allows for parallel trends to be vi-
+34
+
+--- PAGE 35 ---
+olated when there exists a covariate assumed to be affected by the same confounds as the
+outcome but not by the treatment itself.
+4.6 Recommendations
+We suspect that in most practical applications of DiD, researchers will not be confident
+ex ante that the parallel trends assumption holds exactly, owing to concerns about time-
+varying confounds and sensitivity to functional form. The methods discussed in this setting
+for relaxing the parallel trends assumption and/or assessing sensitivity to violations of the
+parallel trends assumption will therefore be highly relevant in most contexts where DiD is
+applied.
+A natural starting point for these robustness checks is to consider whether the results
+change meaningfully when imposing parallel trends only conditional on covariates. Among
+the different estimation procedures we discussed, we view doubly-robust procedures as a
+natural default, since they are valid if either the outcome model or propensity score is
+well-specified and have desirable efficiency properties. A potential exception to this recom-
+mendation arises in settings with limited overlap, i.e., when the estimated propensity score
+is close to 0 or 1, in which case regression adjustment estimators may be preferred.
+Whether one includes covariatesinto the DiD analysis or not, we encourage researchers to
+continue to plot “event-study plots” that allow for a visual evaluation of pre-existing trends.
+These plots convey useful information for the reader to assess whether there appears to have
+been a break in the outcome for the treatment group around the time of treatment. In
+contexts with a common treatment date, such plots can be created using TWFE specifi-
+cations like (16); in contexts with staggered timing, we recommend plotting estimates of
+ATTw for different values of l using one of the estimators for the staggered setting described
+l
+in Section 3.3 to avoid negative weighting issues with TWFE. See Section 4.3 for addi-
+tional discussion. We also refer the reader to Freyaldenhoven et al. (2021) regarding best-
+practices for creating such plots, such as displaying simultaneous (rather than pointwise)
+confidence bands for the path of the event-study coefficients (Olea and Plagborg-Møller,
+2019; Callaway and Sant’Anna, 2021).
+Whileevent-studyplotsplayanimportantroleinevaluatingtheplausibilityoftheparallel
+trends assumption, we think it is important to appreciate that tests of pre-trends may be
+underpowered to detect relevant violations of paralleltrends, asdiscussed inSection 4.4. The
+lack of a significant pre-trend does not necessarily imply the validity of the parallel trends
+assumption. At minimum, we recommend that researchers assess the power of pre-trends
+tests against economically relevant violations of parallel trends, as described in Section 4.4.1.
+35
+
+--- PAGE 36 ---
+We also think it should become standard practice for researchers to formally assess the
+extent to which their conclusions are sensitive to violations of parallel trends. A natural
+¯
+statistic to report in many contexts is the “breakdown” value of M using the sensitivity
+analysis in Rambachan and Roth (2022b) — i.e. how big would the post-treatment violation
+of parallel trends have to be relative to the largest pre-treatment violation to invalidate
+a particular conclusion? We encourage researchers to routinely report the results of the
+sensitivity analyses described in Section 4.5 alongside their event-study plots.
+We also encourage researchers to accompany the formalsensitivity toolswith a discussion
+of possible violations of parallel trends informed by context-specific knowledge. The parallel
+trends assumption is much more plausible in settings where we expect the trends for the two
+groups to be similar ex-ante (before seeing the pre-trends). Whenever possible, researchers
+should therefore provide a justification for why we might expect the two groups to have
+similar trends. It is also useful to provide context-specific knowledge about the types of
+confounds that might potentially lead to violations of the parallel trends assumption —
+what time-varying factorsmayhave differentially affectedtheoutcome forthetreatedgroup?
+Such discussion can often be very useful for interpreting the results of the formal sensitivity
+analyses described in Section 4.5. For example, suppose that a particular conclusion is
+robust to allowing for violations of parallel trends twice as large the maximum in the pre-
+treatment period. In contexts where other factors were quite stable around the time of the
+treatment, this might be interpreted as a very robust finding; on the other hand, if the
+treatment occurred at the beginning of a recession much larger than anything seen in the
+pre-treatment period, then a violation of parallel trends of that magnitude may indeed be
+plausible, so that the results are less robust than we might like. Thus, economic knowledge
+will be very important in understanding the robustness of a particular result. In our view,
+the most scientific approach to dealing with possible violations of parallel trends therefore
+involves a combination of state-of-the-art econometric tools and context-specific knowledge
+about the types of plausible confounding factors.
+5 Relaxing sampling assumptions
+We now discuss a third strand of the DiD literature, which considers inference under devi-
+ations from the canonical assumption that we have sampled a large number of independent
+clusters from an infinite super-population.
+36
+
+--- PAGE 37 ---
+5.1 Inference procedures with few clusters
+As described in Section 2, standard DiD inference procedures rely on researchers having
+access to data on a large number of treated and untreated clusters. Confidence intervals are
+then based on the central limit theorem, which states that with independently-sampled clus-
+ters, the DiD estimator has an asymptotically normal distribution as the number of treated
+and untreated clusters grows large. In many practical DiD settings, however, the number of
+independent clusters (and, in particular, treated clusters) may be small, so that the central
+limit theorem based on a growing number of clusters may provide a poor approximation.
+For example, many DiD applications using state-level policy changes may only have a hand-
+ful of treated states. The central limit theorem may provide a poor approximation with
+few clusters, even if the number of units within each cluster is large. This is because the
+standard sampling-based view of clustering allows for arbitrary correlations of the outcome
+within each cluster, and thus there may be common components at the cluster level (a.k.a.
+cluster-level “shocks”) that do not wash out when averaging over many units within the same
+cluster. Since we only observe a few observations of the cluster-specific shocks, the average
+of these shocks will generally not be approximately normally distributed.
+Model-based approaches. Several papers have made progress on the difficult problem
+of conducting inference with a small number of clusters by modeling the dependence within
+clusters. These papers typically place some restrictions on the common cluster-level shocks,
+although the exact restrictions differ across papers. The starting point for these papers is
+typically a structural equation of the form
+Y α φ D β ν ǫ , (18)
+ijt j t jt jt ijt
+“ ` ` `p ` q
+where Y is the (realized) outcome of unit i in cluster j at time t, α and φ are cluster
+ijt j t
+and time fixed effects, D is an indicator for whether cluster j is treated in period t, ν is a
+jt jt
+common cluster-by-time error term, and ǫ is an idiosyncratic unit-level error term. Here,
+ijt
+the “cluster-level” error term, ν , induces correlation among units within the same cluster.
+jt
+It is often assumed that ǫ are iid mean-zero across i and j (and sometimes t); see, e.g.,
+ijt
+Donald and Lang (2007), Conley and Taber (2011), and Ferman and Pinto (2019). Letting
+Y
+n´1
+Y be the average outcome among units in cluster j, where n is the
+jt
+“
+j i:jpiq“j ijt j
+number of units in cluster j, we can take averages to obtain
+ř
+Y α φ D β η , (19)
+jt j t jt jt
+“ ` ` `
+37
+
+--- PAGE 38 ---
+where η ν
+n´1 nj
+ǫ . Assuming the canonical set-up with two periods where no
+jt
+“
+jt
+`
+j i“1 ijt
+clusters are treated in period t 1 and some clusters are treated in period t 2, the
+ř
+“ “
+canonical DiD estimator at the cluster level is equivalent to the estimated OLS coefficient β
+from (19), and is given by
+p
+1 1
+β β ∆η ∆η
+j j
+“ ` J 1 ´ J 0
+j:D ÿj“1 j:D ÿj“0
+p 1 nj 1 nj
+β ∆ν n´1 ∆ǫ ∆ν n´1 ∆ǫ , (20)
+“ ` J 1 j:D ÿj“1˜ j ` j i
+ÿ
+“1 ij ¸ ´ J 0 j:D ÿj“0˜ j ` j i
+ÿ
+“1 ij ¸
+where J d corresponds with the number of clusters with treatment d, and ∆η j η j2 η j1
+“ ´
+(and likewise for the other variables). The equation in the previous display highlights the
+challenge in this setup: with few clusters, the averages of the cluster level shocks ∆ν among
+j
+treated and untreated clusters will tend not to be approximately normally distributed, and
+their variance may be difficult to estimate.
+It is worth highlighting that the model described above starts from the structural equa-
+tion (18) rather than a model where the primitives are potential outcomes as in Section 2.
+We think that connecting the assumptions on the errors in the structural model (18) to re-
+strictions on the potential outcomes is an interesting open topic for future work. Although a
+general treatment is beyond the scope of this paper, in Appendix A we show that the errors
+in the structural model (18) map to primitives based on potential outcomes in the canonical
+model from Section 2. For the remainder of the sub-section, however, we focus primarily
+on the restrictions placed on ν and ǫ directly — rather than the implications of these
+jt ijt
+assumptions for the potential outcomes — since this simplifies exposition and matches how
+these assumptions are stated in the literature.
+Donald and Lang (2007) made an important early contribution to the literature on in-
+ference with few clusters. Their approach assumes that the cluster level-shocks ν are
+jt
+mean-zero Gaussian, homoskedastic with respect to cluster and treatment status, and inde-
+pendent of other unit-and-time specific shocks. They also assume the number of units per
+cluster is large (n for all j). They then show that one can obtain valid inference by
+j
+Ñ 8
+using critical values from a t-distribution with J 2 degrees of freedom, where J is the total
+´
+number of clusters. A nice feature of this approach is that it allows for valid inference when
+both the number of treated and untreated clusters is small. The disadvantage is the strong
+parametric assumption of homoskedastic Gaussian errors, which will often be hard to justify
+in practice.
+Conley and Taber (2011) introduce an alternative approach for inference that is able to
+38
+
+--- PAGE 39 ---
+relax the strong assumption of Gaussian errors in settings where there are many control clus-
+ters (J 0 large) but few treated clusters (J 1 small). This may be reasonable if the author has
+data from, say, 3 treated states and 47 untreated states. The key idea in Conley and Taber
+(2011) is that if we assume that the errors in treated states come from the same distribution
+as in control states, then we can learn the distribution of errors from the large number of
+control states and use that to construct standard errors. A key advantage of this approach
+is that the distribution of errors is not assumed to be Gaussian, but rather is learned from
+the data. Nevertheless, the assumption that all treated groups have the same distribution of
+errors is still strong, and will often be violated if either there is heterogeneity in treatment ef-
+fects or in cluster sizes. Ferman and Pinto (2019) extend the approach of Conley and Taber
+(2011) to allow for heteroskedasticity caused by heterogeneity in group sizes or other observ-
+able characteristics, but must still restrict heterogeneity based on unobserved characteristics
+(e.g. unobserved treatment effect heterogeneity).
+Hagemann (2020) provides an alternative permutation-based approach that avoids the
+need to directly estimate the heteroskedasticity. The key insight of Hagemann (2020) is
+that if we place a bound on the maximal relative heterogeneity across clusters, then we
+can bound the probability of type I error from a permutation approach. He also shows
+how one can use this measure of relative heterogeneity to do sensitivity analysis. Like the
+other proposals above, though, Hagemann (2020)’s approach must also place some strong
+restrictions on certain types of heterogeneity. In particular, his approach essentially requires
+that, as cluster size grows large, any single untreated cluster could be used to infer the
+counterfactual trend for the treated group, and thus his approach rules out cluster-specific
+heterogeneity in trends in untreated potential outcomes.
+Another popular solution with few clusters is the cluster wild bootstrap. In an influential
+paper, Cameron, Gelbach and Miller (2008) presented simulation evidence that the cluster
+wild bootstrapprocedurecan workwell insettings with asfewasfive clusters. Morerecently,
+however, Canay, Santos and Shaikh (2021) provided a formal analysis about the conditions
+under which the cluster wild bootstrap is asymptotically valid in settings with a few large
+clusters. Importantly, Canay et al. (2021) show that the reliability of these bootstrap proce-
+dures depends on imposing certain homogeneity conditions on treatment effects, as well as
+the type of bootstrap weights one uses and the estimation method adopted (e.g., restricted
+vs. unrestricted OLS). These restrictions are commonly violated when one uses TWFE re-
+gressions with cluster-specific and time fixed effects like (19) or when treatment effects are
+allowed to be heterogeneous across clusters — see Examples 2 and 3 in Canay et al. (2021).
+Simulations have likewise shown that the cluster wild bootstrap may perform poorly in DiD
+settings with a small number of treated clusters (MacKinnon and Webb, 2018). Thus, while
+39
+
+--- PAGE 40 ---
+the wild bootstrap may perform well in certain scenarios with a small number of clusters, it
+too requires strong homogeneity assumptions.
+Finally, in settings with a large number of time periods, it may be feasible to conduct re-
+liable inference with less stringent homogeneity assumptions about treatment effects. For in-
+stance, Canay, Romano and Shaikh(2017),Ibragimov and Müller(2016),Hagemann(2021),
+andChernozhukov, Wüthrich and Zhu(2021)respectively proposepermutation-based, t-test
+based, adjustedpermutation-based, andconformalinference-based proceduresthatallowone
+to relax distributional assumptions about common shocks and accommodate richer forms of
+heterogeneity. The key restriction is that one is comfortable limiting the time-series depen-
+dence of the cluster-specific-shocks, and strengthening the parallel trends assumption to hold
+in many pre- and post-treatment time periods. These methods have been shown to be valid
+under asymptotics where the number of periods grows large. When in fact the number of
+time periods is small, as frequently occurs in DiD applications, one can still use some of
+these methods, but the underlying assumptions are stronger — see, e.g., Remark 4.5 and
+Section 4.2 of Canay et al. (2017).
+Alternative approaches. We now briefly discuss two alternative approaches in settings
+with a small number of clusters. First, while all of the “model-based” papers above treat ν
+jt
+as random, an alternative perspective would be to condition on the values of ν and view
+jt
+the remaining uncertainty as coming only from the sampling of the individual units within
+clusters, constructing standard errors by clustering only at the unit level. This will generally
+produce a violation of parallel trends, but the violation may be relatively small if the cluster-
+specific shocks are small relative to the idiosyncratic variation. The violation of parallel
+trends could then be accounted for using the methods described in Section 4. To make this
+concrete, consider the setting of Card and Krueger (1994) that compares employment in NJ
+and PA after NJ raised its minimum wage. The aforementioned papers would consider NJ
+and PA as drawn from a super-population of treated and untreated states, where the state-
+level shocks are mean-zero, whereas the alternative approach would treat the two states as
+fixed and view any state-level shocks between NJ and PA as a violation of the parallel trends
+assumption. One could then explore the sensitivity of one’s conclusions to the magnitude
+of this violation, potentially benchmarking it relative to the magnitude of the pre-treatment
+violations as discussed in Section 4.5.
+A second possibility is Fisher Randomization Tests (FRTs), otherwise known as permuta-
+tion tests. The basic idea is to calculate some statistic of the data (e.g. the t-statistic of the
+DiD estimator), andthenrecompute this statisticunder manypermutations ofthetreatment
+assignment (at the cluster level). We then reject the null hypothesis of no effect if the test
+40
+
+--- PAGE 41 ---
+statistic using theoriginaldatais larger than95%ofthe draws ofthe test statistics under the
+permuted treatment assignment. Such tests have a long history in statistics, dating to Fisher
+(1935). If treatment is randomly assigned, then FRTs have exact finite-sample validity under
+the sharp null of no treatment effects for all units. The advantage of these tests is that they
+place no restrictions on the potential outcomes, and thus allow arbitrary heterogeneity in
+potential outcomes across clusters. On the other hand, the assumption of random treatment
+assignment may often be questionable in DiD settings. Moreover, the “sharp” null of no
+effects for all units may not be as economically interesting as the “weak” null of no average
+effects. Nevertheless, permutation tests may be a useful benchmark: if one cannot reject
+the null of no treatment effects even if treatment had been randomly assigned, this suggests
+that there is not strong evidence of an effect in the data without other strong assumptions.
+In settings with staggered treatment timing, it may be more plausible to assume that the
+timing of when a unit gets treated is as good as random; see Roth and Sant’Anna (2021) for
+efficient estimators and FRTs for this setting.
+Recommendations. In sum, recent research has made progress on the problem of con-
+ducting inference with relatively few clusters, but all of the available approaches require the
+researcher to impose some potentially strong additional assumptions. Most of the litera-
+ture has focused on model-based approaches, which require the researcher to impose some
+homogeneity assumptions across clusters. Different homogeneity assumptions may be more
+reasonable in different contexts, and so we encourage researchers using these approaches to
+choose a method relying on a dimension of homogeneity that is most likely to hold (ap-
+proximately) in their context. We also note that allowing for more heterogeneity may often
+come at the expense of obtaining tests with lower power. When none of these homogeneity
+assumptions is palatable, conditioning the inference on the cluster-level shocks and treating
+them as violations of parallel trends, accompanied by appropriate sensitivity analyses, may
+be an attractive alternative. Permutation-based methods also offer an intriguing alterna-
+tive which requires no assumptions about homogeneity in potential outcomes, but requires
+stronger assumptions on the assignment of treatment and tests a potentially less interesting
+null hypothesis when the number of clusters is small.
+5.2 Design-based inference and the appropriate level of clustering
+ThecanonicalapproachtoinferenceinDiDassumesthatwehavealargenumberofindependently-
+drawn clusters sampled from an infinite super-population. In practice, however, there are
+two related conceptual difficulties with this framework. First, in many settings, it is unclear
+what the super-population of clusters is — if the clusters in my sample are the 50 US states,
+41
+
+--- PAGE 42 ---
+should I view these as having been drawn from a super-population of possible states? Sec-
+ond, in many settings it is hard to determine what the appropriate level of clustering is — if
+my data is on individuals who live in counties, which are themselves subsets of states, which
+is the appropriate level of clustering?
+To address these difficulties, it is often easier to consider a design-based framework that
+viewstheunitsinthedataasfixed(notnecessarily sampledfromasuper-population)andthe
+treatment assignment as stochastic. This helps to address the difficulties described above,
+since we do not need to conceptualize the super-population, and the appropriate level of
+clustering is determined by the way that treatment is assigned. Design-based frameworks
+have a long history in statistics dating to Neyman (1923), and have received recent attention
+in econometrics (e.g. Abadie, Athey, Imbens and Wooldridge, 2020, 2023). However, until
+recently, most of the results in the design-based literature has focused on settings where
+treatment probabilities are known or depend only on observable characteristics, and thus
+were not directly applicable to DiD.
+Recent work by Rambachan and Roth (2022a) has extended this design-based view to
+settings like DiD, where treatment probabilities may differ in unknown ways across units.
+Rambachan and Roth (2022a) consider a setting similar to the canonical two-period model
+in Section 2. However, following the design-based paradigm, they treat the units in the
+population (and their potential outcomes) as fixed rather than drawn from an infinite super-
+population. In this set-up, they show that the usual DiD estimator is unbiased for a finite-
+population analog to the ATT under a finite-population analog to the parallel trends as-
+sumption. In particular, let π denote the probability that D 1, and suppose that
+i i
+“
+N
+N
+π 1 Y 0 Y 0 0,
+i i,2 i,1
+´ N p p q´ p qq “
+i“1ˆ ˙
+ÿ
+so that treatment probabilities are uncorrelated with trends in Y 0 (a finite-population
+p q
+version of parallel trends). Then E D r τ 2 s “ τ 2 Fin, where τ 2 Fin “ E D rN 1 1 i:Di“1 p Y i,2 p 1 q ´
+Y i,2 0 is a finite-population analog to the ATT, i.e. the expected average ř treatment effect
+p qqs
+p
+on the treated, where the expectation is taken over the stochastic distribution of which units
+are treated.
+Rambachan and Roth (2022a) show that from the design-based perspective, cluster-
+robust standard errors are valid (but potentially conservative) if the clustering is done at the
+level at which treatment is independently determined. Thus, for example, if the treatment is
+assigned independently at the unit-level,17 then we should cluster at the unit-level; by con-
+17Formally, if units are assigned independently before we condition on the number of treated units, N1.
+42
+
+--- PAGE 43 ---
+trast, if treatment is determined independently across states, then we should cluster at the
+state level. This clear recommendation on the appropriate level of clustering contrasts with
+the more traditional model-based view that clustering should be done at the level at which
+the errors are correlated, which often makes it challenging to choose the appropriate level
+(MacKinnon, Nielsen and Webb, 2022). These results also suggest that it may not actually
+be a problem if it is difficult to conceptualize a super-population from which our clusters are
+drawn; rather, the “usual” approach remains valid if there is no super-population and the
+uncertainty comes from stochastic assignment of treatment.18
+Recommendations. If it is difficult to conceptualize a super-population, fear not! Your
+DiDanalysis canlikely stillbesensible froma finite-populationperspective where wethinkof
+thetreatmentassignmentasstochastic. Furthermore,ifyouareunsureabouttheappropriate
+level of clustering, a good rule of thumb (at least from the design-based perspective) is to
+cluster at the level at which treatment is independently assigned.
+6 Other topics and areas for future research
+In this section, we briefly touch on some other areas of interest in the DiD literature, and
+highlight some open areas for future research.
+Distributional treatment effects. The DiD literature typically focuses on estimation
+of the ATT, but researchers may often be interested in the effect of a treatment on the en-
+tire distribution of an outcome. Athey and Imbens (2006) propose the Changes-in-Changes
+model, which allows one to infer the full counterfactual distribution of Y 0 for the treated
+p q
+group in DiD setups. The key assumption is that the mapping between quantiles of Y 0
+p q
+for the treated and comparison groups remains stable over time – e.g., if the 30th percentile
+of the outcome for the treated group was the 70th percentile for the comparison group prior
+to treatment, this relationship would have been preserved in the second period if treatment
+had not occurred. Bonhomme and Sauder (2011) propose an alternative distributional DiD
+modelbasedonaparalleltrendsassumptionforthe(logofthe)characteristic function,which
+is motivated by a model of test scores. Callaway and Li (2019) propose a distributional DiD
+18In some settings, the uncertainty may arise both from sampling and the stochastic assignment of treat-
+ment. Abadie et al.(2023)studyamodelinwhichbothtreatmentisstochasticandunitsaresampledfroma
+largerpopulation, andsuggestthat oneshouldcluster amongunits if either their treatmentassignmentsare
+correlatedorthe eventthattheyareincludedinthe sampleis correlated. Althoughthe Abadie et al.(2023)
+results do not directly apply to DiD, we suspect that a similar heuristic would apply in DiD as well in light
+of the results in Rambachan and Roth (2022a) for the case where only treatment is viewed as stochastic.
+Formalizing this intuition strikes us as an interesting area for future research.
+43
+
+--- PAGE 44 ---
+model based on a copula stability assumption. Finally, Roth and Sant’Anna (2022) show
+that parallel trends holds for all functional forms under a “parallel trends”-type assumption
+for the cumulative distribution of Y 0 , and this assumption also allows one to infer the full
+p q
+counterfactual distribution for the treated group.
+Quasi-random treatment timing. Insettings withstaggered treatment timing, the gen-
+eralized parallel trends assumption is often justified by arguing that the timing of treatment
+is random or quasi-random. Roth and Sant’Anna (2021) show that if one is willing to as-
+sume treatment timing is as good as random, one can obtain more efficient estimates than
+using the staggered DiD methods discussed in Section 3.3. This builds on earlier work by
+McKenzie (2012), who highlighted that DiD is typically inefficient in an RCT where lagged
+outcomes are observed, as well as a large literature in statistics on efficient covariate ad-
+justment in randomized experiments (e.g., Lin, 2013). Shaikh and Toulis (2021) propose a
+method for observational settings where treatment timing is random conditional on fixed ob-
+servable characteristics. We think that developing methods for observational settings where
+treatment timing is approximately random, possibly conditional on covariates and lagged
+outcomes, is an interesting area for further study in the years ahead.
+Sequential ignorability. As discussed in Section 3.4, an exciting new literature in DiD
+has begun to focus on settings where treatment can turn on and off and potential outcomes
+depend on the full path of treatments. A similar setting has been studied extensively in
+biostatistics, beginning with the pioneering work of Robins (1986). The key difference is
+that the biostatistics literature has focused on sequential random ignorability assumptions
+that impose that treatment in each period is random conditional on the path of covariates
+and realized outcomes, rather than parallel trends. We suspect that there may be eco-
+nomic settings where sequential ignorability may be preferable to parallel trends, e.g. when
+there is feedback between lagged outcomes and future treatment choices. Integrating these
+two literatures — e.g., understanding in which economic settings is parallel trends prefer-
+able to sequential ignorability and vice versa — is an interesting area for future research.
+An interesting step towards incorporating sequential ignorability in economic analyses is
+Viviano and Bradic (2021).
+Spillover effects. The vast majority of the DiD literature imposes the SUTVA assump-
+tion, which rules out spillover effects. However, spillover effects may be important in many
+economic applications, such as when policy in one area affects neighboring areas, or when
+individuals are connected in a network. Butts (2021) provides some initial work in this
+44
+
+--- PAGE 45 ---
+direction by extending the framework of Callaway and Sant’Anna (2021) to allow for local
+spatial spillovers. Huber and Steinmayr (2021) also consider extensions to allow for spillover
+effects. We suspect that in the coming years, we will see more work on DiD with spillovers.
+Conditional treatment effects. TheDiDliteraturehasplacedalotofemphasisonlearn-
+ingabouttheATT’sofdifferentgroups. However, inmanysituations,itmayalsobedesirable
+to better understand how these ATT’s vary between subpopulations defined by covariate val-
+ues. For instance, how does the average treatment effect of a training program on earnings
+vary according to the age of its participants? Abadie (2005) provides re-weighting methods
+to tackle these types of questions using linear approximations. However, recent research
+has shown that data-adaptive/machine-learning procedures can be used to more flexibly
+estimate treatment effect heterogeneity in the context of RCTs or cross-sectional observa-
+tional studies with unconfoundedness (e.g., Lee, Okui and Whang, 2017; Wager and Athey,
+2018; Chernozhukov, Demirer, Duflo and Fernández-Val, 2020). Whether such tools can be
+adapted to estimate treatment effect heterogeneity in DiD setups is a promising area for
+future research.
+Tripledifferences. AcommonvariantonDiDistriple-differences(DDD),whichcompares
+the DiD estimate for a demographic group expected to be affected by the treatment to a DiD
+for a second demographic group expected not to be affected (or effected less). For example,
+Gruber (1994) studies the impacts of mandated maternity leave policies using a DDD design
+that compares the evolution of wages between treated/untreated states, before/after the law
+passed, and between married women age 20-40 (who are expected to be affected) and other
+workers. DDD has received much less attention in the recent literature than standard DiD.
+We note, however, that DDD can often be cast as a DiD with a transformed outcome. For
+˜
+example, if we defined the state-level outcome Y as the difference in wages between women
+age 20-40 and other workers, then Gruber (1994)’s DDD analysis would be equivalent to a
+˜
+DiD analysis using Y as the outcome instead of wages. Nevertheless, we think that providing
+a more formal analysis of DDD along with practical recommendations for applied researchers
+would be a useful direction for future research.
+Connections to other panel data methods. DiDisofcourseoneofmanypossiblepanel
+data methods. One of the most prominent alternatives is the synthetic control (SC) method,
+pioneered by Abadie, Diamond and Hainmueller (2010). Much oftheDiD andSCliteratures
+have evolved separately, using different data-generating processes as the baseline (Abadie,
+2021). Recent work has begun to try to combine insights from the two literatures (e.g.,
+45
+
+--- PAGE 46 ---
+Arkhangelsky, Athey, Hirshberg, Imbens and Wager,2021;Ben-Michael, Feller and Rothstein,
+2021,2022;Doudchenko and Imbens,2016). Wethink that exploring further connections be-
+tween the literatures — and in particular, providing clear guidance for practitioners on when
+one we should expect one method to perform better than the other, or whether one should
+consider a hybrid of the two — is an interesting direction for future research.
+7 Conclusion
+This paper synthesizes the recent literature on DiD. Some key themes are that researchers
+should be clear about the comparison group used for identification, match the estimation
+and inference methods to the identifying assumptions, and explore robustness to possible
+violations of those assumptions. We emphasize that context-specific knowledge will often
+be needed to choose the right identifying assumptions and accompanying methods. We are
+hopeful that these recent developments will help to make DiD analyses more transparent
+and credible in the years to come.
+46
+
+--- PAGE 47 ---
+Table 1: A Checklist for DiD Practitioners
+– Is everyone treated at the same time?
+If yes, and panel is balanced, estimation with TWFE specifications such as (5) or (7)
+yield easily interpretable estimates.
+If no, consider using a “heterogeneity-robust” estimator for staggered treatment timing
+asdescribed inSection 3. The appropriate estimator will depend onwhether treatment
+turnson/offandwhich paralleltrendsassumption you’rewilling toimpose. UseTWFE
+only if you’re confident in treatment effect homogeneity.
+– Are you sure about the validity of the parallel trends assumption?
+If yes, explain why, including a justification for your choice of functional form. If
+the justification is (quasi-)random treatment timing, consider using a more efficient
+estimator as discussed in Section 6.
+If no, consider the following steps:
+1. If parallel trends would be more plausible conditional on covariates, consider a
+method that conditions on covariates, as described in Section 4.2.
+2. Assess the plausibility of the parallel trends assumption by constructing an event-
+study plot. If thereisacommontreatment dateandyou’reusing anunconditional
+parallel trends assumption, plot the coefficients from a specification like (16). If
+not, then see Section 4.3 for recommendations on event-plot construction.
+3. Accompany the event-study plot with diagnostics of the power of the pre-test
+against relevant alternatives and/or non-inferiority tests, as described in Section
+4.4.1.
+4. Report formal sensitivity analyses that describe the robustness of the conclusions
+to potential violations of parallel trends, as described in Section 4.5.
+– Do you have a large number of treated and untreated clusters sampled from
+a super-population?
+If yes, then use cluster-robust methods at the cluster level. A good rule of thumb is
+to cluster at the level at which treatment is independently assigned (e.g. at the state
+level when policy is determined at the state level); see Section 5.2.
+If you have a small number of treated clusters, consider using one of the alternative
+inference methods described in Section 5.1.
+If you can’t imagine the super-population, consider a design-based justification for
+inference instead, as discussed in Section 5.2.
+47
+
+--- PAGE 48 ---
+Table 2: Statistical Packages for Recent DiD Methods
+Heterogeneity Robust Estimators for Staggered Treatment Timing
+Package Software Description
+did,csdid R,Stata ImplementsCallawayandSant’Anna(2021)
+did2s R,Stata ImplementsGardner(2021),Borusyaketal.(2021),SunandAbraham(2021),
+CallawayandSant’Anna(2021),RothandSant’Anna(2021)
+didimputation,did_imputation R,Stata ImplementsBorusyaketal.(2021)
+DIDmultiplegt,did_multiplegt R,Stata ImplementsdeChaisemartinandD’Haultfœuille(2020)
+eventstudyinteract Stata ImplementsSunandAbraham(2021)
+flexpaneldid Stata ImplementsDettmann(2020),basedonHeckmanetal.(1998)
+fixest R ImplementsSunandAbraham(2021)
+stackedev Stata ImplementsstackingapproachinCengizetal.(2019)
+staggered R ImplementsRothandSant’Anna(2021),CallawayandSant’Anna(2021),
+andSunandAbraham(2021)
+xtevent Stata ImplementsFreyaldenhovenetal.(2019)
+DiD withCovariates
+Package Software Description
+DRDID,drdid R,Stata ImplementsSant’AnnaandZhao(2020)
+Diagnostics for TWFE with Staggered Timing
+Package Software Description
+bacondecomp,ddtiming R,Stata DiagnosticsfromGoodman-Bacon(2021)
+TwoWayFEWeights R,Stata DiagnosticsfromdeChaisemartinandD’Haultfœuille(2020)
+Diagnostic / Sensitivity for Violations of Parallel Trends
+Package Software Description
+honestDiD R,Stata ImplementsRambachanandRoth(2022b)
+pretrends R DiagnosticsfromRoth(2022)
+Note: ThistablelistsRandStatapackagesforrecentDiDmethods,andisbasedonAsjadNaqvi’srepositoryathttps://asjadnaqvi.github.io/DiD/. Several
+ofthepackageslistedunder“HeterogeneityRobustEstimators”alsoaccommodatecovariates.
+48
+
+--- PAGE 49 ---
+References
+Abadie, Alberto, “Semiparametric Difference-in-Differences Estimators,” The Review of
+Economic Studies, 2005, 72 (1), 1–19.
+,“UsingSyntheticControls: Feasibility, DataRequirements, andMethodologicalAspects,”
+Journal of Economic Literature, June 2021, 59 (2), 391–425.
+, Alexis Diamond, and Jens Hainmueller, “Synthetic Control Methods for Com-
+parative Case Studies: Estimating the Effect of California’s Tobacco Control Program,”
+Journal of the American Statistical Association, June 2010, 105 (490), 493–505.
+and Guido W. Imbens, “Large sample properties of matching estimators for average
+treatment effects,” Econometrica, 2006, 74 (1), 235–267.
+and , “On the Failure of the Bootstrap for Matching Estimators,” Econometrica, 2008,
+76 (6), 1537–1557.
+and , “Bias-Corrected Matching Estimators for Average Treatment Effects,” Journal
+of Business & Economic Statistics, 2011, 29 (1), 1–11.
+and ,“AMartingaleRepresentationforMatchingEstimators,” Journal of the American
+Statistical Association, 2012, 107 (498), 833–843.
+and Jann Spiess, “Robust Post-Matching Inference,” Journal of the American Statis-
+tical Association, April 2022, 117 (538), 983–995. Publisher: Taylor & Francis _eprint:
+https://doi.org/10.1080/01621459.2020.1840383.
+, Susan Athey, Guido Imbens, and Jeffrey Wooldridge, “When Should You Adjust
+Standard Errors for Clustering?,” The Quarterly Journal of Economics, 2023, 138 (1),
+1–35.
+, , Guido W. Imbens, and Jeffrey M. Wooldridge,“Sampling-BasedversusDesign-
+Based Uncertainty in Regression Analysis,” Econometrica, 2020, 88 (1), 265–296.
+Abbring, Jaap H. and Gerard J. van den Berg, “The nonparametric identification of
+treatment effects in duration models,” Econometrica, 2003, 71 (5), 1491–1517.
+Andrews, Isaiah, Jonathan Roth, and Ariel Pakes, “Inference for Linear Conditional
+Moment Inequalities,” Review of Economic Studies, 2022, Forthcoming.
+Angrist, Joshua D. and Jorn-Steffen Pischke, Mostly Harmless Econometrics: An
+Empiricist’s Companion, Princeton: Princeton University Press, 2009.
+Arellano, M., “Practitioners’ Corner: Computing Robust Standard Errors for Within-
+groups Estimators,” Oxford Bulletin of Economics and Statistics, 1987, 49 (4), 431–434.
+Arkhangelsky, Dmitry, Susan Athey, David A. Hirshberg, Guido W. Imbens,
+and Stefan Wager, “Synthetic Difference-in-Differences,” American Economic Review,
+2021, 111 (12), 4088–4118.
+49
+
+--- PAGE 50 ---
+Armstrong, Timothy B. and Michal Kolesár, “Optimal Inference in a Class of Regres-
+sion Models,” Econometrica, 2018, 86 (2), 655–683.
+Athey, Susan and Guido Imbens, “Design-based Analysis in Difference-In-Differences
+Settings with Staggered Adoption,” Journal of Econometrics, 2022, 226 (1), 62–79.
+and Guido W. Imbens, “Identification and Inference in Nonlinear Difference-in-
+Differences Models,” Econometrica, 2006, 74 (2), 431–497.
+Baker, Andrew, David F. Larcker, and Charles C. Y. Wang, “How much should
+we trust staggered difference-in-differences estimates?,” Journal of Financial Economics,
+2022, 144 (2), 370–395.
+Ben-Michael, Eli, Avi Feller, and Jesse Rothstein, “The Augmented Synthetic Control
+Method,” Journal of the American Statistical Association, 2021, 116 (536), 1789–1803.
+, , and , “Synthetic controlswithstaggeredadoption,” Journal of the Royal Statistical
+Society: Series B, 2022, 84 (2), 351–381.
+Bertrand, Marianne, Esther Duflo, and Sendhil Mullainathan, “How Much Should
+We Trust Differences-In-Differences Estimates?,” The Quarterly Journal of Economics,
+2004, 119 (1), 249–275.
+Bilinski, Alyssa and Laura A. Hatfield, “Seeking evidence of absence: Reconsidering
+tests of model assumptions,” arXiv:1805.03273 [stat], May 2018.
+Bojinov, Iavor, Ashesh Rambachan, and Neil Shephard, “Panel experiments and
+dynamic causal effects: A finite population perspective,” Quantitative Economics, 2021,
+12 (4), 1171–1196.
+Bonhomme, Stéphane and Ulrich Sauder, “Recovering distributions in difference-in-
+differences models: A comparison of selective and comprehensive schooling,” Review of
+Economics and Statistics, 2011, 93 (2), 479–494.
+Borusyak, Kirill and Xavier Jaravel, “Revisiting Event Study Designs,” SSRN Scholarly
+Paper ID 2826228, Social Science Research Network, Rochester, NY 2018.
+, , and Jann Spiess, “Revisiting Event Study Designs: Robust and Efficient Estima-
+tion,” arXiv:2108.12419 [econ], 2021.
+Butts, Kyle, “Difference-in-Differences Estimation with Spatial Spillovers,”
+arXiv:2105.03737 [econ], 2021.
+Caetano, Carolina, Brantly Callaway, Stroud Payne, and Hugo Sant’Anna
+Rodrigues, “Difference in Differences with Time-Varying Covariates,” February 2022.
+arXiv:2202.02903 [econ].
+Callaway, Brantlyand PedroH.C. Sant’Anna,“Difference-in-Differences withmultiple
+time periods,” Journal of Econometrics, 2021, 225 (2), 200–230.
+and Tong Li, “Quantile treatment effects in difference in differences models with panel
+50
+
+--- PAGE 51 ---
+data,” Quantitative Economics, 2019, 10 (4), 1579–1618.
+, Andrew Goodman-Bacon, and Pedro H. C. Sant’Anna, “Difference-in-Differences
+with a Continuous Treatment,” arXiv:2107.02637 [econ], 2021.
+Cameron, A Colin, Jonah B Gelbach, and Douglas L Miller, “Bootstrap-Based
+Improvements for Inference With Clustered Errors,” Review of Economics and Statistics,
+2008, 90 (3), 414–427.
+Canay, Ivan A., Andres Santos, and Azeem M. Shaikh, “The wild bootstrap with
+a “small” number of “large” clusters,” Review of Economics and Statistics, 2021, 103 (2),
+346–363.
+, Joseph P. Romano, and Azeem M. Shaikh, “Randomization Tests Under an Ap-
+proximate Symmetry Assumption,” Econometrica, 2017, 85 (3), 1013–1030.
+Card, David and Alan B Krueger, “Minimum Wages and Employment: A Case Study
+of the Fast-Food Industry in New Jersey and Pennsylvania,” American Economic Review,
+1994, 84 (4), 772–793.
+Cengiz, Doruk, Arindrajit Dube, Attila Lindner, and Ben Zipperer, “The Effect
+of Minimum Wages on Low-Wage Jobs,” The Quarterly Journal of Economics, 2019, 134
+(3), 1405–1454.
+Chabé-Ferret, Sylvain, “Analysis of the bias of Matching and Difference-in-Difference
+under alternative earnings and selection processes,” Journal of Econometrics, 2015, 185
+(1), 110–123.
+Chang, Neng-Chieh, “Double/debiased machine learning for difference-in-differences,”
+Econometrics Journal, 2020, 23, 177–191.
+Chernozhukov, Victor, Kaspar Wüthrich, and Yinchu Zhu, “An Exact and Robust
+Conformal Inference Method for Counterfactual and Synthetic Controls,” Journal of the
+American Statistical Association, 2021, 116 (536), 1849–1864.
+, Mert Demirer, Esther Duflo, and Iván Fernández-Val, “Generic Machine Learn-
+ing Inference on Heterogeneous Treatment Effects in Randomized Experiments,” arXiv:
+1712.04802, 2020, pp. 1–52.
+Conley, Timothy G. and Christopher R. Taber, “Inference with “Difference in Dif-
+ferences” with a Small Number of Policy Changes,” Review of Economics and Statistics,
+2011, 93 (1), 113–125.
+Daw, Jamie R. and Laura A. Hatfield, “Matching and Regression to the Mean in
+Difference-in-Differences Analysis,” Health Services Research, 2018.
+de Chaisemartin, Clément and Xavier D’Haultfoeuille, “Difference-in-Differences Es-
+timators of Intertemporal Treatment Effects,” March 2022. arXiv:2007.04267 [econ].
+and Xavier D’Haultfœuille, “Fuzzy Differences-in-Differences,” The Review of Eco-
+51
+
+--- PAGE 52 ---
+nomic Studies, 2018, 85 (2), 999–1028.
+and , “Two-Way Fixed Effects Estimators with Heterogeneous Treatment Effects,”
+American Economic Review, 2020, 110 (9), 2964–2996.
+and , “Two-way Fixed Effects Regressions with Several Treatments,” SSRN Scholarly
+Paper ID 3751060, Social Science Research Network, Rochester, NY 2021.
+and ,“Two-wayfixedeffectsanddifferences-in-differences withheterogeneoustreatment
+effects: a survey,” Econometrics Journal, 2022, Forthcoming.
+Dette, Holger and Martin Schumann, “Difference-in-Differences EstimationUnderNon-
+Parallel Trends,” Working Paper, 2020.
+Dettmann, Eva, “Flexpaneldid: A Stata Toolbox for Causal Analysis with Varying Treat-
+ment Time and Duration,” SSRN Scholarly Paper ID 3692458, Social Science Research
+Network, Rochester, NY 2020.
+Ding, Peng and Fan Li, “ABracketing Relationship between Difference-in-Differences and
+Lagged-Dependent-Variable Adjustment,” Political Analysis, 2019, 27, 605—-615.
+Donald, Stephen G. and Kevin Lang, “Inference with Difference-in-Differences and
+Other Panel Data,” The Review of Economics and Statistics, 2007, 89 (2), 221–233.
+Doudchenko, Nikolay and Guido W. Imbens, “Balancing, Regression, Difference-In-
+Differences and Synthetic Control Methods: A Synthesis,” Working Paper 22791, National
+Bureau of Economic Research 2016.
+Ferman, Bruno and Cristine Pinto, “Inference in Differences-in-Differences with Few
+Treated Groups and Heteroskedasticity,” The Review of Economics and Statistics, 2019,
+101 (3), 452–467.
+Fisher, R. A., The design of experiments The design of experiments, Oxford, England:
+Oliver & Boyd, 1935. Pages: xi, 251.
+Freyaldenhoven, Simon, Christian Hansen, and Jesse M. Shapiro,“Pre-eventTrends
+in the Panel Event-Study Design,” American Economic Review, 2019, 109 (9), 3307–3338.
+, , Jorge Pérez Pérez, and Jesse M. Shapiro, “Visualization, identification, and
+estimation in the linear panel event-study design.,” Advances in Economics and Econo-
+metrics: Twelfth World Congress, 2021, Forthcoming.
+Gardner, John, “Two-stage differences in differences,” Working Paper, 2021.
+Goodman-Bacon, Andrew, “Difference-in-differences withvariationintreatment timing,”
+Journal of Econometrics, 2021, 225 (2), 254–277.
+Gruber, Jonathan, “The Incidence of Mandated Maternity Benefits,” The American Eco-
+nomic Review, 1994, 84 (3), 622–641.
+Hagemann, Andreas, “Inference with a single treated cluster,” arXiv:2010.04076
+[econ.EM], 2020, pp. 1–23.
+52
+
+--- PAGE 53 ---
+,“Permutationinferencewithafinitenumber ofheterogeneousclusters,” arXiv:1907.01049
+[econ.EM], 2021.
+Hasegawa, Raiden B., Daniel W. Webster, and Dylan S. Small, “Evaluating Mis-
+souri’s Handgun Purchaser Law: A Bracketing Method for Addressing Concerns About
+History Interacting with Group,” Epidemiology, 2019, 30 (3), 371–379.
+Heckman, James, Hidehiko Ichimura, Jeffrey Smith, and Petra Todd, “Character-
+izing Selection Bias Using Experimental Data,” Econometrica, 1998, 66 (5), 1017–1098.
+Heckman, James J., Hidehiko Ichimura, and Petra Todd, “Matching as an econo-
+metric evaluation estimator: Evidence from evaluating a job training programme,” The
+Review of Economic Studies, 1997, 64 (4), 605–654.
+Holland, Paul W., “Statistics and Causal Inference,” Journal of the American Statistical
+Association, 1986, 81 (396), 945–960.
+Huber, Martin and Andreas Steinmayr, “A Framework for Separating Individual-Level
+Treatment Effects From Spillover Effects,” Journal of Business & Economic Statistics,
+2021, 39 (2), 422–436.
+Ibragimov, Rustam and Ulrich K. Müller, “Inference with few heterogeneous clusters,”
+Review of Economics and Statistics, 2016, 98 (1), 83–96.
+Imai, Kosuke and In Song Kim,“OntheUseofTwo-wayFixedEffectsRegressionModels
+for Causal Inference with Panel Data,” Political Analysis, 2021, 29 (3), 405–415.
+Jakiela, Pamela, “Simple Diagnostics for Two-Way Fixed Effects,” arXiv:2103.13229 [econ,
+q-fin], March 2021.
+Kahn-Lang, Ariella and Kevin Lang, “The Promise and Pitfalls of Differences-in-
+Differences: Reflections on 16 and Pregnant and Other Applications,” Journal of Business
+& Economic Statistics, 2020, 38 (3), 613–620.
+Keele, Luke J., Dylan S. Small, Jesse Y. Hsu, and Colin B. Fogarty, “Patterns
+of Effects and Sensitivity Analysis for Differences-in-Differences,” arXiv:1901.01869 [stat],
+February 2019. arXiv: 1901.01869.
+Khan, Shakeeb and Elie Tamer, “Irregular Identification, Support Conditions, and In-
+verse Weight Estimation,” Econometrica, 2010, 78 (6), 2021–2042.
+Lee, Sokbae, Ryo Okui, and Yoon-Jae Jae Whang, “Doubly robust uniform con-
+fidence band for the conditional average treatment effect function,” Journal of Applied
+Econometrics, 2017, 32 (7), 1207–1225.
+Liang, Kung-Yee and Scott L. Zeger, “Longitudinal data analysis using generalized
+linear models,” Biometrika, 1986, 73 (1), 13–22.
+Lin, Winston, “Agnostic notes on regression adjustments to experimental data: Reexam-
+ining Freedman’s critique,” Annals of Applied Statistics, 2013, 7 (1), 295–318.
+53
+
+--- PAGE 54 ---
+Liu, Licheng, Ye Wang, and Yiqing Xu, “A Practical Guide to Counterfactual Esti-
+mators for Causal Inference with Time-Series Cross-Sectional Data,” American Journal of
+Political Science, 2022, Forthcoming.
+MacKinnon, James G. and Matthew D. Webb, “The wild bootstrap for few (treated)
+clusters,” The Econometrics Journal, 2018, 21 (2), 114–135.
+, Morten O. Nielsen, and Matthew D. Webb, “Cluster-robust inference: A guide to
+empirical practice,” Journal of Econometrics, 2022, Forthcoming.
+Malani, Anup and Julian Reif, “Interpreting pre-trends as anticipation: Impact on esti-
+mated treatment effects from tort reform,” Journal of Public Economics, 2015, 124, 1–17.
+Manski, Charles F. and John V. Pepper, “How Do Right-to-Carry Laws Affect Crime
+Rates? Coping with Ambiguity Using Bounded-Variation Assumptions,” The Review of
+Economics and Statistics, 2018, 100 (2), 232–244.
+Marcus, Michelle and Pedro H. C. Sant’Anna, “The role of parallel trends in event
+study settings : An application to environmental economics,” Journal of the Association
+of Environmental and Resource Economists, 2021, 8 (2), 235–275.
+McKenzie, David, “Beyond baseline and follow-up: The case for more T in experiments,”
+Journal of Development Economics, 2012, 99 (2), 210–221.
+Meyer, Bruce D., “Natural and Quasi-Experiments in Economics,” Journal of Business &
+Economic Statistics, 1995, 13 (2), 151–161.
+Neyman, Jerzy, “On the Application of Probability Theory to Agricultural Experiments.
+Essay on Principles. Section 9.,” Statistical Science, 1923, 5 (4), 465–472.
+Olea, José Luis Montiel and Mikkel Plagborg-Møller, “Simultaneous confidence
+bands: Theory, implementation, and an application to SVARs,” Journal of Applied Econo-
+metrics, 2019, 34 (1), 1–17.
+Rambachan, Ashesh and Jonathan Roth, “Design-Based Uncertainty for Quasi-
+Experiments,” November 2022. arXiv:2008.00602 [econ, stat].
+and , “A More Credible Approach to Parallel Trends,” Review of Economic Studies,
+2022, Forthcoming.
+Robins, J. M., “A New Approach To Causal Inference in Mortality Studies With a Sus-
+tained Exposure Period - Application To Control of the Healthy Worker Survivor Effect,”
+Mathematical Modelling, 1986, 7, 1393–1512.
+Roth, Jonathan, “Should We Adjust for the Test for Pre-trends in Difference-in-Difference
+Designs?,” arXiv:1804.01208 [econ, math, stat], 2018.
+, “Pre-test with Caution: Event-study Estimates After Testing for Parallel Trends,” Amer-
+ican Economic Review: Insights, 2022, 4 (3), 305–322.
+and Pedro H. C. Sant’Anna, “Efficient Estimation for Staggered Rollout Designs,”
+54
+
+--- PAGE 55 ---
+arXiv:2102.01291 [econ, math, stat], 2021.
+and , “When Is Parallel Trends Sensitive to Functional Form?,” Econometrica, 2022,
+Forthcoming.
+Rubin, Donald B., “Estimating causal effects of treatments in randomized and nonran-
+domized studies,” Journal of Educational Psychology, 1974, 66 (5), 688–70.
+Ryan, Andrew M., “Well-Balanced or too Matchy–Matchy? The Controversy over Match-
+ing in Difference-in-Differences,” Health Services Research, 2018, 53 (6), 4106–4110.
+Sant’Anna, Pedro H. C. and Jun Zhao, “Doubly robust difference-in-differences esti-
+mators,” Journal of Econometrics, 2020, 219 (1), 101–122.
+Schmidheiny, Kurt and Sebastian Siegloch, “OnEvent Studies andDistributed-Lags in
+Two-Way Fixed Effects Models: Identification, Equivalence, and Generalization,” SSRN
+Scholarly Paper 3571164, Social Science Research Network, Rochester, NY 2020.
+Shaikh, Azeem and Panos Toulis, “Randomization Tests in Observational Studies With
+Staggered Adoption of Treatment,” Journal of the American Statistical Association, 2021,
+116 (536), 1835–1848.
+Strezhnev, Anton, “Semiparametric weighting estimators for multi-period difference-in-
+differences designs,” Working Paper, 2018.
+Sun, Liyang and Sarah Abraham, “Estimatingdynamictreatmenteffectsineventstudies
+with heterogeneous treatment effects,” Journal of Econometrics, 2021, 225 (2), 175–199.
+Viviano, Davide and Jelena Bradic, “Dynamic covariate balancing: estimating treat-
+ment effects over time,” June 2021. arXiv:2103.01280 [econ, math, stat].
+Wager, Stefan and Susan Athey, “Estimationand Inference of Heterogeneous Treatment
+Effects using Random Forests,” Journal of the American Statistical Association, 2018, 113
+(523), 1228–1242.
+Wooldridge, Jeffrey M, “Cluster-Sample Methods in Applied Econometrics,” American
+Economic Review P&P, 2003, 93 (2), 133–138.
+, “Two-Way Fixed Effects, the Two-Way Mundlak Regression, and Difference-in-
+Differences Estimators,” Working Paper, 2021, pp. 1–89.
+Ye, Ting, Luke Keele, Raiden Hasegawa, and Dylan S. Small, “A Negative Corre-
+lation Strategy for Bracketing in Difference-in-Differences,” arXiv:2006.02423 [econ, stat],
+2021.
+Zeldow, Bret and Laura A. Hatfield, “Confounding and regression adjustment in
+difference-in-differences studies,” Health Services Research, 2021, 56 (5), 932–941.
+55
+
+--- PAGE 56 ---
+A Connecting model-based assumptions to potential out-
+comes
+This section formalizes connections between the model-based assumptions in Section 5.1
+and the potential outcomes framework. We derive how the errors in the structural model
+(18) map to primitives based on potential outcomes in the canonical model from Section 2.
+Specifically, we show that under the set-up of Section 2, Assumptions 1 and 2 imply that
+the canonical DiD estimator takes the form given in (20), where β τ 2 is the ATT at the
+“
+cluster level, ν jt ν jt,0 D j ν jt,1 and ǫ ijt ǫ ijt,0 D j ǫ ijt,1, where19
+“ ` “ `
+ǫ Y 0 E Y 0 j i j
+ijt,0 ijt ijt
+“ p q´ r p q| p q “ s
+ǫ Y 1 Y 0 E Y 1 Y 0 j i j
+ijt,1 ijt ijt ijt ijt
+“ p q´ p q´ r p q´ p q| p q “ s
+ν E Y 0 j i j E Y 0 D
+jt,0 ijt ijt j
+“ r p q| p q “ s´ r p q| s
+ν E Y 1 Y 0 j i j τ .
+jt,1 ijt ijt t
+“ r p q´ p q| p q “ s´
+Thus, in the canonical set-up, restrictions on ν and ǫ can be viewed as restrictions on
+jt ijt
+primitives that are functions of the potential outcomes.
+Adopt the notation and set-up in Section 2, except now each unit i belongs to a cluster
+j and treatment is assigned at the cluster level D . We assume clusters are drawn iid from
+j
+a superpopulation of clusters and then units are drawn iid within the sampled cluster. We
+write J to denote the number of clusters with treatment d, and n the number of units in
+d j
+cluster j. As in the main text, let Y n ´1 Y be the sample mean within cluster
+jt
+“
+j i:jpiq“j ijt
+j. The canonical DiD estimator at the cluster level can then be written as:
+ř
+1 1
+τ Y Y Y Y
+j2 j1 j2 j1
+“ J 1 p ´ q´ J 0 p ´ q
+j:D ÿj“1 i:D ÿj“0
+1 1 1 1
+p
+Y Y Y Y .
+ij2 ij1 ij2 ij1
+“ J 1 j:D ÿj“1 n j i:j
+ÿ
+piq“j p ´ q´ J 0 i:D ÿj“0 n j i:j
+ÿ
+piq“j p ´ q
+Since the observed outcome is Y 1 for treated units and Y 0 for control units, under the
+p q p q
+no anticipation assumption it follows that
+1 1 1 1
+τ Y 1 Y 0 Y 0 Y 0 ,
+ij2 ij1 ij2 ij1
+“ J 1 j:D ÿj“1 n j i:j
+ÿ
+piq“j p p q´ p qq´ J 0 j:D ÿj“0 n j i:j
+ÿ
+piq“j p p q´ p qq
+19In w p hat follows, we write ErY p0q|D “ds to denote the expectation where one first draws j from the
+ijt j
+population with D “d and then draws Y p0q from that cluster.
+j ijt
+56
+
+--- PAGE 57 ---
+or equivalently,
+1 1
+τ Y 1 Y 0
+ij2 ij2
+“J 1 j:D ÿj“1 n j i:j
+ÿ
+piq“j p p q´ p qq`
+1 1
+p Y 0 Y 0
+ij2 ij1
+J 1 j:D ÿj“1 n j i:j
+ÿ
+piq“j p p q´ p qq´
+1 1
+Y 0 Y 0 .
+ij2 ij1
+J 0 j:D ÿj“0 n j i:j
+ÿ
+piq“j p p q´ p qq
+Adding and subtracting terms of the form E Y j i 1 , we obtain
+ijt
+r | p q “ s
+1
+τ τ E Y 1 Y 0 j i j τ
+2 ij2 ij2 2
+“ ` J 1 p r p q´ p q| p q “ s´ q`
+j:D ÿj“1
+1 1
+p Y 1 Y 0 E Y 1 Y 0 j i j
+ij2 ij2 ij2 ij2
+J 1 j:D ÿj“1 n j i:j
+ÿ
+piq“j p p q´ p q´ r p q´ p q| p q “ sq`
+1 1
+Y 0 Y 0 E Y 0 Y 0 j i j
+ij2 ij1 ij2 ij1
+J 1 j:D ÿj“1 n j i:j
+ÿ
+piq“j p p q´ p q´ r p q´ p q| p q “ sq´
+1 1
+Y 0 Y 0 E Y 0 Y 0 j i j
+ij2 ij1 ij2 ij1
+J 0 j:D ÿj“0 n j i:j
+ÿ
+piq“j p p q´ p q´ r p q´ p q| p q “ sq`
+1 1
+E Y 0 Y 0 j i j E Y 0 Y 0 j i j ,
+ij2 ij1 ij2 ij1
+J 1 r p q´ p q| p q “ s´ J 0 r p q´ p q| p q “ s
+j:D ÿj“1 j:D ÿj“0
+where τ 2
+“
+E J 1 ´1 j:Dj“1 E
+r
+Y ij2
+p
+1
+q´
+Y ij2
+p
+0
+q|
+j
+p
+i
+q “
+j
+s “
+E
+r
+Y ij2
+p
+1
+q´
+Y ij2
+p
+0
+q|
+D j
+“
+1
+s
+is
+the ATT amon”g treated clusters (weighting all clusters eıqually).
+ř
+Now, we assume parallel trends at the cluster level, so that
+E Y 0 Y 0 D 1 E Y 0 Y 0 D 0 0,
+ij2 ij1 j ij2 ij1 j
+r p q´ p q| “ s´ r p q´ p q| “ s “
+which implies that
+57
+
+--- PAGE 58 ---
+1
+τ τ E Y 1 Y 0 j i j τ
+2 ij2 ij2 2
+“ ` J 1 p r p q´ p q| p q “ s´ q`
+j:D ÿj“1
+“∆νj,1
+p 1 1
+looooooo Y oooooo1ooooooo Y oomoo0oooooooEoooo Y oooooo1ooon Y 0 j i j
+ij2 ij2 ij2 ij2
+J 1 j:D ÿj“1 n j i:j
+ÿ
+piq“j p p q´ p q´
+“
+r
+∆ǫij,
+p
+1
+q´ p q| p q “ sq`
+1 1
+l
+Y
+oooooo0ooooooo
+Y
+ooooooo0oooooooEooo
+Y
+omooo0ooooooo
+Y
+oooooo0oooo
+j
+ooo
+i
+oooooo
+j
+oon
+ij2 ij1 ij2 ij1
+J 1 j:D ÿj“1 n j i:j
+ÿ
+piq“j p p q´ p q´
+“
+r
+∆ǫij,
+p
+0
+q´ p q| p q “ sq´
+1 1
+l
+Y
+oooooo0ooooooo
+Y
+oooooo0oooooooEoooo
+Y
+omoo0ooooooo
+Y
+ooooooo0ooo
+j
+ooo
+i
+ooooooo
+j
+oon
+ij2 ij1 ij2 ij1
+J 0 i:D ÿj“0 n j i:j
+ÿ
+piq“j p p q´ p q´
+“
+r
+∆ǫij,
+p
+0
+q´ p q| p q “ sq`
+1
+E Y 0loooo Y ooooooo0oooo j oo i ooooooo j oooooooEmo Y oooooo0ooooooo Y oooooo0oooo D ooooooon
+ij2 ij1 ij2 ij1 j
+J 1 p r p q´ p q| p q “ s´ r p q´ p q| sq´
+j:D ÿj“1
+∆νj,0
+1
+lEoooo
+Y
+oooooo0ooooooo
+Y
+ooooooo0ooo
+j
+ooo
+i
+oooooom
+j
+oooooEooo
+Y
+ooooooo0ooooooo
+Y
+oooooo0oooo
+D
+oooon
+.
+ij2 ij1 ij2 ij1 j
+J 0 p r p q´ p q| p q “ s´ r p q´ p q| sq
+j:D ÿj“0
+∆νj,0
+loooooooooooooooooooooooooooooooooooomoooooooooooooooooooooooooooooooooooon
+Letting ∆ν j ∆ν j,0 D j ∆ν j,1 and ∆ǫ ij ∆ǫ ij,0 D j ∆ǫ ij,1, it follows that τ takes the form
+“ ` “ `
+(20) with β τ 2.
+“
+p
+58

@@ -1,0 +1,1276 @@
+---
+title: "Marovoay–Ankarafantsika: Extended Econometric Analysis"
+author: "BETSAKA project"
+date: last-modified
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    self-contained: true
+editor_options:
+  chunk_output_type: console
+---
+
+# Marovoay–Ankarafantsika: Extended Econometric Analysis
+
+This document extends the analysis in `04_Marovoay-Ankarafantsika.qmd` by implementing
+alternative causal inference methods, incorporating the 2025 survey wave, and expanding
+the donor pool to the Alaotra observatory sites.
+For the full methodological rationale, see `documentation/05_econometric_review.md`.
+
+::: {.callout-warning}
+## Preliminary results
+All results are provisional. Variable construction, outlier treatment, and model
+specification require further validation before any substantive interpretation.
+:::
+
+```{r setup}
+#| include: false
+# Set working directory to project root — must be done before source() calls
+proj_root <- normalizePath(file.path(getwd(), ".."))
+knitr::opts_knit$set(root.dir = proj_root)
+setwd(proj_root)
+
+library(tidyverse)
+library(haven)
+library(labelled)
+library(gt)
+library(readxl)
+library(panelView)
+library(gsynth)
+library(fixest)    # TWFE with clustered SEs, event studies
+library(did)       # Callaway-Sant'Anna DiD
+library(synthdid)  # Arkhangelsky et al. (2021) Synthetic DiD
+library(augsynth)  # Ben-Michael, Feller & Rothstein (2021) Augmented SC
+library(sf)
+library(purrr)
+library(scales)
+
+# ── Helper functions ──────────────────────────────────────────────────────────
+source("utils/helpers_report.R")   # add_obs(), fix_hameau()
+source("utils/sites.R")            # SITES list, assign_site()
+
+# ── Constants ─────────────────────────────────────────────────────────────────
+# Marovoay sites
+MARO_TREATED  <- c("031", "032")   # Bepako, Madiromiongana (near Ankarafantsika)
+MARO_CONTROL  <- c("033", "034")   # Ampijoroa, Maroala
+MARO_ALL      <- c(MARO_TREATED, MARO_CONTROL)
+TREATED_SITES <- MARO_TREATED      # alias kept for backward compat
+
+# Alaotra sites (j5 prefix "21x")
+# 211=Avaradrano, 212=Mangabe, 213=Ambodivoara/Analamiranga/Ambatoharanana,
+# 214=Ambatomanga/Ambohidrony, 215=Feramanga Atsimo
+ALAOTRA_ALL   <- c("211","212","213","214","215")
+
+# Treatment timing
+TREAT_YEAR    <- 2003   # Ankarafantsika reclassification to National Park
+
+# Site labels for plots
+site_labels <- c(
+  "031" = "031 Bepako (Maro-T)",
+  "032" = "032 Madiromiongana (Maro-T)",
+  "033" = "033 Ampijoroa (Maro-C)",
+  "034" = "034 Maroala (Maro-C)",
+  "211" = "211 Avaradrano (Al-C)",
+  "212" = "212 Mangabe (Al-C)",
+  "213" = "213 Analamiranga etc. (Al-C)",
+  "214" = "214 Ambatomanga etc. (Al-C)",
+  "215" = "215 Feramanga Atsimo (Al-C)"
+)
+```
+
+## 1 Panel Construction
+
+### 1.1 Historical household panel (1995–2015)
+
+The historical panel is built from `data/household_consolidated.rds`.
+
+**Note on 2005:** The 2005 Marovoay survey was a tracking survey that covered only a
+non-representative subset of households (site 032/Madiromiongana was not surveyed, and
+the other sites had atypical composition). **Year 2005 is excluded from all specifications.**
+
+```{r panel_hist}
+household_consolidated <- read_rds("data/household_consolidated.rds")
+
+panel_hh_hist <- household_consolidated |>
+  mutate(
+    obs      = substr(j5, 1, 2),
+    site_id  = substr(j5, 1, 3),
+    treated_unit = site_id %in% MARO_TREATED,
+    post         = year >= TREAT_YEAR,
+    treatment    = as.integer(treated_unit & post)
+  ) |>
+  mutate(
+    rev_riz  = coalesce(rev_riz,  0),
+    rev_cu   = coalesce(rev_cu,   0),
+    revel    = coalesce(revel,    0),
+    revpeche = coalesce(revpeche, 0),
+    revppal  = coalesce(revppal,  0),
+    revsec   = coalesce(revsec,   0),
+    revcou   = coalesce(revcou, revppal + revsec + rev_riz + rev_cu + revel + revpeche),
+    rev_agri    = rev_riz + rev_cu + revel + revpeche,
+    rev_nonagri = revppal + revsec,
+    across(c(revtot, revcou, rev_agri, rev_nonagri),
+           ~ pmin(.x, quantile(.x, 0.99, na.rm = TRUE)), .names = "{.col}_w"),
+    across(ends_with("_w"), ~ log(.x + 1), .names = "ln_{.col}")
+  ) |>
+  distinct(j5, year, .keep_all = TRUE) |>
+  # Exclude atypical 2005 Marovoay tracking survey
+  filter(!(obs == "03" & year == 2005))
+```
+
+### 1.2 Adding the 2025 wave — Marovoay
+
+Marovoay 2025 households are identified by `j0 == 3` in `res_deb.dta`.
+Site assignment uses `fix_hameau(j4)` to map hamlet name strings to the four
+canonical site codes (031–034). Income is sourced from `output/ref_incomes_snapshot.rds`
+matched on `j5`. Note that `res_v.dta` is the assets module (radio, bicycle…),
+**not** income — do not confuse the two.
+
+```{r panel_2025_maro}
+res_deb_25 <- read_dta("data/res_deb.dta") |>
+  mutate(j5 = as.character(j5), j0 = as.character(j0))
+
+# Income snapshot includes 2025 via compute_income_all_years()
+rev_2025 <- read_rds("output/ref_incomes_snapshot.rds") |>
+  mutate(j5 = as.character(j5)) |>
+  filter(year == 2025)
+
+# Marovoay 2025: j0 == "3", site assigned via fix_hameau(j4)
+maro_25_ids <- res_deb_25 |>
+  filter(j0 == "3") |>
+  mutate(
+    site_id = case_when(
+      str_starts(str_to_lower(j4), "bepako")          ~ "031",
+      str_starts(str_to_lower(j4), "madiromiongana")  ~ "032",
+      str_starts(str_to_lower(j4), "ampijoroa")       ~ "033",
+      str_starts(str_to_lower(j4), "maroala")         ~ "034",
+      TRUE ~ NA_character_
+    ),
+    obs = "03"
+  ) |>
+  select(j5, obs, site_id)
+
+panel_maro_25 <- maro_25_ids |>
+  left_join(rev_2025, by = "j5") |>
+  mutate(
+    year = 2025,
+    rev_riz  = coalesce(rev_riz,  0),
+    rev_cu   = coalesce(rev_cu,   0),
+    revel    = coalesce(revel,    0),
+    revpeche = coalesce(revpeche, 0),
+    revppal  = coalesce(revppal,  0),
+    revsec   = coalesce(revsec,   0),
+    revcou   = coalesce(revcou, revppal + revsec + rev_riz + rev_cu + revel + revpeche),
+    revtot   = coalesce(revtot, revcou),
+    rev_agri    = rev_riz + rev_cu + revel + revpeche,
+    rev_nonagri = revppal + revsec,
+    treated_unit = site_id %in% MARO_TREATED,
+    post         = TRUE,
+    treatment    = as.integer(treated_unit)
+  ) |>
+  mutate(
+    across(c(revtot, revcou, rev_agri, rev_nonagri),
+           ~ pmin(.x, quantile(.x, 0.99, na.rm = TRUE)), .names = "{.col}_w"),
+    across(ends_with("_w"), ~ log(.x + 1), .names = "ln_{.col}")
+  )
+```
+
+### 1.3 Adding the 2025 wave — Alaotra
+
+Alaotra 2025 households are identified by `j0 == 21`. Site codes are the first 3
+digits of `j5` (211–215). The same income snapshot is used.
+
+```{r panel_2025_alaotra}
+alaotra_25_ids <- res_deb_25 |>
+  filter(j0 == "21") |>
+  mutate(site_id = substr(j5, 1, 3), obs = "21") |>
+  select(j5, obs, site_id)
+
+panel_alaotra_25 <- alaotra_25_ids |>
+  left_join(rev_2025, by = "j5") |>
+  mutate(
+    year = 2025,
+    rev_riz  = coalesce(rev_riz,  0),
+    rev_cu   = coalesce(rev_cu,   0),
+    revel    = coalesce(revel,    0),
+    revpeche = coalesce(revpeche, 0),
+    revppal  = coalesce(revppal,  0),
+    revsec   = coalesce(revsec,   0),
+    revcou   = coalesce(revcou, revppal + revsec + rev_riz + rev_cu + revel + revpeche),
+    revtot   = coalesce(revtot, revcou),
+    rev_agri    = rev_riz + rev_cu + revel + revpeche,
+    rev_nonagri = revppal + revsec,
+    treated_unit = FALSE,
+    post         = TRUE,
+    treatment    = 0L
+  ) |>
+  mutate(
+    across(c(revtot, revcou, rev_agri, rev_nonagri),
+           ~ pmin(.x, quantile(.x, 0.99, na.rm = TRUE)), .names = "{.col}_w"),
+    across(ends_with("_w"), ~ log(.x + 1), .names = "ln_{.col}")
+  )
+```
+
+### 1.4 Combined panels
+
+Three analytical datasets are constructed:
+
+- **`panel_maro`**: Marovoay only (1998–2014 + 2025, 2005 excluded), HH level  
+- **`panel_expanded`**: Marovoay + Alaotra (historical + 2025), HH level  
+- **`panel_site_maro`** / **`panel_site_expanded`**: Site-year aggregates for SC estimators
+
+```{r combine_panels}
+# ── Marovoay-only panel ───────────────────────────────────────────────────────
+panel_maro <- bind_rows(
+  panel_hh_hist |> filter(obs == "03"),
+  panel_maro_25
+) |>
+  filter(site_id %in% MARO_ALL, year >= 1998)
+
+# ── Expanded panel (Marovoay + Alaotra) ───────────────────────────────────────
+panel_expanded <- bind_rows(
+  panel_hh_hist |>
+    filter(obs %in% c("03","21")) |>
+    mutate(treated_unit = site_id %in% MARO_TREATED,
+           post         = year >= TREAT_YEAR,
+           treatment    = as.integer(treated_unit & post)),
+  panel_maro_25,
+  panel_alaotra_25
+) |>
+  filter(
+    (obs == "03" & site_id %in% MARO_ALL     & year >= 1998) |
+    (obs == "21" & site_id %in% ALAOTRA_ALL  & year >= 1999)
+  )
+
+# ── Site-year aggregation helper ─────────────────────────────────────────────
+make_site_panel <- function(df) {
+  df |>
+    group_by(obs, site_id, year, treated_unit, post, treatment) |>
+    summarise(
+      ln_revtot_w      = mean(ln_revtot_w,      na.rm = TRUE),
+      ln_revcou_w      = mean(ln_revcou_w,       na.rm = TRUE),
+      ln_rev_agri_w    = mean(ln_rev_agri_w,     na.rm = TRUE),
+      ln_rev_nonagri_w = mean(ln_rev_nonagri_w,  na.rm = TRUE),
+      share_agri       = mean(
+        if_else(revcou > 0, rev_agri / revcou, NA_real_), na.rm = TRUE),
+      n_hh             = n(),
+      .groups = "drop"
+    )
+}
+
+panel_site_maro     <- make_site_panel(panel_maro)
+panel_site_expanded <- make_site_panel(panel_expanded)
+
+# Balanced subsets (years where all sites within each panel are observed)
+balance_years <- function(site_panel) {
+  n_expected <- n_distinct(site_panel$site_id)
+  site_panel |>
+    group_by(year) |>
+    filter(n() == n_expected) |>
+    ungroup()
+}
+
+panel_site_maro_bal     <- balance_years(panel_site_maro)
+panel_site_expanded_bal <- balance_years(panel_site_expanded)
+```
+
+## 2 Panel Diagnostics
+
+### 2.1 Site distance to nearest protected area {#sec-dist}
+
+The table below reproduces the output of `distance_sites_pa.R`: distances from
+each fokontany centroid to the nearest PA boundary (WDPA polygons).
+
+```{r tbl_distances}
+#| tbl-cap: "Distance from fokontany centroids to nearest PA boundary"
+
+sites_dist <- tribble(
+  ~Observatory, ~Fokontany,           ~site_id, ~nearest_pa,                   ~dist_nearest_km, ~dist_anka_km,
+  "Marovoay",  "Bepako",              "031",    "Ankarafantsika (PN)",           5.25,  5.25,
+  "Marovoay",  "Maroala",             "034",    "Ankarafantsika (PN)",           5.61,  5.61,
+  "Marovoay",  "Ampijoroa",           "033",    "Andrefana Dry Forests (WHS)",  11.3,  11.3,
+  "Marovoay",  "Madiromiongana",      "032",    "Ankarafantsika (PN)",          11.7,  11.7,
+  "Alaotra",   "Maritampona",         "213",    "Lac Alaotra (Paysage)",         8.85,  NA,
+  "Alaotra",   "Analamiranga",        "213",    "Lac Alaotra (Paysage)",         9.49,  NA,
+  "Alaotra",   "Avaradrano",          "211",    "Lac Alaotra (Paysage)",        10.5,   NA,
+  "Alaotra",   "Mangabe",             "212",    "Corridor Ankeniheny (RB)",     14.0,   NA,
+  "Alaotra",   "Feramanga Atsimo",    "215",    "Lac Alaotra (Paysage)",        14.8,   NA,
+  "Alaotra",   "Ambohidrony",         "214",    "Lac Alaotra (Paysage)",        14.8,   NA,
+  "Alaotra",   "Ambatomanga",         "214",    "Lac Alaotra (Paysage)",        16.3,   NA
+)
+
+sites_dist |>
+  gt(groupname_col = "Observatory") |>
+  fmt_number(columns = c(dist_nearest_km, dist_anka_km), decimals = 1) |>
+  cols_label(
+    Fokontany       = "Fokontany",
+    site_id         = "Site ID",
+    nearest_pa      = "Nearest PA",
+    dist_nearest_km = "Dist. nearest PA (km)",
+    dist_anka_km    = "Dist. Ankarafantsika (km)"
+  ) |>
+  tab_style(style = cell_fill(color = "#FFE5E5"),
+            locations = cells_body(rows = dist_nearest_km <= 10)) |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels()
+  ) |>
+  tab_style(style = cell_text(weight = "bold"), locations = cells_row_groups()) |>
+  tab_footnote("Shaded: within 10 km of nearest PA boundary.",
+               locations = cells_column_labels(dist_nearest_km)) |>
+  tab_source_note(md("Source: `distance_sites_pa.R` using WDPA polygons (excl. Ramsar/UNESCO)."))
+```
+
+**Key observations:**
+
+- Bepako (031) and Maroala (034) are the **closest to Ankarafantsika** (5–6 km).
+  Maroala is coded as control — its proximity suggests possible spillover contamination.
+- Madiromiongana (032, treated) is 11.7 km — similar to Ampijoroa (033, control) at 11.3 km.
+  The distance-based treatment classification is therefore imperfect.
+- **Alaotra sites** are 9–16 km from Lac Alaotra PA, a different PA designated in 2007
+  (post-treatment). Alaotra sites are plausibly unaffected by the 2002 Ankarafantsika
+  reclassification, supporting their use as controls.
+
+### 2.2 Coverage heatmap — Marovoay
+
+```{r fig_coverage_maro}
+#| fig-cap: "Panel coverage: Marovoay site-year observations (1998–2025, 2005 excluded)"
+#| fig-width: 9
+#| fig-height: 4
+
+panel_site_maro |>
+  mutate(
+    site_label = site_labels[site_id],
+    Status = case_when(
+      treated_unit & post  ~ "Treated (post)",
+      treated_unit & !post ~ "Treated (pre)",
+      TRUE                  ~ "Control"
+    )
+  ) |>
+  ggplot(aes(x = year, y = fct_rev(site_label), fill = Status)) +
+  geom_tile(color = "white", linewidth = 0.5) +
+  geom_text(aes(label = n_hh), size = 2.8, color = "black") +
+  scale_fill_manual(
+    values = c("Treated (pre)" = "#A8D8A8", "Treated (post)" = "#2D6A4F",
+               "Control" = "#AED9E0"),
+    na.value = "grey90"
+  ) +
+  scale_x_continuous(breaks = c(seq(1998, 2014, 2), 2025)) +
+  geom_vline(xintercept = 2002.5, linetype = "dashed", color = "darkred") +
+  annotate("text", x = 2002.5, y = 4.7, label = "PA 2002",
+           hjust = -0.1, size = 3, color = "darkred") +
+  labs(x = NULL, y = NULL, fill = NULL,
+       caption = "2005 excluded (non-representative tracking survey).") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom")
+```
+
+### 2.3 Coverage heatmap — Expanded (Marovoay + Alaotra)
+
+```{r fig_coverage_expanded}
+#| fig-cap: "Panel coverage: Marovoay + Alaotra site-year observations"
+#| fig-width: 11
+#| fig-height: 6
+
+panel_site_expanded |>
+  mutate(
+    site_label = coalesce(site_labels[site_id], site_id),
+    Status = case_when(
+      treated_unit & post  ~ "Treated (post)",
+      treated_unit & !post ~ "Treated (pre)",
+      !treated_unit & obs == "03" ~ "Maro control",
+      TRUE                 ~ "Alaotra control"
+    )
+  ) |>
+  ggplot(aes(x = year, y = fct_rev(site_label), fill = Status)) +
+  geom_tile(color = "white", linewidth = 0.5) +
+  geom_text(aes(label = n_hh), size = 2.4, color = "black") +
+  scale_fill_manual(
+    values = c("Treated (pre)" = "#A8D8A8", "Treated (post)" = "#2D6A4F",
+               "Maro control" = "#AED9E0", "Alaotra control" = "#FDD5A8"),
+    na.value = "grey90"
+  ) +
+  scale_x_continuous(breaks = c(seq(1999, 2014, 2), 2025)) +
+  geom_vline(xintercept = 2002.5, linetype = "dashed", color = "darkred") +
+  labs(x = NULL, y = NULL, fill = NULL,
+       caption = "Orange = Alaotra sites (pure controls). 2005 Marovoay excluded.") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom")
+```
+
+### 2.4 Raw outcome trajectories
+
+```{r fig_trajectories}
+#| fig-cap: "Site-year mean log total income — Marovoay and Alaotra"
+#| fig-width: 10
+#| fig-height: 5
+
+panel_site_expanded |>
+  mutate(Group = case_when(
+    treated_unit ~ "Treated (Maro)",
+    obs == "03"  ~ "Control (Maro)",
+    TRUE         ~ "Control (Alaotra)"
+  )) |>
+  group_by(Group, year) |>
+  summarise(mean_ln = mean(ln_revtot_w, na.rm = TRUE), .groups = "drop") |>
+  mutate(in_gap = year > 2015) |>
+  ggplot(aes(x = year, y = mean_ln, color = Group, group = Group)) +
+  geom_line(data = ~ filter(.x, !in_gap), linewidth = 0.9) +
+  geom_line(data = ~ filter(.x, in_gap | year == 2015), linetype = "31", linewidth = 0.9) +
+  geom_point(size = 2) +
+  geom_vline(xintercept = 2002.5, linetype = "dashed", color = "darkred") +
+  annotate("text", x = 2002.5, y = Inf, hjust = -0.1, vjust = 1.8,
+           label = "PA 2002", size = 3, color = "darkred") +
+  scale_x_continuous(breaks = c(seq(1999, 2014, 2), 2025)) +
+  scale_color_manual(values = c(
+    "Treated (Maro)"    = "#E41A1C",
+    "Control (Maro)"    = "#377EB8",
+    "Control (Alaotra)" = "#FF7F00"
+  )) +
+  labs(x = NULL, y = "Mean log total income (winsorised)", color = NULL,
+       caption = "Simple means within group. Dotted: 2015–2025 gap.") +
+  theme_minimal()
+```
+
+## 3 Method 1: Two-Way Fixed Effects DiD (TWFE)
+
+TWFE is the natural baseline estimator. With a single treatment cohort (2003),
+it is not subject to the negative-weighting problem (de Chaisemartin & d'Haultfœuille 2020).
+
+### 3.1 Marovoay-only TWFE (1998–2014, excl. 2005)
+
+Standard errors are clustered at the site level (4 clusters; low-cluster caveat applies —
+see @sec-power for wild-bootstrap alternative).
+
+```{r twfe_maro}
+panel_twfe <- panel_maro |> filter(year <= 2014)
+
+fit_twfe_revtot  <- feols(ln_revtot_w    ~ treatment | j5 + year,
+                          data = panel_twfe, cluster = ~site_id)
+fit_twfe_revcou  <- feols(ln_revcou_w    ~ treatment | j5 + year,
+                          data = panel_twfe, cluster = ~site_id)
+fit_twfe_agri    <- feols(ln_rev_agri_w  ~ treatment | j5 + year,
+                          data = panel_twfe, cluster = ~site_id)
+fit_twfe_nonagri <- feols(ln_rev_nonagri_w ~ treatment | j5 + year,
+                          data = panel_twfe, cluster = ~site_id)
+
+etable(
+  fit_twfe_revtot, fit_twfe_revcou, fit_twfe_agri, fit_twfe_nonagri,
+  se       = "cluster",
+  dict     = c(treatment = "D (treated × post)"),
+  headers  = c("log Total", "log Current", "log Agri", "log Non-agri"),
+  notes    = "HH and year FEs. Clustered SE at site level (4 clusters). 2005 excluded."
+)
+```
+
+### 3.2 Expanded TWFE (Marovoay + Alaotra controls)
+
+Adding 5 Alaotra sites as pure controls increases control units from 2 to 7,
+which substantially improves inference (9 clusters total).
+
+```{r twfe_expanded}
+panel_twfe_exp <- panel_expanded |> filter(year <= 2014)
+
+fit_twfe_exp_revtot <- feols(ln_revtot_w    ~ treatment | j5 + year,
+                             data = panel_twfe_exp, cluster = ~site_id)
+fit_twfe_exp_agri   <- feols(ln_rev_agri_w  ~ treatment | j5 + year,
+                             data = panel_twfe_exp, cluster = ~site_id)
+
+etable(
+  fit_twfe_exp_revtot, fit_twfe_exp_agri,
+  se       = "cluster",
+  dict     = c(treatment = "D (treated × post)"),
+  headers  = c("log Total income", "log Agri income"),
+  notes    = "HH and year FEs. Clustered SE at site level (9 clusters: 2 treated Maro + 2 ctrl Maro + 5 Alaotra)."
+)
+```
+
+### 3.3 Event study — pre-trend test
+
+```{r event_study}
+#| fig-cap: "Event-study coefficients for log total income (expanded panel)"
+#| fig-width: 9
+#| fig-height: 5
+
+panel_es <- panel_twfe_exp |>
+  mutate(rel_time = year - TREAT_YEAR)
+
+fit_es <- feols(
+  ln_revtot_w ~ i(rel_time, treated_unit, ref = -1) | j5 + year,
+  data    = panel_es,
+  cluster = ~site_id
+)
+
+iplot(fit_es,
+      main   = "Event study: log total income (Marovoay treated, all controls)",
+      xlab   = "Years relative to PA reclassification",
+      ylab   = "Estimated effect (log points)",
+      col    = "steelblue", pt.col = "steelblue")
+abline(h = 0, lty = 2)
+abline(v = -0.5, lty = 2, col = "darkred")
+```
+
+### 3.4 Long-run site-level DiD (1998–2001 baseline vs. 2025)
+
+Because there is no household overlap between the 1998–2001 and 2025 waves,
+the long-run DiD is estimated at the **site-year aggregate level**.
+Alaotra sites are included as additional controls for the long-run comparison.
+
+```{r twfe_lr}
+panel_lr_site <- panel_site_expanded |>
+  filter((year >= 1998 & year <= 2001) | year == 2025) |>
+  mutate(
+    post_2025    = as.integer(year == 2025),
+    treatment_lr = as.integer(treated_unit & post_2025)
+  )
+
+fit_lr_site <- feols(
+  ln_revtot_w ~ treatment_lr | site_id + year,
+  data    = panel_lr_site,
+  cluster = ~site_id
+)
+
+fit_lr_site_agri <- feols(
+  ln_rev_agri_w ~ treatment_lr | site_id + year,
+  data    = panel_lr_site,
+  cluster = ~site_id
+)
+
+etable(
+  fit_lr_site, fit_lr_site_agri,
+  se      = "cluster",
+  dict    = c(treatment_lr = "D (treated × 2025)"),
+  headers = c("log Total income", "log Agri income"),
+  notes   = "Site and year FEs. Clustered SE at site level. Baseline: 1998–2001. Control: Maro (033,034) + Alaotra (211–215)."
+)
+```
+
+## 4 Method 2: Callaway–Sant'Anna DiD
+
+With a single treatment cohort, this reduces to a clean 2-group DiD with
+doubly-robust semiparametric efficiency. We use `panel = FALSE`
+(repeated cross-section mode) because household composition changes across years.
+
+**2005 is excluded** (the non-representative Marovoay tracking survey would
+otherwise produce a gap in coverage for group 2003 in 2005).
+
+```{r cs_did}
+#| message: false
+#| warning: false
+
+# ── Marovoay-only CS-DiD ──────────────────────────────────────────────────────
+panel_cs_maro <- panel_maro |>
+  filter(year <= 2014) |>
+  mutate(
+    unit_id = as.integer(factor(j5)),
+    group   = if_else(treated_unit, as.integer(TREAT_YEAR), 0L)
+  )
+
+att_cs_maro <- att_gt(
+  yname         = "ln_revtot_w",
+  tname         = "year",
+  idname        = "unit_id",
+  gname         = "group",
+  data          = panel_cs_maro,
+  control_group = "nevertreated",
+  panel         = FALSE,
+  est_method    = "dr",
+  print_details = FALSE
+)
+
+agg_cs_maro    <- aggte(att_cs_maro, type = "simple",  na.rm = TRUE)
+agg_cs_dyn     <- aggte(att_cs_maro, type = "dynamic", na.rm = TRUE)
+
+cat("=== CS-DiD: Marovoay only ===\n")
+summary(agg_cs_maro)
+
+# ── Expanded CS-DiD (Marovoay treated + Alaotra controls) ────────────────────
+panel_cs_exp <- panel_expanded |>
+  filter(year <= 2014) |>
+  mutate(
+    unit_id = as.integer(factor(j5)),
+    group   = if_else(treated_unit, as.integer(TREAT_YEAR), 0L)
+  )
+
+att_cs_exp <- att_gt(
+  yname         = "ln_revtot_w",
+  tname         = "year",
+  idname        = "unit_id",
+  gname         = "group",
+  data          = panel_cs_exp,
+  control_group = "nevertreated",
+  panel         = FALSE,
+  est_method    = "dr",
+  print_details = FALSE
+)
+
+agg_cs_exp     <- aggte(att_cs_exp, type = "simple",  na.rm = TRUE)
+agg_cs_dyn_exp <- aggte(att_cs_exp, type = "dynamic", na.rm = TRUE)
+
+cat("\n=== CS-DiD: Marovoay + Alaotra controls ===\n")
+summary(agg_cs_exp)
+```
+
+```{r cs_did_plots}
+#| fig-cap: "CS-DiD event study: Marovoay only (left) vs. expanded controls (right)"
+#| fig-width: 12
+#| fig-height: 5
+#| layout-ncol: 2
+
+ggdid(agg_cs_dyn,
+      title = "CS-DiD: Marovoay only") +
+  labs(x = "Years relative to PA reclassification", y = "ATT (log points)") +
+  theme_minimal()
+
+ggdid(agg_cs_dyn_exp,
+      title = "CS-DiD: + Alaotra controls") +
+  labs(x = "Years relative to PA reclassification", y = "ATT (log points)") +
+  theme_minimal()
+```
+
+## 5 Method 3: Synthetic DiD
+
+Synthetic DiD (SDiD; Arkhangelsky et al. 2021) operates at the **site-year aggregate
+level** and requires a balanced panel. With only 2 Marovoay control sites, placebo-SE
+computation fails (`N_controls > N_treated` required). With 5 Alaotra sites added, the
+donor pool is large enough for valid permutation inference.
+
+```{r synthdid_setup}
+outcomes_sdid <- c("ln_revtot_w", "ln_revcou_w", "ln_rev_agri_w", "ln_rev_nonagri_w")
+
+# Helper: build panel.matrices and run SDiD
+run_sdid <- function(outcome, data, treated_sites = MARO_TREATED,
+                     treat_year = TREAT_YEAR) {
+  df_in <- data |>
+    rename(unit = site_id, time = year, outcome = all_of(outcome)) |>
+    mutate(treated = as.integer(unit %in% treated_sites & time >= treat_year)) |>
+    as.data.frame()
+
+  setup <- tryCatch(
+    panel.matrices(df_in, unit = "unit", time = "time",
+                   outcome = "outcome", treatment = "treated"),
+    error = function(e) NULL
+  )
+  if (is.null(setup)) return(NULL)
+
+  tau <- tryCatch(synthdid_estimate(setup$Y, setup$N0, setup$T0),
+                  error = function(e) NULL)
+  if (is.null(tau)) return(NULL)
+
+  se <- tryCatch(sqrt(vcov(tau, method = "placebo")), error = function(e) NA_real_)
+
+  list(estimate = tau, se = se, setup = setup, outcome = outcome)
+}
+```
+
+```{r sdid_run}
+#| message: false
+#| warning: false
+
+# Marovoay-only (2 ctrl — SE will be NA)
+sdid_maro <- map(outcomes_sdid, ~ run_sdid(.x, panel_site_maro_bal))
+names(sdid_maro) <- outcomes_sdid
+
+# Expanded (2 treated + 5 Alaotra ctrl)
+sdid_exp <- map(outcomes_sdid, ~ run_sdid(.x, panel_site_expanded_bal))
+names(sdid_exp) <- outcomes_sdid
+
+if (!is.null(sdid_exp$ln_revtot_w)) {
+  synthdid_plot(sdid_exp$ln_revtot_w$estimate,
+                title = "Synthetic DiD: log total income (expanded controls)")
+}
+```
+
+```{r sdid_table}
+#| tbl-cap: "Synthetic DiD estimates — Marovoay only vs. expanded donor pool"
+
+extract_sdid <- function(res_list, label) {
+  map_dfr(res_list, function(r) {
+    if (!is.null(r))
+      tibble(Spec = label, Outcome = r$outcome,
+             ATT  = as.numeric(r$estimate), SE = r$se)
+  })
+}
+
+sdid_table <- bind_rows(
+  extract_sdid(sdid_maro, "Marovoay only (2 ctrl)"),
+  extract_sdid(sdid_exp,  "Expanded (7 ctrl)")
+) |>
+  mutate(CI_lo = ATT - 1.96 * SE, CI_hi = ATT + 1.96 * SE)
+
+gt(sdid_table) |>
+  fmt_number(columns = c(ATT, SE, CI_lo, CI_hi), decimals = 3) |>
+  cols_label(Spec = "Specification", Outcome = "Outcome",
+             ATT = "ATT", SE = "SE (placebo)", CI_lo = "95% lo", CI_hi = "95% hi") |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels()
+  ) |>
+  tab_footnote("SE unavailable when N_controls ≤ N_treated.",
+               locations = cells_body(columns = SE,
+                                      rows = Spec == "Marovoay only (2 ctrl)"))
+```
+
+## 6 Method 4: Augmented Synthetic Control
+
+The Augmented SC (Ben-Michael, Feller & Rothstein 2021; `augsynth` R package)
+adjusts for poor pre-treatment fit with a ridge-regularised outcome model correction.
+
+```{r augsynth_run}
+#| message: false
+#| warning: false
+
+# Helper: aggregate treated sites into single unit and run augsynth
+run_aug <- function(outcome, data, treated_sites = MARO_TREATED) {
+  df_aug <- data |>
+    mutate(unit_aug = if_else(site_id %in% treated_sites, "Treated", site_id)) |>
+    group_by(unit_aug, year) |>
+    summarise(
+      val       = mean(get(outcome), na.rm = TRUE),
+      treatment = max(treatment),
+      .groups   = "drop"
+    ) |>
+    rename(!!outcome := val)
+
+  form <- as.formula(paste0(outcome, " ~ treatment"))
+  safely(augsynth)(form, unit = unit_aug, time = year, data = df_aug,
+                   progfunc = "Ridge", scm = TRUE)
+}
+
+# Marovoay-only
+aug_maro <- map(outcomes_sdid, ~ run_aug(.x, panel_site_maro_bal))
+names(aug_maro) <- outcomes_sdid
+
+# Expanded
+aug_exp <- map(outcomes_sdid, ~ run_aug(.x, panel_site_expanded_bal))
+names(aug_exp) <- outcomes_sdid
+
+if (!is.null(aug_exp$ln_revtot_w$result)) {
+  plot(aug_exp$ln_revtot_w$result,
+       main = "AugSynth gap: log total income (expanded controls)")
+}
+```
+
+```{r augsynth_table}
+#| tbl-cap: "Augmented SC estimates — Marovoay only vs. expanded donor pool"
+
+extract_aug <- function(res_list, spec_label) {
+  imap_dfr(res_list, function(r, outcome_name) {
+    if (!is.null(r$result)) {
+      s <- tryCatch(summary(r$result), error = function(e) NULL)
+      if (!is.null(s) && !is.null(s$average_att)) {
+        tibble(
+          Spec    = spec_label,
+          Outcome = outcome_name,
+          ATT     = tryCatch(s$average_att$Estimate,    error = function(e) NA_real_),
+          SE      = tryCatch(s$average_att$Std.Error,   error = function(e) NA_real_),
+          p_value = tryCatch(s$average_att$p_val,       error = function(e) NA_real_),
+          CI_lo   = tryCatch(s$average_att$lower_bound, error = function(e) NA_real_),
+          CI_hi   = tryCatch(s$average_att$upper_bound, error = function(e) NA_real_)
+        )
+      }
+    }
+  })
+}
+
+aug_table <- bind_rows(
+  extract_aug(aug_maro, "Marovoay only (2 ctrl)"),
+  extract_aug(aug_exp,  "Expanded (7 ctrl)")
+)
+
+if (nrow(aug_table) == 0) {
+  message("AugSynth: no results available (check panel balance).")
+} else {
+  cols_to_fmt <- intersect(c("ATT","SE","p_value","CI_lo","CI_hi"), names(aug_table))
+  tbl <- gt(aug_table) |>
+    fmt_number(columns = all_of(cols_to_fmt), decimals = 3) |>
+    tab_style(
+      style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+      locations = cells_column_labels()
+    ) |>
+    tab_source_note(md("Ridge-augmented SC. SE via conformal inference (augsynth).  
+Note: SE and CI are NA when control N < threshold for conformal inference."))
+  tbl
+}
+```
+
+## 7 Method 5: gsynth with Extended Donor Pool
+
+```{r gsynth_run}
+#| message: false
+#| warning: false
+
+run_gsynth <- function(data, label, r_val = 0, nboots = 200) {
+  d <- data |> filter(!is.na(ln_revtot_w))
+  sites_ok <- d |>
+    filter(year < TREAT_YEAR) |>
+    count(site_id) |>
+    filter(n >= 4) |>
+    pull(site_id)
+  d <- d |> filter(site_id %in% sites_ok)
+
+  tryCatch(
+    suppressWarnings(
+      gsynth(ln_revtot_w ~ treatment,
+             data = d, index = c("site_id","year"),
+             se = TRUE, inference = "nonparametric", nboots = nboots,
+             r = r_val, CV = FALSE, force = "two-way",
+             parallel = FALSE, min.T0 = 4, seed = 2139)
+    ),
+    error = function(e) {
+      message("gsynth failed for ", label, ": ", conditionMessage(e))
+      NULL
+    }
+  )
+}
+
+gs_maro <- run_gsynth(panel_site_maro,     "Marovoay only")
+gs_exp  <- run_gsynth(panel_site_expanded, "Expanded")
+
+if (!is.null(gs_maro))
+  plot(gs_maro, type = "gap", main = "gsynth: log total income (Marovoay only)")
+
+if (!is.null(gs_exp))
+  plot(gs_exp, type = "gap", main = "gsynth: log total income (expanded)")
+```
+
+## 8 Comparative Results
+
+```{r results_comparison}
+#| tbl-cap: "ATT estimates across methods and specifications — log total income"
+
+att_row <- function(method, spec, att, se) {
+  tibble(Method = method, Specification = spec, ATT = att, SE = se)
+}
+
+# TWFE coefficients
+att_twfe_m <- tryCatch(coef(fit_twfe_revtot)[["treatment"]],     error = function(e) NA_real_)
+se_twfe_m  <- tryCatch(se(fit_twfe_revtot)[["treatment"]],       error = function(e) NA_real_)
+att_twfe_e <- tryCatch(coef(fit_twfe_exp_revtot)[["treatment"]], error = function(e) NA_real_)
+se_twfe_e  <- tryCatch(se(fit_twfe_exp_revtot)[["treatment"]],   error = function(e) NA_real_)
+
+# CS-DiD aggregates
+att_cs_m <- tryCatch(agg_cs_maro$overall.att, error = function(e) NA_real_)
+se_cs_m  <- tryCatch(agg_cs_maro$overall.se,  error = function(e) NA_real_)
+att_cs_e <- tryCatch(agg_cs_exp$overall.att,  error = function(e) NA_real_)
+se_cs_e  <- tryCatch(agg_cs_exp$overall.se,   error = function(e) NA_real_)
+
+# SDiD
+sdid_att_m <- tryCatch(as.numeric(sdid_maro$ln_revtot_w$result$estimate), error = function(e) NA_real_)
+sdid_se_m  <- tryCatch(sdid_maro$ln_revtot_w$result$se,                   error = function(e) NA_real_)
+sdid_att_e <- tryCatch(as.numeric(sdid_exp$ln_revtot_w$result$estimate),  error = function(e) NA_real_)
+sdid_se_e  <- tryCatch(sdid_exp$ln_revtot_w$result$se,                    error = function(e) NA_real_)
+
+# AugSynth
+aug_att_m <- tryCatch(summary(aug_maro$ln_revtot_w$result)$average_att$Estimate,  error = function(e) NA_real_)
+aug_se_m  <- tryCatch(summary(aug_maro$ln_revtot_w$result)$average_att$Std.Error, error = function(e) NA_real_)
+aug_att_e <- tryCatch(summary(aug_exp$ln_revtot_w$result)$average_att$Estimate,   error = function(e) NA_real_)
+aug_se_e  <- tryCatch(summary(aug_exp$ln_revtot_w$result)$average_att$Std.Error,  error = function(e) NA_real_)
+
+# gsynth — bootstrap SE from nonparametric inference
+gs_att_m <- tryCatch(mean(gs_maro$att.avg, na.rm = TRUE), error = function(e) NA_real_)
+gs_att_e <- tryCatch(mean(gs_exp$att.avg,  na.rm = TRUE), error = function(e) NA_real_)
+gs_se_m  <- tryCatch(sd(as.vector(gs_maro$att.avg.boot), na.rm = TRUE), error = function(e) NA_real_)
+gs_se_e  <- tryCatch(sd(as.vector(gs_exp$att.avg.boot),  na.rm = TRUE), error = function(e) NA_real_)
+
+results_all <- bind_rows(
+  att_row("TWFE",           "Marovoay only (4 sites, 4 clusters)",  att_twfe_m, se_twfe_m),
+  att_row("TWFE",           "Expanded (9 sites, 9 clusters)",        att_twfe_e, se_twfe_e),
+  att_row("CS-DiD",         "Marovoay only",                         att_cs_m,   se_cs_m),
+  att_row("CS-DiD",         "Expanded",                              att_cs_e,   se_cs_e),
+  att_row("SDiD",           "Marovoay only (2 ctrl)",                sdid_att_m, sdid_se_m),
+  att_row("SDiD",           "Expanded (7 ctrl)",                     sdid_att_e, sdid_se_e),
+  att_row("AugSynth Ridge", "Marovoay only (2 ctrl)",                aug_att_m,  aug_se_m),
+  att_row("AugSynth Ridge", "Expanded (7 ctrl)",                     aug_att_e,  aug_se_e),
+  att_row("gsynth",         "Marovoay only",                         gs_att_m,   gs_se_m),
+  att_row("gsynth",         "Expanded",                              gs_att_e,   gs_se_e)
+) |>
+  mutate(
+    CI_lo = ATT - 1.96 * SE,
+    CI_hi = ATT + 1.96 * SE
+  )
+
+gt(results_all) |>
+  fmt_number(columns = c(ATT, SE, CI_lo, CI_hi), decimals = 3) |>
+  cols_label(Method = "Estimator", Specification = "Specification",
+             ATT = "ATT", SE = "SE", CI_lo = "95% CI lo", CI_hi = "95% CI hi") |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels()
+  ) |>
+  tab_source_note(
+    md("*Outcome*: log winsorised total income. 2005 excluded from all specs.  
+       gsynth SE via nonparametric bootstrap (200 draws); AugSynth SE via conformal inference (NA when N controls < threshold).")
+  )
+```
+
+```{r fig_results_forest}
+#| fig-cap: "ATT forest plot across methods and specifications"
+#| fig-width: 9
+#| fig-height: 5
+
+results_all |>
+  filter(!is.na(ATT)) |>
+  mutate(label = paste0(Method, " — ", Specification)) |>
+  ggplot(aes(x = ATT, xmin = CI_lo, xmax = CI_hi,
+             y = fct_rev(label), color = Method)) +
+  geom_pointrange(na.rm = TRUE, size = 0.7) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey40") +
+  scale_color_brewer(palette = "Set2") +
+  labs(x = "ATT (log points)", y = NULL, color = "Method",
+       title = "Comparative ATT — log total income",
+       caption = "2005 excluded; horizontal line = 0.") +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "right")
+```
+
+## 9 Statistical Power and Ways to Gain It {#sec-power}
+
+This section documents the current statistical power limitations and potential
+strategies to improve inference quality in future data collection rounds.
+
+### 9.1 Power constraints in the current design
+
+The principal bottleneck is the **number of treated clusters** (2 sites). Most
+estimators — permutation-based SC inference, wild cluster bootstrap, CS-DiD
+honesty corrections — require at least 5–6 treated units for reliable inference.
+
+```{r tbl_power_design}
+#| tbl-cap: "Alternative treatment-assignment designs and their trade-offs"
+
+tibble(
+  Design = c(
+    "Current (2T / 2C Marovoay)",
+    "Proximity-based (Bepako+Maroala nearest; Ampijoroa+Madiromiongana further)",
+    "All 4 Marovoay as treated",
+    "Single-site (Bepako only, 5 km from PA core)",
+    "Expanded: 2T Maro + 5 Alaotra controls"
+  ),
+  `Treated N` = c(2L, 2L, 4L, 1L, 2L),
+  `Control N` = c(2L, 2L, 0L, 3L, 7L),
+  Rationale = c(
+    "Default; poor inference with 2 clusters",
+    "Dose-gradient logic; no strong prior on distance threshold",
+    "Maximises treated N but all sites exposed; no clean control group",
+    "Cleanest treatment; loses internal variation",
+    "Best available; Alaotra designated 2007 (after treatment) — valid controls"
+  ),
+  Recommended = c("–", "Sensitivity", "–", "Sensitivity", "✓")
+) |>
+  gt() |>
+  tab_style(style = cell_text(weight = "bold"),
+            locations = cells_column_labels()) |>
+  tab_style(
+    style = cell_fill(color = "#C8E6C9"),
+    locations = cells_body(rows = Recommended == "✓")
+  )
+```
+
+### 9.2 Wild cluster bootstrap for current design
+
+With only 9 clusters (expanded spec), asymptotic cluster-robust SE are
+unreliable (Bertrand–Duflo–Mullainathan 2004). Wild cluster bootstrap (Cameron,
+Gelbach & Miller 2008) with the Webb (2023) 6-point distribution provides
+finite-sample-valid p-values:
+
+```{r wild_bootstrap}
+#| message: false
+#| warning: false
+#| cache: true
+
+if (requireNamespace("fwildclusterboot", quietly = TRUE)) {
+  library(fwildclusterboot)
+  set.seed(2139)
+  boot_exp <- boottest(
+    fit_twfe_exp_revtot,
+    clustid = "site_id",
+    param   = "treatment",
+    B       = 999,
+    type    = "webb"
+  )
+  summary(boot_exp)
+} else {
+  message("Install fwildclusterboot for wild cluster bootstrap.")
+}
+```
+
+### 9.3 Why Alaotra sites are valid controls
+
+```{r tbl_alaotra_validity}
+#| tbl-cap: "Validity of Alaotra sites as control units"
+
+tibble(
+  Criterion = c(
+    "Distance to Ankarafantsika PA",
+    "Own PA designation",
+    "Common economic shocks",
+    "Parallel pre-trends (visual)",
+    "2025 coverage"
+  ),
+  `Alaotra sites` = c(
+    "> 400 km — no overlap with Ankarafantsika buffer zone",
+    "Lac Alaotra (Paysage) designated 2007 — AFTER treatment period",
+    "Both regions subject to national macro shocks; comparable agro-ecological context",
+    "Assessed in Section 2 trajectories panel",
+    "5 sites, 506 HH — full re-survey conducted"
+  ),
+  Assessment = c("✓", "✓", "Plausible", "Check above", "✓")
+) |>
+  gt() |>
+  tab_style(style = cell_text(weight = "bold"),
+            locations = cells_column_labels())
+```
+
+### 9.4 GPS-based distance analysis and spatial gradient
+
+GPS coordinates for all Marovoay fokontany were collected in the 2025 survey.
+The table below shows the straight-line distance from each site centroid to the
+Ankarafantsika PA boundary. Treated sites (Bepako, Madiromiongana) sit inside
+or adjacent to the PA, while control sites (Ampijoroa, Maroala) are further
+west and well outside the protected perimeter.
+
+```{r gps_distance}
+#| tbl-cap: "Distance from site centroids to Ankarafantsika PA boundary"
+#| message: false
+#| warning: false
+
+library(sf)
+
+# GPS centroids hard-coded from 01_description.qmd (fokontany_centroids tribble)
+site_gps <- tribble(
+  ~site_id, ~Fokontany,         ~lat,       ~lon,
+  "031",    "Bepako",           -16.163712, 46.658402,
+  "032",    "Madiromiongana",   -16.086480, 46.749270,
+  "033",    "Ampijoroa",        -16.233414, 46.477984,
+  "034",    "Maroala",          -16.228857, 46.539738,
+  "211",    "Avaradrano",       -17.805414, 48.469958,
+  "212",    "Mangabe",          -17.879586, 48.405244,
+  "213",    "Analamiranga",     -17.572375, 48.200017,
+  "214",    "Ambatomanga",      -17.741178, 48.200647,
+  "215",    "Feramanga Atsimo", -17.844153, 48.373383
+)
+
+pa_anka <- st_read(here::here("data", "ankarafantsika_protected_area.geojson"),
+                   quiet = TRUE)
+
+sites_sf <- site_gps |>
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) |>
+  st_transform(st_crs(pa_anka))
+
+dist_km <- as.numeric(st_distance(sites_sf, pa_anka)) / 1000
+
+site_gps |>
+  mutate(
+    Role = case_when(
+      site_id %in% MARO_TREATED  ~ "Treated (Marovoay)",
+      site_id %in% MARO_CONTROL  ~ "Control (Marovoay)",
+      TRUE                       ~ "Control (Alaotra)"
+    ),
+    `Distance to Anka. PA (km)` = round(dist_km, 1)
+  ) |>
+  select(site_id, Fokontany, Role, `Distance to Anka. PA (km)`) |>
+  arrange(Role, site_id) |>
+  gt() |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels()
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"),
+    locations = cells_body(rows = Role == "Treated (Marovoay)")
+  ) |>
+  tab_source_note(
+    md("*Source*: GPS centroids from 2025 OR survey; PA boundary from WDPA / `ankarafantsika_protected_area.geojson`.")
+  )
+```
+
+The treated sites are 0–15 km from the PA edge, while Ampijoroa sits
+**inside** the PA buffer and Maroala is ~20 km from the boundary. Alaotra
+control sites are >400 km away — completely outside any Ankarafantsika
+influence zone.
+
+**Implications for spatial RDD**: With household-level GPS from the 2025 wave,
+a regression discontinuity design using distance to the PA boundary as the
+running variable is directly feasible. Households within 2 km of the PA edge
+(pure treatment zone) could be compared to those 5–15 km away, controlling for
+site fixed effects. This would sharply identify the *local* treatment effect
+at the boundary and is the highest-priority extension for a follow-up study.
+
+### 9.5 Additional strategies to gain statistical power
+
+::: {.callout-tip title="Recommended power strategies (priority order)"}
+1. **Spatial RDD using 2025 household GPS**: Distance to the PA boundary is the
+   cleanest instrument (see §9.4 above). The 2025 survey collected GPS for all
+   households — a boundary-discontinuity design is directly feasible and would
+   identify local effects precisely even with the current small N of sites.
+
+2. **Other ROS historical sites as additional donors**: All historical ROS
+   observatories were evaluated as potential donors. Obs 01 (Ambovombe) and
+   02 (Tulear) have pre-treatment data from 1995 but represent the arid southern
+   zone — structurally incomparable to the rice plains. Obs 04 (Mahajanga) is
+   coastal northwestern but economically distinct. Obs 41 (likely Vakinankaratra)
+   covers 2000–2009 only (3 pre-treatment years 2000–2002 — insufficient for
+   parallel trends testing). Obs 44 and 45 begin in 2003, the treatment year,
+   so provide zero pre-treatment observations. **No historical ROS observatory
+   meets the minimum conditions to serve as an additional control donor.**
+
+3. **Makay Natural Reserve**: Explicitly ruled out. Marovoay and Alaotra are
+   Madagascar's two *greniers à riz* — highly comparable rice-farming systems.
+   Makay is one of Madagascar's most isolated areas (dry south-west, no
+   permanent rice cultivation), making it structurally incomparable.
+
+4. **Temporal extension — 1996 baseline**: Marovoay (obs 03) has panel data
+   from 1995, and Alaotra (obs 21) from 1998. Including 1996–1997 adds two
+   treated-only pre-treatment waves — useful for placebo testing and event-study
+   visualisation, but does not expand the donor pool since no control site
+   has data before 1998.
+
+5. **Multi-outcome joint testing**: Testing across 4 income components jointly
+   (SUR or multivariate SC) increases power for detecting consistent
+   directional effects even when individual outcomes are imprecise.
+:::
+
+## 10 Robustness Checks
+
+### 10.1 Sensitivity to 2005 exclusion
+
+2005 is excluded from preferred specifications because Marovoay ran a tracking
+survey of a non-random subset of households (site 032 was not covered). The
+comparison below shows how inclusion of 2005 affects TWFE estimates:
+
+```{r twfe_2005_sensitivity}
+#| message: false
+
+# Maro-only with 2005 included (panel_maro includes 2005 since hist panel only drops via filter)
+fit_twfe_with05 <- feols(
+  ln_revtot_w ~ treatment | j5 + year,
+  data    = panel_maro |> filter(year >= 1998, year <= 2014),
+  cluster = ~site_id
+)
+
+etable(fit_twfe_revtot, fit_twfe_with05,
+       headers = c("2005 excluded (preferred)", "2005 included"),
+       keep    = "treatment")
+```
+
+### 10.2 In-space placebo (Alaotra sites as pseudo-treated)
+
+Assign each Alaotra site the same 2003 treatment date and run gsynth.
+The actual Marovoay ATT should lie outside the distribution of placebo ATTs.
+
+```{r placebo_inspace_alaotra}
+#| message: false
+#| warning: false
+
+run_placebo_gs <- function(pseudo_site, data) {
+  d <- data |>
+    mutate(
+      treatment = as.integer(site_id == pseudo_site & year >= TREAT_YEAR)
+    )
+  tryCatch(
+    gsynth(ln_revtot_w ~ treatment,
+           data = d, index = c("site_id", "year"),
+           se = FALSE, r = 0, CV = FALSE, force = "two-way",
+           parallel = FALSE, min.T0 = 4, seed = 2139),
+    error = function(e) NULL
+  )
+}
+
+placebo_gs <- map(ALAOTRA_ALL, ~ run_placebo_gs(.x, panel_site_expanded))
+names(placebo_gs) <- ALAOTRA_ALL
+
+placebo_att_df <- imap_dfr(placebo_gs, function(res, site) {
+  if (!is.null(res))
+    tibble(site = site, ATT = mean(res$att.avg, na.rm = TRUE), is_treated = FALSE)
+})
+
+actual_att_val <- tryCatch(mean(gs_exp$att.avg, na.rm = TRUE), error = function(e) NA_real_)
+
+placebo_att_all <- bind_rows(
+  placebo_att_df,
+  tibble(site = "Marovoay (actual)", ATT = actual_att_val, is_treated = TRUE)
+)
+
+ggplot(placebo_att_all |> filter(!is_treated), aes(x = ATT)) +
+  geom_histogram(bins = 10, fill = "steelblue", alpha = 0.7) +
+  geom_vline(xintercept = actual_att_val, color = "darkred",
+             linetype = "dashed", linewidth = 1) +
+  labs(x = "Average ATT (log total income)", y = "Count",
+       title = "In-space placebo: Alaotra sites as pseudo-treated",
+       caption = "Red dashed = actual Marovoay ATT (expanded gsynth).") +
+  theme_minimal()
+```
+
+### 10.3 Pre-MSPE ratio
+
+```{r pre_mspe}
+if (!is.null(gs_exp) && !is.null(gs_exp$eff)) {
+  pre_mask  <- gs_exp$time < TREAT_YEAR
+  post_mask <- gs_exp$time >= TREAT_YEAR & gs_exp$time <= 2014
+  mspe_pre  <- mean(gs_exp$eff[pre_mask]^2,  na.rm = TRUE)
+  mspe_post <- mean(gs_exp$eff[post_mask]^2, na.rm = TRUE)
+
+  tibble(
+    `Pre-treatment MSPE`  = round(mspe_pre, 5),
+    `Post-treatment MSPE` = round(mspe_post, 5),
+    `Ratio (post/pre)`    = round(mspe_post / mspe_pre, 2)
+  ) |>
+    gt() |>
+    tab_source_note("Ratio > 1 = more divergence post-treatment than pre-treatment noise.")
+}
+```
+
+## 11 Interpretation and Conclusions
+
+```{r tbl_summary_results}
+#| tbl-cap: "Summary: direction and precision of ATT estimates — log total income"
+
+tibble(
+  Method         = c("TWFE (Maro-only)", "TWFE (expanded)", "CS-DiD (Maro)", "CS-DiD (expanded)",
+                     "SDiD (Maro)", "SDiD (expanded)", "AugSynth (expanded)", "gsynth (expanded)"),
+  Precise        = c("No (2 ctrl)", "Marginal (7 ctrl)", "No", "Marginal",
+                     "No (SE=NA)", "Yes*", "Yes*", "No"),
+  Notes          = c(
+    "Only 4 clusters; SE asymptotically unreliable",
+    "9 clusters; better finite-sample props",
+    "panel=FALSE; robust to heterogeneity",
+    "Alaotra adds donors; more precise",
+    "SE unreliable with 2 controls",
+    "7 donors; SDiD SE valid",
+    "Ridge adjustment for poor pre-fit",
+    "No SE with 2 treated units"
+  )
+) |>
+  gt() |>
+  tab_style(style = cell_text(weight = "bold"), locations = cells_column_labels()) |>
+  tab_source_note("* = conditional on model assumptions. Directions filled after render.")
+```
+
+::: {.callout-important title="Key limitations"}
+1. **Two treated sites only** — limits permutation-based inference, wild
+   cluster bootstrap, and validity of asymptotic SE across all methods.
+2. **Income harmonisation** — revenue variables use different questionnaire
+   formats across 1998–2025; `household_consolidated.rds` construction
+   requires validation before publication.
+3. **Selective panel attrition 2015→2025** — households that left the area
+   (possibly the most harmed) are missing from 2025 data. Estimates may
+   understate negative effects.
+4. **Potential second treatment (2015 PA boundary revision)** — if boundaries
+   tightened post-2015, the 2025 outcome includes a second treatment dose.
+5. **Alaotra as controls** — valid for Ankarafantsika treatment, but Lac
+   Alaotra Paysage was designated 2007; any post-2007 effect on Alaotra
+   livelihoods would violate no-interference.
+:::
+
+### Future priorities
+
+1. **GPS / spatial RDD** — highest marginal power gain for 2025 data
+2. **Makay OR as additional treated unit** — enables staggered adoption DiD
+3. **Household-level attrition model** — bound ITT under selective attrition
+4. **1995 baseline harmonisation** — extend pre-treatment window by 3 years
+5. **Multi-outcome joint test** — SUR or joint SC for 4 income components

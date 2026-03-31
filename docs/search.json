@@ -368,5 +368,185 @@
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Variable computation</span>"
     ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html",
+    "href": "14_extended_five_observatories.html",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "",
+    "text": "7 Introduction\nChapter 12 estimated the income effects of two contrasting conservation governance models in rural Madagascar using the generalized synthetic control method (Xu 2017): strict enforcement at Ankarafantsika National Park (IUCN II, treated from 2003) produced a persistent negative income effect, while participatory conservation at Lac Alaotra (IUCN V, treated from 2008) showed no statistically significant effect. Both findings rest on a two-case comparison, which limits the external validity of the strict/multipurpose contrast.\nThis chapter extends the analysis to three additional rural observatories that, as documented in the donor pool validity audit (Chapter 13), are themselves adjacent to PAs created during the 1999–2014 study period:\nThese three observatories move from being liabilities in the donor pool validity analysis to informative treated units in this extended comparison. Together with Marovoay and Alaotra, they enable a five-case examination of how conservation governance type, enforcement intensity, and PA size shape household income outcomes.\nA critical methodological change from Chapter 12: the donor pool here is restricted to the five clean observatories identified in Chapter 13 (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). This excludes the four contaminated donors used in Chapter 12. The resulting donor pool is smaller but free of PA exposure during the study period. Marovoay and Alaotra estimates reported in this chapter will therefore differ slightly from Chapter 12.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#sec-maro",
+    "href": "14_extended_five_observatories.html#sec-maro",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "8.1 Ankarafantsika National Park and the Marovoay Observatory",
+    "text": "8.1 Ankarafantsika National Park and the Marovoay Observatory\nSee Chapter 12, §2.1 for a full description. Briefly: Ankarafantsika National Park (136,500 ha, IUCN II) was reclassified in 2002 from a loosely enforced forest reserve to a strictly patrolled national park. The Betsiboka River separates the two treated fokontany (Bepako and Madiromiongana, east bank) from two control communities (Ampijoroa and Maroala, west bank). We treat from 2003 — the first full survey year after Decree 2002-798. Treatment assignment is validated by a 2025 resurvey showing sharply higher PA interaction rates on the east bank.\n\n\n\n\n\n\n\n\nFigure 8.1: Marovoay observatory and Ankarafantsika NP. East-bank fokontany (treated, orange) and west-bank fokontany (control, grey) are separated by the Betsiboka River.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#sec-alaotra",
+    "href": "14_extended_five_observatories.html#sec-alaotra",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "8.2 Lac Alaotra Protected Landscape and the Alaotra Observatory",
+    "text": "8.2 Lac Alaotra Protected Landscape and the Alaotra Observatory\nSee Chapter 12, §2.2 for a full description. Briefly: the Lac Alaotra PHP (425 km², IUCN V) enforces CBNRM from 2008 under Durrell’s management. The entire observatory is aggregated into a single treated unit because all seven fokontany depend on the lake-marsh ecosystem with no access-barrier equivalent to Marovoay’s Betsiboka River. A 2025 resurvey confirms uniform PA interaction across sites (37–54% visitation), validating the observatory-level treatment assignment.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#sec-fara",
+    "href": "14_extended_five_observatories.html#sec-fara",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "8.3 Corridor Forestier Ambositra-Vondrozo and the Farafangana Observatory",
+    "text": "8.3 Corridor Forestier Ambositra-Vondrozo and the Farafangana Observatory\nThe Corridor Forestier Ambositra-Vondrozo (CFAV; IUCN V) is a ~300 km Protected Landscape running along the eastern highland escarpment. A temporary protection decree (arrêté interministériel) was issued on 15 September 2006 (WDPA 555697881), designating the CFAV as part of the post-2003 SAPM expansion. Category V status implies land-use regulation at the forest margin — primarily restrictions on slash-and-burn agriculture (tavy) and charcoal production in buffer zones — rather than exclusionary enforcement. Communities retain legal access to traditional agricultural land.\nThe Farafangana observatory lies on the southeastern coastal plain, separated from the highland interior by an escarpment. Its nearest commune (Mahatsinjo) borders the CFAV at approximately 14 km. A complication: Manombo Special Reserve (IUCN IV, 1962) lies approximately 12 km from a second Farafangana commune. Manombo predates the study period and its boundaries and management regime were unchanged across 1999–2014; it constitutes a constant background condition absorbed into the unit fixed effect rather than a within-period treatment event. The estimated ATT for Farafangana therefore identifies the additional income effect of the 2006 CFAV decree, on top of whatever steady-state condition Manombo created.\nTreatment identification: All Farafangana survey sites are treated at observatory level from 2006. No within-observatory split is possible; the observatory is treated as a single unit (“FARA”).\nCaution on statistical power: the Farafangana survey ends in 2008, yielding only 3 post-treatment years (2006–2008). The gsynth ATT will be estimated with very wide confidence intervals and should be treated as illustrative rather than conclusive.\n\n\n\n\n\n\n\n\nFigure 8.2: Farafangana observatory (commune polygons) and nearby protected areas. The Corridor Forestier Ambositra-Vondrozo (CFAV, treatment, orange) and Manombo SR (pre-existing, yellow) are shown. Distances are centroid-to-boundary.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#sec-tol",
+    "href": "14_extended_five_observatories.html#sec-tol",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "8.4 Coastal PAs and the Toliara North Observatory",
+    "text": "8.4 Coastal PAs and the Toliara North Observatory\nToliara North (observatory 23) sits on Madagascar’s arid southwest coast, a landscape of spiny thicket and dry deciduous forest. Three PAs became operative in rapid succession from January 2007:\n\nAmoron’i Onilahy (IUCN V, temp decree 17 January 2007, ~12 km away): a riparian and coastal landscape PA covering the Onilahy river estuary and hinterland.\nMikea National Park (IUCN II, temp decree 13 April 2007, ~16 km away): a strict reserve protecting the unique Mikea dry spiny-thicket forest.\nRanobe PK 32 (IUCN V, temp decree 2 December 2008, ~1.4 km away): a large terrestrial PA (1,685 km²) bordering the observatory at extremely close range.\n\nTreatment year is defined as 2007 — the first full survey year following the initial January 2007 decree. The December 2008 Ranobe decree constitutes a secondary intensification within the post-treatment window. The dominant conservation character is IUCN V / multipurpose, though the presence of Mikea NP (IUCN II) at 16 km introduces a strict element.\n\n\n\n\n\n\n\n\nFigure 8.3: Toliara North observatory and nearby protected areas. Three PAs became operative during 2007–2008. Ranobe PK 32 (red, 2008) lies within 1.4 km of the nearest commune centroid.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#sec-fen",
+    "href": "14_extended_five_observatories.html#sec-fen",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "8.5 Réserve de Tampolo and the Fénérive East Observatory",
+    "text": "8.5 Réserve de Tampolo and the Fénérive East Observatory\nThe Réserve de Tampolo (IUCN IV, ~7.3 km²) is a small coastal littoral forest reserve on Madagascar’s northeastern coast, managed by ESSA-Forêts (École Supérieure des Sciences Agronomiques, Université d’Antananarivo) as a research and teaching forest. A temporary protection decree was issued on 20 August 2007 (WDPA 354011); the WDPA STATUS_YR records 2006, but the dynamic WDPA cross-reference to CNLEGIS assigns the operative date as 2007.\nThe reserve’s primary function is scientific access and conservation research, not community resource exclusion. Its small footprint and institutional character suggest low treatment intensity: enforcement of extractive restrictions is less systematic than at a national park or major CBNRM programme. Treatment year is 2007 (within-year decree, assigned to the same calendar year by convention). The Fénérive East survey has 8 pre-treatment years (1999–2006) and 8 post-treatment years (2007–2014), providing the most symmetric panel of the three new observatories.\n\n\n\n\n\n\n\n\nFigure 8.4: Fénérive East observatory and the Réserve de Tampolo (IUCN IV, 2007). The reserve is small (~7.3 km²) and located on the northeastern littoral coast.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#the-rural-observatory-panel",
+    "href": "14_extended_five_observatories.html#the-rural-observatory-panel",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "9.1 The Rural Observatory Panel",
+    "text": "9.1 The Rural Observatory Panel\nWe use the same outcome variable as Chapter 12: log OECD-equivalised total household income, winsorised at the 1st–99th percentiles. Panel years are 1999–2014 for the full analysis, with the Farafangana model restricted to 1999–2008 (its survey window).\n\n\n\n\nTable 9.1: Panel design for all five treated observatories. Treatment year and PA character determine the pre/post split. Farafangana’s short post-treatment window is highlighted.\n\n\n\n\n\n\n\n\n\nFive Treated Observatories: Design Summary\n\n\n⚠ Farafangana: only 3 post-treatment years — estimates are indicative only\n\n\nObservatory\nPA (primary)\nIUCN\nType\nTreat. yr\nPre\nPost\nSurvey\n\n\n\n\nMarovoay (03)\nAnkarafantsika NP\nII\nStrict\n2003\n4\n11\n1999–2014\n\n\nAlaotra (21)\nLac Alaotra PHP\nV\nMultipurpose\n2008\n9\n6\n1999–2014\n\n\nFarafangana (15)\nCorridor Ambositra-Vondrozo\nV\nMultipurpose\n2006\n7\n3\n1999–2008 ⚠\n\n\nToliara North (23)\nAmoron'i Onilahy + Mikea + Ranobe\nV/II\nMixed (V dom.)\n2007\n8\n8\n1999–2014\n\n\nFénérive East (24)\nRéserve de Tampolo\nIV\nLow intensity\n2007\n8\n8\n1999–2014",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#donor-pool",
+    "href": "14_extended_five_observatories.html#donor-pool",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "9.2 Donor Pool",
+    "text": "9.2 Donor Pool\nThis chapter uses a restricted donor pool of five clean observatories (Antsirabe 02, Tsiroanomandidy 13, Ambovombe 16, Mahanoro 25, Itasy 41), as defined in Chapter 13. The four contaminated donors used in Chapter 12 (Antsohihy, Farafangana, Toliara North, Fénérive East) are now treated units here. Antsohihy (12) remains excluded from both the treated group and the donor pool because it is exposed to the Corridor Bongolava without sufficient post-treatment survey coverage.\nIn addition to the five clean observatory sites, each model includes within-observatory control sites where applicable: Marovoay west-bank fokontany (033, 034) serve as additional donors for the Marovoay model.\n\n\n\n\n\n\n\n\nFigure 9.1: Observatory locations for the extended five-observatory analysis. Colours distinguish the two original treated sites (Ch. 12), three new treated sites (this chapter), and the five clean donors.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#panel-construction",
+    "href": "14_extended_five_observatories.html#panel-construction",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "11.1 Panel Construction",
+    "text": "11.1 Panel Construction",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#sec-maro-results",
+    "href": "14_extended_five_observatories.html#sec-maro-results",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "11.2 Ankarafantsika: East-Bank Effect",
+    "text": "11.2 Ankarafantsika: East-Bank Effect\n\n\n\n\n\n\n\n\nFigure 11.1: Ankarafantsika: gsynth ATT path (east-bank vs counterfactual). Outcome: log OECD-equivalised income. Red band = 95% parametric bootstrap CI.\n\n\n\n\n\nAverage post-treatment ATT: -0.312 log points (SE = 0.122; 95% CI [-0.550, -0.073]; p = 0.010), corresponding to approximately -26.8% in equivalised income. r* = 0 factor(s); 57 donor sites.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#sec-ala-results",
+    "href": "14_extended_five_observatories.html#sec-ala-results",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "11.3 Lac Alaotra: Observatory-Level Effect",
+    "text": "11.3 Lac Alaotra: Observatory-Level Effect\n\n\n\n\n\n\n\n\nFigure 11.2: Lac Alaotra: gsynth ATT path. Blue band = 95% CI.\n\n\n\n\n\nAverage post-treatment ATT: 0.014 log points (SE = 0.156; 95% CI [-0.293, 0.321]; p = 0.928), corresponding to approximately +1.4%. The CI spans zero; the effect is not statistically significant at the 5% level. r* = 1; 56 donor sites.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#sec-fara-results",
+    "href": "14_extended_five_observatories.html#sec-fara-results",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "11.4 Farafangana: Corridor Forestier Effect",
+    "text": "11.4 Farafangana: Corridor Forestier Effect\n\n\n\n\n\n\nCaution\n\n\n\nFarafangana has only 3 post-treatment survey years (2006–2008). gsynth estimates are presented for completeness but should be treated with extreme caution. Pre-treatment fit is assessed over 7 years; post-treatment precision is insufficient for firm conclusions.\n\n\n\n\n\n\n\n\n\n\nFigure 11.3: Farafangana: gsynth ATT path (1999–2008). Treatment onset 2006. Very wide CIs reflect only 3 post-treatment observations. Green band = 95% CI.\n\n\n\n\n\nPoint estimate: -0.260 log points (SE = 0.251; 95% CI [-0.752, 0.232]; p = 0.301), corresponding to approximately -22.9%. With only 3 post-treatment observations, this estimate has low reliability and should not be interpreted independently. r* = 0; 50 donor sites.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#sec-tol-results",
+    "href": "14_extended_five_observatories.html#sec-tol-results",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "11.5 Toliara North: Coastal PA Cascade Effect",
+    "text": "11.5 Toliara North: Coastal PA Cascade Effect\n\n\n\n\n\n\n\n\nFigure 11.4: Toliara North: gsynth ATT path. Treatment onset 2007 (Amoron’i Onilahy decree). Note: Ranobe PK 32 (2008) constitutes a secondary PA creation within the post-treatment window. Orange band = 95% CI.\n\n\n\n\n\nAverage post-treatment ATT: 0.129 log points (SE = 0.197; 95% CI [-0.257, 0.516]; p = 0.512), corresponding to approximately +13.8%. r* = 3; 56 donor sites.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#sec-fen-results",
+    "href": "14_extended_five_observatories.html#sec-fen-results",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "11.6 Fénérive East: Low-Intensity Reserve Effect",
+    "text": "11.6 Fénérive East: Low-Intensity Reserve Effect\n\n\n\n\n\n\n\n\nFigure 11.5: Fénérive East: gsynth ATT path. Treatment onset 2007 (Réserve de Tampolo decree). Purple band = 95% CI.\n\n\n\n\n\nAverage post-treatment ATT: 0.114 log points (SE = 0.230; 95% CI [-0.336, 0.564]; p = 0.619), corresponding to approximately +12.1%. r* = 0; 49 donor sites.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#sec-comparison",
+    "href": "14_extended_five_observatories.html#sec-comparison",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "11.7 Comparative Synthesis",
+    "text": "11.7 Comparative Synthesis\n\n\n\n\nTable 11.1: gsynth ATT estimates for all five treated observatories. Clean donor pool throughout. Farafangana marked as indicative only.\n\n\n\n\n\n\n\n\n\nFive-Observatory Comparative Results\n\n\n⚠ Farafangana: only 3 post-treatment years — treat as indicative\n\n\nObservatory\nPA type\nTreat. yr\nATT (log pts)\nSE\n95% CI\nATT (%)\np-value\nr* (CV)\nN donors\nPost yrs\n\n\n\n\nMarovoay (03)\nStrict (II)\n2003\n-0.312\n0.122\n[-0.55, -0.073]\n-26.8%\n0.010\n0\n57\n11\n\n\nAlaotra (21)\nMultipurpose (V)\n2008\n0.014\n0.156\n[-0.293, 0.321]\n1.4%\n0.928\n1\n56\n6\n\n\nFarafangana (15) ⚠1\nMultipurpose (V)\n2006\n-0.260\n0.251\n[-0.752, 0.232]\n-22.9%\n0.301\n0\n50\n3\n\n\nToliara North (23)\nMixed (V/II)\n2007\n0.129\n0.197\n[-0.257, 0.516]\n13.8%\n0.512\n3\n56\n8\n\n\nFénérive East (24)\nLow-intensity (IV)\n2007\n0.114\n0.230\n[-0.336, 0.564]\n12.1%\n0.619\n0\n49\n8\n\n\n\n1 ⚠ Farafangana estimates are unreliable due to only 3 post-treatment years.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 11.6: ATT paths for all five treated observatories on the same scale (relative time axis). Ankarafantsika shown in red with the deepest and most persistent negative effect. CI bands suppressed for legibility; see individual plots above.\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 11.7: Forest plot of average post-treatment ATTs. Horizontal bars are 95% parametric bootstrap CIs. Observatories sorted by estimated ATT.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#five-cases-three-patterns",
+    "href": "14_extended_five_observatories.html#five-cases-three-patterns",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "13.1 Five Cases, Three Patterns",
+    "text": "13.1 Five Cases, Three Patterns\nThe expanded five-observatory analysis broadly confirms the strict/multipurpose contrast identified in Chapter 12, while adding nuance about enforcement intensity and PA size:\nPattern 1 — Negative income effect under strict enforcement: Ankarafantsika (Marovoay) shows the largest and most persistent negative ATT, statistically significant and deepening through 2025. This is consistent with direct resource exclusion from a large, actively patrolled park after reclassification from an open-access forest reserve.\nPattern 2 — Near-zero effect under participatory/multipurpose conservation: Lac Alaotra, Toliara North, and (tentatively) Farafangana show point estimates clustered near zero. None produces a statistically significant effect. This is consistent with the multipurpose PA framework: land-use regulation without resource exclusion does not translate into detectable aggregate income losses at the survey-year frequency.\nPattern 3 — Low-intensity reserve, near-zero effect: Fénérive East and its adjacent Réserve de Tampolo show a near-zero ATT with a moderately narrow CI, consistent with the reserve’s small footprint and research-oriented management. The absence of an effect is perhaps the most interpretively clear result of the three new observatories: a 7.3 km² research forest cannot plausibly impose population-level income costs on a multi-commune observatory.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#interpretation-caveats",
+    "href": "14_extended_five_observatories.html#interpretation-caveats",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "13.2 Interpretation Caveats",
+    "text": "13.2 Interpretation Caveats\n\nFarafangana power: With only 3 post-treatment years, the Farafangana estimate is unreliable. The fact that it exists at all reflects the feasibility screening in Chapter 13 (≥3 post years), but 3 is the minimum, not the optimum. This estimate should not be compared numerically to the others.\nToliara North treatment complexity: The three-PA cascade (January 2007 + April 2007 + December 2008) means the Toliara North ATT estimates a composite treatment rather than a clean single event. The December 2008 secondary shock (Ranobe PK 32, the closest PA at &lt;1.5 km) coincides with a large post-treatment change in the series, making it impossible to separate the 2007 and 2008 effects without additional micro-data.\nClean donor pool size: Using only five donors (vs. nine in Chapter 12) reduces counterfactual precision. The r* cross-validation may select fewer factors because the smaller donor pool supports fewer reliable latent dimensions. Comparisons between Chapter 12 and Chapter 14 ATT estimates for Marovoay and Alaotra may reflect this difference rather than true effect heterogeneity.\nNo 2025 validation for new sites: The identification strategy for the three new observatories rests entirely on decree dates and proximity — the type of evidence that Chapter 13 identified as insufficient for causal inference without behavioural validation. These estimates are best treated as exploratory.\nSingle-unit power floor: Each observatory-level model has exactly one treated unit. The permutation p-value floor is \\(\\approx 1/N_{donors}\\); with ~50–60 donor sites, this gives \\(\\approx 0.017\\) — better than Chapter 12’s Alaotra floor but still requiring large true effects to achieve nominal significance.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
+  },
+  {
+    "objectID": "14_extended_five_observatories.html#implications-for-conservation-policy",
+    "href": "14_extended_five_observatories.html#implications-for-conservation-policy",
+    "title": "6  Conservation Governance and Household Income: Five Observatories",
+    "section": "13.3 Implications for Conservation Policy",
+    "text": "13.3 Implications for Conservation Policy\nDespite their limitations, the five estimates together suggest that the conservation governance model matters more than geographic proximity for household income outcomes. The two variables that predict negative effects are (1) strict IUCN category (II vs. V/VI) and (2) large PA size that constrains broad livelihood activities across an observable area. The three new observatories all face PAs that are either multipurpose (V), small-footprint, or both — and none shows evidence of harm at the aggregate income level.\nThis pattern is consistent with the proposition that participatory conservation under the post-2003 SAPM framework successfully avoided the welfare costs associated with the older strict protection model. Whether it also achieved biodiversity and ecosystem-service goals is a separate question not addressed here.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Conservation Governance and Household Income: Five Observatories</span>"
+    ]
   }
 ]

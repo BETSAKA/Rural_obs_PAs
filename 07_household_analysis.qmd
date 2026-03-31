@@ -1,0 +1,951 @@
+---
+title: "Marovoay–Ankarafantsika: Household-Level and Long-Run Analysis"
+author: BETSAKA project
+date: last-modified
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    self-contained: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup}
+#| include: false
+proj_root <- normalizePath(file.path(getwd(), ".."))
+knitr::opts_knit$set(root.dir = proj_root)
+setwd(proj_root)
+
+library(tidyverse)
+library(haven)
+library(gt)
+library(fixest)
+library(gsynth)
+library(sf)
+library(scales)
+library(purrr)
+
+source("utils/helpers_report.R")
+source("utils/sites.R")
+
+MARO_TREATED  <- c("031", "032")
+MARO_CONTROL  <- c("033", "034")
+MARO_ALL      <- c(MARO_TREATED, MARO_CONTROL)
+# Alaotra sites: 211 = Ambato (Avaradrano/Feramanga Atsimo/Mangabe),
+#                212 = Amparafa (Ambatoharanana/Ambodivoara/Analamiranga),
+#                213 = Morarano (Ambatomanga/Ambohidrony) — enters 2004
+ALAOTRA_ALL   <- c("211", "212", "213")
+TREAT_YEAR    <- 2003
+PRE_YEARS     <- 1999:2002    # Alaotra starts 1999; 4-year pre-treatment window
+HIST_YEARS    <- 1999:2014    # full historical window (excl. 2005 for Marovoay)
+
+# All 7 sites (2 treated + 5 control) for the long-run analysis
+ALL_SITES <- c(MARO_ALL, ALAOTRA_ALL)
+
+site_labels <- c(
+  "031" = "031 Bepako (T)",
+  "032" = "032 Madiromiongana (T)",
+  "033" = "033 Ampijoroa (C)",
+  "034" = "034 Maroala (C)",
+  "211" = "211 Ambato (C)",
+  "212" = "212 Amparafa (C)",
+  "213" = "213 Morarano (C)"
+)
+
+# Load income computation pipeline (handles 1995-2015 and 2025)
+source("utils/calc_incomes_all_years.R")
+```
+
+## 1 Panel Design: The Rotating-Panel Constraint
+
+### 1.1 What the attrition data tell us
+
+The Madagascar ROS panel is a **rotating panel**, not a strict re-interview
+panel. This is documented in detail by Chabé-Ferret et al. (2024,
+*Sci. Data* 11: 1085; doi:10.1038/s41597-024-03879-9):
+
+- Annual attrition rate ≈ **15%**, cumulative ≈ **80% over 10 years**
+- Attriting households are replaced by new randomly drawn ones to maintain
+  n ≈ 500 per observatory per wave
+- Attrition is **non-random**: the dominant cause is out-migration (65% of
+  traceable attritors), which correlates with income and shock exposure
+- Household identifiers (`j5`) are **not fully stable** across all years:
+  six observatory-years had attrition rates >75% attributable to ID code
+  reshuffles; the 2025 `j5` codes are from a new enumeration and carry no
+  continuity with the 1995–2014 series
+
+### 1.2 Implications for estimation strategy
+
+::: {.callout-important title="Household fixed effects are not appropriate here"}
+The standard panel DiD with **household fixed effects** (`| j5 + year`) would
+require the same households to be observed in both pre- and post-treatment
+periods. With 15% annual exit, only ~44% of 1998 households remain in 2003,
+and ~6% survive to 2014. Since treatment is assigned at the *site* level (not
+the household level), household FE absorbs within-household variance without
+providing the identification gains expected from a true balanced panel. The
+2025 `j5` codes are entirely new and cannot be linked to any historical
+household.
+:::
+
+**Valid approaches given a rotating panel:**
+
+| Approach | Unit | FE structure | Requires HH tracking? |
+|---|---|---|---|
+| Repeated cross-sections DiD | Household | Site + year | No |
+| Event study (RC) | Household | Site + year | No |
+| Long-run 2×2 DiD | Household / site | Site + period | No |
+| Synthetic control (SC/SDiD/gsynth) | Site-year | — | No |
+| Spatial RDD (2025 cross-section) | Household | None | No |
+
+All approaches below use one of these valid designs.
+
+---
+
+## 2 Panel Construction
+
+```{r panel_build}
+#| message: false
+
+household_consolidated <- read_rds("data/household_consolidated.rds")
+
+# ── Historical panel (1998–2014, 2005 Marovoay excluded) ─────────────────────
+mk_income <- function(df) {
+  df |>
+    mutate(
+      rev_riz  = coalesce(rev_riz,  0),
+      rev_cu   = coalesce(rev_cu,   0),
+      revel    = coalesce(revel,    0),
+      revpeche = coalesce(revpeche, 0),
+      revppal  = coalesce(revppal,  0),
+      revsec   = coalesce(revsec,   0),
+      revcou   = coalesce(revcou, revppal + revsec + rev_riz + rev_cu + revel + revpeche),
+      revtot   = coalesce(revtot, revcou),
+      rev_agri    = rev_riz + rev_cu + revel + revpeche,
+      rev_nonagri = revppal + revsec
+    )
+}
+
+# ── Historical panel: Marovoay 1999–2014 (2005 excluded) ────────────────────
+panel_hist_maro <- household_consolidated |>
+  filter(obs == "03", site_id %in% MARO_ALL,
+         year %in% HIST_YEARS, !(year == 2005)) |>
+  mk_income() |>
+  mutate(
+    treated_unit = site_id %in% MARO_TREATED,
+    post         = year >= TREAT_YEAR,
+    treatment    = as.integer(treated_unit & post),
+    rel_time     = year - TREAT_YEAR
+  ) |>
+  # Winsorise at 99th percentile pooled across all site-years
+  mutate(across(c(revtot, revcou, rev_agri, rev_nonagri),
+                ~ pmin(.x, quantile(.x, 0.99, na.rm = TRUE)),
+                .names = "{.col}_w")) |>
+  mutate(across(ends_with("_w"), ~ log(.x + 1), .names = "ln_{.col}")) |>
+  distinct(j5, year, .keep_all = TRUE)
+
+# ── 2025 income (both observatories) via the standard pipeline ───────────────
+# The historical snapshot (output/ref_incomes_snapshot.rds) ends at 2015.
+# For 2025 we use compute_income_year() from utils/calc_incomes_all_years.R,
+# which reads raw DTA files from data/ROS_MDG_microdata/2025/.
+rev_2025_raw <- compute_income_year(2025) |>
+  mutate(j5 = as.character(j5))
+
+# ── 2025 wave — Marovoay (j0=3; fresh enumeration) ───────────────────────────
+res_deb_25 <- read_dta("data/res_deb.dta") |>
+  mutate(j5 = as.character(j5), j0 = as.character(as.numeric(j0)))
+
+maro_25_ids <- res_deb_25 |>
+  filter(j0 == "3") |>
+  mutate(
+    site_id = case_when(
+      str_starts(str_to_lower(j4), "bepako")         ~ "031",
+      str_starts(str_to_lower(j4), "madiromiongana") ~ "032",
+      str_starts(str_to_lower(j4), "ampijoroa")      ~ "033",
+      str_starts(str_to_lower(j4), "maroala")        ~ "034",
+      TRUE ~ NA_character_
+    ),
+    obs = "03"
+  ) |>
+  select(j5, obs, site_id)
+
+panel_2025_maro <- maro_25_ids |>
+  left_join(rev_2025_raw, by = "j5") |>
+  mutate(year = 2025) |>
+  mk_income() |>
+  mutate(
+    treated_unit = site_id %in% MARO_TREATED,
+    post = TRUE, treatment = as.integer(treated_unit),
+    rel_time = 2025 - TREAT_YEAR
+  ) |>
+  mutate(across(c(revtot, revcou, rev_agri, rev_nonagri),
+                ~ pmin(.x, quantile(.x, 0.99, na.rm = TRUE)),
+                .names = "{.col}_w")) |>
+  mutate(across(ends_with("_w"), ~ log(.x + 1), .names = "ln_{.col}"))
+
+# ── 2025 wave — Alaotra (j0=21; control sites, fresh enumeration) ─────────────
+# Site mapping: 211=Ambato (Avaradrano/Feramanga Atsimo/Mangabe),
+#              212=Amparafa (Ambatoharanana/Ambodivoara/Analamiranga),
+#              213=Morarano (Ambatomanga/Ambohidrony)
+alaotra_25_ids <- res_deb_25 |>
+  filter(j0 == "21") |>
+  mutate(
+    site_id = case_when(
+      j4 %in% c("Avaradrano", "Feramanga Atsimo", "Mangabe")        ~ "211",
+      j4 %in% c("Ambatoharanana", "Ambodivoara", "Analamiranga")   ~ "212",
+      j4 %in% c("Ambatomanga", "Ambohidrony")                       ~ "213",
+      TRUE ~ NA_character_
+    ),
+    obs = "21"
+  ) |>
+  select(j5, obs, site_id)
+
+panel_2025_alaotra <- alaotra_25_ids |>
+  filter(!is.na(site_id)) |>
+  left_join(rev_2025_raw, by = "j5") |>
+  mutate(year = 2025) |>
+  mk_income() |>
+  mutate(
+    treated_unit = FALSE,
+    post = TRUE, treatment = 0L,
+    rel_time = 2025 - TREAT_YEAR
+  ) |>
+  mutate(across(c(revtot, revcou, rev_agri, rev_nonagri),
+                ~ pmin(.x, quantile(.x, 0.99, na.rm = TRUE)),
+                .names = "{.col}_w")) |>
+  mutate(across(ends_with("_w"), ~ log(.x + 1), .names = "ln_{.col}"))
+
+# ── Historical panel: Alaotra 1999–2014 (control only) ──────────────────────
+panel_hist_alaotra <- household_consolidated |>
+  filter(obs == "21", site_id %in% ALAOTRA_ALL, year %in% HIST_YEARS) |>
+  mk_income() |>
+  mutate(
+    treated_unit = FALSE,
+    post         = year >= TREAT_YEAR,
+    treatment    = 0L,
+    rel_time     = year - TREAT_YEAR
+  ) |>
+  mutate(across(c(revtot, revcou, rev_agri, rev_nonagri),
+                ~ pmin(.x, quantile(.x, 0.99, na.rm = TRUE)),
+                .names = "{.col}_w")) |>
+  mutate(across(ends_with("_w"), ~ log(.x + 1), .names = "ln_{.col}")) |>
+  distinct(j5, year, .keep_all = TRUE)
+
+# ── Full RC DiD panel: Marovoay only (1999-2014 + 2025) ──────────────────────
+# Historical Alaotra is NOT included here — parallel trends would need to be
+# defended across two geographically distinct observatories for the medium run.
+panel_maro_rc <- bind_rows(panel_hist_maro, panel_2025_maro) |>
+  filter(!is.na(site_id))
+
+# ── Long-run panel: Marovoay + Alaotra (1999-2002 pre vs 2025 post) ──────────
+# Alaotra adds 3 control sites for the long-run comparison, boosting power.
+# Valid because: (1) no PA in Alaotra until 2007 (temporary) / 2015 (permanent),
+# so 1999-2002 pre-period is unaffected; (2) the Alaotra PA designation postdates
+# the Ankarafantsika treatment by 4-12 years, so Alaotra is a clean control
+# for the 2025 endpoint ONLY if we assume the Alaotra PA had no income effects
+# by 2025 — a maintained assumption to be discussed in the text.
+panel_lr_full <- bind_rows(
+  panel_hist_maro  |> filter(year %in% PRE_YEARS),
+  panel_hist_alaotra |> filter(year %in% PRE_YEARS),
+  panel_2025_maro,
+  panel_2025_alaotra
+) |>
+  filter(!is.na(site_id)) |>
+  mutate(
+    post_lr = as.integer(year == 2025),
+    did_lr  = as.integer(treated_unit & post_lr)
+  )
+
+# Keep Marovoay-only long-run panel for comparison (original spec)
+panel_lr2 <- bind_rows(
+  panel_hist_maro |> filter(year %in% PRE_YEARS),
+  panel_2025_maro
+) |>
+  filter(!is.na(site_id)) |>
+  mutate(
+    post_lr = as.integer(year == 2025),
+    did_lr  = as.integer(treated_unit & post_lr)
+  )
+
+# ── Site-year aggregation (for gsynth comparison) ─────────────────────────────
+panel_site_maro <- panel_hist_maro |>
+  group_by(site_id, year, treated_unit, post, treatment) |>
+  summarise(across(starts_with("ln_"), mean, na.rm = TRUE),
+            n_hh = n(), .groups = "drop")
+```
+
+---
+
+## 3 Attrition Diagnostics
+
+### 3.1 Sample size per site per year
+
+```{r fig_sample_size}
+#| fig-cap: "Households surveyed per site per year (Marovoay, historical panel)"
+#| fig-width: 9
+#| fig-height: 4
+
+panel_hist_maro |>
+  count(site_id, year) |>
+  mutate(site_label = site_labels[site_id]) |>
+  ggplot(aes(x = year, y = n, color = site_label, linetype = site_label)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  geom_vline(xintercept = 2002.5, linetype = "dashed", color = "darkred", alpha = 0.6) +
+  annotate("text", x = 2002.5, y = Inf, label = " PA 2002",
+           hjust = 0, vjust = 1.3, size = 3, color = "darkred") +
+  scale_color_manual(values = c("#2D6A4F","#52B788","#1E6091","#74B3CE")) +
+  labs(x = NULL, y = "Households surveyed", color = NULL, linetype = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+```
+
+### 3.2 Distribution of observation spells (1998–2014)
+
+How many times is each `j5` household identifier observed across the 16
+historical waves? This approximates the re-interview rate — though note that
+`j5` reassignments cause under-counting of true re-interviews.
+
+```{r tbl_spells}
+#| tbl-cap: "Distribution of household observation spells (Marovoay, 1998–2014)"
+
+spells <- panel_hist_maro |>
+  count(j5, name = "n_waves")
+
+spell_summary <- spells |>
+  count(n_waves, name = "n_households") |>
+  mutate(pct = round(100 * n_households / sum(n_households), 1),
+         cum_pct = cumsum(pct))
+
+gt(spell_summary) |>
+  cols_label(n_waves = "Waves observed", n_households = "Households",
+             pct = "%", cum_pct = "Cumulative %") |>
+  tab_style(style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+            locations = cells_column_labels()) |>
+  tab_source_note(md(
+    "Each `j5` code is counted across 1998–2014 (2005 excluded). Because `j5` codes
+    are not fully stable across all years (Chabé-Ferret et al. 2024), this
+    **overestimates** the share of single-observation households and **underestimates**
+    true re-interview rates."
+  ))
+```
+
+### 3.3 Differential attrition test
+
+If attrition is correlated with treatment status, year-over-year sample
+composition may diverge between treated and control sites. We test this by
+comparing (a) annual sample counts and (b) mean household size over time
+across treated vs. control sites.
+
+```{r fig_diff_attrition}
+#| fig-cap: "Year-over-year N and mean household size by treatment group"
+#| fig-width: 10
+#| fig-height: 4
+#| layout-ncol: 2
+
+panel_hist_maro |>
+  mutate(Group = if_else(treated_unit, "Treated", "Control")) |>
+  summarise(n = n(), mean_hh_size = mean(n_membres, na.rm = TRUE),
+            .by = c(Group, year)) |>
+  pivot_longer(c(n, mean_hh_size), names_to = "metric", values_to = "value") |>
+  mutate(metric = recode(metric,
+                         n = "Annual N (households)",
+                         mean_hh_size = "Mean household size")) |>
+  ggplot(aes(x = year, y = value, color = Group)) +
+  geom_line(linewidth = 0.8) +
+  geom_vline(xintercept = 2002.5, linetype = "dashed", color = "darkred", alpha = 0.5) +
+  facet_wrap(~metric, scales = "free_y") +
+  scale_color_manual(values = c("Treated" = "#2D6A4F", "Control" = "#1E6091")) +
+  labs(x = NULL, y = NULL, color = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+```
+
+```{r test_diff_attrition}
+#| tbl-cap: "Test for differential trends in household size (composition check)"
+
+# Linear trend in household size post-treatment, by group
+# If PA restriction caused differential migration, household size should diverge
+fit_hh_size <- feols(
+  n_membres ~ treatment + i(year, treated_unit, ref = 2002) | site_id + year,
+  data    = panel_hist_maro,
+  cluster = ~site_id
+)
+
+# Simplified: just compare pre vs. post mean size by group
+panel_hist_maro |>
+  mutate(period = if_else(post, "Post-2002", "Pre-2002"),
+         Group  = if_else(treated_unit, "Treated", "Control")) |>
+  summarise(mean_size = round(mean(n_membres, na.rm = TRUE), 2),
+            sd_size   = round(sd(n_membres,   na.rm = TRUE), 2),
+            n         = n(),
+            .by = c(Group, period)) |>
+  arrange(Group, period) |>
+  gt() |>
+  cols_label(Group = "Group", period = "Period",
+             mean_size = "Mean HH size", sd_size = "SD", n = "N obs") |>
+  tab_style(style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+            locations = cells_column_labels()) |>
+  tab_source_note(md(
+    "If mean household size diverges between treated and control groups after 2002,
+    this suggests differential out-migration — a potential source of composition bias."
+  ))
+```
+
+---
+
+## 4 Repeated Cross-Sections DiD
+
+The repeated cross-sections (RC) DiD uses site + year fixed effects to identify
+the treatment effect. Since treatment is assigned at the site level, this is
+equivalent to the site-level TWFE but applied to household-level data — giving
+tighter standard errors by using the full within-site variation in outcomes,
+while still clustering at the site level to account for within-site correlation.
+
+$$
+\ln y_{ist} = \alpha_s + \lambda_t + \delta \cdot D_{st} + \varepsilon_{ist}
+$$
+
+where $D_{st} = \mathbf{1}[\text{site } s \in \text{Treated}] \times \mathbf{1}[t \geq 2003]$,
+$\alpha_s$ are site fixed effects, and $\lambda_t$ year fixed effects.
+Standard errors are clustered at the site level ($S = 4$).
+
+### 4.1 Main specification
+
+```{r rc_did_main}
+#| tbl-cap: "Repeated cross-sections DiD — log income outcomes (Marovoay, 1998–2014)"
+#| message: false
+
+# Historical panel only (excluding 2025 — different composition, instrument changes)
+panel_rc_hist <- panel_hist_maro |>
+  filter(year %in% HIST_YEARS)  # 1999–2014
+
+fit_rc_revtot    <- feols(ln_revtot_w    ~ treatment | site_id + year,
+                          data = panel_rc_hist, cluster = ~site_id)
+fit_rc_revcou    <- feols(ln_revcou_w    ~ treatment | site_id + year,
+                          data = panel_rc_hist, cluster = ~site_id)
+fit_rc_agri      <- feols(ln_rev_agri_w  ~ treatment | site_id + year,
+                          data = panel_rc_hist, cluster = ~site_id)
+fit_rc_nonagri   <- feols(ln_rev_nonagri_w ~ treatment | site_id + year,
+                          data = panel_rc_hist, cluster = ~site_id)
+
+etable(fit_rc_revtot, fit_rc_revcou, fit_rc_agri, fit_rc_nonagri,
+       headers = c("Total", "Coupled", "Agri", "Non-agri"),
+       keep    = "treatment",
+       se.below = TRUE,
+       notes   = "Site + year FE. Clustered SE (4 clusters). 2005 excluded.")
+```
+
+### 4.2 With household-size control
+
+Household size may shift between treated and control sites if the PA
+restriction caused differential out-migration. Adding `n_membres` controls
+for this potential composition effect.
+
+```{r rc_did_cov}
+#| message: false
+
+fit_rc_cov <- feols(
+  ln_revtot_w ~ treatment + n_membres | site_id + year,
+  data = panel_rc_hist, cluster = ~site_id
+)
+
+etable(fit_rc_revtot, fit_rc_cov,
+       headers = c("No controls", "+ HH size"),
+       keep    = c("treatment", "n_membres"),
+       se.below = TRUE,
+       notes   = "Site + year FE. Clustered SE (4 clusters).")
+```
+
+### 4.3 Event study (repeated cross-sections)
+
+The event study uses site × year FE with relative-time indicators interacted
+with the treated-unit dummy. Since treatment is site-level, the pre-treatment
+coefficients are identified from the within-site outcome variation relative to
+the between-group (treated vs. control) trend.
+
+```{r fig_event_study}
+#| fig-cap: "Event study — log total income (RC specification, site + year FE)"
+#| fig-width: 9
+#| fig-height: 4
+#| message: false
+
+panel_es <- panel_rc_hist |>
+  mutate(rel_time = pmax(pmin(year - TREAT_YEAR, 11), -4))
+
+fit_es_rc <- feols(
+  ln_revtot_w ~ i(rel_time, treated_unit, ref = -1) | site_id + year,
+  data    = panel_es,
+  cluster = ~site_id
+)
+
+iplot(fit_es_rc,
+      main  = "Event study: log total income (RC DiD, site+year FE)",
+      xlab  = "Years relative to PA reclassification",
+      ylab  = "ATT (log points)",
+      pt.join = TRUE)
+abline(h = 0, lty = 2, col = "grey40")
+```
+
+### 4.4 Exact permutation test (4 sites, 6 possible assignments)
+
+With only 4 Marovoay sites and 2 treated, there are $\binom{4}{2} = 6$ possible
+assignments of 2 treated sites. We enumerate all of them exhaustively and
+compare the actual ATT to the permutation distribution. The minimum achievable
+two-sided p-value under this design is $2/6 \approx 0.33$ — a hard floor set
+by the number of units, not by the estimation method.
+
+```{r permutation_rc}
+#| tbl-cap: "Exact permutation test — RC DiD, log total income"
+
+# All C(4,2) = 6 possible treatment assignments
+perm_grid <- combn(MARO_ALL, 2, simplify = FALSE)
+
+perm_atts <- map_dbl(perm_grid, function(treat_sites) {
+  d <- panel_rc_hist |>
+    mutate(treatment = as.integer(site_id %in% treat_sites & post))
+  tryCatch(
+    coef(feols(ln_revtot_w ~ treatment | site_id + year,
+               data = d, cluster = ~site_id,
+               warn = FALSE, notes = FALSE))[["treatment"]],
+    error = function(e) NA_real_
+  )
+})
+
+actual_att_rc <- coef(fit_rc_revtot)[["treatment"]]
+p_two_sided   <- mean(abs(perm_atts) >= abs(actual_att_rc), na.rm = TRUE)
+p_one_sided   <- mean(perm_atts >= actual_att_rc, na.rm = TRUE)
+
+# Table: all permutations
+tibble(
+  `Treated sites` = map_chr(perm_grid, paste, collapse = " + "),
+  `ATT`           = round(perm_atts, 4),
+  `Is actual`     = map_lgl(perm_grid, ~ setequal(.x, MARO_TREATED))
+) |>
+  arrange(desc(`Is actual`), ATT) |>
+  gt() |>
+  tab_style(
+    style = list(cell_fill(color = "#D4EDDA"), cell_text(weight = "bold")),
+    locations = cells_body(rows = `Is actual`)
+  ) |>
+  tab_style(style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+            locations = cells_column_labels()) |>
+  tab_footnote(
+    paste0("Two-sided p = ", round(p_two_sided, 3),
+           " (min achievable = 0.333). One-sided p = ", round(p_one_sided, 3), "."),
+    locations = cells_column_labels(ATT)
+  ) |>
+  tab_source_note(md("Green row = actual treatment assignment. All 6 possible assignments enumerated."))
+```
+
+---
+
+## 5 Long-Run 2×2 DiD: Pre-treatment vs. 2025
+
+The 2025 BETSAKA survey provides a **23-year post-treatment observation**.
+A long-run DiD comparing the pre-treatment period (1999–2002) to the 2025
+wave bypasses all intermediate panel-gap issues: it requires no tracking and
+no interpolation across the 2015–2024 gap. The estimand is the compound ATT
+accumulating both the original 2002 Ankarafantsika reclassification and the
+2015 boundary extension.
+
+::: {.callout-warning title="What the long-run DiD measures"}
+The 2025 endline reflects **23 years of cumulative treatment**, including both
+the 2002 PA designation and the 2015 boundary extension (Décret n° 2015-730),
+which further expanded the park perimeter. The long-run ATT cannot be
+attributed to either event in isolation. Interpret as the total long-run
+impact of the PA regime as of 2025.
+:::
+
+::: {.callout-note title="Alaotra controls: validity and timing"}
+The Alaotra Lac observatory sites (211 Ambato, 212 Amparafa, 213 Morarano)
+serve as additional control sites in the extended long-run specification.
+Alaotra is subject to a distinct PA process: a **temporary protection decree
+(2007)** followed by **permanent national protection (2015)**. Two implications
+for validity:
+
+1. **Pre-treatment period (1999–2002):** Alaotra has no PA restrictions.
+   Parallel trends in the 1999–2002 baseline is plausible — both observatories
+   are rural, rice-farming zones in Madagascar.
+2. **Post-period (2025):** The 2015 Alaotra PA decree postdates Ankarafantsika
+   by 13 years and may itself have affected Alaotra incomes. If the Alaotra PA
+   *reduced* incomes, using Alaotra as a control in 2025 would **attenuate**
+   the estimated Ankarafantsika effect (bias toward zero). If it *increased*
+   incomes (e.g. through conservation payments or eco-tourism), the bias is
+   upward. We treat this as a maintained assumption and report the Alaotra-
+   extended spec alongside the Marovoay-only spec for transparency.
+:::
+
+### 5.1 Site-level comparison
+
+```{r fig_longrun_trajectories}
+#| fig-cap: "Income trajectories with 2025 endpoint — treated vs. control sites"
+#| fig-width: 10
+#| fig-height: 4
+
+panel_site_maro |>
+  bind_rows(
+    panel_2025_maro |>
+      group_by(site_id, year, treated_unit, post, treatment) |>
+      summarise(across(starts_with("ln_"), mean, na.rm = TRUE),
+                n_hh = n(), .groups = "drop")
+  ) |>
+  filter(year >= 1998) |>
+  mutate(
+    site_label = site_labels[site_id],
+    Group = if_else(treated_unit, "Treated (031/032)", "Control (033/034)")
+  ) |>
+  ggplot(aes(x = year, y = ln_revtot_w, color = site_label, group = site_label)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  geom_vline(xintercept = 2002.5, linetype = "dashed", color = "darkred", alpha = 0.7) +
+  geom_vline(xintercept = 2014.5, linetype = "dotted", color = "grey50") +
+  annotate("text", x = 2002.5, y = Inf, label = " PA 2002",
+           hjust = 0, vjust = 1.4, size = 3, color = "darkred") +
+  annotate("text", x = 2014.5, y = Inf, label = " Gap ",
+           hjust = 1, vjust = 1.4, size = 3, color = "grey50") +
+  scale_color_manual(values = c("#2D6A4F","#52B788","#1E6091","#74B3CE")) +
+  scale_x_continuous(breaks = c(seq(1998, 2014, 4), 2025)) +
+  labs(x = NULL, y = "Mean log income (winsorised)", color = NULL,
+       caption = "Dotted: start of 10-year gap (2015–2024). 2005 excluded.") +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+```
+
+### 5.2 Long-run DiD regression (household-level, site + period FE)
+
+Two specifications are reported side-by-side:
+
+- **Marovoay only (4 sites)**: cleanest control group, tightest geographic
+  comparability; minimum permutation p = 0.333.
+- **Marovoay + Alaotra (7 sites)**: adds 3 Alaotra control sites, improving
+  power; minimum permutation p = 0.095 with $\binom{7}{2} = 21$ allocations.
+  Validity requires Alaotra incomes not to have been differentially affected
+  by the 2015 Alaotra PA (see callout above).
+
+```{r longrun_did}
+#| message: false
+#| tbl-cap: "Long-run DiD: log total income (pre-treatment 1999–2002 vs. 2025)"
+
+# Marovoay-only specification (4 sites)
+fit_lr <- feols(
+  ln_revtot_w ~ did_lr | site_id + post_lr,
+  data    = panel_lr2,
+  cluster = ~site_id
+)
+fit_lr_agri <- feols(
+  ln_rev_agri_w ~ did_lr | site_id + post_lr,
+  data    = panel_lr2, cluster = ~site_id
+)
+fit_lr_nonagri <- feols(
+  ln_rev_nonagri_w ~ did_lr | site_id + post_lr,
+  data    = panel_lr2, cluster = ~site_id
+)
+
+# Extended specification: Marovoay + Alaotra (7 sites)
+fit_lr_ext <- feols(
+  ln_revtot_w ~ did_lr | site_id + post_lr,
+  data    = panel_lr_full,
+  cluster = ~site_id
+)
+fit_lr_ext_agri <- feols(
+  ln_rev_agri_w ~ did_lr | site_id + post_lr,
+  data    = panel_lr_full, cluster = ~site_id
+)
+fit_lr_ext_nonagri <- feols(
+  ln_rev_nonagri_w ~ did_lr | site_id + post_lr,
+  data    = panel_lr_full, cluster = ~site_id
+)
+
+etable(
+  fit_lr, fit_lr_agri, fit_lr_nonagri,
+  fit_lr_ext, fit_lr_ext_agri, fit_lr_ext_nonagri,
+  headers = c("Total (Maro)", "Agri (Maro)", "Non-agri (Maro)",
+              "Total (Maro+Al)", "Agri (Maro+Al)", "Non-agri (Maro+Al)"),
+  keep    = "did_lr",
+  se.below = TRUE,
+  notes   = paste0(
+    "Pre-period: ", min(PRE_YEARS), "–", max(PRE_YEARS),
+    ". Post-period: 2025. Site + period FE. ",
+    "Maro: 4 clusters; Maro+Alaotra: 7 clusters."
+  ))
+```
+
+### 5.3 Exact permutation tests
+
+We run two permutation tests: one for the 4-site Marovoay-only spec
+($\binom{4}{2} = 6$ allocations, p-floor = 0.333) and one for the 7-site
+extended spec ($\binom{7}{2} = 21$ allocations, p-floor = 0.095).
+
+```{r longrun_perm}
+#| tbl-cap: "Exact permutation test — long-run DiD, Marovoay only (4 sites)"
+
+# ── 4-site permutation (Marovoay only) ───────────────────────────────────────
+perm_atts_lr <- map_dbl(perm_grid, function(treat_sites) {
+  d <- panel_lr2 |>
+    mutate(
+      treated_unit = site_id %in% treat_sites,
+      did_lr       = as.integer(treated_unit & post_lr)
+    )
+  tryCatch(
+    coef(feols(ln_revtot_w ~ did_lr | site_id + post_lr,
+               data = d, cluster = ~site_id,
+               warn = FALSE, notes = FALSE))[["did_lr"]],
+    error = function(e) NA_real_
+  )
+})
+
+actual_att_lr <- coef(fit_lr)[["did_lr"]]
+p_two_lr  <- mean(abs(perm_atts_lr) >= abs(actual_att_lr), na.rm = TRUE)
+p_one_lr  <- mean(perm_atts_lr >= actual_att_lr, na.rm = TRUE)
+
+tibble(
+  `Treated sites` = map_chr(perm_grid, paste, collapse = " + "),
+  `ATT (long-run)` = round(perm_atts_lr, 4),
+  `Is actual`      = map_lgl(perm_grid, ~ setequal(.x, MARO_TREATED))
+) |>
+  arrange(desc(`Is actual`), `ATT (long-run)`) |>
+  gt() |>
+  tab_style(
+    style = list(cell_fill(color = "#D4EDDA"), cell_text(weight = "bold")),
+    locations = cells_body(rows = `Is actual`)
+  ) |>
+  tab_style(style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+            locations = cells_column_labels()) |>
+  tab_footnote(
+    paste0("Two-sided p = ", round(p_two_lr, 3),
+           " (min achievable = 0.333). One-sided p = ", round(p_one_lr, 3), "."),
+    locations = cells_column_labels(`ATT (long-run)`)
+  ) |>
+  tab_source_note(md(
+    "Pre-period: 1999–2002. Post-period: 2025. All 6 C(4,2) allocations enumerated."
+  ))
+```
+
+```{r longrun_perm_ext}
+#| tbl-cap: "Exact permutation test — long-run DiD, Marovoay + Alaotra (7 sites)"
+
+# ── 7-site permutation (Marovoay + Alaotra) ──────────────────────────────────
+perm_grid_ext <- combn(ALL_SITES, 2, simplify = FALSE)
+
+perm_atts_lr_ext <- map_dbl(perm_grid_ext, function(treat_sites) {
+  d <- panel_lr_full |>
+    mutate(
+      treated_unit = site_id %in% treat_sites,
+      did_lr       = as.integer(treated_unit & post_lr)
+    )
+  tryCatch(
+    coef(feols(ln_revtot_w ~ did_lr | site_id + post_lr,
+               data = d, cluster = ~site_id,
+               warn = FALSE, notes = FALSE))[["did_lr"]],
+    error = function(e) NA_real_
+  )
+})
+
+actual_att_lr_ext <- coef(fit_lr_ext)[["did_lr"]]
+p_two_lr_ext <- mean(abs(perm_atts_lr_ext) >= abs(actual_att_lr_ext), na.rm = TRUE)
+p_one_lr_ext <- mean(perm_atts_lr_ext >= actual_att_lr_ext, na.rm = TRUE)
+
+tibble(
+  `Treated sites` = map_chr(perm_grid_ext, paste, collapse = " + "),
+  `ATT (long-run)` = round(perm_atts_lr_ext, 4),
+  `Is actual` = map_lgl(perm_grid_ext, ~ setequal(.x, MARO_TREATED))
+) |>
+  arrange(desc(`Is actual`), `ATT (long-run)`) |>
+  gt() |>
+  tab_style(
+    style = list(cell_fill(color = "#D4EDDA"), cell_text(weight = "bold")),
+    locations = cells_body(rows = `Is actual`)
+  ) |>
+  tab_style(style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+            locations = cells_column_labels()) |>
+  tab_footnote(
+    paste0("Two-sided p = ", round(p_two_lr_ext, 3),
+           " (min achievable = 0.095). One-sided p = ", round(p_one_lr_ext, 3), "."),
+    locations = cells_column_labels(`ATT (long-run)`)
+  ) |>
+  tab_source_note(md(
+    "Pre-period: 1999–2002. Post-period: 2025. All 21 C(7,2) allocations enumerated."
+  ))
+```
+
+---
+
+## 6 Site-Level Synthetic Control (for comparison)
+
+The site-level gsynth result from the companion analysis
+(`06_Marovoay-Ankarafantsika-extended.qmd`) is reproduced here for direct
+comparison with the RC DiD estimates above.
+
+```{r gsynth_ref}
+#| message: false
+#| warning: false
+#| cache: true
+
+run_gsynth_site <- function(data) {
+  d <- data |>
+    filter(!is.na(ln_revtot_w))
+  suppressWarnings(
+    gsynth(ln_revtot_w ~ treatment,
+           data      = d,
+           index     = c("site_id", "year"),
+           se        = TRUE, inference = "nonparametric", nboots = 200,
+           r = 0, CV = FALSE, force = "two-way",
+           parallel  = FALSE, min.T0 = 4, seed = 2139)
+  )
+}
+
+gs_maro <- tryCatch(run_gsynth_site(panel_site_maro), error = function(e) NULL)
+
+if (!is.null(gs_maro))
+  plot(gs_maro, type = "gap",
+       main = "gsynth gap plot — site-level (Marovoay only)",
+       ylab = "ATT (log points)", xlab = "Year")
+```
+
+---
+
+## 7 Synthesis: All Estimates
+
+```{r tbl_synthesis}
+#| tbl-cap: "All ATT estimates — log total income, Marovoay–Ankarafantsika"
+
+att_row <- function(method, spec, estimand, att, se, ci_lo = NA, ci_hi = NA) {
+  tibble(Method = method, Specification = spec, Estimand = estimand,
+         ATT = att, SE = se, CI_lo = ci_lo, CI_hi = ci_hi)
+}
+
+# RC DiD
+rc_att  <- tryCatch(coef(fit_rc_revtot)[["treatment"]],  error = function(e) NA_real_)
+rc_se   <- tryCatch(se(fit_rc_revtot)[["treatment"]],    error = function(e) NA_real_)
+
+# RC DiD (with HH size control)
+rcc_att <- tryCatch(coef(fit_rc_cov)[["treatment"]],     error = function(e) NA_real_)
+rcc_se  <- tryCatch(se(fit_rc_cov)[["treatment"]],       error = function(e) NA_real_)
+
+# Long-run DiD (Marovoay only)
+lr_att  <- tryCatch(coef(fit_lr)[["did_lr"]],            error = function(e) NA_real_)
+lr_se   <- tryCatch(se(fit_lr)[["did_lr"]],              error = function(e) NA_real_)
+
+# Long-run DiD (Marovoay + Alaotra)
+lre_att <- tryCatch(coef(fit_lr_ext)[["did_lr"]],        error = function(e) NA_real_)
+lre_se  <- tryCatch(se(fit_lr_ext)[["did_lr"]],          error = function(e) NA_real_)
+
+# gsynth site-level
+gs_att  <- tryCatch(mean(gs_maro$att.avg, na.rm = TRUE), error = function(e) NA_real_)
+gs_se   <- tryCatch(sd(as.vector(gs_maro$att.avg.boot), na.rm = TRUE), error = function(e) NA_real_)
+
+bind_rows(
+  att_row("RC DiD",           "Site + year FE",             "Medium-run ATT (1999–2014)", rc_att,  rc_se,
+          rc_att  - 1.96 * rc_se,  rc_att  + 1.96 * rc_se),
+  att_row("RC DiD + HH size", "Site + year FE + n_membres", "Medium-run ATT (1999–2014)", rcc_att, rcc_se,
+          rcc_att - 1.96 * rcc_se, rcc_att + 1.96 * rcc_se),
+  att_row("Long-run DiD (Maro)",  "Site + period FE, 4 sites", "Long-run ATT (1999–2002 vs 2025)",
+          lr_att,  lr_se,  lr_att  - 1.96 * lr_se,  lr_att  + 1.96 * lr_se),
+  att_row("Long-run DiD (Maro+Al)", "Site + period FE, 7 sites", "Long-run ATT (1999–2002 vs 2025)",
+          lre_att, lre_se, lre_att - 1.96 * lre_se, lre_att + 1.96 * lre_se),
+  att_row("gsynth (site)",    "IFE, nonparam bootstrap",    "Medium-run ATT (1999–2014)", gs_att, gs_se,
+          gs_att - 1.96 * gs_se, gs_att + 1.96 * gs_se)
+) |>
+  gt() |>
+  fmt_number(columns = c(ATT, SE, CI_lo, CI_hi), decimals = 3) |>
+  cols_label(Method = "Estimator", Specification = "FE structure",
+             Estimand = "Estimand", ATT = "ATT", SE = "SE",
+             CI_lo = "95% CI lo", CI_hi = "95% CI hi") |>
+  tab_style(style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+            locations = cells_column_labels()) |>
+  tab_style(style = cell_fill(color = "#FFF3CD"),
+            locations = cells_body(rows = Method == "Long-run DiD")) |>
+  tab_source_note(md(
+    "Outcome: log winsorised total income. CIs: 1.96 × cluster SE (4 clusters).
+    gsynth SE via 200 nonparametric bootstrap draws.
+    Long-run DiD captures 2002 + 2015 treatment effects jointly.
+    See permutation tests (§4.4, §5.3) for finite-sample p-values."
+  ))
+```
+
+---
+
+## 8 Spatial RDD: Data Availability Assessment
+
+The most powerful identification strategy would be a spatial RDD using
+distance from the Ankarafantsika PA boundary as the running variable. The
+2025 survey collected GPS coordinates for all survey sites.
+
+```{r tbl_gps_assessment}
+#| tbl-cap: "GPS data availability and spatial RDD feasibility"
+
+tribble(
+  ~`Data layer`, ~`Available?`, ~`Source`, ~`Implication`,
+  "Fokontany centroid GPS", "Yes",
+    "`01_description.qmd` (hardcoded tribble)",
+    "Site-level distance to PA computable; too coarse for RDD",
+  "Hamlet (hameau) GPS", "Yes",
+    "`Coordonnées_GPS_OR_Alaotra_Marovoay_2025.ods`",
+    "4–8 hamlets per site; still too coarse for within-site RDD",
+  "Individual household GPS", "Unknown",
+    "Would need field GPS from `res_deb.dta` or separate file",
+    "Required for boundary-discontinuity RDD",
+  "PA boundary polygon", "Yes",
+    "`data/ankarafantsika_protected_area.geojson`",
+    "Running variable = distance to boundary (metres)"
+) |>
+  gt() |>
+  tab_style(style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+            locations = cells_column_labels()) |>
+  tab_style(style = cell_fill(color = "#D4EDDA"),
+            locations = cells_body(rows = `Available?` == "Yes")) |>
+  tab_style(style = cell_fill(color = "#FFF3CD"),
+            locations = cells_body(rows = `Available?` == "Unknown")) |>
+  tab_source_note(md(
+    "The hamlet-level GPS centroids give **4–8 points per site** — not enough for
+    a smooth running-variable RDD. Household GPS would give ~120 observations per
+    site in 2025, enabling a local linear RDD in the 0–15 km bandwidth around the
+    PA boundary. If individual GPS was recorded in `res_deb.dta` (or a companion
+    GPS file), it should be checked before concluding RDD is infeasible."
+  ))
+```
+
+---
+
+## 9 Interpretation
+
+The rotating-panel structure of the Madagascar ROS data constrains but does
+not preclude a credible impact evaluation. The key implications are:
+
+1. **The site is the effective unit of observation** for treatment assignment.
+   Any specification — whether household-level repeated cross-sections or
+   site-level aggregation — ultimately clusters inference at the 4-site level.
+   This hard ceiling on statistical power is intrinsic to the design.
+
+2. **The RC DiD gains efficiency** relative to the site-level aggregate by
+   using the full within-site variance in outcomes, not just site means. The
+   point estimate should be identical to the site-level TWFE; the SE should be
+   narrower if within-site variance is informative. With only $G = 4$ sites,
+   conventional clustered SEs and the wild cluster bootstrap both undercover;
+   the exact permutation test (§4.4) is the appropriate inference tool.
+
+3. **The long-run DiD is the most policy-relevant estimate**: it captures
+   the 23-year compound effect of the PA regime on household incomes, using
+   a clean pre-treatment baseline (1999–2002) and a fresh 2025 cross-section.
+   It is immune to the panel-gap problem and the `j5` instability issue. The
+   extended specification including Alaotra controls (7 sites) reduces the
+   minimum permutation p-value from 0.333 to 0.095, making statistically
+   detectable effects possible for the first time in this design.
+
+4. **Spatial RDD remains the priority extension**: if household-level GPS is
+   embedded in `res_deb.dta` or a companion file, a boundary-discontinuity
+   design in the 2025 cross-section would provide the sharpest identification
+   and is entirely independent of the panel attrition problem.
+
+## References
+
+- Chabé-Ferret, S. *et al.* (2024). The Madagascar Rural Observatory Survey
+  (1995–2015). *Scientific Data* 11: 1085.
+  <https://doi.org/10.1038/s41597-024-03879-9>
+- MacKinnon, J.G. & Webb, M.D. (2018). The wild bootstrap for few (treated)
+  clusters. *Econometrics Journal* 21(2): 114–135.
+- Callaway, B. & Sant'Anna, P. (2020). Difference-in-differences with
+  multiple time periods. *Journal of Econometrics* 225(2): 200–230.

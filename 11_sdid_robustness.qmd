@@ -1,0 +1,806 @@
+---
+title: "Synthetic Difference-in-Differences"
+subtitle: "Robustness Check for the Three Conservation Models Framework"
+author: "[Authors]"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    theme: cosmo
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: false
+  warning: false
+  message: false
+bibliography: ../references.bib
+---
+
+```{r setup}
+#| label: setup
+
+library(tidyverse)
+library(synthdid)
+library(fixest)
+library(gt)
+library(scales)
+library(knitr)
+library(patchwork)
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
+winsorize <- function(x, probs = c(0.01, 0.99)) {
+  q <- quantile(x, probs, na.rm = TRUE)
+  pmin(pmax(x, q[1]), q[2])
+}
+
+mk_income_ext <- function(df) {
+  df |>
+    mutate(
+      rev_riz  = coalesce(rev_riz,  0),
+      rev_cu   = coalesce(rev_cu,   0),
+      revel    = coalesce(revel,    0),
+      revpeche = coalesce(revpeche, 0),
+      revppal  = coalesce(revppal,  0),
+      revsec   = coalesce(revsec,   0),
+      revcou   = coalesce(revcou, revppal + revsec + rev_riz + rev_cu + revel + revpeche),
+      revtot   = coalesce(revtot, revcou)
+    )
+}
+
+# ── Constants (same as paper 10) ─────────────────────────────────────────────
+TREAT_YEAR_MARO <- 2003
+TREAT_YEAR_ALA  <- 2008
+DONOR_OBS       <- c("02", "12", "13", "15", "16", "23", "24", "25", "41")
+
+# ── Load data ────────────────────────────────────────────────────────────────
+household_consolidated <- read_rds("../data/household_consolidated.rds")
+gs10 <- read_rds("../data/paper10_gsynth.rds")
+```
+
+# Motivation {.unnumbered}
+
+The TWFE estimates in the companion paper rely on the parallel trends assumption, while the gsynth estimator relaxes this via latent factors but requires selecting the number of factors by cross-validation. **Synthetic Difference-in-Differences** (SDID, Arkhangelsky et al. 2021, *AER*) offers a third approach that combines the strengths of both:
+
+- Like **DID**, it is invariant to additive unit-level shifts (no need for exact pre-treatment level matching).
+- Like **SC**, it reweights control units to match pre-treatment *trends*, reducing sensitivity to the parallel trends assumption.
+- It adds **time weights** that concentrate comparison on pre-treatment periods most predictive of the post-treatment outcome, providing double robustness.
+
+Under the latent factor model $Y_{it}(0) = \alpha_i + \beta_t + \lambda_i' f_t + \varepsilon_{it}$, SDID is consistent if *either* the unit weights or the time weights successfully remove confounding from $\lambda_i' f_t$ — the factor structure need not be correctly specified in both dimensions simultaneously (Theorem 3.1 in Arkhangelsky et al. 2021).
+
+This document estimates SDID for each treatment block and compares with TWFE and gsynth.
+
+# Data Construction {#sec-data}
+
+## Site-Level Panel
+
+We build a balanced site × year panel, aggregating household-level log income to site means. Because `synthdid` requires a fully balanced panel matrix, we must restrict to years observed for *all* retained units.
+
+```{r build-panel}
+#| label: build-panel
+
+# ── Household-level data for all relevant observatories ──────────────────────
+panel_hh <- household_consolidated |>
+  filter(
+    obs %in% c("03", "21", DONOR_OBS),
+    year %in% 1999:2014,
+    !(obs == "03" & year == 2005)
+  ) |>
+  mk_income_ext() |>
+  mutate(
+    revtot_w = pmin(revtot, quantile(revtot, 0.99, na.rm = TRUE))
+  ) |>
+  mutate(ln_y = log(pmax(revtot_w, 0) + 1))
+
+# ── Aggregate to site-year means ────────────────────────────────────────────
+panel_site <- panel_hh |>
+  summarize(
+    ln_y = mean(ln_y, na.rm = TRUE),
+    n_hh = n(),
+    .by = c(obs, site_id, year)
+  )
+```
+
+## Balanced Panels for Each Treatment Block
+
+SDID handles staggered adoption by decomposing into **block-assignment subproblems** (Arkhangelsky et al. 2021, Appendix): one balanced panel per treatment cohort, each with its own pre/post structure. We then average the block-level ATTs, weighting by the number of post-treatment periods.
+
+```{r block-panels}
+#| label: block-panels
+
+# ── Helper: build balanced panel for a treatment block ───────────────────────
+build_block_panel <- function(treated_ids, treat_year, year_set, panel_data) {
+  # Keep only the specified years
+  df <- panel_data |>
+    filter(year %in% year_set) |>
+    mutate(treatment = as.integer(site_id %in% treated_ids & year >= treat_year))
+
+  # Retain only sites present in ALL years of the block
+  balanced_sites <- df |>
+    count(site_id) |>
+    filter(n == length(year_set)) |>
+    pull(site_id)
+
+  df_balanced <- df |>
+    filter(site_id %in% balanced_sites) |>
+    arrange(site_id, year)
+
+  # Confirm treated sites survived
+  n_tr <- sum(balanced_sites %in% treated_ids)
+  n_co <- length(balanced_sites) - n_tr
+  t0   <- sum(year_set < treat_year)
+  t1   <- sum(year_set >= treat_year)
+
+  list(
+    data = df_balanced,
+    n_tr = n_tr, n_co = n_co, t0 = t0, t1 = t1,
+    treated = intersect(balanced_sites, treated_ids),
+    controls = setdiff(balanced_sites, treated_ids),
+    years = year_set
+  )
+}
+
+# ── Block 1: Marovoay — treated 2003 ────────────────────────────────────────
+# Primary: 1999–2008 (excl. 2005) → T0 = 4, T1 = 5
+maro_years_primary <- c(1999:2004, 2006:2008)
+block1 <- build_block_panel(
+  treated_ids = c("033", "034"),
+  treat_year  = TREAT_YEAR_MARO,
+  year_set    = maro_years_primary,
+  panel_data  = panel_site
+)
+
+# ── Block 2: Alaotra — treated 2008 ─────────────────────────────────────────
+# Primary: 1999–2014 (excl. 2005, 2009) → T0 = 9, T1 = 6
+ala_years_primary <- c(1999:2004, 2006:2008, 2010:2014)
+block2 <- build_block_panel(
+  treated_ids = c("212"),
+  treat_year  = TREAT_YEAR_ALA,
+  year_set    = ala_years_primary,
+  panel_data  = panel_site
+)
+```
+
+```{r block-summary}
+#| label: tbl-blocks
+#| tbl-cap: "SDID block structure"
+
+tibble(
+  Block = c("Block 1: Marovoay (treat 2003)",
+            "Block 2: Alaotra (treat 2008)"),
+  Years = c(paste(range(block1$years), collapse = "–"),
+            paste(range(block2$years), collapse = "–")),
+  `T₀ (pre)` = c(block1$t0, block2$t0),
+  `T₁ (post)` = c(block1$t1, block2$t1),
+  `N_tr` = c(block1$n_tr, block2$n_tr),
+  `N_co` = c(block1$n_co, block2$n_co),
+  `Treated sites` = c(
+    paste(block1$treated, collapse = ", "),
+    paste(block2$treated, collapse = ", ")
+  )
+) |>
+  gt() |>
+  tab_header(title = "Staggered SDID: Block Decomposition")
+```
+
+# SDID Estimation {#sec-estimation}
+
+## Block 1: Marovoay (Ankarafantsika, 2003)
+
+```{r sdid-block1}
+#| label: sdid-block1
+
+# Convert to synthdid format
+sdid_panel_1 <- block1$data |>
+  select(unit = site_id, time = year, outcome = ln_y, treatment) |>
+  as.data.frame()
+
+setup1 <- panel.matrices(sdid_panel_1)
+
+# SDID estimate
+sdid1 <- synthdid_estimate(setup1$Y, setup1$N0, setup1$T0)
+
+# Also compute SC and DID for comparison
+sc1  <- sc_estimate(setup1$Y, setup1$N0, setup1$T0)
+did1 <- did_estimate(setup1$Y, setup1$N0, setup1$T0)
+
+# Standard errors via placebo (works with N_tr ≥ 1)
+se_sdid1 <- synthdid_se(sdid1, method = "placebo")
+se_sc1   <- synthdid_se(sc1,   method = "placebo")
+se_did1  <- synthdid_se(did1,  method = "placebo")
+
+# Bootstrap and jackknife SEs for SDID
+se_sdid1_boot <- tryCatch(
+  synthdid_se(sdid1, method = "bootstrap"),
+  error = function(e) NA_real_
+)
+se_sdid1_jack <- tryCatch(
+  synthdid_se(sdid1, method = "jackknife"),
+  error = function(e) NA_real_
+)
+```
+
+```{r block1-table}
+#| label: tbl-block1
+#| tbl-cap: "Block 1 (Marovoay): SDID, SC, and DID estimates"
+
+tibble(
+  Method = c("SDID", "Synthetic Control", "Difference-in-Differences"),
+  ATT = round(c(as.numeric(sdid1), as.numeric(sc1), as.numeric(did1)), 3),
+  `SE (placebo)` = round(c(se_sdid1, se_sc1, se_did1), 3),
+  `% change` = round((exp(ATT) - 1) * 100, 1)
+) |>
+  gt() |>
+  tab_header(
+    title = "Block 1: Marovoay — Ankarafantsika Reclassification (2003)",
+    subtitle = sprintf("T₀ = %d, T₁ = %d, N_tr = %d, N_co = %d",
+                       block1$t0, block1$t1, block1$n_tr, block1$n_co)
+  )
+```
+
+```{r block1-plot}
+#| label: fig-block1
+#| fig-cap: "Block 1 (Marovoay): SDID trend plot. Solid blue = reweighted synthetic control; solid red = treated average; dashed = counterfactual. The gap between the red line and the dashed line post-treatment is the SDID estimate."
+
+plot(sdid1) +
+  labs(title = "SDID: Marovoay (Treated 2003) vs Synthetic Control") +
+  theme_minimal(base_size = 12)
+```
+
+## Block 2: Alaotra (Lac Alaotra, 2008)
+
+```{r sdid-block2}
+#| label: sdid-block2
+
+sdid_panel_2 <- block2$data |>
+  select(unit = site_id, time = year, outcome = ln_y, treatment) |>
+  as.data.frame()
+
+setup2 <- panel.matrices(sdid_panel_2)
+
+sdid2 <- synthdid_estimate(setup2$Y, setup2$N0, setup2$T0)
+sc2   <- sc_estimate(setup2$Y, setup2$N0, setup2$T0)
+did2  <- did_estimate(setup2$Y, setup2$N0, setup2$T0)
+
+se_sdid2 <- synthdid_se(sdid2, method = "placebo")
+se_sc2   <- synthdid_se(sc2,   method = "placebo")
+se_did2  <- synthdid_se(did2,  method = "placebo")
+
+se_sdid2_boot <- tryCatch(
+  synthdid_se(sdid2, method = "bootstrap"),
+  error = function(e) NA_real_
+)
+se_sdid2_jack <- tryCatch(
+  synthdid_se(sdid2, method = "jackknife"),
+  error = function(e) NA_real_
+)
+```
+
+```{r block2-table}
+#| label: tbl-block2
+#| tbl-cap: "Block 2 (Alaotra): SDID, SC, and DID estimates"
+
+tibble(
+  Method = c("SDID", "Synthetic Control", "Difference-in-Differences"),
+  ATT = round(c(as.numeric(sdid2), as.numeric(sc2), as.numeric(did2)), 3),
+  `SE (placebo)` = round(c(se_sdid2, se_sc2, se_did2), 3),
+  `% change` = round((exp(ATT) - 1) * 100, 1)
+) |>
+  gt() |>
+  tab_header(
+    title = "Block 2: Alaotra — Lac Alaotra PHP / Ramsar Enforcement (2008)",
+    subtitle = sprintf("T₀ = %d, T₁ = %d, N_tr = %d, N_co = %d",
+                       block2$t0, block2$t1, block2$n_tr, block2$n_co)
+  )
+```
+
+```{r block2-plot}
+#| label: fig-block2
+#| fig-cap: "Block 2 (Alaotra): SDID trend plot."
+
+plot(sdid2) +
+  labs(title = "SDID: Alaotra (Treated 2008) vs Synthetic Control") +
+  theme_minimal(base_size = 12)
+```
+
+# Staggered SDID: Pooled Estimate {#sec-staggered}
+
+Following the Appendix of Arkhangelsky et al. (2021), the staggered SDID estimator decomposes the problem into block-assignment subproblems and averages the block-level ATTs. We weight by the number of treated unit × post-treatment period cells in each block:
+
+$$
+\hat{\tau}^{\text{staggered}} = \frac{N_{tr,1} \cdot T_{1,1} \cdot \hat{\tau}_1 + N_{tr,2} \cdot T_{1,2} \cdot \hat{\tau}_2}{N_{tr,1} \cdot T_{1,1} + N_{tr,2} \cdot T_{1,2}}
+$$
+
+```{r staggered}
+#| label: staggered
+
+# Weighted average across blocks
+w1 <- block1$n_tr * block1$t1
+w2 <- block2$n_tr * block2$t1
+
+tau_staggered <- (w1 * as.numeric(sdid1) + w2 * as.numeric(sdid2)) / (w1 + w2)
+
+# SE via delta method (conservative): sqrt of weighted variance
+se_staggered <- sqrt(
+  (w1 / (w1 + w2))^2 * se_sdid1^2 +
+  (w2 / (w1 + w2))^2 * se_sdid2^2
+)
+```
+
+```{r staggered-table}
+#| label: tbl-staggered
+#| tbl-cap: "Staggered SDID: pooled estimate across treatment blocks"
+
+tibble(
+  Estimate = c("Block 1 (Marovoay, 2003)", "Block 2 (Alaotra, 2008)", "**Staggered (pooled)**"),
+  Weight = c(
+    sprintf("%d × %d = %d", block1$n_tr, block1$t1, w1),
+    sprintf("%d × %d = %d", block2$n_tr, block2$t1, w2),
+    sprintf("Σ = %d", w1 + w2)
+  ),
+  ATT = round(c(as.numeric(sdid1), as.numeric(sdid2), tau_staggered), 3),
+  SE = round(c(se_sdid1, se_sdid2, se_staggered), 3),
+  `% change` = round((exp(ATT) - 1) * 100, 1)
+) |>
+  gt() |>
+  tab_header(title = "Staggered SDID Estimate") |>
+  fmt_markdown(columns = Estimate)
+```
+
+# Inference {#sec-inference}
+
+We report three inference methods from Arkhangelsky et al. (2021):
+
+- **Placebo** (Algorithm 4): reassigns treatment to each control unit in turn and re-estimates, using the distribution of placebo effects for SE. Valid even with $N_{tr} = 1$.
+- **Bootstrap** (Algorithm 2): resamples control units with replacement.
+- **Jackknife** (Algorithm 3): leaves out one control unit at a time.
+
+```{r inference-table}
+#| label: tbl-inference
+#| tbl-cap: "SDID inference: standard errors by method"
+
+tibble(
+  Block = c("Block 1 (Marovoay)", "Block 2 (Alaotra)"),
+  ATT = round(c(as.numeric(sdid1), as.numeric(sdid2)), 3),
+  `SE placebo` = round(c(se_sdid1, se_sdid2), 3),
+  `SE bootstrap` = round(c(
+    ifelse(is.na(se_sdid1_boot), NA, se_sdid1_boot),
+    ifelse(is.na(se_sdid2_boot), NA, se_sdid2_boot)
+  ), 3),
+  `SE jackknife` = round(c(
+    ifelse(is.na(se_sdid1_jack), NA, se_sdid1_jack),
+    ifelse(is.na(se_sdid2_jack), NA, se_sdid2_jack)
+  ), 3)
+) |>
+  gt() |>
+  tab_header(
+    title = "SDID Standard Errors by Inference Method",
+    subtitle = "Placebo is the recommended method for N_tr = 1–2 (Arkhangelsky et al. 2021)"
+  )
+```
+
+# Unit and Time Weights {#sec-weights}
+
+A key feature of SDID is the interpretability of its weights. The **unit weights** $\hat{\omega}$ show which control sites contribute most to the synthetic counterfactual. The **time weights** $\hat{\lambda}$ show which pre-treatment periods are most informative.
+
+```{r weights-block1}
+#| label: fig-weights-block1
+#| fig-cap: "Block 1 (Marovoay): SDID unit weights (left) and time weights (right)."
+#| fig-height: 5
+#| fig-width: 11
+
+# Extract weights
+omega1  <- synthdid_controls(sdid1)
+lambda1 <- attr(sdid1, "weights")$lambda
+
+# Unit weights plot
+p_omega1 <- tibble(
+  site_id = names(omega1),
+  weight  = as.numeric(omega1)
+) |>
+  filter(weight > 0.01) |>
+  mutate(site_id = fct_reorder(site_id, weight)) |>
+  ggplot(aes(x = site_id, y = weight)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Block 1: Unit Weights (ω > 0.01)",
+       x = NULL, y = "Weight") +
+  theme_minimal(base_size = 11)
+
+# Time weights plot
+lambda1_tbl <- tibble(
+  year   = block1$years[1:block1$t0],
+  weight = as.numeric(lambda1)
+) |>
+  filter(!is.na(weight))
+
+p_lambda1 <- lambda1_tbl |>
+  ggplot(aes(x = year, y = weight)) +
+  geom_col(fill = "coral") +
+  labs(title = "Block 1: Time Weights (λ)",
+       subtitle = "Pre-treatment periods",
+       x = "Year", y = "Weight") +
+  theme_minimal(base_size = 11)
+
+p_omega1 + p_lambda1
+```
+
+```{r weights-block2}
+#| label: fig-weights-block2
+#| fig-cap: "Block 2 (Alaotra): SDID unit weights (left) and time weights (right)."
+#| fig-height: 5
+#| fig-width: 11
+
+omega2  <- synthdid_controls(sdid2)
+lambda2 <- attr(sdid2, "weights")$lambda
+
+p_omega2 <- tibble(
+  site_id = names(omega2),
+  weight  = as.numeric(omega2)
+) |>
+  filter(weight > 0.01) |>
+  mutate(site_id = fct_reorder(site_id, weight)) |>
+  ggplot(aes(x = site_id, y = weight)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Block 2: Unit Weights (ω > 0.01)",
+       x = NULL, y = "Weight") +
+  theme_minimal(base_size = 11)
+
+lambda2_tbl <- tibble(
+  year   = block2$years[1:block2$t0],
+  weight = as.numeric(lambda2)
+) |>
+  filter(!is.na(weight))
+
+p_lambda2 <- lambda2_tbl |>
+  ggplot(aes(x = year, y = weight)) +
+  geom_col(fill = "coral") +
+  labs(title = "Block 2: Time Weights (λ)",
+       subtitle = "Pre-treatment periods",
+       x = "Year", y = "Weight") +
+  theme_minimal(base_size = 11)
+
+p_omega2 + p_lambda2
+```
+
+# Comparison Across Estimators {#sec-comparison}
+
+```{r comparison}
+#| label: tbl-comparison
+#| tbl-cap: "Comparison of ATT estimates across all estimators"
+
+# Retrieve gsynth results
+gs_att <- gs10$att_avg
+gs_se  <- mean(gs10$est_att[as.numeric(rownames(gs10$est_att)) >= 0, "S.E."])
+
+comparison <- tibble(
+  Method = c(
+    "TWFE — Marovoay (1995–2014, treat 2003)",
+    "TWFE — Alaotra (1999–2014, treat 2008)",
+    "gsynth staggered (1999–2014, IFE)",
+    "SDID — Marovoay block (1999–2008)",
+    "SDID — Alaotra block (1999–2014)",
+    "SDID — Staggered (pooled)"
+  ),
+  ATT = NA_real_,
+  SE = NA_real_
+)
+
+# Fill in from session objects and new estimates
+# TWFE Marovoay (from paper 10 setup chunk — recompute here)
+spatial <- read_rds("../data/paper10_spatial.rds")
+MARO_SITES <- tibble(
+  site_id    = c("031", "032", "033", "034"),
+  river_side = c("west", "west", "east", "east")
+)
+RIVER_PENALTY_KM <- 15
+DEFAULT_CUTOFF   <- 12
+
+maro_treatment <- spatial$maro_dist |>
+  select(site_id, fokontany, dist_km) |>
+  left_join(MARO_SITES |> select(site_id, river_side), by = "site_id") |>
+  mutate(
+    river_penalty = if_else(river_side == "west", RIVER_PENALTY_KM, 0),
+    effective_km  = dist_km + river_penalty,
+    treated       = effective_km < DEFAULT_CUTOFF
+  )
+
+maro_panel <- household_consolidated |>
+  filter(obs == "03") |>
+  left_join(maro_treatment |> select(site_id, effective_km, treated), by = "site_id") |>
+  mutate(revtot_w = winsorize(revtot), .by = year) |>
+  mutate(
+    ln_revtot  = log(pmax(revtot_w, 1)),
+    post       = as.integer(year >= TREAT_YEAR_MARO),
+    treat_post = as.integer(treated & post)
+  )
+
+twfe_maro <- feols(ln_revtot ~ treat_post | site_id + year,
+                   data = maro_panel, vcov = "hetero")
+
+# TWFE Alaotra
+ala_treatment <- spatial$ala_site_dist |>
+  mutate(treated = dist_km < DEFAULT_CUTOFF)
+
+ala_panel_mr <- household_consolidated |>
+  filter(obs == "21") |>
+  left_join(ala_treatment |> select(site_id, treated), by = "site_id") |>
+  mutate(revtot_w = winsorize(revtot), .by = year) |>
+  mutate(
+    ln_revtot      = log(pmax(revtot_w, 1)),
+    post_ala       = as.integer(year >= TREAT_YEAR_ALA),
+    treat_post_ala = as.integer(treated & post_ala)
+  )
+
+twfe_ala <- feols(ln_revtot ~ treat_post_ala | site_id + year,
+                  data = ala_panel_mr, vcov = "hetero")
+
+comparison <- tibble(
+  Method = c(
+    "TWFE — Marovoay (1995–2014)",
+    "TWFE — Alaotra (1999–2014)",
+    "gsynth staggered (1999–2014)",
+    "SDID — Marovoay block",
+    "SDID — Alaotra block",
+    "SDID — Staggered (pooled)"
+  ),
+  ATT = round(c(
+    coef(twfe_maro)["treat_post"],
+    coef(twfe_ala)["treat_post_ala"],
+    gs_att,
+    as.numeric(sdid1),
+    as.numeric(sdid2),
+    tau_staggered
+  ), 3),
+  SE = round(c(
+    fixest::se(twfe_maro)["treat_post"],
+    fixest::se(twfe_ala)["treat_post_ala"],
+    gs_se,
+    se_sdid1,
+    se_sdid2,
+    se_staggered
+  ), 3),
+  `% change` = round((exp(ATT) - 1) * 100, 1)
+)
+
+comparison |>
+  gt() |>
+  tab_header(
+    title = "ATT Estimates Across Estimators",
+    subtitle = "Outcome: log(total household income, winsorized)"
+  ) |>
+  tab_row_group(label = "Synthetic DID", rows = 4:6) |>
+  tab_row_group(label = "Generalized Synthetic Control", rows = 3) |>
+  tab_row_group(label = "Two-Way Fixed Effects", rows = 1:2) |>
+  tab_style(
+    style = cell_fill(color = "#E3F2FD"),
+    locations = cells_body(rows = 4:6)
+  ) |>
+  tab_footnote("gsynth SE is the mean bootstrap SE across post-treatment periods.") |>
+  tab_footnote("SDID SEs use the placebo method (Arkhangelsky et al. 2021, Algorithm 4).")
+```
+
+```{r comparison-plot}
+#| label: fig-comparison
+#| fig-cap: "ATT estimates and 95% CIs across estimators. SDID (blue shading) provides a middle ground between TWFE and pure synthetic control methods."
+
+comparison |>
+  mutate(
+    Method = fct_inorder(Method),
+    ci_lo = ATT - 1.96 * SE,
+    ci_hi = ATT + 1.96 * SE,
+    family = case_when(
+      str_detect(Method, "TWFE")   ~ "TWFE",
+      str_detect(Method, "gsynth") ~ "gsynth",
+      TRUE ~ "SDID"
+    )
+  ) |>
+  ggplot(aes(x = ATT, y = fct_rev(Method), color = family)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_pointrange(aes(xmin = ci_lo, xmax = ci_hi), size = 0.6) +
+  scale_color_manual(values = c(
+    "TWFE"   = "#D32F2F",
+    "gsynth" = "#7B1FA2",
+    "SDID"   = "#1565C0"
+  )) +
+  labs(
+    title = "ATT Comparison Across Estimators",
+    x = "ATT (log points)",
+    y = NULL,
+    color = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom")
+```
+
+# Sensitivity: Alternative Year Windows {#sec-sensitivity}
+
+We assess sensitivity of the SDID estimates to the choice of year window used for balancing the panel.
+
+```{r sensitivity}
+#| label: tbl-sensitivity
+#| tbl-cap: "Sensitivity of SDID estimates to the panel year window"
+
+# Block 1 alternatives
+maro_specs <- list(
+  "1999–2004 (short post)" = c(1999:2004),
+  "1999–2008 (primary)"    = c(1999:2004, 2006:2008),
+  "1999–2014 (full)"       = c(1999:2004, 2006:2008, 2010:2014)
+)
+
+# Block 2 alternatives
+ala_specs <- list(
+  "2004–2014 (incl. site 213)" = c(2004:2008, 2010:2014),
+  "1999–2014 (primary)"        = c(1999:2004, 2006:2008, 2010:2014)
+)
+
+run_sdid_spec <- function(treated_ids, treat_year, year_set, label) {
+  blk <- build_block_panel(treated_ids, treat_year, year_set, panel_site)
+
+  if (blk$n_tr == 0 || blk$n_co < 2) {
+    return(tibble(Spec = label, ATT = NA_real_, SE = NA_real_,
+                  N_co = blk$n_co, T0 = blk$t0, T1 = blk$t1))
+  }
+
+  df <- blk$data |>
+    select(unit = site_id, time = year, outcome = ln_y, treatment) |>
+    as.data.frame()
+
+  s <- panel.matrices(df)
+  est <- tryCatch(synthdid_estimate(s$Y, s$N0, s$T0), error = function(e) NULL)
+
+  if (is.null(est)) {
+    return(tibble(Spec = label, ATT = NA_real_, SE = NA_real_,
+                  N_co = blk$n_co, T0 = blk$t0, T1 = blk$t1))
+  }
+
+  se <- tryCatch(synthdid_se(est, method = "placebo"), error = function(e) NA_real_)
+
+ tibble(
+    Spec = label,
+    ATT  = round(as.numeric(est), 3),
+    SE   = round(se, 3),
+    N_co = blk$n_co,
+    T0   = blk$t0,
+    T1   = blk$t1
+  )
+}
+
+sens_maro <- map_dfr(
+  names(maro_specs),
+  ~ run_sdid_spec(c("033", "034"), TREAT_YEAR_MARO, maro_specs[[.x]], .x)
+) |>
+  mutate(Block = "Marovoay", .before = 1)
+
+sens_ala <- map_dfr(
+  names(ala_specs),
+  ~ run_sdid_spec(c("212"), TREAT_YEAR_ALA, ala_specs[[.x]], .x)
+) |>
+  mutate(Block = "Alaotra", .before = 1)
+
+bind_rows(sens_maro, sens_ala) |>
+  mutate(`% change` = round((exp(ATT) - 1) * 100, 1)) |>
+  gt() |>
+  tab_header(
+    title = "SDID Sensitivity to Year Window",
+    subtitle = "Primary specs highlighted"
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#E3F2FD"),
+    locations = cells_body(rows = str_detect(Spec, "primary"))
+  )
+```
+
+# Placebo Tests {#sec-placebo}
+
+We run in-time placebo tests by shifting the treatment date to earlier periods and checking whether the SDID detects spurious effects.
+
+```{r placebo}
+#| label: fig-placebo
+#| fig-cap: "In-time placebo tests for SDID. Each point shows the SDID estimate when the treatment date is shifted to the indicated year. The true treatment year is marked with a vertical dashed line. Placebo ATTs near zero support the identifying assumption."
+#| fig-height: 5
+#| fig-width: 10
+
+# Block 1 placebo: shift treatment year from 2000 to 2003
+placebo_maro <- map_dfr(2000:2003, function(ty) {
+  blk <- build_block_panel(c("033", "034"), ty, maro_years_primary, panel_site)
+  if (blk$n_tr == 0 || blk$n_co < 2 || blk$t0 < 2 || blk$t1 < 1) {
+    return(tibble(treat_year = ty, att = NA_real_))
+  }
+  df <- blk$data |>
+    select(unit = site_id, time = year, outcome = ln_y, treatment) |>
+    as.data.frame()
+  s <- panel.matrices(df)
+  est <- tryCatch(synthdid_estimate(s$Y, s$N0, s$T0), error = function(e) NULL)
+  tibble(treat_year = ty, att = ifelse(is.null(est), NA_real_, as.numeric(est)))
+}) |>
+  mutate(block = "Block 1: Marovoay", true_year = TREAT_YEAR_MARO)
+
+# Block 2 placebo: shift from 2003 to 2008
+placebo_ala <- map_dfr(2003:2008, function(ty) {
+  blk <- build_block_panel(c("212"), ty, ala_years_primary, panel_site)
+  if (blk$n_tr == 0 || blk$n_co < 2 || blk$t0 < 2 || blk$t1 < 1) {
+    return(tibble(treat_year = ty, att = NA_real_))
+  }
+  df <- blk$data |>
+    select(unit = site_id, time = year, outcome = ln_y, treatment) |>
+    as.data.frame()
+  s <- panel.matrices(df)
+  est <- tryCatch(synthdid_estimate(s$Y, s$N0, s$T0), error = function(e) NULL)
+  tibble(treat_year = ty, att = ifelse(is.null(est), NA_real_, as.numeric(est)))
+}) |>
+  mutate(block = "Block 2: Alaotra", true_year = TREAT_YEAR_ALA)
+
+bind_rows(placebo_maro, placebo_ala) |>
+  filter(!is.na(att)) |>
+  ggplot(aes(x = treat_year, y = att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(aes(xintercept = true_year), linetype = "dashed", color = "red", alpha = 0.6) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_line(color = "steelblue", alpha = 0.5) +
+  facet_wrap(~block, scales = "free_x") +
+  labs(
+    title = "In-Time Placebo Tests",
+    subtitle = "SDID ATT at counterfactual treatment dates (true date = dashed red line)",
+    x = "Counterfactual treatment year",
+    y = "ATT (log points)"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+# Discussion {#sec-discussion}
+
+## SDID vs TWFE
+
+SDID relaxes the parallel trends assumption by constructing unit weights that balance pre-treatment outcome trajectories between treated and synthetic control units. The TWFE estimator implicitly assigns equal weight to all control sites within each observatory, regardless of their pre-treatment trend similarity. Where pre-treatment trends diverge, SDID should provide a more credible counterfactual.
+
+## SDID vs gsynth
+
+Both SDID and gsynth address the same identification concern — unobserved time-varying confounders. They differ in how:
+
+- **gsynth** explicitly models latent factors ($\lambda_i' f_t$) and selects the number of factors by cross-validation. It is more parametric but can be unstable with few pre-treatment periods.
+- **SDID** uses unit and time weights to non-parametrically control for factor structure. It requires no tuning parameter selection (the regularization $\zeta$ is determined by the data). It is doubly robust: consistent if either unit or time weights succeed.
+
+The key diagnostic is whether the three approaches agree on the sign and approximate magnitude of the treatment effect. Agreement across estimators with different identifying assumptions strengthens causal claims; divergence suggests sensitivity to modelling choices.
+
+## Limitations
+
+1. **Few donors for Block 2.** The Alaotra block has only `r block2$n_co` control sites due to the long time span required. This limits the effective sample for weight estimation.
+2. **Balanced panel requirement.** Restricting to a balanced panel drops many donor sites that have incomplete year coverage. This trades external validity (breadth of the donor pool) for internal consistency.
+3. **Site-level aggregation.** Aggregating household outcomes to site means reduces noise but discards within-site variation. With repeated cross-sections rather than a true household panel, this is a reasonable compromise.
+
+# Technical Notes {.appendix}
+
+## The SDID Estimator
+
+The SDID estimator (Arkhangelsky et al. 2021) solves:
+
+$$
+(\hat{\tau}^{\text{sdid}}, \hat{\mu}, \hat{\alpha}, \hat{\beta}) = \arg\min_{\tau, \mu, \alpha, \beta} \sum_{i=1}^{N} \sum_{t=1}^{T} (Y_{it} - \mu - \alpha_i - \beta_t - W_{it} \tau)^2 \hat{\omega}_i^{\text{sdid}} \hat{\lambda}_t^{\text{sdid}}
+$$
+
+where $\hat{\omega}^{\text{sdid}}$ are unit weights satisfying:
+
+$$
+\sum_{i=1}^{N_{\text{co}}} \hat{\omega}_i Y_{it} \approx \frac{1}{N_{\text{tr}}} \sum_{i=N_{\text{co}}+1}^{N} Y_{it}, \quad t = 1, \ldots, T_{\text{pre}}
+$$
+
+and $\hat{\lambda}^{\text{sdid}}$ are time weights satisfying:
+
+$$
+\sum_{t=1}^{T_{\text{pre}}} \hat{\lambda}_t Y_{it} \approx \frac{1}{T_{\text{post}}} \sum_{t=T_{\text{pre}}+1}^{T} Y_{it}, \quad i = 1, \ldots, N_{\text{co}}
+$$
+
+The regularization parameter $\zeta = (N_{\text{tr}} \cdot T_{\text{post}})^{1/4} \cdot \hat{\sigma}$ prevents overfitting when $T_{\text{pre}}$ or $N_{\text{co}}$ is small relative to the other dimension.
+
+## Software
+
+Estimates computed using the `synthdid` R package v`r packageVersion("synthdid")` (Arkhangelsky et al.).
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
