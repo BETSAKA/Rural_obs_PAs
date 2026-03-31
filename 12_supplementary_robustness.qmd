@@ -41,28 +41,31 @@ winsorize <- function(x, probs = c(0.01, 0.99)) {
 mk_income_ext <- function(df) {
   df |>
     mutate(
-      rev_riz  = coalesce(rev_riz,  0),
-      rev_cu   = coalesce(rev_cu,   0),
-      revel    = coalesce(revel,    0),
+      rev_riz = coalesce(rev_riz, 0),
+      rev_cu = coalesce(rev_cu, 0),
+      revel = coalesce(revel, 0),
       revpeche = coalesce(revpeche, 0),
-      revppal  = coalesce(revppal,  0),
-      revsec   = coalesce(revsec,   0),
-      revcou   = coalesce(revcou, revppal + revsec + rev_riz + rev_cu + revel + revpeche),
-      revtot   = coalesce(revtot, revcou),
-      rev_agri    = rev_riz + rev_cu + revel + revpeche,
+      revppal = coalesce(revppal, 0),
+      revsec = coalesce(revsec, 0),
+      revcou = coalesce(
+        revcou,
+        revppal + revsec + rev_riz + rev_cu + revel + revpeche
+      ),
+      revtot = coalesce(revtot, revcou),
+      rev_agri = rev_riz + rev_cu + revel + revpeche,
       rev_nonagri = revppal + revsec
     )
 }
 
 # -- Constants (same as main paper) --------------------------------------------
 TREAT_YEAR_MARO <- 2003
-TREAT_YEAR_ALA  <- 2008
+TREAT_YEAR_ALA <- 2008
 DONOR_OBS <- c("02", "12", "13", "15", "16", "23", "24", "25", "41")
 
 # -- Load household data -------------------------------------------------------
 household_consolidated <- read_rds("data/household_consolidated.rds") |>
   mutate(
-    obs     = substr(j5, 1, 2),
+    obs = substr(j5, 1, 2),
     site_id = substr(j5, 1, 3)
   )
 ```
@@ -96,14 +99,16 @@ panel_unadj <- household_consolidated |>
   ) |>
   mk_income_ext() |>
   mutate(
-    revtot_w       = pmin(revtot, quantile(revtot, 0.99, na.rm = TRUE)),
-    ln_revtot_w    = log(pmax(revtot_w, 0) + 1)
+    revtot_w = pmin(revtot, quantile(revtot, 0.99, na.rm = TRUE)),
+    ln_revtot_w = log(pmax(revtot_w, 0) + 1)
   )
 
 # Marovoay gsynth panel
 maro_gs_unadj <- panel_unadj |>
   mutate(
-    treatment = as.integer(site_id %in% c("033", "034") & year >= TREAT_YEAR_MARO)
+    treatment = as.integer(
+      site_id %in% c("033", "034") & year >= TREAT_YEAR_MARO
+    )
   ) |>
   summarize(
     ln_revtot_w = mean(ln_revtot_w, na.rm = TRUE),
@@ -115,7 +120,7 @@ maro_gs_unadj <- panel_unadj |>
 # Alaotra gsynth panel
 ala_gs_unadj <- panel_unadj |>
   mutate(
-    unit_id   = if_else(obs == "21", "ALA", site_id),
+    unit_id = if_else(obs == "21", "ALA", site_id),
     treatment = as.integer(obs == "21" & year >= TREAT_YEAR_ALA)
   ) |>
   summarize(
@@ -155,10 +160,10 @@ if (file.exists(gs_unadj_maro_cache)) {
     att_avg = gs_unadj_maro_fit$att.avg,
     est_att = gs_unadj_maro_fit$est.att,
     est_avg = gs_unadj_maro_fit$est.avg,
-    r_cv    = gs_unadj_maro_fit$r.cv,
-    N_tr    = gs_unadj_maro_fit$Ntr,
-    N_co    = gs_unadj_maro_fit$Nco,
-    eff     = gs_unadj_maro_fit$eff
+    r_cv = gs_unadj_maro_fit$r.cv,
+    N_tr = gs_unadj_maro_fit$Ntr,
+    N_co = gs_unadj_maro_fit$Nco,
+    eff = gs_unadj_maro_fit$eff
   )
   write_rds(gs_unadj_maro, gs_unadj_maro_cache)
 }
@@ -191,10 +196,10 @@ if (file.exists(gs_unadj_ala_cache)) {
     att_avg = gs_unadj_ala_fit$att.avg,
     est_att = gs_unadj_ala_fit$est.att,
     est_avg = gs_unadj_ala_fit$est.avg,
-    r_cv    = gs_unadj_ala_fit$r.cv,
-    N_tr    = gs_unadj_ala_fit$Ntr,
-    N_co    = gs_unadj_ala_fit$Nco,
-    eff     = gs_unadj_ala_fit$eff
+    r_cv = gs_unadj_ala_fit$r.cv,
+    N_tr = gs_unadj_ala_fit$Ntr,
+    N_co = gs_unadj_ala_fit$Nco,
+    eff = gs_unadj_ala_fit$eff
   )
   write_rds(gs_unadj_ala, gs_unadj_ala_cache)
 }
@@ -208,16 +213,16 @@ if (file.exists(gs_unadj_ala_cache)) {
 
 att_unadj_maro <- tibble(
   rel_time = as.numeric(rownames(gs_unadj_maro$est_att)),
-  att      = gs_unadj_maro$est_att[, "ATT"],
-  ci_lo    = gs_unadj_maro$est_att[, "CI.lower"],
-  ci_hi    = gs_unadj_maro$est_att[, "CI.upper"]
+  att = gs_unadj_maro$est_att[, "ATT"],
+  ci_lo = gs_unadj_maro$est_att[, "CI.lower"],
+  ci_hi = gs_unadj_maro$est_att[, "CI.upper"]
 )
 
 att_unadj_ala <- tibble(
   rel_time = as.numeric(rownames(gs_unadj_ala$est_att)),
-  att      = gs_unadj_ala$est_att[, "ATT"],
-  ci_lo    = gs_unadj_ala$est_att[, "CI.lower"],
-  ci_hi    = gs_unadj_ala$est_att[, "CI.upper"]
+  att = gs_unadj_ala$est_att[, "ATT"],
+  ci_lo = gs_unadj_ala$est_att[, "CI.lower"],
+  ci_hi = gs_unadj_ala$est_att[, "CI.upper"]
 )
 
 p1 <- ggplot(att_unadj_maro, aes(rel_time, att)) +
@@ -230,9 +235,15 @@ p1 <- ggplot(att_unadj_maro, aes(rel_time, att)) +
     x = "Years relative to treatment (2003)",
     y = "ATT (log total income)",
     title = "Ankarafantsika (strict)",
-    subtitle = paste0("r* = ", gs_unadj_maro$r_cv,
-                      "; ", gs_unadj_maro$N_tr, " treated, ",
-                      gs_unadj_maro$N_co, " donors")
+    subtitle = paste0(
+      "r* = ",
+      gs_unadj_maro$r_cv,
+      "; ",
+      gs_unadj_maro$N_tr,
+      " treated, ",
+      gs_unadj_maro$N_co,
+      " donors"
+    )
   ) +
   theme_minimal(base_size = 11)
 
@@ -246,13 +257,20 @@ p2 <- ggplot(att_unadj_ala, aes(rel_time, att)) +
     x = "Years relative to treatment (2008)",
     y = "ATT (log total income)",
     title = "Lac Alaotra (multipurpose)",
-    subtitle = paste0("r* = ", gs_unadj_ala$r_cv,
-                      "; ", gs_unadj_ala$N_tr, " treated, ",
-                      gs_unadj_ala$N_co, " donors")
+    subtitle = paste0(
+      "r* = ",
+      gs_unadj_ala$r_cv,
+      "; ",
+      gs_unadj_ala$N_tr,
+      " treated, ",
+      gs_unadj_ala$N_co,
+      " donors"
+    )
   ) +
   theme_minimal(base_size = 11)
 
-p1 + p2 +
+p1 +
+  p2 +
   plot_annotation(
     title = "Robustness: Unadjusted Log Total Income",
     subtitle = "Log of winsorised total HH income without OECD equivalisation"
@@ -264,17 +282,49 @@ p1 + p2 +
 
 att_unadj_m <- gs_unadj_maro$att_avg
 pct_unadj_m <- round((exp(att_unadj_m) - 1) * 100, 1)
-se_unadj_m  <- if (!is.null(gs_unadj_maro$est_avg)) round(gs_unadj_maro$est_avg[1, "S.E."], 3) else NA
-ci_lo_unadj_m <- if (!is.null(gs_unadj_maro$est_avg)) round(gs_unadj_maro$est_avg[1, "CI.lower"], 3) else NA
-ci_hi_unadj_m <- if (!is.null(gs_unadj_maro$est_avg)) round(gs_unadj_maro$est_avg[1, "CI.upper"], 3) else NA
-pval_unadj_m  <- if (!is.null(gs_unadj_maro$est_avg)) round(gs_unadj_maro$est_avg[1, "p.value"], 3) else NA
+se_unadj_m <- if (!is.null(gs_unadj_maro$est_avg)) {
+  round(gs_unadj_maro$est_avg[1, "S.E."], 3)
+} else {
+  NA
+}
+ci_lo_unadj_m <- if (!is.null(gs_unadj_maro$est_avg)) {
+  round(gs_unadj_maro$est_avg[1, "CI.lower"], 3)
+} else {
+  NA
+}
+ci_hi_unadj_m <- if (!is.null(gs_unadj_maro$est_avg)) {
+  round(gs_unadj_maro$est_avg[1, "CI.upper"], 3)
+} else {
+  NA
+}
+pval_unadj_m <- if (!is.null(gs_unadj_maro$est_avg)) {
+  round(gs_unadj_maro$est_avg[1, "p.value"], 3)
+} else {
+  NA
+}
 
 att_unadj_a <- gs_unadj_ala$att_avg
 pct_unadj_a <- round((exp(att_unadj_a) - 1) * 100, 1)
-se_unadj_a  <- if (!is.null(gs_unadj_ala$est_avg)) round(gs_unadj_ala$est_avg[1, "S.E."], 3) else NA
-ci_lo_unadj_a <- if (!is.null(gs_unadj_ala$est_avg)) round(gs_unadj_ala$est_avg[1, "CI.lower"], 3) else NA
-ci_hi_unadj_a <- if (!is.null(gs_unadj_ala$est_avg)) round(gs_unadj_ala$est_avg[1, "CI.upper"], 3) else NA
-pval_unadj_a  <- if (!is.null(gs_unadj_ala$est_avg)) round(gs_unadj_ala$est_avg[1, "p.value"], 3) else NA
+se_unadj_a <- if (!is.null(gs_unadj_ala$est_avg)) {
+  round(gs_unadj_ala$est_avg[1, "S.E."], 3)
+} else {
+  NA
+}
+ci_lo_unadj_a <- if (!is.null(gs_unadj_ala$est_avg)) {
+  round(gs_unadj_ala$est_avg[1, "CI.lower"], 3)
+} else {
+  NA
+}
+ci_hi_unadj_a <- if (!is.null(gs_unadj_ala$est_avg)) {
+  round(gs_unadj_ala$est_avg[1, "CI.upper"], 3)
+} else {
+  NA
+}
+pval_unadj_a <- if (!is.null(gs_unadj_ala$est_avg)) {
+  round(gs_unadj_ala$est_avg[1, "p.value"], 3)
+} else {
+  NA
+}
 
 # Main paper OECD results for comparison
 gs_maro_main <- read_rds("data/paper12_gsynth_maro_oecd.rds")
@@ -282,32 +332,53 @@ att_main_m <- gs_maro_main$att_avg
 pct_main_m <- round((exp(att_main_m) - 1) * 100, 1)
 
 cat(sprintf(
-"**Ankarafantsika (unadjusted log income).** The average post-treatment ATT is **%.3f log points** (95%%%% CI: [%.3f, %.3f]; SE = %.3f; p = %.3f), corresponding to approximately **%+.1f%%%%** in income levels. ",
-  att_unadj_m, ci_lo_unadj_m, ci_hi_unadj_m, se_unadj_m, pval_unadj_m, pct_unadj_m
+  "**Ankarafantsika (unadjusted log income).** The average post-treatment ATT is **%.3f log points** (95%%%% CI: [%.3f, %.3f]; SE = %.3f; p = %.3f), corresponding to approximately **%+.1f%%%%** in income levels. ",
+  att_unadj_m,
+  ci_lo_unadj_m,
+  ci_hi_unadj_m,
+  se_unadj_m,
+  pval_unadj_m,
+  pct_unadj_m
 ))
 
 cat(sprintf(
-"The main paper's primary estimate (OECD-equivalised income) is %.3f log points (%+.1f%%%%). ",
-  att_main_m, pct_main_m
+  "The main paper's primary estimate (OECD-equivalised income) is %.3f log points (%+.1f%%%%). ",
+  att_main_m,
+  pct_main_m
 ))
 
 if (abs(att_unadj_m) > abs(att_main_m)) {
-  cat("The unadjusted estimate is **larger** in magnitude, consistent with east-bank (treated) households being slightly larger than west-bank ones: equivalisation partially offsets the income gap attributable to composition.\n\n")
+  cat(
+    "The unadjusted estimate is **larger** in magnitude, consistent with east-bank (treated) households being slightly larger than west-bank ones: equivalisation partially offsets the income gap attributable to composition.\n\n"
+  )
 } else {
-  cat("The unadjusted and equivalised estimates are similar in magnitude, suggesting household composition differences play a minor role.\n\n")
+  cat(
+    "The unadjusted and equivalised estimates are similar in magnitude, suggesting household composition differences play a minor role.\n\n"
+  )
 }
 
 cat(sprintf(
-"**Lac Alaotra (unadjusted log income).** The average post-treatment ATT is **%.3f log points** (95%%%% CI: [%.3f, %.3f]; SE = %.3f; p = %.3f), corresponding to approximately **%+.1f%%%%** in income levels. ",
-  att_unadj_a, ci_lo_unadj_a, ci_hi_unadj_a, se_unadj_a, pval_unadj_a, pct_unadj_a
+  "**Lac Alaotra (unadjusted log income).** The average post-treatment ATT is **%.3f log points** (95%%%% CI: [%.3f, %.3f]; SE = %.3f; p = %.3f), corresponding to approximately **%+.1f%%%%** in income levels. ",
+  att_unadj_a,
+  ci_lo_unadj_a,
+  ci_hi_unadj_a,
+  se_unadj_a,
+  pval_unadj_a,
+  pct_unadj_a
 ))
 
 if (!is.na(ci_lo_unadj_a) && ci_lo_unadj_a <= 0 && ci_hi_unadj_a >= 0) {
-  cat("As in the main specification, the confidence interval spans zero and the effect is **not statistically significant**.\n\n")
+  cat(
+    "As in the main specification, the confidence interval spans zero and the effect is **not statistically significant**.\n\n"
+  )
 } else if (!is.na(pval_unadj_a) && pval_unadj_a >= 0.05) {
-  cat("As in the main specification, the effect is **not statistically significant** at the 5%% level.\n\n")
+  cat(
+    "As in the main specification, the effect is **not statistically significant** at the 5%% level.\n\n"
+  )
 } else {
-  cat("Unlike the main specification, this result reaches statistical significance.\n\n")
+  cat(
+    "Unlike the main specification, this result reaches statistical significance.\n\n"
+  )
 }
 ```
 
@@ -332,13 +403,15 @@ panel_levels <- household_consolidated |>
   mk_income_ext() |>
   mutate(
     revtot_w = pmin(revtot, quantile(revtot, 0.99, na.rm = TRUE)),
-    revtot_w_k = revtot_w / 1000  # thousands of Ariary
+    revtot_w_k = revtot_w / 1000 # thousands of Ariary
   )
 
 # Marovoay site-level panel (levels, thousands of Ariary)
 maro_gs_lev <- panel_levels |>
   mutate(
-    treatment = as.integer(site_id %in% c("033", "034") & year >= TREAT_YEAR_MARO)
+    treatment = as.integer(
+      site_id %in% c("033", "034") & year >= TREAT_YEAR_MARO
+    )
   ) |>
   summarize(
     revtot_w_k = mean(revtot_w_k, na.rm = TRUE),
@@ -418,10 +491,10 @@ if (file.exists(gs_lev_maro_cache)) {
     att_avg = gs_lev_maro_fit$att.avg,
     est_att = gs_lev_maro_fit$est.att,
     est_avg = gs_lev_maro_fit$est.avg,
-    r_cv    = gs_lev_maro_fit$r.cv,
-    N_tr    = gs_lev_maro_fit$Ntr,
-    N_co    = gs_lev_maro_fit$Nco,
-    eff     = gs_lev_maro_fit$eff
+    r_cv = gs_lev_maro_fit$r.cv,
+    N_tr = gs_lev_maro_fit$Ntr,
+    N_co = gs_lev_maro_fit$Nco,
+    eff = gs_lev_maro_fit$eff
   )
   write_rds(gs_lev_maro, gs_lev_maro_cache)
 }
@@ -454,10 +527,10 @@ if (file.exists(gs_lev_ala_cache)) {
     att_avg = gs_lev_ala_fit$att.avg,
     est_att = gs_lev_ala_fit$est.att,
     est_avg = gs_lev_ala_fit$est.avg,
-    r_cv    = gs_lev_ala_fit$r.cv,
-    N_tr    = gs_lev_ala_fit$Ntr,
-    N_co    = gs_lev_ala_fit$Nco,
-    eff     = gs_lev_ala_fit$eff
+    r_cv = gs_lev_ala_fit$r.cv,
+    N_tr = gs_lev_ala_fit$Ntr,
+    N_co = gs_lev_ala_fit$Nco,
+    eff = gs_lev_ala_fit$eff
   )
   write_rds(gs_lev_ala, gs_lev_ala_cache)
 }
@@ -471,16 +544,16 @@ if (file.exists(gs_lev_ala_cache)) {
 
 att_lev_maro <- tibble(
   rel_time = as.numeric(rownames(gs_lev_maro$est_att)),
-  att      = gs_lev_maro$est_att[, "ATT"],
-  ci_lo    = gs_lev_maro$est_att[, "CI.lower"],
-  ci_hi    = gs_lev_maro$est_att[, "CI.upper"]
+  att = gs_lev_maro$est_att[, "ATT"],
+  ci_lo = gs_lev_maro$est_att[, "CI.lower"],
+  ci_hi = gs_lev_maro$est_att[, "CI.upper"]
 )
 
 att_lev_ala <- tibble(
   rel_time = as.numeric(rownames(gs_lev_ala$est_att)),
-  att      = gs_lev_ala$est_att[, "ATT"],
-  ci_lo    = gs_lev_ala$est_att[, "CI.lower"],
-  ci_hi    = gs_lev_ala$est_att[, "CI.upper"]
+  att = gs_lev_ala$est_att[, "ATT"],
+  ci_lo = gs_lev_ala$est_att[, "CI.lower"],
+  ci_hi = gs_lev_ala$est_att[, "CI.upper"]
 )
 
 p1 <- ggplot(att_lev_maro, aes(rel_time, att)) +
@@ -494,9 +567,15 @@ p1 <- ggplot(att_lev_maro, aes(rel_time, att)) +
     x = "Years relative to treatment (2003)",
     y = "ATT (thousands of Ariary)",
     title = "Ankarafantsika (strict)",
-    subtitle = paste0("r* = ", gs_lev_maro$r_cv,
-                      "; ", gs_lev_maro$N_tr, " treated, ",
-                      gs_lev_maro$N_co, " donors")
+    subtitle = paste0(
+      "r* = ",
+      gs_lev_maro$r_cv,
+      "; ",
+      gs_lev_maro$N_tr,
+      " treated, ",
+      gs_lev_maro$N_co,
+      " donors"
+    )
   ) +
   theme_minimal(base_size = 11)
 
@@ -511,13 +590,20 @@ p2 <- ggplot(att_lev_ala, aes(rel_time, att)) +
     x = "Years relative to treatment (2008)",
     y = "ATT (thousands of Ariary)",
     title = "Lac Alaotra (multipurpose)",
-    subtitle = paste0("r* = ", gs_lev_ala$r_cv,
-                      "; ", gs_lev_ala$N_tr, " treated, ",
-                      gs_lev_ala$N_co, " donors")
+    subtitle = paste0(
+      "r* = ",
+      gs_lev_ala$r_cv,
+      "; ",
+      gs_lev_ala$N_tr,
+      " treated, ",
+      gs_lev_ala$N_co,
+      " donors"
+    )
   ) +
   theme_minimal(base_size = 11)
 
-p1 + p2 +
+p1 +
+  p2 +
   plot_annotation(
     title = "Robustness: Income in Levels",
     subtitle = "Winsorised total household income (thousands of Ariary), no log transformation"
@@ -534,9 +620,9 @@ p1 + p2 +
 gs_maro_oecd_primary <- read_rds("data/paper12_gsynth_maro_oecd.rds")
 att_log_maro <- tibble(
   rel_time = as.numeric(rownames(gs_maro_oecd_primary$est_att)),
-  att      = gs_maro_oecd_primary$est_att[, "ATT"],
-  ci_lo    = gs_maro_oecd_primary$est_att[, "CI.lower"],
-  ci_hi    = gs_maro_oecd_primary$est_att[, "CI.upper"]
+  att = gs_maro_oecd_primary$est_att[, "ATT"],
+  ci_lo = gs_maro_oecd_primary$est_att[, "CI.lower"],
+  ci_hi = gs_maro_oecd_primary$est_att[, "CI.upper"]
 )
 
 p_log <- ggplot(att_log_maro, aes(rel_time, att)) +
@@ -545,8 +631,11 @@ p_log <- ggplot(att_log_maro, aes(rel_time, att)) +
   geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
   geom_line(color = "#D32F2F", linewidth = 0.8) +
   geom_point(color = "#D32F2F", size = 2) +
-  labs(x = "Relative time", y = "ATT (log equiv. income)",
-       title = "Primary specification (OECD-equivalised log)") +
+  labs(
+    x = "Relative time",
+    y = "ATT (log equiv. income)",
+    title = "Primary specification (OECD-equivalised log)"
+  ) +
   theme_minimal(base_size = 11)
 
 p_lev <- ggplot(att_lev_maro, aes(rel_time, att)) +
@@ -556,11 +645,15 @@ p_lev <- ggplot(att_lev_maro, aes(rel_time, att)) +
   geom_line(color = "#D32F2F", linewidth = 0.8) +
   geom_point(color = "#D32F2F", size = 2) +
   scale_y_continuous(labels = label_comma()) +
-  labs(x = "Relative time", y = "ATT (thousands of Ariary)",
-       title = "Levels specification (thousands Ariary)") +
+  labs(
+    x = "Relative time",
+    y = "ATT (thousands of Ariary)",
+    title = "Levels specification (thousands Ariary)"
+  ) +
   theme_minimal(base_size = 11)
 
-p_log + p_lev +
+p_log +
+  p_lev +
   plot_annotation(
     title = "Ankarafantsika: Pre-Treatment Fit Comparison",
     subtitle = "Log vs levels specification"
@@ -572,21 +665,57 @@ p_log + p_lev +
 
 # Marovoay levels
 att_lev_m <- gs_lev_maro$att_avg
-se_lev_m  <- if (!is.null(gs_lev_maro$est_avg)) round(gs_lev_maro$est_avg[1, "S.E."], 1) else NA
-ci_lo_lev_m <- if (!is.null(gs_lev_maro$est_avg)) round(gs_lev_maro$est_avg[1, "CI.lower"], 1) else NA
-ci_hi_lev_m <- if (!is.null(gs_lev_maro$est_avg)) round(gs_lev_maro$est_avg[1, "CI.upper"], 1) else NA
-pval_lev_m  <- if (!is.null(gs_lev_maro$est_avg)) round(gs_lev_maro$est_avg[1, "p.value"], 3) else NA
+se_lev_m <- if (!is.null(gs_lev_maro$est_avg)) {
+  round(gs_lev_maro$est_avg[1, "S.E."], 1)
+} else {
+  NA
+}
+ci_lo_lev_m <- if (!is.null(gs_lev_maro$est_avg)) {
+  round(gs_lev_maro$est_avg[1, "CI.lower"], 1)
+} else {
+  NA
+}
+ci_hi_lev_m <- if (!is.null(gs_lev_maro$est_avg)) {
+  round(gs_lev_maro$est_avg[1, "CI.upper"], 1)
+} else {
+  NA
+}
+pval_lev_m <- if (!is.null(gs_lev_maro$est_avg)) {
+  round(gs_lev_maro$est_avg[1, "p.value"], 3)
+} else {
+  NA
+}
 
 # Alaotra levels
 att_lev_a <- gs_lev_ala$att_avg
-se_lev_a  <- if (!is.null(gs_lev_ala$est_avg)) round(gs_lev_ala$est_avg[1, "S.E."], 1) else NA
-ci_lo_lev_a <- if (!is.null(gs_lev_ala$est_avg)) round(gs_lev_ala$est_avg[1, "CI.lower"], 1) else NA
-ci_hi_lev_a <- if (!is.null(gs_lev_ala$est_avg)) round(gs_lev_ala$est_avg[1, "CI.upper"], 1) else NA
-pval_lev_a  <- if (!is.null(gs_lev_ala$est_avg)) round(gs_lev_ala$est_avg[1, "p.value"], 3) else NA
+se_lev_a <- if (!is.null(gs_lev_ala$est_avg)) {
+  round(gs_lev_ala$est_avg[1, "S.E."], 1)
+} else {
+  NA
+}
+ci_lo_lev_a <- if (!is.null(gs_lev_ala$est_avg)) {
+  round(gs_lev_ala$est_avg[1, "CI.lower"], 1)
+} else {
+  NA
+}
+ci_hi_lev_a <- if (!is.null(gs_lev_ala$est_avg)) {
+  round(gs_lev_ala$est_avg[1, "CI.upper"], 1)
+} else {
+  NA
+}
+pval_lev_a <- if (!is.null(gs_lev_ala$est_avg)) {
+  round(gs_lev_ala$est_avg[1, "p.value"], 3)
+} else {
+  NA
+}
 
 cat(sprintf(
-"**Ankarafantsika (levels).** The average ATT is **%s thousand Ariary** (95%%%% CI: [%s, %s]; SE = %s; p = %.3f). ",
-  comma(round(att_lev_m, 1)), comma(ci_lo_lev_m), comma(ci_hi_lev_m), comma(se_lev_m), pval_lev_m
+  "**Ankarafantsika (levels).** The average ATT is **%s thousand Ariary** (95%%%% CI: [%s, %s]; SE = %s; p = %.3f). ",
+  comma(round(att_lev_m, 1)),
+  comma(ci_lo_lev_m),
+  comma(ci_hi_lev_m),
+  comma(se_lev_m),
+  pval_lev_m
 ))
 
 # Contextualise: what % of mean income is this?
@@ -598,17 +727,24 @@ mean_income_maro <- panel_levels |>
 pct_of_mean <- round(att_lev_m / mean_income_maro * 100, 1)
 
 cat(sprintf(
-"This represents approximately **%+.1f%%%%** of the pre-treatment mean income for east-bank households (%s thousand Ariary).\n\n",
-  pct_of_mean, comma(round(mean_income_maro))
+  "This represents approximately **%+.1f%%%%** of the pre-treatment mean income for east-bank households (%s thousand Ariary).\n\n",
+  pct_of_mean,
+  comma(round(mean_income_maro))
 ))
 
 cat(sprintf(
-"**Lac Alaotra (levels).** The average ATT is **%s thousand Ariary** (95%%%% CI: [%s, %s]; SE = %s; p = %.3f). ",
-  comma(round(att_lev_a, 1)), comma(ci_lo_lev_a), comma(ci_hi_lev_a), comma(se_lev_a), pval_lev_a
+  "**Lac Alaotra (levels).** The average ATT is **%s thousand Ariary** (95%%%% CI: [%s, %s]; SE = %s; p = %.3f). ",
+  comma(round(att_lev_a, 1)),
+  comma(ci_lo_lev_a),
+  comma(ci_hi_lev_a),
+  comma(se_lev_a),
+  pval_lev_a
 ))
 
 if (!is.na(pval_lev_a) && pval_lev_a >= 0.05) {
-  cat("As in the main specification, the effect is **not statistically significant** at the 5%% level.\n\n")
+  cat(
+    "As in the main specification, the effect is **not statistically significant** at the 5%% level.\n\n"
+  )
 } else if (!is.na(ci_lo_lev_a) && ci_lo_lev_a <= 0 && ci_hi_lev_a >= 0) {
   cat("As in the main specification, the confidence interval spans zero.\n\n")
 } else {
@@ -625,8 +761,13 @@ if (!is.na(pval_lev_a) && pval_lev_a >= 0.05) {
 
 get_ci_str <- function(gs) {
   if (!is.null(gs$est_avg)) {
-    paste0("[", round(gs$est_avg[1, "CI.lower"], 3), ", ",
-           round(gs$est_avg[1, "CI.upper"], 3), "]")
+    paste0(
+      "[",
+      round(gs$est_avg[1, "CI.lower"], 3),
+      ", ",
+      round(gs$est_avg[1, "CI.upper"], 3),
+      "]"
+    )
   } else {
     "—"
   }
@@ -639,8 +780,8 @@ get_pval_val <- function(gs) {
 }
 
 # Main paper (primary) and robustness results
-gs_maro_main <- read_rds("data/paper12_gsynth_maro_oecd.rds")  # primary spec
-gs_ala_main  <- read_rds("data/paper12_gsynth_ala_oecd.rds")   # primary spec
+gs_maro_main <- read_rds("data/paper12_gsynth_maro_oecd.rds") # primary spec
+gs_ala_main <- read_rds("data/paper12_gsynth_ala_oecd.rds") # primary spec
 
 tibble(
   PA = rep(c("Ankarafantsika", "Lac Alaotra"), 3),
@@ -650,34 +791,52 @@ tibble(
     rep("Robustness 2: levels (Ariary)", 2)
   ),
   ATT = c(
-    round(gs_maro_main$att_avg, 3), round(gs_ala_main$att_avg, 3),
-    round(gs_unadj_maro$att_avg, 3), round(gs_unadj_ala$att_avg, 3),
-    round(gs_lev_maro$att_avg, 1), round(gs_lev_ala$att_avg, 1)
+    round(gs_maro_main$att_avg, 3),
+    round(gs_ala_main$att_avg, 3),
+    round(gs_unadj_maro$att_avg, 3),
+    round(gs_unadj_ala$att_avg, 3),
+    round(gs_lev_maro$att_avg, 1),
+    round(gs_lev_ala$att_avg, 1)
   ),
   SE = c(
-    get_se_val(gs_maro_main), get_se_val(gs_ala_main),
-    get_se_val(gs_unadj_maro), get_se_val(gs_unadj_ala),
-    get_se_val(gs_lev_maro), get_se_val(gs_lev_ala)
+    get_se_val(gs_maro_main),
+    get_se_val(gs_ala_main),
+    get_se_val(gs_unadj_maro),
+    get_se_val(gs_unadj_ala),
+    get_se_val(gs_lev_maro),
+    get_se_val(gs_lev_ala)
   ),
   `95% CI` = c(
-    get_ci_str(gs_maro_main), get_ci_str(gs_ala_main),
-    get_ci_str(gs_unadj_maro), get_ci_str(gs_unadj_ala),
-    get_ci_str(gs_lev_maro), get_ci_str(gs_lev_ala)
+    get_ci_str(gs_maro_main),
+    get_ci_str(gs_ala_main),
+    get_ci_str(gs_unadj_maro),
+    get_ci_str(gs_unadj_ala),
+    get_ci_str(gs_lev_maro),
+    get_ci_str(gs_lev_ala)
   ),
   `p-value` = c(
-    get_pval_val(gs_maro_main), get_pval_val(gs_ala_main),
-    get_pval_val(gs_unadj_maro), get_pval_val(gs_unadj_ala),
-    get_pval_val(gs_lev_maro), get_pval_val(gs_lev_ala)
+    get_pval_val(gs_maro_main),
+    get_pval_val(gs_ala_main),
+    get_pval_val(gs_unadj_maro),
+    get_pval_val(gs_unadj_ala),
+    get_pval_val(gs_lev_maro),
+    get_pval_val(gs_lev_ala)
   ),
   `r* (CV)` = c(
-    gs_maro_main$r_cv, gs_ala_main$r_cv,
-    gs_unadj_maro$r_cv, gs_unadj_ala$r_cv,
-    gs_lev_maro$r_cv, gs_lev_ala$r_cv
+    gs_maro_main$r_cv,
+    gs_ala_main$r_cv,
+    gs_unadj_maro$r_cv,
+    gs_unadj_ala$r_cv,
+    gs_lev_maro$r_cv,
+    gs_lev_ala$r_cv
   ),
   Unit = c(
-    "log points", "log points",
-    "log points", "log points",
-    "k Ariary", "k Ariary"
+    "log points",
+    "log points",
+    "log points",
+    "log points",
+    "k Ariary",
+    "k Ariary"
   )
 ) |>
   gt() |>
@@ -705,26 +864,48 @@ cat("## Key Findings\n\n")
 
 cat("1. **Unadjusted log income** (no household-composition correction): ")
 if (abs(gs_unadj_maro$att_avg) > abs(gs_maro_main$att_avg)) {
-  diff_pct <- round((abs(gs_unadj_maro$att_avg) / abs(gs_maro_main$att_avg) - 1) * 100, 0)
-  cat(sprintf("The unadjusted estimate for Ankarafantsika is **larger** than the primary by approximately %d%%%% (%.3f vs %.3f log points). ",
-    diff_pct, gs_unadj_maro$att_avg, gs_maro_main$att_avg))
-  cat("This is consistent with east-bank (treated) households being slightly larger: OECD equivalisation scales down their income, partially attenuating the gap. The qualitative conclusion is unchanged.\n\n")
+  diff_pct <- round(
+    (abs(gs_unadj_maro$att_avg) / abs(gs_maro_main$att_avg) - 1) * 100,
+    0
+  )
+  cat(sprintf(
+    "The unadjusted estimate for Ankarafantsika is **larger** than the primary by approximately %d%%%% (%.3f vs %.3f log points). ",
+    diff_pct,
+    gs_unadj_maro$att_avg,
+    gs_maro_main$att_avg
+  ))
+  cat(
+    "This is consistent with east-bank (treated) households being slightly larger: OECD equivalisation scales down their income, partially attenuating the gap. The qualitative conclusion is unchanged.\n\n"
+  )
 } else {
-  cat(sprintf("The unadjusted estimate (%.3f) is close to the primary OECD-equivalised estimate (%.3f), suggesting household composition does not meaningfully drive the result.\n\n",
-    gs_unadj_maro$att_avg, gs_maro_main$att_avg))
+  cat(sprintf(
+    "The unadjusted estimate (%.3f) is close to the primary OECD-equivalised estimate (%.3f), suggesting household composition does not meaningfully drive the result.\n\n",
+    gs_unadj_maro$att_avg,
+    gs_maro_main$att_avg
+  ))
 }
 
 cat("2. **Income in levels**: ")
 if (!is.na(get_pval_val(gs_lev_maro)) && get_pval_val(gs_lev_maro) < 0.05) {
-  cat(sprintf("The Ankarafantsika effect remains statistically significant in levels (%s Ariary, p = %.3f). ",
-    comma(round(gs_lev_maro$att_avg)), get_pval_val(gs_lev_maro)))
+  cat(sprintf(
+    "The Ankarafantsika effect remains statistically significant in levels (%s Ariary, p = %.3f). ",
+    comma(round(gs_lev_maro$att_avg)),
+    get_pval_val(gs_lev_maro)
+  ))
 } else {
-  cat(sprintf("The Ankarafantsika effect in levels is %s Ariary (p = %.3f). ",
-    comma(round(gs_lev_maro$att_avg)), get_pval_val(gs_lev_maro)))
+  cat(sprintf(
+    "The Ankarafantsika effect in levels is %s Ariary (p = %.3f). ",
+    comma(round(gs_lev_maro$att_avg)),
+    get_pval_val(gs_lev_maro)
+  ))
 }
-cat("The levels specification is more sensitive to outliers and scale differences across observatories, which may affect the pre-treatment fit and the precision of the counterfactual.\n\n")
+cat(
+  "The levels specification is more sensitive to outliers and scale differences across observatories, which may affect the pre-treatment fit and the precision of the counterfactual.\n\n"
+)
 
-cat("3. **Lac Alaotra**: The null result for the multipurpose PA is **robust across all specifications**. Neither the unadjusted nor the levels specification produces a statistically significant effect.\n\n")
+cat(
+  "3. **Lac Alaotra**: The null result for the multipurpose PA is **robust across all specifications**. Neither the unadjusted nor the levels specification produces a statistically significant effect.\n\n"
+)
 ```
 
 
@@ -749,10 +930,10 @@ panel_hh_sdid <- household_consolidated |>
     by = c("j5", "year")
   ) |>
   mutate(
-    oecd_equiv  = replace_na(oecd_equiv, 1),
-    revtot_eq   = revtot / oecd_equiv,
-    revtot_w    = pmin(revtot_eq, quantile(revtot_eq, 0.99, na.rm = TRUE)),
-    ln_y        = log(pmax(revtot_w, 0) + 1)
+    oecd_equiv = replace_na(oecd_equiv, 1),
+    revtot_eq = revtot / oecd_equiv,
+    revtot_w = pmin(revtot_eq, quantile(revtot_eq, 0.99, na.rm = TRUE)),
+    ln_y = log(pmax(revtot_w, 0) + 1)
   )
 
 panel_site_sdid <- panel_hh_sdid |>
@@ -764,30 +945,47 @@ panel_site_sdid <- panel_hh_sdid |>
 ```{r sdid-maro}
 #| label: sdid-maro
 
-maro_years <- c(1999:2004, 2006:2008)  # T0=4, T1=5
+maro_years <- c(1999:2004, 2006:2008) # T0=4, T1=5
 
 build_sdid_block <- function(treated_ids, treat_year, year_set, panel_data) {
   df <- panel_data |>
     filter(year %in% year_set) |>
-    mutate(treatment = as.integer(site_id %in% treated_ids & year >= treat_year))
-  balanced <- df |> count(site_id) |> filter(n == length(year_set)) |> pull(site_id)
+    mutate(
+      treatment = as.integer(site_id %in% treated_ids & year >= treat_year)
+    )
+  balanced <- df |>
+    count(site_id) |>
+    filter(n == length(year_set)) |>
+    pull(site_id)
   df |> filter(site_id %in% balanced)
 }
 
-blk1 <- build_sdid_block(c("031", "032"), TREAT_YEAR_MARO, maro_years, panel_site_sdid)
+blk1 <- build_sdid_block(
+  c("031", "032"),
+  TREAT_YEAR_MARO,
+  maro_years,
+  panel_site_sdid
+)
 
 sdid_df1 <- blk1 |>
   select(unit = site_id, time = year, outcome = ln_y, treatment) |>
   as.data.frame()
 
-s1    <- panel.matrices(sdid_df1)
+s1 <- panel.matrices(sdid_df1)
 sdid1 <- synthdid_estimate(s1$Y, s1$N0, s1$T0)
-sc1   <- sc_estimate(s1$Y, s1$N0, s1$T0)
-did1  <- did_estimate(s1$Y, s1$N0, s1$T0)
+sc1 <- sc_estimate(s1$Y, s1$N0, s1$T0)
+did1 <- did_estimate(s1$Y, s1$N0, s1$T0)
 
-se_sdid1 <- tryCatch(synthdid_se(sdid1, method = "placebo"), error = function(e) NA_real_)
-se_sc1   <- tryCatch(synthdid_se(sc1,   method = "placebo"), error = function(e) NA_real_)
-se_did1  <- tryCatch(synthdid_se(did1,  method = "placebo"), error = function(e) NA_real_)
+se_sdid1 <- tryCatch(
+  synthdid_se(sdid1, method = "placebo"),
+  error = function(e) NA_real_
+)
+se_sc1 <- tryCatch(synthdid_se(sc1, method = "placebo"), error = function(e) {
+  NA_real_
+})
+se_did1 <- tryCatch(synthdid_se(did1, method = "placebo"), error = function(e) {
+  NA_real_
+})
 ```
 
 ```{r sdid-maro-table}
@@ -803,8 +1001,11 @@ tibble(
   gt() |>
   tab_header(
     title = "Block 1: Marovoay (Ankarafantsika, 2003)",
-    subtitle = sprintf("T\u2080 = %d, T\u2081 = %d", sum(maro_years < TREAT_YEAR_MARO),
-                       sum(maro_years >= TREAT_YEAR_MARO))
+    subtitle = sprintf(
+      "T\u2080 = %d, T\u2081 = %d",
+      sum(maro_years < TREAT_YEAR_MARO),
+      sum(maro_years >= TREAT_YEAR_MARO)
+    )
   )
 ```
 
@@ -821,28 +1022,39 @@ plot(sdid1) +
 ```{r sdid-ala}
 #| label: sdid-ala
 
-ala_years <- c(1999:2004, 2006:2008, 2010:2014)  # T0=9, T1=6
+ala_years <- c(1999:2004, 2006:2008, 2010:2014) # T0=9, T1=6
 
 # Aggregate Alaotra to observatory level
 panel_sdid_ala_site <- panel_hh_sdid |>
   mutate(unit_id = if_else(obs == "21", "ALA", site_id)) |>
   summarize(ln_y = mean(ln_y, na.rm = TRUE), .by = c(obs, unit_id, year))
 
-blk2 <- build_sdid_block(c("ALA"), TREAT_YEAR_ALA, ala_years,
-                          panel_sdid_ala_site |> rename(site_id = unit_id))
+blk2 <- build_sdid_block(
+  c("ALA"),
+  TREAT_YEAR_ALA,
+  ala_years,
+  panel_sdid_ala_site |> rename(site_id = unit_id)
+)
 
 sdid_df2 <- blk2 |>
   select(unit = site_id, time = year, outcome = ln_y, treatment) |>
   as.data.frame()
 
-s2    <- panel.matrices(sdid_df2)
+s2 <- panel.matrices(sdid_df2)
 sdid2 <- synthdid_estimate(s2$Y, s2$N0, s2$T0)
-sc2   <- sc_estimate(s2$Y, s2$N0, s2$T0)
-did2  <- did_estimate(s2$Y, s2$N0, s2$T0)
+sc2 <- sc_estimate(s2$Y, s2$N0, s2$T0)
+did2 <- did_estimate(s2$Y, s2$N0, s2$T0)
 
-se_sdid2 <- tryCatch(synthdid_se(sdid2, method = "placebo"), error = function(e) NA_real_)
-se_sc2   <- tryCatch(synthdid_se(sc2,   method = "placebo"), error = function(e) NA_real_)
-se_did2  <- tryCatch(synthdid_se(did2,  method = "placebo"), error = function(e) NA_real_)
+se_sdid2 <- tryCatch(
+  synthdid_se(sdid2, method = "placebo"),
+  error = function(e) NA_real_
+)
+se_sc2 <- tryCatch(synthdid_se(sc2, method = "placebo"), error = function(e) {
+  NA_real_
+})
+se_did2 <- tryCatch(synthdid_se(did2, method = "placebo"), error = function(e) {
+  NA_real_
+})
 ```
 
 ```{r sdid-ala-table}
@@ -858,8 +1070,11 @@ tibble(
   gt() |>
   tab_header(
     title = "Block 2: Alaotra (Lac Alaotra PHP, 2008)",
-    subtitle = sprintf("T\u2080 = %d, T\u2081 = %d", sum(ala_years < TREAT_YEAR_ALA),
-                       sum(ala_years >= TREAT_YEAR_ALA))
+    subtitle = sprintf(
+      "T\u2080 = %d, T\u2081 = %d",
+      sum(ala_years < TREAT_YEAR_ALA),
+      sum(ala_years >= TREAT_YEAR_ALA)
+    )
   )
 ```
 
@@ -870,7 +1085,7 @@ tibble(
 #| tbl-cap: "ATT estimates across estimators (primary gsynth vs SDID). All outcomes in log OECD-equivalised income."
 
 gs_prim_maro <- read_rds("data/paper12_gsynth_maro_oecd.rds")
-gs_prim_ala  <- read_rds("data/paper12_gsynth_ala_oecd.rds")
+gs_prim_ala <- read_rds("data/paper12_gsynth_ala_oecd.rds")
 
 tibble(
   Method = c(
@@ -879,15 +1094,28 @@ tibble(
     "SDID — Marovoay block",
     "SDID — Alaotra block"
   ),
-  ATT = round(c(
-    gs_prim_maro$att_avg, gs_prim_ala$att_avg,
-    as.numeric(sdid1), as.numeric(sdid2)
-  ), 3),
-  SE = round(c(
-    if (!is.null(gs_prim_maro$est_avg)) gs_prim_maro$est_avg[1, "S.E."] else NA,
-    if (!is.null(gs_prim_ala$est_avg))  gs_prim_ala$est_avg[1, "S.E."]  else NA,
-    se_sdid1, se_sdid2
-  ), 3),
+  ATT = round(
+    c(
+      gs_prim_maro$att_avg,
+      gs_prim_ala$att_avg,
+      as.numeric(sdid1),
+      as.numeric(sdid2)
+    ),
+    3
+  ),
+  SE = round(
+    c(
+      if (!is.null(gs_prim_maro$est_avg)) {
+        gs_prim_maro$est_avg[1, "S.E."]
+      } else {
+        NA
+      },
+      if (!is.null(gs_prim_ala$est_avg)) gs_prim_ala$est_avg[1, "S.E."] else NA,
+      se_sdid1,
+      se_sdid2
+    ),
+    3
+  ),
   `% change` = round((exp(ATT) - 1) * 100, 1)
 ) |>
   gt() |>
