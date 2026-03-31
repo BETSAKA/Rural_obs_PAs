@@ -1,0 +1,48 @@
+---
+title: "Discussion"
+subtitle: "Policy implications, limitations, and next steps"
+---
+
+# Summary of findings {#sec-summary}
+
+<!-- 
+Content to develop:
+- Strict conservation (IUCN II) → persistent negative income effect
+- Multipurpose / CBNRM (IUCN VI) → no detectable effect
+- Pattern robust across five observatories
+- 2025 resurvey confirms long-run persistence
+-->
+
+# Policy implications {#sec-policy}
+
+<!-- 
+Content to develop:
+- Governance model matters for local livelihoods
+- Compensation mechanisms and livelihood integration
+- Relevance for Madagascar's PA expansion (post-Durban)
+- Broader implications for tropical conservation policy
+-->
+
+# Limitations {#sec-limitations}
+
+<!-- 
+Content to develop:
+- Site-level aggregation (gsynth constraint)
+- Repeated cross-sections, not true panels
+- Limited post-treatment years for 2006–2008 cohorts
+- Potential violations of no-anticipation (gradual enforcement)
+- Ecological outcomes not measured
+-->
+
+# Next steps: 2026 survey wave {#sec-next-steps}
+
+<!-- 
+Content to develop:
+- Household-level CS-DiD with 4 staggered treatment cohorts
+- Not-yet-treated units as controls (Alaotra 2003–2007)
+- Sun-Abraham event studies via fixest::sunab()
+- HH covariates for conditional parallel trends
+- This section will be updated when 2026 data arrives
+-->
+
+# References {.unnumbered}

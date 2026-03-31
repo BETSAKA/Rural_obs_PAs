@@ -1,0 +1,47 @@
+---
+title: "Appendix D: Methodology"
+subtitle: "Technical details on estimation methods"
+---
+
+<!-- 
+This appendix provides formal descriptions of the methods used.
+Draw from:
+- archive/12_strict_vs_multipurpose.qmd (gsynth description)
+- archive/06_Marovoay-Ankarafantsika-extended.qmd (CS-DiD, SDID descriptions)
+- archive/11_sdid_robustness.qmd (SDID details)
+- documentation/GSynth/ (reference materials)
+-->
+
+# Generalized synthetic control {#sec-d-gsynth}
+
+<!-- 
+- Interactive fixed effects model
+- Factor selection via cross-validation
+- Parametric bootstrap inference
+- Relationship to standard synthetic control
+-->
+
+# Callaway–Sant'Anna DiD {#sec-d-csdid}
+
+<!-- 
+- Group-time ATT framework
+- Repeated cross-sections vs panel data
+- Aggregation schemes
+- When this becomes the primary method (2026 wave)
+-->
+
+# Synthetic difference-in-differences {#sec-d-sdid}
+
+<!-- 
+- Arkhangelsky et al. (2021) framework
+- Comparison with gsynth
+- Implementation details
+-->
+
+# Inference with few clusters {#sec-d-inference}
+
+<!-- 
+- Wild cluster bootstrap
+- Permutation-based inference
+- Placebo tests (in-space, in-time)
+-->

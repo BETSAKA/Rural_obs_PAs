@@ -1,0 +1,31 @@
+---
+title: "Appendix B: Donor Pool Validity"
+subtitle: "Are donor observatories truly unexposed to conservation interventions?"
+---
+
+```{r setup}
+#| label: setup
+source("R/load_data.R")
+```
+
+<!-- 
+Migrate from archive/13_donor_pool_pa_exposure.qmd.
+This is largely self-contained and can be adapted with minimal restructuring.
+
+Key sections:
+- Motivation: why donor pool purity matters for gsynth
+- Dynamic WDPA: temporal PA boundary dataset
+- Proximity analysis: which donors are near active PAs?
+- Results: 4 contaminated, 5 clean donors
+- Implications for main analysis and extensions
+-->
+
+# Motivation {#sec-b-motivation}
+
+# Dynamic WDPA construction {#sec-b-wdpa}
+
+# Proximity analysis {#sec-b-proximity}
+
+# Results {#sec-b-results}
+
+# Implications {#sec-b-implications}

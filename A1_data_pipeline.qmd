@@ -1,0 +1,32 @@
+---
+title: "Appendix A: Data Pipeline"
+subtitle: "Georeferencing, PA overlaps, and variable harmonisation"
+---
+
+```{r setup}
+#| label: setup
+source("R/load_data.R")
+```
+
+<!-- 
+This appendix contains the full reproducible data pipeline. 
+Migrate detailed content from:
+- archive/01_Georeference_observatories.qmd (georeferencing)
+- archive/02_Overlaps_PAs_observatories.qmd (PA overlaps)
+- archive/03_Variable_computation.qmd (variable construction)
+
+The paper chapter (02_data.qmd) provides a condensed summary;
+this appendix gives all details needed for reproducibility.
+-->
+
+# Georeferencing ROS localities {#sec-a-georef}
+
+<!-- Full fuzzy-matching pipeline from archive/01 -->
+
+# Protected area overlap analysis {#sec-a-overlaps}
+
+<!-- Full spatial overlay analysis from archive/02 -->
+
+# Variable construction {#sec-a-variables}
+
+<!-- Full income harmonisation, OECD scale, etc. from archive/03 -->

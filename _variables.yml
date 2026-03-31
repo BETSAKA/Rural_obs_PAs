@@ -1,0 +1,34 @@
+# Shared parameters across chapters
+# Reference these in QMD files with {{< var param_name >}}
+
+# -- Study period --------------------------------------------------------------
+study_start: 1999
+study_end: 2014
+resurvey_year: 2025
+next_survey: 2026
+
+# -- Treatment years -----------------------------------------------------------
+treat_year_maro: 2003
+treat_year_ala: 2008
+treat_year_fara: 2006
+treat_year_tol: 2007
+treat_year_fen: 2007
+
+# -- Sample sizes --------------------------------------------------------------
+n_observatories: 11
+n_donor_obs: 9
+n_clean_donor_obs: 5
+n_household_years: 101253
+
+# -- PA names ------------------------------------------------------------------
+pa_strict: "Ankarafantsika National Park"
+pa_multipurpose: "Lac Alaotra New Protected Area"
+pa_strict_iucn: "II"
+pa_multipurpose_iucn: "VI"
+
+# -- Key results (update after re-estimation) ----------------------------------
+att_maro: "-0.31"
+att_ala: "+0.01"
+
+# -- Clean donor observatories -------------------------------------------------
+clean_donors: "Antsirabe (02), Tsiroanomandidy (13), Ambovombe (16), Mahanoro (25), Itasy (41)"

@@ -1,0 +1,53 @@
+---
+title: "Results"
+subtitle: "Strict vs. multipurpose conservation impacts on household income"
+---
+
+```{r setup}
+#| label: setup
+source("R/load_data.R")
+source("R/gsynth_helpers.R")
+source("R/plot_themes.R")
+```
+
+<!-- TODO: Extract core results from archive/12_strict_vs_multipurpose.qmd -->
+
+# Marovoay / Ankarafantsika (strict conservation) {#sec-maro}
+
+<!-- 
+Content to develop:
+- gsynth estimation with 9 donors, then 5 clean donors
+- ATT event study plot
+- Counterfactual trajectory plot
+- ATT ≈ -0.31 log points (equivalised income)
+- Pre-treatment fit assessment
+-->
+
+# Alaotra / Lac Alaotra (multipurpose conservation) {#sec-ala}
+
+<!-- 
+Content to develop:
+- gsynth estimation with equivalent donor pools
+- ATT event study plot  
+- Near-zero effect: ATT ≈ +0.01 log points
+- Pre-treatment fit assessment
+-->
+
+# Comparison {#sec-comparison}
+
+<!-- 
+Content to develop:
+- Side-by-side ATT comparison (forest plot or table)
+- Why the contrast? Governance model, enforcement, livelihood integration
+- Placebo tests (in-space)
+-->
+
+# Long-run evidence: 2025 resurvey {#sec-longrun}
+
+<!-- 
+Content to develop:
+- Repeated cross-section DiD using 2025 wave
+- 22 years post-treatment for Marovoay, 17 for Alaotra
+- Persistence of negative effect around Ankarafantsika
+- Descriptive comparison of 2025 vs pre-treatment levels
+-->

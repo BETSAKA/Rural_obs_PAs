@@ -1,0 +1,53 @@
+---
+title: "Identification Strategy"
+subtitle: "Treatment definitions, donor pool, and estimation methods"
+---
+
+```{r setup}
+#| label: setup
+source("R/load_data.R")
+```
+
+<!-- TODO: Extract from archive/12_strict_vs_multipurpose.qmd strategy section + archive/13_donor_pool_pa_exposure.qmd summary -->
+
+# Treatment definition {#sec-treatment}
+
+<!-- 
+Content to develop:
+- Marovoay: east-bank sites (031, 032) treated from 2003 (Ankarafantsika reclassification)
+- Alaotra: sites (211, 212, 213) treated from 2008 (Lac Alaotra creation)
+- Betsiboka river as natural boundary for Marovoay (map)
+- Extensions: Farafangana (2006), Toliara (2007), Fénérive East (2007)
+-->
+
+# Donor pool selection {#sec-donor-pool}
+
+<!-- 
+Content to develop:
+- Initial pool: 9 donor observatories
+- PA exposure audit (summary from Ch. 13 / Appendix B)
+- Contaminated donors: Antsohihy (12), Farafangana (15), Toliara (23), Fénérive East (24)
+- Clean donors: {{< var clean_donors >}}
+- How contaminated obs become treated units in the extension (Ch. 5)
+-->
+
+# Generalized synthetic control {#sec-gsynth}
+
+<!-- 
+Content to develop:
+- Why gsynth? Interactive fixed effects relax parallel trends
+- Site-level aggregation (median equivalised income)
+- Cross-validation for factor selection
+- Inference: parametric bootstrap
+- Brief formal model (detail in Appendix D)
+-->
+
+# Towards household-level DiD {#sec-did-roadmap}
+
+<!-- 
+Content to develop (forward-looking):
+- Limitation of gsynth: site-level aggregation
+- CS-DiD at household level with staggered treatment
+- What 2026 data will enable (4 treatment cohorts)
+- Sun-Abraham as complementary estimator
+-->

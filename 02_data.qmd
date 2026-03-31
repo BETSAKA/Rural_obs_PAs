@@ -1,0 +1,50 @@
+---
+title: "Data"
+subtitle: "Rural Observatory Surveys, georeferencing, and variable construction"
+---
+
+```{r setup}
+#| label: setup
+source("R/load_data.R")
+```
+
+<!-- TODO: Condense archive/01_Georeference_observatories.qmd + archive/02_Overlaps_PAs_observatories.qmd + archive/03_Variable_computation.qmd into ~3-4 pages -->
+
+# Survey data {#sec-survey-data}
+
+<!-- 
+Content to develop:
+- 11 observatories used in this study, {{< var n_household_years >}} HH-year observations
+- Map of observatory locations
+- Year coverage per observatory (heatmap)
+- Key variables: income, demographics, food security
+-->
+
+# Georeferencing {#sec-georef}
+
+<!-- 
+Content to develop:
+- Matching ROS locality names to COD P-codes
+- Fuzzy matching approach (brief — full details in Appendix A)
+- Summary of matching quality
+-->
+
+# Protected area overlaps {#sec-pa-overlaps}
+
+<!-- 
+Content to develop:
+- Which observatories overlap with which PAs?
+- Timeline: which PAs were created/reclassified during 1995–2015?
+- Map showing observatory–PA spatial relationships
+- Table of treatment assignments
+-->
+
+# Outcome variable {#sec-outcome}
+
+<!-- 
+Content to develop:
+- Household income construction (OECD equivalised, log-transformed, winsorised)
+- Brief description of income components
+- Cross-year harmonisation challenges (summary — full details in Appendix A)
+- Descriptive statistics table
+-->

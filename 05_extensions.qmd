@@ -1,0 +1,43 @@
+---
+title: "Extensions"
+subtitle: "Three additional observatory–PA pairs"
+---
+
+```{r setup}
+#| label: setup
+source("R/load_data.R")
+source("R/gsynth_helpers.R")
+source("R/plot_themes.R")
+```
+
+<!-- TODO: Extract from archive/14_extended_five_observatories.qmd -->
+
+# Additional treatment sites {#sec-additional-sites}
+
+<!-- 
+Content to develop:
+- Farafangana / CFAV corridor (IUCN VI, 2006)
+- Toliara North / Amoron'i Onilahy (IUCN VI, 2007)
+- Fénérive East / Tampolo Reserve (IUCN IV, 2007)
+- Map of all five observatory–PA pairs
+- Using only clean donors (Appendix B)
+-->
+
+# Results by observatory {#sec-ext-results}
+
+<!-- 
+Content to develop:
+- gsynth ATTs for each of the three additional sites
+- Event study plots
+- Comparison across all five sites: pattern of effects by governance type
+-->
+
+# Synthesis {#sec-synthesis}
+
+<!-- 
+Content to develop:
+- Table summarising all five ATTs + IUCN categories
+- Forest plot across all sites
+- Do results support the strict vs. multipurpose hypothesis?
+- Caveats: shorter post-treatment windows, smaller donor pool
+-->

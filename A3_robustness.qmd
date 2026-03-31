@@ -1,0 +1,29 @@
+---
+title: "Appendix C: Robustness Tests"
+subtitle: "Alternative specifications and sensitivity analysis"
+---
+
+```{r setup}
+#| label: setup
+source("R/load_data.R")
+source("R/gsynth_helpers.R")
+```
+
+<!-- 
+Migrate from archive/12_supplementary_robustness.qmd.
+Key robustness checks:
+
+1. Unadjusted log income (no OECD equivalisation)
+2. Levels-based gsynth (instead of log)
+3. Synthetic difference-in-differences (SDID)
+4. Alternative donor pool configurations
+5. Leave-one-out donor sensitivity
+-->
+
+# Alternative outcome measures {#sec-c-outcomes}
+
+# SDID estimation {#sec-c-sdid}
+
+# Donor pool sensitivity {#sec-c-donors}
+
+# Summary of robustness {#sec-c-summary}

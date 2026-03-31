@@ -1,0 +1,41 @@
+---
+title: "Conservation in Madagascar"
+subtitle: "Protected areas, governance models, and rural livelihoods"
+---
+
+```{r setup}
+#| label: setup
+source("R/load_data.R")
+```
+
+<!-- TODO: Condense from archive/09_paper_manuscript.qmd intro + archive/12_strict_vs_multipurpose.qmd intro -->
+
+# Madagascar's protected area system {#sec-pa-system}
+
+<!-- 
+Content to develop:
+- SAPM expansion timeline (Durban Vision 2003, tripling of PA surface)
+- IUCN governance categories relevant to this study (II vs VI)
+- The tension between conservation goals and rural livelihoods
+- Brief literature review: global evidence on PA impacts
+-->
+
+# The Rural Observatory Surveys {#sec-ros}
+
+<!-- 
+Content to develop:
+- What are the ROS? (IRD/Dial, 1995–2015, then 2025 resurvey)
+- 28 observatories across agroecological zones
+- Repeated cross-sections (not panel), ~500 HH per site per year
+- Why this is a rare dataset for impact evaluation
+-->
+
+# Research question {#sec-research-question}
+
+<!-- 
+Content to develop:
+- Does the GOVERNANCE MODEL of a PA matter for local livelihoods?
+- Strict (Ankarafantsika NP, IUCN II, 2002) vs Multipurpose (Lac Alaotra, IUCN VI, 2008)
+- Why staggered adoption helps identification
+- Preview of the five-observatory extension
+-->
