@@ -39,12 +39,10 @@ household_consolidated <- household_consolidated |>
   mutate(oecd_equiv = replace_na(oecd_equiv, 1))
 
 # -- Load spatial data ---------------------------------------------------------
-if (file.exists("data/Vahatra/Shapefiles/AP_Vahatra.shp")) {
-  vahatra <- st_read("data/Vahatra/Shapefiles/AP_Vahatra.shp", quiet = TRUE) |>
-    st_make_valid()
-  ankarafantsika_pa <- vahatra |> filter(grepl("Ankarafantsika", nom))
-  alaotra_pa        <- vahatra |> filter(grepl("Lac Alaotra", nom))
-}
+# Protected areas (WDPA dynamic boundaries)
+wdpa <- read_rds("data/dynamic_wdpa.rds") |> st_make_valid()
+ankarafantsika_pa <- wdpa |> filter(grepl("Ankarafantsika", NAME))
+alaotra_pa        <- wdpa |> filter(grepl("Lac Alaotra", NAME))
 
 # Observatory communes
 if (file.exists("data/Observatoires_ROS_communes_COD_v4.gpkg")) {
