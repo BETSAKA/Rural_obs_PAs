@@ -7,6 +7,7 @@ subtitle: "Rural Observatory Surveys, georeferencing, and variable construction"
 #| label: setup
 source("R/load_data.R")
 source("R/plot_themes.R")
+source("R/gsynth_helpers.R")
 ```
 
 This chapter summarises the data construction pipeline. The full reproducible workflow — georeferencing, PA overlap analysis, and variable harmonisation — is documented in [Appendix A](A1_data_pipeline.qmd).
@@ -18,19 +19,128 @@ The *Réseau des Observatoires Ruraux* (ROR) surveyed rural households across Ma
 ```{r}
 #| label: fig-obs-map
 #| fig-cap: "Location of the 11 rural observatories used in this study."
-#| eval: false
+#| fig-height: 7
+#| fig-width: 6
 
-# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (fig-donor-map)
-# Map showing all 11 observatories, colour-coded by role (treated/donor)
+ggplot() +
+  geom_sf(data = madagascar, fill = "grey95", color = "grey60", linewidth = 0.3) +
+  geom_point(
+    data = obs_locations,
+    aes(x = longitude, y = latitude, color = role, shape = role),
+    size = 3.5, stroke = 1
+  ) +
+  geom_label_repel(
+    data = obs_locations,
+    aes(x = longitude, y = latitude, label = paste0(name, " (", code, ")")),
+    size = 2.5, fontface = "bold", box.padding = 0.5,
+    min.segment.length = 0, max.overlaps = 20
+  ) +
+  scale_color_manual(
+    values = c("Marovoay (strict, 2003)" = "#D32F2F",
+               "Alaotra (multipurpose, 2008)" = "#1565C0",
+               "New treated (2006\u20132007)" = "#FF8F00",
+               "Clean donor pool" = "#4CAF50"),
+    name = NULL
+  ) +
+  scale_shape_manual(
+    values = c("Marovoay (strict, 2003)" = 17,
+               "Alaotra (multipurpose, 2008)" = 17,
+               "New treated (2006\u20132007)" = 18,
+               "Clean donor pool" = 16),
+    name = NULL
+  ) +
+  labs(title = "Rural Observatories in the Analysis") +
+  theme_void(base_size = 11) +
+  theme(legend.position = "bottom")
 ```
 
 ```{r}
 #| label: fig-time-grid
 #| fig-cap: "Year-by-year data coverage across observatories and survey sites."
-#| eval: false
+#| fig-height: 7
+#| fig-width: 10
 
-# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (fig-time-grid)
-# Heatmap of site × year coverage
+obs_names_df <- obs_locations |> st_drop_geometry() |> select(code, name)
+# obs 12 (Antsohihy) is in ALL_DONOR_OBS but not in obs_locations
+obs_names_df <- bind_rows(obs_names_df, tibble(code = "12", name = "Antsohihy"))
+
+coverage <- household_consolidated |>
+  filter(obs %in% c("03", "21", ALL_DONOR_OBS)) |>
+  mutate(
+    unit_label = case_when(
+      site_id == "031" ~ "Marovoay: Bepako",
+      site_id == "032" ~ "Marovoay: Madiromiongana",
+      site_id == "033" ~ "Marovoay: Ampijoroa",
+      site_id == "034" ~ "Marovoay: Maroala",
+      obs == "21" & site_id == "211" ~ "Alaotra: Avaradrano / Feramanga A.",
+      obs == "21" & site_id == "212" ~ "Alaotra: Mangabe",
+      obs == "21" & site_id == "213" ~ "Alaotra: Analamiranga area",
+      obs == "21" ~ paste0("Alaotra: site ", site_id),
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(unit_label) | obs %in% ALL_DONOR_OBS)
+
+treated_cov <- coverage |>
+  filter(!is.na(unit_label)) |>
+  distinct(unit_label, year, obs) |>
+  mutate(
+    status = case_when(
+      obs == "03" & grepl("Bepako|Madiromiongana", unit_label) &
+        year >= TREAT_YEAR_MARO ~ "Treated (post)",
+      obs == "03" & grepl("Bepako|Madiromiongana", unit_label) ~ "Treated (pre)",
+      obs == "03" ~ "Maro. control",
+      obs == "21" & year >= TREAT_YEAR_ALA ~ "Treated (post)",
+      obs == "21" ~ "Treated (pre)"
+    ),
+    group = if_else(obs == "03", "Marovoay", "Alaotra")
+  )
+
+donor_cov <- coverage |>
+  filter(obs %in% ALL_DONOR_OBS) |>
+  distinct(obs, year) |>
+  left_join(obs_names_df, by = c("obs" = "code")) |>
+  mutate(
+    unit_label = name,
+    status = "Donor",
+    group = "Donor pool"
+  )
+
+all_cov <- bind_rows(treated_cov, donor_cov)
+
+level_order <- c(
+  donor_cov |> distinct(unit_label) |> arrange(unit_label) |> pull(unit_label),
+  "Alaotra: Analamiranga area",
+  "Alaotra: Mangabe",
+  "Alaotra: Avaradrano / Feramanga A.",
+  "Marovoay: Maroala",
+  "Marovoay: Ampijoroa",
+  "Marovoay: Bepako",
+  "Marovoay: Madiromiongana"
+)
+
+all_cov <- all_cov |>
+  mutate(unit_label = factor(unit_label, levels = level_order))
+
+ggplot(all_cov, aes(x = factor(year), y = unit_label, fill = status)) +
+  geom_tile(color = "white", linewidth = 0.3) +
+  scale_fill_manual(
+    values = c(
+      "Treated (post)" = "#EF9A9A",
+      "Treated (pre)"  = "#A5D6A7",
+      "Maro. control"  = "#90CAF9",
+      "Donor"          = "#E0E0E0"
+    ),
+    name = NULL
+  ) +
+  labs(x = NULL, y = NULL, title = "Panel Coverage: Sites \u00d7 Years") +
+  theme_minimal(base_size = 10) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+    axis.text.y = element_text(size = 8),
+    legend.position = "bottom",
+    panel.grid = element_blank()
+  )
 ```
 
 # Georeferencing {#sec-georef}
@@ -47,7 +157,7 @@ The result is a geocoded correspondence table linking each ROR household identif
 
 # Protected area overlaps {#sec-pa-overlaps}
 
-We overlay the geocoded ROR communes and fokontany with the Vahatra protected area database and the dynamic WDPA layer (see [Appendix B](A2_donor_validity.qmd) for the temporal PA boundary construction). Three temporal configurations emerge:
+We overlay the geocoded ROR fokontany with the Vahatra protected area database and the dynamic WDPA layer (see [Appendix B](A2_donor_validity.qmd) for the temporal PA boundary construction). Three temporal configurations emerge:
 
 | Configuration | Observatories | Use |
 |---|---|---|
@@ -60,13 +170,124 @@ We overlay the geocoded ROR communes and fokontany with the Vahatra protected ar
 ```{r}
 #| label: fig-pa-overlaps
 #| fig-cap: "Protected areas and rural observatories: spatial and temporal relationships."
-#| eval: false
+#| fig-height: 6
+#| fig-width: 9
 
-# TODO: Migrate from archive/02_Overlaps_PAs_observatories.qmd (fig-ror-pa-years)
-# Timeline figure: ROS survey windows vs PA creation dates
+# --- PA creation events from spatial overlaps ---
+study_obs_codes <- as.integer(c("02", "03", "12", "13", "15", "16",
+                                "21", "23", "24", "25", "41"))
+
+pa_overlaps <- st_join(
+  sel_fokontany |> filter(OBS_CODE %in% study_obs_codes),
+  wdpa |> select(NAME, STATUS_YR, IUCN_CAT),
+  left = FALSE
+) |>
+  st_drop_geometry() |>
+  mutate(STATUS_YR = as.integer(STATUS_YR)) |>
+  filter(STATUS_YR >= 1995, STATUS_YR <= 2015) |>
+  # Keep earliest event per PA per observatory
+  summarize(
+    pa_year = min(STATUS_YR),
+    IUCN_CAT = first(IUCN_CAT),
+    .by = c(OBS_CODE, NAME)
+  )
+
+# Map OBS_CODE to name
+obs_name_map <- bind_rows(
+  obs_locations |> st_drop_geometry() |>
+    mutate(OBS_CODE = as.integer(code)) |>
+    select(OBS_CODE, obs_name = name),
+  tibble(OBS_CODE = 12L, obs_name = "Antsohihy")
+)
+
+pa_overlaps <- pa_overlaps |>
+  left_join(obs_name_map, by = "OBS_CODE") |>
+  mutate(label = paste0(obs_name, " \u2013 ", NAME),
+         type = "PA creation")
+
+# --- Survey year coverage ---
+survey_cov <- household_consolidated |>
+  filter(obs %in% c("03", "21", ALL_DONOR_OBS)) |>
+  distinct(obs, year) |>
+  left_join(
+    bind_rows(
+      obs_locations |> st_drop_geometry() |> select(code, name),
+      tibble(code = "12", name = "Antsohihy")
+    ),
+    by = c("obs" = "code")
+  ) |>
+  filter(!is.na(name))
+
+# Build combined data: one row per obs, showing survey span + PA events
+# Panel A: survey spans by observatory
+obs_spans <- survey_cov |>
+  summarize(first_yr = min(year), last_yr = max(year), .by = name) |>
+  arrange(first_yr)
+
+# Only include observatories that have PA overlaps (plus both treated)
+obs_with_pa <- pa_overlaps |> distinct(obs_name) |> pull(obs_name)
+obs_of_interest <- unique(c("Marovoay", "Alaotra", obs_with_pa))
+
+# Survey years for observatories of interest
+survey_pts <- survey_cov |>
+  filter(name %in% obs_of_interest) |>
+  mutate(type = "ROR survey")
+
+# PA creation events
+pa_pts <- pa_overlaps |>
+  filter(obs_name %in% obs_of_interest) |>
+  select(obs_name, year = pa_year, NAME, type)
+
+# Combined for plotting — use observatory–PA label for y-axis
+# For survey years, create one row per obs-PA pair
+pa_labels <- pa_overlaps |>
+  filter(obs_name %in% obs_of_interest) |>
+  distinct(obs_name, label)
+
+# Expand survey years across PA labels for each observatory
+survey_expanded <- survey_pts |>
+  inner_join(pa_labels, by = c("name" = "obs_name"),
+             relationship = "many-to-many") |>
+  select(label, year, type)
+
+pa_events <- pa_pts |>
+  inner_join(pa_labels, by = c("obs_name"),
+             relationship = "many-to-many") |>
+  select(label, year, type)
+
+timeline_data <- bind_rows(survey_expanded, pa_events)
+
+# Order y-axis by PA creation year
+label_order <- pa_overlaps |>
+  filter(obs_name %in% obs_of_interest) |>
+  arrange(pa_year) |>
+  pull(label) |>
+  unique()
+
+timeline_data <- timeline_data |>
+  mutate(label = factor(label, levels = rev(label_order)))
+
+ggplot(timeline_data, aes(x = year, y = label, color = type)) +
+  geom_point(aes(size = type, shape = type)) +
+  scale_color_manual(
+    values = c("ROR survey" = "#1565C0", "PA creation" = "#D32F2F"),
+    name = NULL
+  ) +
+  scale_size_manual(values = c("ROR survey" = 1.5, "PA creation" = 4),
+                    guide = "none") +
+  scale_shape_manual(values = c("ROR survey" = 16, "PA creation" = 18),
+                     guide = "none") +
+  scale_x_continuous(breaks = seq(1995, 2015, 5)) +
+  labs(title = "Timing of ROR Surveys Relative to PA Creation") +
+  theme_minimal(base_size = 11) +
+  theme(
+    axis.title = element_blank(),
+    legend.position = "top",
+    panel.grid.minor = element_blank()
+  )
 ```
 
-The two primary pairs — **Marovoay / Ankarafantsika** (strict, IUCN II, 2002) and **Alaotra / Lac Alaotra** (multipurpose, IUCN VI, ~2008) — offer the longest pre- and post-treatment windows. Three additional pairs provide shorter but informative extensions ([Chapter 5](05_extensions.qmd)).
+The two primary pairs — **Marovoay / Ankarafantsika** (strict, IUCN II, 2002) and **Alaotra / Lac Alaotra** (multipurpose, IUCN V, 2007) — offer the longest pre- and post-treatment windows. Three additional pairs provide shorter but informative extensions ([Chapter 5](05_extensions.qmd)).
 
 # Outcome variable {#sec-outcome}
 
@@ -85,10 +306,78 @@ Cross-year harmonisation is non-trivial: variable names, questionnaire modules, 
 ```{r}
 #| label: fig-income-trends
 #| fig-cap: "Mean log equivalised household income over time, by observatory."
-#| eval: false
+#| fig-height: 5
+#| fig-width: 12
 
-# TODO: Migrate from archive/12_strict_vs_multipurpose.qmd (fig-trends)
-# Line plot of mean log income by observatory across years
+maro_panel <- household_consolidated |>
+  filter(obs == "03") |>
+  mutate(
+    treated  = site_id %in% c("031", "032"),
+    revtot_eq = revtot / oecd_equiv,
+    revtot_w  = winsorize(revtot_eq),
+    ln_rev    = log(pmax(revtot_w, 1)),
+    .by = year
+  )
+
+maro_trends <- maro_panel |>
+  summarize(
+    mean_ln = mean(ln_rev, na.rm = TRUE),
+    se_ln   = sd(ln_rev, na.rm = TRUE) / sqrt(n()),
+    .by = c(year, treated)
+  ) |>
+  mutate(group = if_else(treated, "East bank (treated)", "West bank (donor)"))
+
+p1 <- ggplot(maro_trends, aes(year, mean_ln, color = group, shape = group)) +
+  annotate("rect", xmin = TREAT_YEAR_MARO, xmax = 2015,
+           ymin = -Inf, ymax = Inf, fill = "#FFCDD2", alpha = 0.3) +
+  geom_vline(xintercept = TREAT_YEAR_MARO - 0.5, linetype = "dashed",
+             color = "grey40") +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2.5) +
+  geom_errorbar(aes(ymin = mean_ln - 1.96*se_ln, ymax = mean_ln + 1.96*se_ln),
+                width = 0.3, alpha = 0.5) +
+  scale_color_manual(values = c("East bank (treated)" = "#D32F2F",
+                                "West bank (donor)" = "#1565C0")) +
+  labs(title = "Ankarafantsika (strict, 2003)",
+       x = "Year", y = "Mean log(equiv. income)",
+       color = NULL, shape = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+
+ala_panel <- household_consolidated |>
+  filter(obs == "21") |>
+  mutate(
+    revtot_eq = revtot / oecd_equiv,
+    revtot_w  = winsorize(revtot_eq),
+    ln_rev    = log(pmax(revtot_w, 1)),
+    .by = year
+  )
+
+ala_trends <- ala_panel |>
+  summarize(
+    mean_ln = mean(ln_rev, na.rm = TRUE),
+    se_ln   = sd(ln_rev, na.rm = TRUE) / sqrt(n()),
+    .by = year
+  )
+
+p2 <- ggplot(ala_trends, aes(year, mean_ln)) +
+  annotate("rect", xmin = TREAT_YEAR_ALA, xmax = 2015,
+           ymin = -Inf, ymax = Inf, fill = "#BBDEFB", alpha = 0.3) +
+  geom_vline(xintercept = TREAT_YEAR_ALA - 0.5, linetype = "dashed",
+             color = "grey40") +
+  geom_line(linewidth = 0.8, color = "#1565C0") +
+  geom_point(size = 2.5, color = "#1565C0") +
+  geom_errorbar(aes(ymin = mean_ln - 1.96*se_ln, ymax = mean_ln + 1.96*se_ln),
+                width = 0.3, alpha = 0.5, color = "#1565C0") +
+  labs(title = "Lac Alaotra (multipurpose, 2008)",
+       x = "Year", y = "Mean log(equiv. income)") +
+  theme_minimal(base_size = 11)
+
+p1 + p2 +
+  plot_annotation(
+    title = "Income Trends by Observatory",
+    subtitle = "Shaded regions = post-treatment"
+  )
 ```
 
 # Descriptive statistics {#sec-descriptives}
@@ -96,8 +385,39 @@ Cross-year harmonisation is non-trivial: variable names, questionnaire modules, 
 ```{r}
 #| label: tbl-descriptives
 #| tbl-cap: "Summary statistics for the analysis sample."
-#| eval: false
 
-# TODO: Create summary table of key variables
-# N households, mean income, demographics by observatory group (treated/donor)
+analysis_sample <- household_consolidated |>
+  filter(
+    obs %in% c("03", "21", ALL_DONOR_OBS),
+    year >= STUDY_START & year <= STUDY_END
+  ) |>
+  mutate(
+    group = case_when(
+      obs == "03" & site_id %in% c("031", "032") ~ "Marovoay treated (east)",
+      obs == "03" ~ "Marovoay control (west)",
+      obs == "21" ~ "Alaotra (treated)",
+      TRUE ~ "Donor pool"
+    ),
+    revtot_eq = revtot / oecd_equiv
+  )
+
+analysis_sample |>
+  summarize(
+    `N household-years` = n(),
+    `Mean income (Ar)` = round(mean(revtot, na.rm = TRUE)),
+    `Mean equiv. income` = round(mean(revtot_eq, na.rm = TRUE)),
+    `Mean HH size` = round(mean(n_membres, na.rm = TRUE), 1),
+    `Mean years (max)` = round(mean(max_years_edu, na.rm = TRUE), 1),
+    `% literate adult` = round(mean(any_literate_adult, na.rm = TRUE) * 100, 1),
+    .by = group
+  ) |>
+  arrange(match(group, c("Marovoay treated (east)", "Marovoay control (west)",
+                         "Alaotra (treated)", "Donor pool"))) |>
+  gt() |>
+  tab_header(
+    title = "Sample Descriptive Statistics",
+    subtitle = paste0("Analysis period: ", STUDY_START, "\u2013", STUDY_END)
+  ) |>
+  fmt_number(columns = c(`Mean income (Ar)`, `Mean equiv. income`),
+             use_seps = TRUE, decimals = 0)
 ```

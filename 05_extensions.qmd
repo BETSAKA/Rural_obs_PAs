@@ -34,29 +34,28 @@ All survey sites are treated at observatory level from 2006; no within-observato
 
 ```{r}
 #| label: fig-map-fara
-#| fig-cap: "Farafangana observatory and nearby protected areas. The CFAV (treatment PA, red) and Manombo SR (pre-existing, yellow) are shown over surveyed commune boundaries."
+#| fig-cap: "Farafangana observatory and nearby protected areas. The CFAV (treatment PA, red) and Manombo SR (pre-existing, yellow) are shown over surveyed fokontany."
 #| fig-height: 7
 #| fig-width: 7
 
-fara_communes <- obs_communes |> filter(OBS_CODE == 15)
 fara_pas <- dyn_study |>
   filter(str_detect(NAME, "Corridor Forestier Ambositra Vondrozo|Manombo")) |>
   mutate(pa_type = if_else(str_detect(NAME, "Corridor"),
                            "Treatment PA (CFAV, 2006)",
                            "Pre-existing PA (Manombo, 1962)"))
 
-fara_com_bb <- st_bbox(fara_communes)
+fara_fkt_bb <- st_bbox(fara_fokontany)
 fara_bbox <- st_bbox(c(
-  xmin = unname(fara_com_bb["xmin"]) - 0.3,
-  ymin = unname(fara_com_bb["ymin"]) - 0.3,
-  xmax = unname(fara_com_bb["xmax"]) + 0.3,
-  ymax = unname(fara_com_bb["ymax"]) + 0.3
+  xmin = unname(fara_fkt_bb["xmin"]) - 0.3,
+  ymin = unname(fara_fkt_bb["ymin"]) - 0.3,
+  xmax = unname(fara_fkt_bb["xmax"]) + 0.3,
+  ymax = unname(fara_fkt_bb["ymax"]) + 0.3
 ), crs = 4326)
 
 fara_mad_c <- st_crop(madagascar, fara_bbox)
 fara_pas_c <- tryCatch(st_crop(fara_pas, fara_bbox), error = function(e) fara_pas)
-fara_com_c <- fara_communes |>
-  mutate(layer = "Surveyed communes")
+fara_fkt_c <- fara_fokontany |>
+  mutate(layer = "Surveyed fokontany")
 
 tm_shape(fara_mad_c) +
   tm_borders(col = "grey75", lwd = 0.3) +
@@ -74,10 +73,10 @@ tm_shape(fara_pas_c) +
                           "Pre-existing PA (Manombo, 1962)" = "#F9A825")),
              col.legend = tm_legend(show = FALSE),
              lwd = 0.8) +
-tm_shape(fara_com_c) +
+tm_shape(fara_fkt_c) +
   tm_fill(fill = "layer",
           fill.scale = tm_scale_categorical(
-            values = c("Surveyed communes" = "#E8F5E9")),
+            values = c("Surveyed fokontany" = "#E8F5E9")),
           fill.legend = tm_legend(title = ""),
           fill_alpha = 0.7) +
   tm_borders(col = "grey40", lwd = 0.4) +
@@ -98,11 +97,10 @@ Treatment year is **{{< var treat_year_tol >}}** --- the first full survey year 
 
 ```{r}
 #| label: fig-map-tol
-#| fig-cap: "Toliara North observatory and nearby protected areas. Three PAs became operative during 2007--2008. Ranobe PK 32 lies within 1.4 km of the nearest commune centroid."
+#| fig-cap: "Toliara North observatory and nearby protected areas. Three PAs became operative during 2007--2008."
 #| fig-height: 7
 #| fig-width: 7
 
-tol_communes <- obs_communes |> filter(OBS_CODE == 23)
 tol_pas <- dyn_study |>
   filter(str_detect(NAME, "Ranobe PK 32|Amoron|Mikea")) |>
   mutate(pa_label = case_when(
@@ -117,8 +115,8 @@ tol_bbox <- st_bbox(c(
 
 tol_mad_c  <- st_crop(madagascar, tol_bbox)
 tol_pas_c  <- tryCatch(st_crop(tol_pas, tol_bbox), error = function(e) tol_pas)
-tol_com_c  <- tryCatch(st_crop(tol_communes, tol_bbox), error = function(e) tol_communes)
-tol_com_c  <- tol_com_c |> mutate(layer = "Surveyed communes")
+tol_fkt_c  <- tryCatch(st_crop(tol_fokontany, tol_bbox), error = function(e) tol_fokontany)
+tol_fkt_c  <- tol_fkt_c |> mutate(layer = "Surveyed fokontany")
 
 tol_pal <- c("Ranobe PK 32 (V, 2008)"      = "#EF5350",
              "Amoron'i Onilahy (V, 2007)"   = "#FF8A65",
@@ -136,10 +134,10 @@ tm_shape(tol_pas_c) +
              col.scale = tm_scale_categorical(values = tol_pal),
              col.legend = tm_legend(show = FALSE),
              lwd = 0.8) +
-tm_shape(tol_com_c) +
+tm_shape(tol_fkt_c) +
   tm_fill(fill = "layer",
           fill.scale = tm_scale_categorical(
-            values = c("Surveyed communes" = "#E3F2FD")),
+            values = c("Surveyed fokontany" = "#E3F2FD")),
           fill.legend = tm_legend(title = ""),
           fill_alpha = 0.8) +
   tm_borders(col = "grey40", lwd = 0.4) +
@@ -160,7 +158,6 @@ Treatment year is **{{< var treat_year_fen >}}**. The survey has 8 pre-treatment
 #| fig-height: 7
 #| fig-width: 7
 
-fen_communes <- obs_communes |> filter(OBS_CODE == 24)
 fen_pas <- dyn_study |> filter(str_detect(NAME, "Tampolo")) |>
   mutate(pa_label = "Réserve de Tampolo (IV, 2007)")
 
@@ -169,9 +166,9 @@ fen_bbox <- st_bbox(c(
 ), crs = 4326)
 
 fen_mad_c  <- st_crop(madagascar, fen_bbox)
-fen_com_c  <- tryCatch(st_crop(fen_communes, fen_bbox), error = function(e) fen_communes)
+fen_fkt_c  <- tryCatch(st_crop(fen_fokontany, fen_bbox), error = function(e) fen_fokontany)
 fen_pas_c  <- tryCatch(st_crop(fen_pas, fen_bbox), error = function(e) fen_pas)
-fen_com_c  <- fen_com_c |> mutate(layer = "Surveyed communes")
+fen_fkt_c  <- fen_fkt_c |> mutate(layer = "Surveyed fokontany")
 
 tm_shape(fen_mad_c) +
   tm_borders(col = "grey75", lwd = 0.3) +
@@ -187,10 +184,10 @@ tm_shape(fen_pas_c) +
                values = c("Réserve de Tampolo (IV, 2007)" = "#6A1B9A")),
              col.legend = tm_legend(show = FALSE),
              lwd = 0.8) +
-tm_shape(fen_com_c) +
+tm_shape(fen_fkt_c) +
   tm_fill(fill = "layer",
           fill.scale = tm_scale_categorical(
-            values = c("Surveyed communes" = "#FFF8E1")),
+            values = c("Surveyed fokontany" = "#FFF8E1")),
           fill.legend = tm_legend(title = ""),
           fill_alpha = 0.8) +
   tm_borders(col = "grey40", lwd = 0.4) +
