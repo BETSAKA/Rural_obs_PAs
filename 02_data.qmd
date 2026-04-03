@@ -515,7 +515,10 @@ analysis_sample |>
     `Mean income (Ar)` = round(mean(revtot, na.rm = TRUE)),
     `Mean equiv. income` = round(mean(revtot_eq, na.rm = TRUE)),
     `Mean HH size` = round(mean(n_membres, na.rm = TRUE), 1),
-    `Mean educ. years (adults)` = round(mean(mean_years_edu_adults, na.rm = TRUE), 1),
+    `Mean educ. years (adults)` = round(
+      mean(mean_years_edu_adults, na.rm = TRUE),
+      1
+    ),
     `% literate adult` = round(mean(any_literate_adult, na.rm = TRUE) * 100, 1),
     .by = group
   ) |>
