@@ -5,11 +5,11 @@ subtitle: "Policy implications, limitations, and next steps"
 
 # Summary of findings {#sec-summary}
 
-This paper estimates the causal effect of protected-area creation on household income in rural Madagascar using the generalised synthetic control method [@Xu2017] across five observatory--PA pairs spanning the 1999--2014 study period, with a long-run extension to 2025 for the Marovoay case.
+This analysis estimates the causal effect of protected-area creation on household income in rural Madagascar using the generalised synthetic control method [@Xu2017] across five observatory--PA pairs spanning the 1999--2014 study period, with a long-run extension to 2025 for the Marovoay case.
 
 **Two models, two patterns.** The core finding from the two primary sites is a sharp divergence:
 
-- At **Ankarafantsika**, reclassification from an open-access forest reserve to a strictly patrolled national park (IUCN II, 2002) is associated with a **{{< var att_maro >}} log-point decline** in OECD-equivalised household income ($\approx$ {{< var att_maro_pct }}), statistically significant and deepening through 2025 --- twenty-two years after treatment.
+- At **Ankarafantsika**, the extension of an open-access forest reserve into a strictly patrolled national park (IUCN II, 2002) is associated with a **{{< var att_maro >}} log-point decline** in OECD-equivalised household income ($\approx$ {{< var att_maro_pct }}), statistically significant and deepening through 2025 — twenty-two years after the park extension.
 - At **Lac Alaotra**, creation of a participatory protected landscape under CBNRM (IUCN V, 2008) produces an ATT of **{{< var att_ala >}} log points**, indistinguishable from zero. Communities retained access to the lake-marsh ecosystem under Durrell's management; no aggregate income cost is detectable.
 
 **Three additional sites confirm the pattern.** Extending the analysis to Farafangana (CFAV corridor, IUCN V, 2006), Toliara North (Amoron'i Onilahy + Mikea + Ranobe, mixed V/II, 2007), and Fénérive East (Réserve de Tampolo, IUCN IV, 2007) yields near-zero, statistically insignificant ATTs in all three cases. These sites face PAs that are either multipurpose, small-footprint, or both. Only strict exclusionary conservation at a large park produces a detectable income decline.
@@ -27,13 +27,13 @@ This finding aligns with a growing body of evidence that conservation-income tra
 
 ## Compensation and livelihood integration
 
-The Ankarafantsika result implies that communities adjacent to strict PAs bear real and persistent costs. Two decades after reclassification, the income gap has not closed --- and there is no mechanism in the current PA management framework to compensate adjacent households for foregone resource access. This raises a question of distributional justice: if conservation generates national and global public goods (carbon storage, biodiversity preservation), the costs should not be borne disproportionately by the poorest rural households.
+The Ankarafantsika result implies that communities adjacent to strict PAs bear real and persistent costs. Two decades after the park extension, the income gap has not closed --- and there is no mechanism in the current PA management framework to compensate adjacent households for foregone resource access. This raises a question of distributional justice: if conservation generates national and global public goods (carbon storage, biodiversity preservation), the costs should not be borne disproportionately by the poorest rural households.
 
 Policy options include:
 
 - **Direct transfers** tied to PA proximity and enforcement intensity (analogous to Payments for Ecosystem Services).
 - **Livelihood diversification programmes** targeting communities within buffer zones of strict PAs.
-- **Governance reclassification**: where strict enforcement is not ecologically necessary, converting from IUCN II to IUCN V/VI could reduce livelihood costs while maintaining conservation objectives.
+- **Governance recategorisation**: where strict enforcement is not ecologically necessary, converting from IUCN II to IUCN V/VI could reduce livelihood costs while maintaining conservation objectives.
 
 ## Limitations of the policy inference
 
@@ -71,9 +71,9 @@ The five treated observatories define four treatment cohorts:
 | 2006 | Farafangana (9 sites) | Multipurpose (IUCN V) | Observatory-level |
 | 2007 | Toliara North (4) + Fénérive East (10) | Mixed V/II + Low intensity (IV) | Observatory-level |
 | 2008 | Alaotra (3 sites) | Multipurpose (IUCN V) | Observatory-level |
-| $\infty$ | Marovoay west (2) + 5 clean donors (36) | Never treated | Controls |
+| $\infty$ | Marovoay west (2) + 5 clean donors (36) | Never exposed | Controls |
 
-: Four staggered treatment cohorts for Callaway & Sant'Anna DiD {#tbl-staggered}
+: Four staggered exposure cohorts for Callaway & Sant'Anna DiD {#tbl-staggered}
 
 A crucial structural advantage: **not-yet-treated units serve as controls.** Alaotra (treated from 2008) provides a valid control for the Marovoay effect during 2003--2007 before its own treatment begins. This cross-cohort identification is impossible in the gsynth framework.
 

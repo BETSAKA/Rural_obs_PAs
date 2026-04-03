@@ -11,7 +11,7 @@ website:
   repo-actions: [source, issue]
   navbar:
     left:
-      - text: Paper
+      - text: Analysis
         menu:
           - text: "1. Context"
             href: 01_context.qmd
@@ -42,7 +42,7 @@ website:
     style: floating
     contents:
       - index.qmd
-      - section: "Paper"
+      - section: "Analysis"
         contents:
           - 01_context.qmd
           - 02_data.qmd

@@ -10,11 +10,11 @@ source("R/plot_themes.R")
 source("R/gsynth_helpers.R")
 ```
 
-This chapter summarises the data construction pipeline. The full reproducible workflow — georeferencing, PA overlap analysis, and variable harmonisation — is documented in [Appendix A](A1_data_pipeline.qmd).
+This chapter summarises the data construction pipeline. The full reproducible workflow — georeferencing, PA overlap analysis, and variable harmonisation — is documented in [Appendix A](A1_data_pipeline.qmd). The underlying survey data are described in a companion data paper [@ChabeFerret2024]; supplementary materials and replication code are available in the [associated repository](https://doi.org/10.1038/s41597-024-03879-9).
 
 # Survey data {#sec-survey-data}
 
-The *Réseau des Observatoires Ruraux* (ROR) surveyed rural households across Madagascar from 1995 to 2015. We use {{< var n_observatories >}} observatories comprising approximately {{< var n_household_years >}} household-year observations. Each observatory tracks ~500 households per year in a rotating panel design, with random replacement of attrited households preserving cross-sectional representativeness.
+The Rural Observatory System (ROS) surveyed rural households across Madagascar from 1995 to 2015. We use {{< var n_observatories >}} observatories comprising approximately {{< var n_household_years >}} household-year observations. Each observatory tracks ~500 households per year in a rotating panel design, with random replacement of attrited households preserving cross-sectional representativeness.
 
 ```{r}
 #| label: fig-obs-map
@@ -145,7 +145,7 @@ ggplot(all_cov, aes(x = factor(year), y = unit_label, fill = status)) +
 
 # Georeferencing {#sec-georef}
 
-The original ROS data lacked systematic georeferencing. Locality names were recorded as free text, with inconsistent spellings across years and languages (Malagasy and French). We linked each observation to official administrative boundaries using the Common Operational Datasets (COD), maintained by OCHA and Madagascar's BNGRC.
+The original survey data lacked systematic georeferencing. Locality names were recorded as free text, with inconsistent spellings across years and languages (Malagasy and French). We linked each observation to official administrative boundaries using the Common Operational Datasets (COD), maintained by OCHA and Madagascar's BNGRC.
 
 The matching procedure is hierarchical:
 
@@ -153,15 +153,15 @@ The matching procedure is hierarchical:
 2. **Fuzzy matching** — Jaro-Winkler distance against the COD gazetteer, filtered by observatory-level district membership, with a maximum distance threshold of 0.25.
 3. **Cascading spatial levels** — match first at the commune (ADM3) level, then refine to fokontany (ADM4) where possible.
 
-The result is a geocoded correspondence table linking each ROR household identifier (`j5`) to its P-coded commune and fokontany. This enables spatial overlay with protected area boundaries.
+The result is a geocoded correspondence table linking each ROS household identifier (`j5`) to its P-coded commune and fokontany. This enables spatial overlay with protected area boundaries.
 
 # Protected area overlaps {#sec-pa-overlaps}
 
-We overlay the geocoded ROR fokontany with the Vahatra protected area database and the dynamic WDPA layer (see [Appendix B](A2_donor_validity.qmd) for the temporal PA boundary construction). Three temporal configurations emerge:
+We overlay the geocoded ROS fokontany with the dynamic WDPA layer (see [Appendix B](A2_donor_validity.qmd) for the temporal PA boundary construction). Three temporal configurations emerge:
 
 | Configuration | Observatories | Use |
 |---|---|---|
-| PA predates ROS (no baseline) | e.g., Ranomafana, Andringitra | Excluded |
+| PA predates ROS surveys (no baseline) | e.g., Ranomafana, Andringitra | Excluded |
 | PA created *during* ROS (1999–2014) | Marovoay (2003), Alaotra (2008) | **Primary treatment** |
 | PA created *after* ROS ended | Farafangana, Toliara, Fénérive (2006–07) | **Extension treatment** |
 
@@ -231,7 +231,7 @@ obs_of_interest <- unique(c("Marovoay", "Alaotra", obs_with_pa))
 # Survey years for observatories of interest
 survey_pts <- survey_cov |>
   filter(name %in% obs_of_interest) |>
-  mutate(type = "ROR survey")
+  mutate(type = "ROS survey")
 
 # PA creation events
 pa_pts <- pa_overlaps |>
@@ -270,15 +270,15 @@ timeline_data <- timeline_data |>
 ggplot(timeline_data, aes(x = year, y = label, color = type)) +
   geom_point(aes(size = type, shape = type)) +
   scale_color_manual(
-    values = c("ROR survey" = "#1565C0", "PA creation" = "#D32F2F"),
+    values = c("ROS survey" = "#1565C0", "PA creation" = "#D32F2F"),
     name = NULL
   ) +
-  scale_size_manual(values = c("ROR survey" = 1.5, "PA creation" = 4),
+  scale_size_manual(values = c("ROS survey" = 1.5, "PA creation" = 4),
                     guide = "none") +
-  scale_shape_manual(values = c("ROR survey" = 16, "PA creation" = 18),
+  scale_shape_manual(values = c("ROS survey" = 16, "PA creation" = 18),
                      guide = "none") +
   scale_x_continuous(breaks = seq(1995, 2015, 5)) +
-  labs(title = "Timing of ROR Surveys Relative to PA Creation") +
+  labs(title = "Timing of ROS Surveys Relative to PA Creation") +
   theme_minimal(base_size = 11) +
   theme(
     axis.title = element_blank(),

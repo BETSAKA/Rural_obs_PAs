@@ -1,6 +1,13 @@
 ---
 title: "Conservation Governance and Rural Livelihoods in Madagascar"
 subtitle: "Long-Run Evidence from Rural Observatory Surveys (1995–2025)"
+author:
+  - name: Florent Bédécarrats
+    affiliations:
+      - UMI SOURCE (IRD / UVSQ)
+  - name: Véromanitra Razafimahenina
+    affiliations:
+      - Université d'Antananarivo
 ---
 
 ::: {.callout-note}
@@ -10,31 +17,37 @@ updated when data from the 2026 survey round becomes available. All code is
 available in the [GitHub repository](https://github.com/BETSAKA/Rural_obs_PAs).
 :::
 
+![Marovoay, Véromanitra Ramizason](media/Photo_Marovoay_Veromanitra_Ramizason_01.jpeg){fig-alt="Field photo from the Marovoay observatory site near Ankarafantsika National Park."}
+
 ## Abstract
 
 Does the governance model of a protected area matter for the livelihoods of
-surrounding communities? We exploit the staggered creation and reclassification
+surrounding communities? We exploit the staggered creation and extension
 of protected areas in Madagascar between 2002 and 2008, combined with two
-decades of household survey data from the Rural Observatory Surveys (ROS,
-1995–2015) and a 2025 resurvey, to estimate causal impacts on household income.
+decades of household survey data from the Rural Observatory System (ROS,
+1995–2015) and a 2025 resurvey, to estimate the causal impacts of conservation
+on household income.
 
-Using generalized synthetic control methods with interactive fixed effects, we
-compare two governance archetypes:
+Using generalized synthetic control methods with interactive fixed effects
+— a technique that constructs data-driven counterfactuals for each treated
+unit by modelling unobserved common factors — we compare two governance
+archetypes:
 
-- **Strict conservation** (IUCN category II): the 2002 reclassification of
-  Ankarafantsika as a national park, monitored via the Marovoay observatory.
+- **Strict conservation** (IUCN category II): the 2002 extension of
+  Ankarafantsika National Park, monitored via the Marovoay observatory.
 - **Multipurpose conservation** (IUCN category VI): the 2008 creation of the
   Lac Alaotra new protected area, monitored via the Alaotra observatory.
 
-We find a persistent negative effect of strict conservation on equivalised
-household income (ATT ≈ {{< var att_maro >}} log points), while multipurpose
-conservation shows no detectable effect (ATT ≈ {{< var att_ala >}} log points).
+We find a persistent negative effect of strict conservation at Ankarafantsika on
+equivalised household income (ATT ≈ {{< var att_maro >}} log points), while
+multipurpose conservation at Alaotra shows no detectable effect (ATT ≈
+{{< var att_ala >}} log points).
 These results extend to three additional observatory–PA pairs. A 2025 resurvey
 confirms the long-run persistence of these patterns.
 
 ## Structure
 
-The paper chapters present the core argument:
+The analysis chapters present the core argument:
 
 1. [**Context**](01_context.qmd) — Conservation policy in Madagascar and the
    research question.

@@ -62,6 +62,13 @@ exemples_stata/
 utils/
 images/
 
+# working notes
+todo
+website_migration_plan.md
+
+# legacy script (not used in website)
+R/calc_incomes_all_years.R
+
 # positron/vscode settings
 .vscode/
 extensions.json

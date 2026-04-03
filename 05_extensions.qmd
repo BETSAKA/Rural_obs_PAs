@@ -19,7 +19,7 @@ The two-case comparison in [Chapter 4](04_results.qmd) --- strict enforcement at
 
 These three observatories move from liabilities in the donor pool to informative treated units. Together with Marovoay and Alaotra, they enable a five-case examination of how conservation governance type, enforcement intensity, and PA size shape household-income outcomes.
 
-A critical methodological change: the **donor pool is restricted to five clean observatories** (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy) as identified in [Appendix B](A2_donor_validity.qmd). The four contaminated donors used in [Chapter 4](04_results.qmd) are now treated units here. Marovoay and Alaotra ATT estimates will therefore differ slightly from their Chapter 4 counterparts.
+A critical methodological change: the **donor pool is restricted to five clean observatories** (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy) as identified in [Appendix B](A2_donor_validity.qmd). The four also-exposed donors used in [Chapter 4](04_results.qmd) are now treated units here. Marovoay and Alaotra ATT estimates will therefore differ slightly from their Chapter 4 counterparts.
 
 
 # Study sites {#sec-additional-sites}
@@ -545,7 +545,7 @@ ggplot(forest_df, aes(y = obs, x = att, xmin = ci_lo, xmax = ci_hi,
 
 The five-case comparison reveals three patterns:
 
-**Pattern 1 --- Negative income effect under strict enforcement.** Ankarafantsika (Marovoay) shows the largest and most persistent negative ATT, statistically significant and --- as shown in [Chapter 4](04_results.qmd) --- deepening through the 2025 resurvey. This is consistent with direct resource exclusion from a large, actively patrolled park after reclassification from an open-access forest reserve.
+**Pattern 1 --- Negative income effect under strict enforcement.** Ankarafantsika (Marovoay) shows the largest and most persistent negative ATT, statistically significant and --- as shown in [Chapter 4](04_results.qmd) --- deepening through the 2025 resurvey. This is consistent with direct resource exclusion from a large, actively patrolled park after its extension from an open-access forest reserve.
 
 **Pattern 2 --- Near-zero effect under participatory/multipurpose conservation.** Lac Alaotra, Toliara North, and (tentatively) Farafangana show point estimates clustered near zero. None produces a statistically significant effect. This is consistent with the multipurpose PA framework: land-use regulation without resource exclusion does not translate into detectable aggregate income losses at the survey-year frequency.
 
@@ -560,5 +560,5 @@ Several limitations temper interpretation of the extended comparison:
 1. **Farafangana power**: with only 3 post-treatment years, the Farafangana estimate is unreliable and should not be compared numerically to the others.
 2. **Toliara North treatment complexity**: the three-PA cascade (January 2007 + April 2007 + December 2008) means the ATT estimates a composite treatment rather than a clean single event.
 3. **Clean donor pool size**: using only five donors (vs. nine in [Chapter 4](04_results.qmd)) reduces counterfactual precision. Comparisons between Chapter 4 and Chapter 5 ATT estimates for Marovoay and Alaotra may partly reflect this difference.
-4. **No 2025 validation for new sites**: identification for the three new observatories rests on decree dates and proximity without the behavioural validation available for Marovoay and Alaotra. These estimates are best treated as exploratory.
+4. **No 2025 validation for new sites**: identification for the three new observatories rests on decree dates and proximity without the behavioural validation available for Marovoay and Alaotra.
 5. **Single-unit power floor**: each observatory-level model has exactly one treated unit. The permutation $p$-value floor is $\approx 1/N_{\text{donors}}$; with \~50--60 donor sites, effects smaller than \~20% are difficult to distinguish from zero.
