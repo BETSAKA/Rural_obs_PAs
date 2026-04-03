@@ -28,7 +28,95 @@ The Marovoay observatory comprises four *fokontany* split by the Betsiboka River
 
 : Marovoay site treatment assignments. Effective distances account for the Betsiboka River crossing. {#tbl-maro-sites}
 
-The Betsiboka River constitutes a natural treatment barrier. Although the west-bank sites are geographically close to the park as the crow flies, the river imposes a substantial access penalty, roughly tripling effective travel distance. The 2025 resurvey confirms this behavioural asymmetry: 38% of east-bank households report visiting Ankarafantsika, versus 15% on the west bank. East-bank households also report the park as a source of food (23% vs 8%) and wood (24% vs 12%).
+The Betsiboka River constitutes a natural treatment barrier. Although the west-bank sites are geographically close to the park as the crow flies, the river imposes a substantial access penalty, roughly tripling effective travel distance.
+
+```{r}
+#| label: fig-map-maro
+#| fig-cap: "Marovoay observatory and Ankarafantsika National Park. The Betsiboka River separates west-bank fokontany (control, grey) from east-bank fokontany (exposed, orange). Water features from OpenStreetMap."
+#| fig-height: 8
+#| fig-width: 9
+
+# Bounding box: show the whole of Ankarafantsika plus the fokontany
+ank_bb <- st_bbox(ankarafantsika_pa)
+fkt_bb <- st_bbox(maro_fkt)
+maro_bbox <- st_bbox(c(
+  xmin = min(ank_bb["xmin"], fkt_bb["xmin"]) - 0.08,
+  ymin = min(ank_bb["ymin"], fkt_bb["ymin"]) - 0.08,
+  xmax = max(ank_bb["xmax"], fkt_bb["xmax"]) + 0.08,
+  ymax = max(ank_bb["ymax"], fkt_bb["ymax"]) + 0.08
+), crs = 4326)
+
+# Filter water features: Betsiboka river + water bodies within 1 km
+betsiboka_named <- osm_water_maro$lines |> filter(name == "Betsiboka")
+betsiboka_buf <- betsiboka_named |>
+  st_transform(32738) |> st_union() |> st_buffer(1000) |> st_transform(4326)
+
+water_lines <- tryCatch(st_crop(betsiboka_named, maro_bbox), error = function(e) NULL)
+water_polys <- tryCatch({
+  wp <- st_crop(osm_water_maro$polys, maro_bbox)
+  wp[st_intersects(wp, betsiboka_buf, sparse = FALSE)[, 1], ]
+}, error = function(e) NULL)
+water_mpolys <- tryCatch({
+  wm <- st_crop(osm_water_maro$mpolys, maro_bbox)
+  wm[st_intersects(wm, betsiboka_buf, sparse = FALSE)[, 1], ]
+}, error = function(e) NULL)
+
+WATER_COL <- "#1976D2"
+ank_centroid <- st_coordinates(st_centroid(st_union(ankarafantsika_pa)))
+
+p <- ggplot() +
+  geom_sf(data = ankarafantsika_pa, fill = "#A5D6A7", color = "#388E3C",
+          alpha = 0.4, linewidth = 0.6)
+
+if (!is.null(water_polys) && nrow(water_polys) > 0)
+  p <- p + geom_sf(data = water_polys, fill = WATER_COL, color = WATER_COL,
+                   linewidth = 0.1)
+if (!is.null(water_mpolys) && nrow(water_mpolys) > 0)
+  p <- p + geom_sf(data = water_mpolys, fill = WATER_COL, color = WATER_COL,
+                   linewidth = 0.1)
+if (!is.null(water_lines) && nrow(water_lines) > 0)
+  p <- p + geom_sf(data = water_lines, color = WATER_COL, linewidth = 0.7)
+
+maro_fkt_lab <- maro_fkt |>
+  mutate(
+    lon = st_coordinates(geometry)[, 1],
+    lat = st_coordinates(geometry)[, 2],
+    nudge_x = if_else(fokontany == "Maroala", -0.06, 0),
+    nudge_y = if_else(fokontany == "Maroala",  0.04, 0)
+  )
+
+p +
+  annotate("text", x = ank_centroid[1], y = ank_centroid[2],
+           label = "Ankarafantsika\nNational Park",
+           color = "#1B5E20", fontface = "bold.italic", size = 4.5, alpha = 0.8) +
+  geom_sf(data = maro_fkt, aes(color = river_side, shape = river_side),
+          size = 4, stroke = 1.2) +
+  geom_label_repel(
+    data = maro_fkt_lab,
+    aes(x = lon, y = lat,
+        label = paste0(fokontany, "\n(", dist_km, " km)"),
+        color = river_side),
+    size = 3, fontface = "bold", box.padding = 0.8,
+    nudge_x = maro_fkt_lab$nudge_x,
+    nudge_y = maro_fkt_lab$nudge_y,
+    min.segment.length = 0, show.legend = FALSE
+  ) +
+  scale_color_manual(
+    values = c("east" = "#E65100", "west" = "#616161"),
+    labels = c("east" = "East bank (exposed)", "west" = "West bank (donor)"),
+    name = NULL
+  ) +
+  scale_shape_manual(
+    values = c("east" = 17, "west" = 16),
+    labels = c("east" = "East bank (exposed)", "west" = "West bank (donor)"),
+    name = NULL
+  ) +
+  annotation_scale(location = "bl", width_hint = 0.25) +
+  coord_sf(xlim = c(maro_bbox["xmin"], maro_bbox["xmax"]),
+           ylim = c(maro_bbox["ymin"], maro_bbox["ymax"])) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+```
 
 ### Historical expansion of Ankarafantsika {#sec-expansion}
 
@@ -44,13 +132,274 @@ In 2002, the RNI, the forest reserves, and the Ampijoroa Forestry Station were m
 
 The 2002 reclassification was therefore the **first event to impose binding land-use restrictions** on the east-bank communities: slash-and-burn agriculture (*tavy*), charcoal production, and non-timber forest product extraction within the newly unified park were explicitly prohibited and — crucially — enforced. Enforcement capacity was supported by international conservation funding from the World Bank and bilateral donors as part of Madagascar's third Environmental Action Plan. The transition from a nominally protected but effectively open-access forest reserve to a strictly patrolled national park constitutes our treatment event.
 
+### PA interaction patterns (2025 resurvey) {#sec-maro-usage}
+
+The 2025 resurvey included a dedicated module on protected area usage (UM), asking all households whether they visit the PA zone, what activities they pursue there, and — for non-visitors — why they do not go. These responses help characterise the behavioural asymmetry across the Betsiboka.
+
+```{r}
+#| label: tbl-maro-usage
+#| tbl-cap: "PA interaction at Marovoay by fokontany (2025 resurvey). 'Visit PA zone' = any visit, including leisure. 'Extractive use' = food gathering, woodcutting, cultivation, grazing, or craft materials. '% cite forbidden' = share of non-visitors citing legal prohibition."
+
+res_deb_25 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
+  mutate(
+    j5 = as.character(j5),
+    Observatory = case_when(
+      as.character(j0) == "3"  ~ "Marovoay",
+      as.character(j0) == "21" ~ "Alaotra"
+    ),
+    Site = case_when(
+      j0 == 3 & str_detect(str_to_lower(j4), "^bepako")          ~ "Bepako",
+      j0 == 3 & str_detect(str_to_lower(j4), "^madiromiongana")  ~ "Madiromiongana",
+      j0 == 3 & str_detect(str_to_lower(j4), "^ampijoroa")       ~ "Ampijoroa",
+      j0 == 3 & str_detect(str_to_lower(j4), "^maroala")         ~ "Maroala",
+      j0 == 21 ~ j4
+    ),
+    bank = case_when(
+      Site %in% c("Bepako", "Madiromiongana") ~ "East",
+      Site %in% c("Ampijoroa", "Maroala")     ~ "West"
+    )
+  )
+
+um1_25 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_um1.dta") |>
+  mutate(j5 = as.character(j5)) |>
+  inner_join(res_deb_25 |> select(j5, Observatory, Site, bank), by = "j5")
+
+um2_25 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_um2.dta") |>
+  mutate(j5 = as.character(j5)) |>
+  inner_join(res_deb_25 |> select(j5, Observatory, Site, bank), by = "j5")
+
+# Households with any extractive use (um2_lig 1-8)
+extractive_hh <- um2_25 |>
+  filter(um2_a == 1, um2_lig %in% 1:8) |>
+  distinct(j5) |>
+  mutate(extractive = TRUE)
+
+res_deb_25 |>
+  filter(Observatory == "Marovoay") |>
+  left_join(um1_25 |> select(j5, um1, um1d_a), by = "j5") |>
+  left_join(extractive_hh, by = "j5") |>
+  mutate(extractive = replace_na(extractive, FALSE)) |>
+  summarise(
+    N = n(),
+    `% visit PA zone` = round(sum(um1 == 1, na.rm = TRUE) / n() * 100, 0),
+    `% extractive use` = round(sum(extractive) / n() * 100, 0),
+    `% cite 'forbidden'` = round(
+      sum(um1d_a == 1, na.rm = TRUE) / sum(um1 == 2, na.rm = TRUE) * 100, 0
+    ),
+    .by = c(Site, bank)
+  ) |>
+  arrange(match(Site, c("Bepako", "Madiromiongana", "Ampijoroa", "Maroala"))) |>
+  gt() |>
+  cols_label(bank = "Bank") |>
+  tab_header(
+    title = "PA Interaction by Fokontany",
+    subtitle = "Marovoay observatory, 2025 resurvey (N = 519 households)"
+  )
+```
+
+The visitation asymmetry is clear — 38% of east-bank households report visiting the park zone, versus 15% on the west bank — but the nature of these visits requires qualification. Among visitors on both banks, the dominant reported activity is *promenade/loisir* (leisure walks), cited by 67% of users. Only 10% of east-bank households report any extractive use of the park (food gathering, woodcutting), and 91% of all visitors go only a few times per year.
+
+The more informative signal comes from non-visitors. At Madiromiongana — the east-bank fokontany closest to the park's core — 34% of non-visitors cite legal prohibition as their reason for not going, compared to 2% at Maroala on the west bank. Across both banks, the dominant reason for non-use is distance (*lavitra*), cited in free-text responses by 54% of Marovoay non-visitors. This pattern is consistent with the treatment design: the river barrier makes the park *behaviourally distant* for west-bank communities even where it is *geographically close*, while east-bank communities are aware of and constrained by the park's legal status.
+
 ## Alaotra / Lac Alaotra (2008) {#sec-treat-ala}
 
 Lac Alaotra is Madagascar's largest lake and a critical habitat for the Alaotran gentle lemur (*Hapalemur alaotrensis*). The Ramsar Convention listed the site in 2003. In 2015, the lake and its marshlands were formally designated as a *Paysage Harmonieux Protégé* (PHP, 425 km², IUCN Category V), though enforcement through community-based natural resource management (CBNRM) agreements and *transferts de gestion* had intensified from around 2008 under the management of Durrell Wildlife Conservation Trust. A temporary protection decree (*Arrêté* 381/2007, 1 August 2007) preceded the intensification. We set the exposure year to **2008** to remain consistent with the annual-survey convention applied to Ankarafantsika (attributing effects to the first full survey year following the operative decree).^[An alternative treatment year of 2007 is defensible; using 2007 instead has negligible impact on the estimated ATT, given that the post-treatment window contains up to seven observations under either assumption.]
 
 The observatory's seven *fokontany* (across three historical survey sites) all depend on the lake-marsh ecosystem. Unlike Ankarafantsika, there is no natural barrier separating "exposed" from "unexposed" communities. All communities interact with the PA. A complication specific to Alaotra is the proximity of some eastern hamlets to two additional protected areas: the **Corridor Ankeniheny-Zahamena** (CAZ, IUCN Category VI, managed by Conservation International) and the **Zahamena National Park** (IUCN Category II), which lies north of the CAZ. The hamlet of Mangabe lies closer to the CAZ boundary (~14 km) than to the Lac Alaotra PHP, creating dual-PA exposure.
 
-The 2025 resurvey confirms the absence of differential exposure within the observatory: PA visitation rates range between 37% and 54% across all hamlets, with no clear distance gradient. The overall rate (44%) is higher than at Marovoay (27%), reflecting the lake ecosystem's central role in livelihoods. We therefore treat the **entire observatory as a single treated unit**, aggregated to a site-level mean.
+```{r}
+#| label: fig-map-ala
+#| fig-cap: "Alaotra observatory and surrounding protected areas. Lac Alaotra PHP (green), Corridor Ankeniheny-Zahamena (CAZ, orange), Zahamena National Park (light orange). Fokontany centroids from 2025 GPS survey; distances to nearest PA boundary."
+#| fig-height: 8
+#| fig-width: 8
+
+ala_bbox <- st_bbox(c(xmin = 48.00, ymin = -18.10, xmax = 48.80, ymax = -17.20),
+                    crs = 4326)
+
+ala_clip <- tryCatch(st_crop(alaotra_pa, ala_bbox), error = function(e) NULL)
+caz_clip <- tryCatch(st_crop(caz_pa, ala_bbox), error = function(e) NULL)
+zah_clip <- tryCatch(st_crop(zahamena_pa, ala_bbox), error = function(e) NULL)
+
+p <- ggplot()
+
+# PA polygons
+if (!is.null(ala_clip) && nrow(ala_clip) > 0) {
+  ala_centroid <- st_coordinates(st_centroid(st_union(ala_clip)))
+  p <- p + geom_sf(data = ala_clip, fill = "#A5D6A7", color = "#388E3C",
+                   alpha = 0.4, linewidth = 0.6) +
+    annotate("text", x = ala_centroid[1], y = ala_centroid[2],
+             label = "Lac Alaotra\nPHP", color = "#1B5E20",
+             fontface = "bold.italic", size = 3.5, alpha = 0.8)
+}
+if (!is.null(caz_clip) && nrow(caz_clip) > 0) {
+  caz_centroid <- st_coordinates(st_centroid(st_union(caz_clip)))
+  p <- p + geom_sf(data = caz_clip, fill = "#FFE0B2", color = "#E65100",
+                   alpha = 0.3, linewidth = 0.6) +
+    annotate("text", x = caz_centroid[1], y = caz_centroid[2],
+             label = "Corridor\nAnkeniheny-\nZahamena",
+             color = "#BF360C", fontface = "bold.italic", size = 3, alpha = 0.8)
+}
+if (!is.null(zah_clip) && nrow(zah_clip) > 0) {
+  zah_centroid <- st_coordinates(st_centroid(st_union(zah_clip)))
+  p <- p + geom_sf(data = zah_clip, fill = "#FFCCBC", color = "#BF360C",
+                   alpha = 0.3, linewidth = 0.5) +
+    annotate("text", x = zah_centroid[1], y = zah_centroid[2],
+             label = "Zahamena\nNational Park",
+             color = "#BF360C", fontface = "bold.italic", size = 3, alpha = 0.8)
+}
+
+# Fokontany points
+p +
+  geom_sf(data = ala_fkt, aes(shape = nearest_pa), size = 3,
+          color = "#1B5E20", stroke = 1) +
+  geom_label_repel(
+    data = ala_fkt |> mutate(lon = st_coordinates(geometry)[, 1],
+                             lat = st_coordinates(geometry)[, 2]),
+    aes(x = lon, y = lat,
+        label = paste0(fokontany, " (", round(pmin(dist_php, dist_caz), 1), " km)")),
+    size = 2.5, fontface = "bold", box.padding = 0.6,
+    min.segment.length = 0
+  ) +
+  scale_shape_manual(
+    values = c("Lac Alaotra PHP" = 16, "Corridor Ankeniheny-Zahamena" = 17),
+    name = "Nearest PA"
+  ) +
+  annotation_scale(location = "bl", width_hint = 0.25) +
+  labs(
+    subtitle = "All fokontany exposed at observatory level from 2008 (CBNRM enforcement)"
+  ) +
+  coord_sf(xlim = c(ala_bbox["xmin"], ala_bbox["xmax"]),
+           ylim = c(ala_bbox["ymin"], ala_bbox["ymax"])) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+```
+
+### PA interaction patterns (2025 resurvey) {#sec-ala-usage}
+
+```{r}
+#| label: tbl-ala-usage
+#| tbl-cap: "PA interaction at Alaotra by fokontany (2025 resurvey). 'Visit PA zone' includes any visit to the lake-marsh area. 'Extractive use' = food gathering, fishing/hunting, cultivation, grazing, or woodcutting within the zone. Fishing/hunting shown separately as it dominates extractive use."
+
+res_deb_25 |>
+  filter(Observatory == "Alaotra") |>
+  left_join(um1_25 |> select(j5, um1), by = "j5") |>
+  left_join(extractive_hh, by = "j5") |>
+  left_join(
+    um2_25 |> filter(um2_a == 1, um2_lig == 4) |>
+      distinct(j5) |> mutate(fishes = TRUE),
+    by = "j5"
+  ) |>
+  mutate(
+    extractive = replace_na(extractive, FALSE),
+    fishes = replace_na(fishes, FALSE)
+  ) |>
+  summarise(
+    N = n(),
+    `% visit zone` = round(sum(um1 == 1, na.rm = TRUE) / n() * 100, 0),
+    `% extractive` = round(sum(extractive) / n() * 100, 0),
+    `% fish/hunt` = round(sum(fishes) / n() * 100, 0),
+    .by = Site
+  ) |>
+  arrange(desc(`% extractive`)) |>
+  gt() |>
+  tab_header(
+    title = "PA Interaction by Fokontany",
+    subtitle = "Alaotra observatory, 2025 resurvey (N = 507 households)"
+  )
+```
+
+While 37–54% of households report visiting the lake-marsh zone, this headline rate is misleading as a measure of PA dependence. The survey question (*"Vous arrive-t-il d'aller dans la zone?"*) captures any visit, and the majority of visitors report non-extractive purposes — leisure walks, unspecified *other* reasons, or ritual activities. Among those who do visit, 78% go only a few times per year.
+
+Extractive use is far less prevalent and far less uniform across sites. Fishing and hunting (the dominant extractive activity, reflecting traditional lake use) involves 21% of households in Ambatomanga but none in Avaradrano or Feramanga Atsimo. The overall extractive rate across the observatory is 13% of all households. The relatively uniform *visiting* rate but sharply differentiated *extractive* rate suggests that proximity to the lake-marsh ecosystem — rather than engagement with PA-regulated resources — drives the visiting pattern.
+
+We therefore treat the **entire observatory as a single treated unit**, aggregated to a site-level mean. The uniform exposure assumption is stronger for the CBNRM enforcement mechanism (which applies to all lake-adjacent communities) than for individual extractive dependence (which varies).
+
+### Visit frequency across both observatories
+
+@fig-visit-freq summarises the intensity of PA zone visitation across all survey sites. The white segment — households who never visit — dominates most sites, particularly in Marovoay where the river barrier limits access. Among those who do visit, the overwhelming majority go only a few times per year (grey). Regular visitors (monthly or more, shown in warm colours) are a thin sliver confined to the closest sites: Bepako on the east bank of Ankarafantsika, and Ambohidrony at Alaotra.
+
+```{r}
+#| label: fig-visit-freq
+#| fig-cap: "PA zone visit frequency by site (2025 resurvey). Each bar represents 100% of households in a site. White = does not visit; grey = few times per year; warm colours = monthly or more. Sites ordered by total share of visitors."
+#| fig-height: 7
+#| fig-width: 9
+
+# --- Site assignment ---
+hh_site_fig <- res_deb_25 |>
+  mutate(
+    site = case_when(
+      Observatory == "Marovoay" & str_detect(j4, "(?i)bepako|bepàko")     ~ "Bepako",
+      Observatory == "Marovoay" & str_detect(j4, "(?i)madiro")             ~ "Madiromiongana",
+      Observatory == "Marovoay" & str_detect(j4, "(?i)ampijoroa|ampijoro") ~ "Ampijoroa",
+      Observatory == "Marovoay" & str_detect(j4, "(?i)maroala|maroàla")    ~ "Maroala",
+      TRUE ~ j4
+    )
+  )
+
+# --- Max visit frequency per household ---
+hh_freq_fig <- um2_25 |>
+  filter(um2_a == 1, !is.na(um2_b)) |>
+  summarise(freq_max = max(um2_b), .by = j5)
+
+# --- Classify each household ---
+visit_data <- hh_site_fig |>
+  left_join(um1_25 |> select(j5, um1), by = "j5") |>
+  left_join(hh_freq_fig, by = "j5") |>
+  mutate(
+    category = case_when(
+      um1 == 2 | is.na(um1) ~ "Does not visit",
+      is.na(freq_max)       ~ "Does not visit",
+      freq_max == 1 ~ "Few times/year",
+      freq_max == 2 ~ "Few times/month",
+      freq_max == 3 ~ "Once/week",
+      freq_max == 4 ~ "Several times/week"
+    ),
+    category = factor(category, levels = c(
+      "Does not visit", "Few times/year", "Few times/month",
+      "Once/week", "Several times/week"
+    ))
+  )
+
+# --- Percentages by site ---
+site_freq_fig <- visit_data |>
+  count(Observatory, site, category) |>
+  mutate(pct = n / sum(n) * 100, .by = c(Observatory, site))
+
+# --- Order by total % who visit (most on top) ---
+visit_order <- site_freq_fig |>
+  filter(category != "Does not visit") |>
+  summarise(pct_visit = sum(pct), .by = site) |>
+  arrange(pct_visit)
+
+site_freq_fig <- site_freq_fig |>
+  mutate(site = factor(site, levels = visit_order$site))
+
+# --- Plot ---
+ggplot(site_freq_fig, aes(x = pct, y = site, fill = category)) +
+  geom_col(position = "stack", width = 0.7, color = "grey80", linewidth = 0.2) +
+  scale_fill_manual(
+    values = c(
+      "Does not visit"       = "white",
+      "Few times/year"       = "#B0BEC5",
+      "Few times/month"      = "#FFB74D",
+      "Once/week"            = "#FF7043",
+      "Several times/week"   = "#D32F2F"
+    ),
+    name = NULL
+  ) +
+  facet_wrap(~ Observatory, scales = "free_y", ncol = 1) +
+  labs(
+    x = "% of all households",
+    y = NULL
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank(),
+    strip.text = element_text(face = "bold", size = 11)
+  )
+```
 
 ## Extensions (2006–2007) {#sec-treat-ext}
 

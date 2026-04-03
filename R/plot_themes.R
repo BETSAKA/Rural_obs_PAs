@@ -20,18 +20,18 @@ col_counterfactual <- "#999999"
 
 # IUCN categories
 col_iucn <- c(
-  "II"  = "#E41A1C",   # strict (red)
-  "IV"  = "#FF7F00",   # habitat/species (orange)
-  "V"   = "#4DAF4A",   # landscape (green)
-  "VI"  = "#377EB8"    # multipurpose (blue)
+  "II" = "#E41A1C", # strict (red)
+  "IV" = "#FF7F00", # habitat/species (orange)
+  "V" = "#4DAF4A", # landscape (green)
+  "VI" = "#377EB8" # multipurpose (blue)
 )
 
 # Observatory colours (for maps)
 col_obs <- c(
-  "Marovoay"       = "#E41A1C",
-  "Alaotra"        = "#377EB8",
-  "Farafangana"    = "#4DAF4A",
-  "Toliara North"  = "#FF7F00",
-  "Fénérive East"  = "#984EA3",
-  "Donor"          = "#999999"
+  "Marovoay" = "#E41A1C",
+  "Alaotra" = "#377EB8",
+  "Farafangana" = "#4DAF4A",
+  "Toliara North" = "#FF7F00",
+  "Fénérive East" = "#984EA3",
+  "Donor" = "#999999"
 )

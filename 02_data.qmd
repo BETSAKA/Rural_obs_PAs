@@ -160,7 +160,7 @@ ggplot(all_cov, aes(x = factor(year), y = unit_label, fill = status)) +
 
 # Georeferencing {#sec-georef}
 
-The original survey data lacked systematic georeferencing. Locality names were recorded as free text, with inconsistent spellings across years and languages (Malagasy and French). We linked each observation to official administrative boundaries using the Common Operational Datasets (COD), maintained by OCHA and Madagascar's BNGRC.
+The original survey data lacked systematic georeferencing. Locality names were recorded as free text, with inconsistent spellings across years and languages (Malagasy and French). We linked each observation to official administrative boundaries using the Common Operational Datasets (COD), maintained by OCHA and Madagascar's BNGRC. The full georeferencing procedure is described in the [companion data documentation](https://betsaka.github.io/Rural_obs_Madagascar/03-ros-data-georeferencing.html).
 
 The matching procedure is hierarchical:
 
@@ -193,14 +193,25 @@ For each of the 11 study observatories, we compute the minimum distance from com
 #| fig-width: 11
 
 # --- Proximity computation (self-contained) ---
-study_obs_codes <- as.integer(c("02", "03", "12", "13", "15", "16",
-                                "21", "23", "24", "25", "41"))
+study_obs_codes <- as.integer(c(
+  "02",
+  "03",
+  "12",
+  "13",
+  "15",
+  "16",
+  "21",
+  "23",
+  "24",
+  "25",
+  "41"
+))
 study_communes <- obs_communes |>
   filter(OBS_CODE %in% study_obs_codes) |>
   st_make_valid()
 
-obs_proj  <- study_communes |> st_transform(32738)
-dyn_proj  <- dyn_study |> st_transform(32738)
+obs_proj <- study_communes |> st_transform(32738)
+dyn_proj <- dyn_study |> st_transform(32738)
 obs_cents <- st_centroid(obs_proj)
 
 dist_mat <- st_distance(obs_cents, dyn_proj) |>
@@ -232,9 +243,9 @@ new_pa_by_obs <- proximity_ch2 |>
   filter(within_study) |>
   slice_min(dist_km, by = c(OBS_CODE, WDPAID)) |>
   summarise(
-    nearest_pa  = pa_name[which.min(dist_km)],
-    pa_year     = as.integer(format(valid_from[which.min(dist_km)], "%Y")),
-    closest_km  = min(dist_km),
+    nearest_pa = pa_name[which.min(dist_km)],
+    pa_year = as.integer(format(valid_from[which.min(dist_km)], "%Y")),
+    closest_km = min(dist_km),
     .by = OBS_CODE
   )
 
@@ -246,7 +257,8 @@ obs_names_full <- bind_rows(
 
 hh_coverage <- household_consolidated |>
   summarise(
-    first_year = min(year), last_year = max(year),
+    first_year = min(year),
+    last_year = max(year),
     .by = obs
   ) |>
   filter(obs %in% sprintf("%02d", study_obs_codes))
@@ -263,13 +275,17 @@ gantt_data <- hh_coverage |>
       obs %in% c("15", "23", "24") ~ "Also exposed (2006\u20132007)",
       TRUE ~ "Clean donor pool"
     ),
-    has_pa    = !is.na(pa_year),
-    pre_yrs   = if_else(has_pa, pa_year - first_year, NA_integer_),
-    post_yrs  = if_else(has_pa, pmin(last_year, 2014L) - pa_year + 1L, NA_integer_),
-    feasible  = case_when(
-      !has_pa              ~ "No nearby PA",
+    has_pa = !is.na(pa_year),
+    pre_yrs = if_else(has_pa, pa_year - first_year, NA_integer_),
+    post_yrs = if_else(
+      has_pa,
+      pmin(last_year, 2014L) - pa_year + 1L,
+      NA_integer_
+    ),
+    feasible = case_when(
+      !has_pa ~ "No nearby PA",
       pre_yrs >= 4 & post_yrs >= 3 ~ "Feasible",
-      TRUE                 ~ "Insufficient coverage"
+      TRUE ~ "Insufficient coverage"
     ),
     last_year_cap = pmin(last_year, 2014L),
     obs_label = paste0(name, " (", obs, ")")
@@ -278,41 +294,59 @@ gantt_data <- hh_coverage |>
   mutate(obs_label = factor(obs_label, levels = obs_label))
 
 feasibility_cols <- c(
-  "Feasible"              = "#388E3C",
+  "Feasible" = "#388E3C",
   "Insufficient coverage" = "#EF9A9A",
-  "No nearby PA"          = "#90CAF9"
+  "No nearby PA" = "#90CAF9"
 )
 
 ggplot(gantt_data, aes(y = obs_label)) +
   # Study period shading
-  annotate("rect",
-           xmin = STUDY_START, xmax = STUDY_END,
-           ymin = -Inf, ymax = Inf,
-           fill = "#E3F2FD", alpha = 0.5) +
+  annotate(
+    "rect",
+    xmin = STUDY_START,
+    xmax = STUDY_END,
+    ymin = -Inf,
+    ymax = Inf,
+    fill = "#E3F2FD",
+    alpha = 0.5
+  ) +
   # Survey window bars
   geom_segment(
-    aes(x = first_year, xend = last_year_cap,
-        yend = obs_label, colour = feasible),
-    linewidth = 5, alpha = 0.6, lineend = "round"
+    aes(
+      x = first_year,
+      xend = last_year_cap,
+      yend = obs_label,
+      colour = feasible
+    ),
+    linewidth = 5,
+    alpha = 0.6,
+    lineend = "round"
   ) +
   # PA creation year triangles
   geom_point(
     data = gantt_data |> filter(has_pa),
-    aes(x = pa_year), colour = "#D32F2F",
-    size = 3.5, shape = 17
+    aes(x = pa_year),
+    colour = "#D32F2F",
+    size = 3.5,
+    shape = 17
   ) +
   # PA name labels
   geom_label_repel(
     data = gantt_data |> filter(has_pa),
     aes(x = pa_year, label = nearest_pa),
-    size = 2.2, nudge_y = 0.35, max.overlaps = 15,
-    box.padding = 0.2, colour = "grey20",
-    fill = "white", label.size = 0.1
+    size = 2.2,
+    nudge_y = 0.35,
+    max.overlaps = 15,
+    box.padding = 0.2,
+    colour = "grey20",
+    fill = "white",
+    label.size = 0.1
   ) +
   scale_colour_manual(values = feasibility_cols, name = "gsynth feasibility") +
   scale_x_continuous(breaks = seq(1995, 2015, 5)) +
   labs(
-    x = "Year", y = NULL,
+    x = "Year",
+    y = NULL,
     title = "Survey Coverage and PA Exposure Across Study Observatories",
     subtitle = "Bars = survey span \u00b7 Triangles = nearest new PA decree \u00b7 Blue band = study period (1999\u20132014)"
   ) +
@@ -481,7 +515,7 @@ analysis_sample |>
     `Mean income (Ar)` = round(mean(revtot, na.rm = TRUE)),
     `Mean equiv. income` = round(mean(revtot_eq, na.rm = TRUE)),
     `Mean HH size` = round(mean(n_membres, na.rm = TRUE), 1),
-    `Mean years (max)` = round(mean(max_years_edu, na.rm = TRUE), 1),
+    `Mean educ. years (adults)` = round(mean(mean_years_edu_adults, na.rm = TRUE), 1),
     `% literate adult` = round(mean(any_literate_adult, na.rm = TRUE) * 100, 1),
     .by = group
   ) |>
