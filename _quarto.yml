@@ -3,6 +3,7 @@ project:
   output-dir: docs
   render:
     - "*.qmd"
+    - "!archive/"
 
 website:
   title: "Conservation Governance and Rural Livelihoods in Madagascar"
