@@ -1,6 +1,6 @@
 ---
 title: "Identification Strategy"
-subtitle: "Treatment definitions, donor pool, and estimation methods"
+subtitle: "How we estimate the causal effect of protected areas on household income"
 ---
 
 ```{r}
@@ -9,26 +9,43 @@ source("R/load_data.R")
 source("R/gsynth_helpers.R")
 ```
 
-# Treatment definition {#sec-treatment}
+The central question of this study is whether the creation or expansion of protected areas *caused* changes in household income — or whether observed income differences merely reflect pre-existing trends. This chapter explains how we isolate causal effects despite the fact that PA placement is not random and household surveys were not designed for conservation impact evaluation.
 
-We exploit two natural experiments arising from the staggered extension and creation of protected areas during the ROS survey period.
+The strategy has four parts. First, we define two natural experiments that provide plausible treatment–control comparisons (@sec-treatment). Second, we explain how the survey design constrains the unit of analysis (@sec-panel). Third, we describe the statistical method used to construct counterfactual income trajectories (@sec-estimation). Fourth, we briefly introduce three additional cases that extend the analysis (@sec-extensions).
 
-## Marovoay / Ankarafantsika (2003) {#sec-treat-maro}
+# Two natural experiments {#sec-treatment}
 
-The Ankarafantsika National Park was formally extended by Decree 2002-798 on 7 August 2002, merging the former *Réserve Naturelle Intégrale* (60,500 ha, 1927) with forest reserves into a 136,500 ha national park under IUCN Category II. We set the exposure year to **2003** — the first full ROS survey year following the decree.^[Decree 2002-798 was signed on 7 August 2002. Because the ROS survey is conducted annually and we attribute any treatment effect to the first full survey year following the decree, we set the treatment year to 2003. Using 2002 instead has negligible impact on the estimated ATT.]
+We exploit two events during the ROS survey period where a new or expanded PA began to impose restrictions on communities that had been surveyed *before* the PA became operative. The two cases differ in their conservation governance model — strict exclusion at Ankarafantsika versus participatory management at Lac Alaotra — providing a built-in comparison of how governance type mediates income effects.
 
-The Marovoay observatory comprises four *fokontany* split by the Betsiboka River — a major, permanently flowing watercourse wider than 10 metres. Crossing is possible only under certain hydrological conditions, often requiring long detours or costly boat transport; in practice, flows of people, goods, and services run along the Marovoay downstream axis rather than across the river:
+## Marovoay and Ankarafantsika National Park (2003) {#sec-treat-maro}
 
-| Fokontany | Bank | Straight-line distance | Effective distance | Role | Treatment |
-|---|---|---|---|---|---|
-| Bepako | East | 5.2 km | ~5.2 km | Exposed | From 2003 |
-| Madiromiongana | East | 11.7 km | ~11.7 km | Exposed | From 2003 |
-| Ampijoroa | West | 3.5 km | ~18.5 km (river detour) | Donor | Never |
-| Maroala | West | 5.8 km | ~20.8 km (river detour) | Donor | Never |
+### The 2002 park extension {#sec-maro-history}
+
+The Ankarafantsika National Park was formally extended by Decree 2002-798 on 7 August 2002, merging the former *Réserve Naturelle Intégrale* (60,500 ha, 1927) with forest reserves into a 136,500 ha national park under IUCN Category II (strict nature conservation). We set the exposure year to **2003** — the first full ROS survey year following the decree.^[Decree 2002-798 was signed on 7 August 2002. Because the ROS survey is conducted annually and we attribute any treatment effect to the first full survey year following the decree, we set the treatment year to 2003. Using 2002 instead has negligible impact on the estimated ATT.]
+
+Critically, the 2002 extension was the **first event to impose binding land-use restrictions** on the communities adjacent to the forest reserve zone. The earlier designations had very different *de facto* implications:
+
+- **The 1927 *Réserve Naturelle Intégrale*** covered the inland plateau to the north-east, geographically separate from the Marovoay communities. The east-bank *fokontany* had no direct interface with the strictly protected RNI.
+- **The 1929 forest reserve** was not a conservation zone but a timber and resource reserve under the forest administration. Analyses of this period found no effective enforcement: subsistence agriculture, cattle grazing, and charcoal production continued unimpeded [@brondeau1999].
+
+The 2002 reclassification merged these into a single national park where slash-and-burn agriculture (*tavy*), charcoal production, and non-timber forest product extraction were explicitly prohibited — and, crucially, enforced. Enforcement capacity was supported by international conservation funding from the World Bank and bilateral donors as part of Madagascar's third Environmental Action Plan. @fig-expansion, reproduced from @alonso2002, illustrates the spatial extent of the consolidation.
+
+### The Betsiboka River as a natural barrier {#sec-maro-barrier}
+
+The Marovoay observatory comprises four *fokontany* (villages) split by the Betsiboka River — a major, permanently flowing watercourse wider than 10 metres. Crossing is possible only under certain hydrological conditions, often requiring long detours or costly boat transport. In practice, flows of people, goods, and services run along the Marovoay downstream axis rather than across the river.
+
+This geographic feature creates a natural experiment: east-bank communities have direct walking access to the park, while west-bank communities face a substantial access penalty — roughly tripling the effective travel distance. We formalize this with a **river-crossing penalty** of 15 km added to the straight-line distance for west-bank fokontany, reflecting the detour required to reach the park on foot (no bridge exists in the immediate vicinity):
+
+| Fokontany | Bank | Distance to PA | Effective distance | Role |
+|---|---|---|---|---|
+| Bepako | East | 5.2 km | 5.2 km | **Treated** (from 2003) |
+| Madiromiongana | East | 11.7 km | 11.7 km | **Treated** (from 2003) |
+| Ampijoroa | West | 3.5 km | 18.5 km (river detour) | Donor (control) |
+| Maroala | West | 5.8 km | 20.8 km (river detour) | Donor (control) |
 
 : Marovoay site treatment assignments. Effective distances account for the Betsiboka River crossing. {#tbl-maro-sites}
 
-The Betsiboka River constitutes a natural treatment barrier. Although the west-bank sites are geographically close to the park as the crow flies, the river imposes a substantial access penalty, roughly tripling effective travel distance.
+The 15 km river-crossing penalty is conservative. In rural Madagascar, where most travel is on foot, the actual additional travel time likely exceeds the implied 3-hour walk. An effective distance threshold of 12 km — corresponding to approximately a 2.5-hour daily commuting limit — places both east-bank villages within the PA's zone of influence and both west-bank villages outside it, cleanly separating "treated" from "donor" communities.
 
 ```{r}
 #| label: fig-map-maro
@@ -118,23 +135,11 @@ p +
   theme(legend.position = "bottom")
 ```
 
-### Historical expansion of Ankarafantsika {#sec-expansion}
-
-Ankarafantsika was first gazetted as a *Réserve Naturelle Intégrale* (RNI) in 1927, covering approximately 60,500 ha of the central plateau. A contiguous 75,000 ha forest reserve was classified in 1929. These two early designations imposed different nominal restrictions, but critically different *de facto* situations for the east-bank *fokontany*:
-
-- **The 1929 forest reserve** was not a nature conservation zone but a timber and resource reserve under the forest administration. Subsequent analyses found no effective enforcement over this area, and subsistence agriculture, cattle grazing, and charcoal production continued unimpeded [@brondeau1999]. The forest reserve regime imposed no binding constraint on adjacent communities.
-
-- **The 1927 RNI** was geographically separate from the communities of Bepako and Madiromiongana: the RNI covered the inland plateau to the north-east, while these villages border the forest reserve zone to the south and west of the plateau. The east-bank *fokontany* therefore had no direct interface with the strictly protected RNI.
-
-In 2002, the RNI, the forest reserves, and the Ampijoroa Forestry Station were merged into a single national park (Decree 2002-798, ~130,000 ha), later adjusted to 136,513 ha in 2015 (Decree 2015-730). @fig-expansion, reproduced from @alonso2002, illustrates the spatial extent of the 2002 consolidation.
-
 ![Spatial extent of the 2002 Ankarafantsika expansion, from the original RNI (dark green) to the national park (light green). Source: @alonso2002.](media/Alonso_Shuldenberg_2002.png){#fig-expansion width=80%}
 
-The 2002 reclassification was therefore the **first event to impose binding land-use restrictions** on the east-bank communities: slash-and-burn agriculture (*tavy*), charcoal production, and non-timber forest product extraction within the newly unified park were explicitly prohibited and — crucially — enforced. Enforcement capacity was supported by international conservation funding from the World Bank and bilateral donors as part of Madagascar's third Environmental Action Plan. The transition from a nominally protected but effectively open-access forest reserve to a strictly patrolled national park constitutes our treatment event.
+### Behavioural validation from the 2025 resurvey {#sec-maro-usage}
 
-### PA interaction patterns (2025 resurvey) {#sec-maro-usage}
-
-The 2025 resurvey included a dedicated module on protected area usage (UM), asking all households whether they visit the PA zone, what activities they pursue there, and — for non-visitors — why they do not go. These responses help characterise the behavioural asymmetry across the Betsiboka.
+The treatment assignment rests on the assumption that the Betsiboka River effectively separates communities into "exposed" and "not exposed" groups. The 2025 resurvey provides a direct test of this assumption through its dedicated protected area usage module (UM), which asked all 1,026 households whether they visit the PA zone, what activities they pursue there, and why non-visitors stay away.
 
 ```{r}
 #| label: tbl-maro-usage
@@ -197,15 +202,30 @@ res_deb_25 |>
   )
 ```
 
-The visitation asymmetry is clear — 38% of east-bank households report visiting the park zone, versus 15% on the west bank — but the nature of these visits requires qualification. Among visitors on both banks, the dominant reported activity is *promenade/loisir* (leisure walks), cited by 67% of users. Only 10% of east-bank households report any extractive use of the park (food gathering, woodcutting), and 91% of all visitors go only a few times per year.
+Three findings support the treatment assignment:
 
-The more informative signal comes from non-visitors. At Madiromiongana — the east-bank fokontany closest to the park's core — 34% of non-visitors cite legal prohibition as their reason for not going, compared to 2% at Maroala on the west bank. Across both banks, the dominant reason for non-use is distance (*lavitra*), cited in free-text responses by 54% of Marovoay non-visitors. This pattern is consistent with the treatment design: the river barrier makes the park *behaviourally distant* for west-bank communities even where it is *geographically close*, while east-bank communities are aware of and constrained by the park's legal status.
+1. **Visitation asymmetry.** 38% of east-bank households report visiting the park zone versus 15% on the west bank. However, among visitors on both banks, the dominant activity is leisure walks (67%); only 10% of east-bank households report extractive use (food gathering, woodcutting). 91% of all visitors go only a few times per year.
 
-## Alaotra / Lac Alaotra (2008) {#sec-treat-ala}
+2. **Awareness of prohibition.** At Madiromiongana — the east-bank fokontany closest to the park's core — 34% of non-visitors cite legal prohibition as their reason for not going, versus 2% at Maroala on the west bank. The park's legal status is a binding constraint on the east bank, not the west.
 
-Lac Alaotra is Madagascar's largest lake and a critical habitat for the Alaotran gentle lemur (*Hapalemur alaotrensis*). The Ramsar Convention listed the site in 2003. In 2015, the lake and its marshlands were formally designated as a *Paysage Harmonieux Protégé* (PHP, 425 km², IUCN Category V), though enforcement through community-based natural resource management (CBNRM) agreements and *transferts de gestion* had intensified from around 2008 under the management of Durrell Wildlife Conservation Trust. A temporary protection decree (*Arrêté* 381/2007, 1 August 2007) preceded the intensification. We set the exposure year to **2008** to remain consistent with the annual-survey convention applied to Ankarafantsika (attributing effects to the first full survey year following the operative decree).^[An alternative treatment year of 2007 is defensible; using 2007 instead has negligible impact on the estimated ATT, given that the post-treatment window contains up to seven observations under either assumption.]
+3. **Distance as the dominant barrier.** Across both banks, the most commonly cited reason for not visiting is distance (*lavitra* in Malagasy), mentioned by 54% of non-visitors. The river makes the park *behaviourally distant* for west-bank communities even where it is *geographically close*.
 
-The observatory's seven *fokontany* (across three historical survey sites) all depend on the lake-marsh ecosystem. Unlike Ankarafantsika, there is no natural barrier separating "exposed" from "unexposed" communities. All communities interact with the PA. A complication specific to Alaotra is the proximity of some eastern hamlets to two additional protected areas: the **Corridor Ankeniheny-Zahamena** (CAZ, IUCN Category VI, managed by Conservation International) and the **Zahamena National Park** (IUCN Category II), which lies north of the CAZ. The hamlet of Mangabe lies closer to the CAZ boundary (~14 km) than to the Lac Alaotra PHP, creating dual-PA exposure.
+
+## Lac Alaotra and the Protected Landscape (2008) {#sec-treat-ala}
+
+### A different conservation model {#sec-ala-history}
+
+Lac Alaotra is Madagascar's largest lake and a critical habitat for the Alaotran gentle lemur (*Hapalemur alaotrensis*). The Ramsar Convention listed the site in 2003. In 2015, the lake and its marshlands were formally designated as a *Paysage Harmonieux Protégé* (PHP, 425 km², IUCN Category V — a multipurpose landscape where sustainable use is permitted). However, enforcement through community-based natural resource management (CBNRM) agreements and *transferts de gestion* had intensified from around 2008 under the management of Durrell Wildlife Conservation Trust. A temporary protection decree (*Arrêté* 381/2007, 1 August 2007) preceded the intensification. We set the exposure year to **2008**, consistent with the annual-survey convention applied to Ankarafantsika.^[An alternative treatment year of 2007 is defensible; using 2007 instead has negligible impact on the estimated ATT, given that the post-treatment window contains up to seven observations under either assumption.]
+
+The key difference from Ankarafantsika is governance: rather than exclusionary enforcement prohibiting all resource extraction, Alaotra's CBNRM framework regulates lake-marsh use through community-managed access rules, seasonal fishing closures, and habitat restoration agreements. This participatory model is designed to accommodate livelihoods rather than exclude them.
+
+### Why all Alaotra communities are treated {#sec-ala-all-treated}
+
+Unlike Marovoay, there is no natural barrier separating "exposed" from "unexposed" communities at Alaotra. The observatory's seven *fokontany* (across three historical survey sites) all depend on the lake-marsh ecosystem. The CBNRM enforcement mechanism — seasonal closures, gear restrictions, marsh-burning bans — applies to all lake-adjacent communities through *transferts de gestion*.
+
+A complication specific to Alaotra is the proximity of some eastern hamlets to two additional protected areas: the **Corridor Ankeniheny-Zahamena** (CAZ, IUCN Category VI, managed by Conservation International) and the **Zahamena National Park** (IUCN Category II), which lies north of the CAZ. The hamlet of Mangabe lies closer to the CAZ boundary (~14 km) than to the Lac Alaotra PHP, creating dual-PA exposure.
+
+We therefore treat the **entire observatory as a single treated unit**, aggregated to a site-level mean. This is a stronger assumption than the site-level assignment at Marovoay, but it is supported by the uniform enforcement mechanism (CBNRM applies to all lake-adjacent communities) and the behavioural data from the 2025 resurvey discussed below.
 
 ```{r}
 #| label: fig-map-ala
@@ -274,7 +294,7 @@ p +
   theme(legend.position = "bottom")
 ```
 
-### PA interaction patterns (2025 resurvey) {#sec-ala-usage}
+### Behavioural validation from the 2025 resurvey {#sec-ala-usage}
 
 ```{r}
 #| label: tbl-ala-usage
@@ -308,15 +328,17 @@ res_deb_25 |>
   )
 ```
 
-While 37–54% of households report visiting the lake-marsh zone, this headline rate is misleading as a measure of PA dependence. The survey question (*"Vous arrive-t-il d'aller dans la zone?"*) captures any visit, and the majority of visitors report non-extractive purposes — leisure walks, unspecified *other* reasons, or ritual activities. Among those who do visit, 78% go only a few times per year.
+The Alaotra data reveal an important distinction between *visiting* and *depending on* the PA zone:
 
-Extractive use is far less prevalent and far less uniform across sites. Fishing and hunting (the dominant extractive activity, reflecting traditional lake use) involves 21% of households in Ambatomanga but none in Avaradrano or Feramanga Atsimo. The overall extractive rate across the observatory is 13% of all households. The relatively uniform *visiting* rate but sharply differentiated *extractive* rate suggests that proximity to the lake-marsh ecosystem — rather than engagement with PA-regulated resources — drives the visiting pattern.
+- **Visiting is common but mostly non-extractive.** 37–54% of households report visiting the lake-marsh zone, but the survey question captures any visit including leisure walks. Among visitors, 78% go only a few times per year.
+- **Extractive use is concentrated and heterogeneous.** Fishing and hunting — the dominant extractive activity, reflecting traditional lake use — involves 21% of households in Ambatomanga but none in Avaradrano or Feramanga Atsimo. The overall extractive rate is 13% of all households.
+- **Distance, not prohibition, explains non-use.** Among Alaotra non-visitors, the most cited reason is distance (*lavitra*), at 35%. Legal prohibition is cited by only 8%, consistent with the less restrictive multipurpose framework.
 
-We therefore treat the **entire observatory as a single treated unit**, aggregated to a site-level mean. The uniform exposure assumption is stronger for the CBNRM enforcement mechanism (which applies to all lake-adjacent communities) than for individual extractive dependence (which varies).
+The relatively uniform *visiting* rate but sharply differentiated *extractive* rate suggests that proximity to the ecosystem — rather than engagement with PA-regulated resources — drives the visiting pattern. The uniform exposure assumption is therefore stronger for the CBNRM enforcement mechanism (which applies to all lake-adjacent communities) than for individual extractive dependence (which varies across fokontany).
 
-### Visit frequency across both observatories
+## PA zone usage intensity across both sites {#sec-visit-freq}
 
-@fig-visit-freq summarises the intensity of PA zone visitation across all survey sites. The white segment — households who never visit — dominates most sites, particularly in Marovoay where the river barrier limits access. Among those who do visit, the overwhelming majority go only a few times per year (grey). Regular visitors (monthly or more, shown in warm colours) are a thin sliver confined to the closest sites: Bepako on the east bank of Ankarafantsika, and Ambohidrony at Alaotra.
+@fig-visit-freq provides a cross-site comparison of how intensively households use the PA zone. The contrast between the two observatories is stark: at Marovoay, the majority of households never visit the park (white bars), with the river barrier clearly separating high-access sites (Bepako) from low-access ones (Ampijoroa, Maroala). At Alaotra, a larger share of households visit the zone, but almost all do so infrequently (grey bars). Regular visitors — monthly or more, shown in warm colours — are a thin sliver confined to the closest sites.
 
 ```{r}
 #| label: fig-visit-freq
@@ -401,37 +423,61 @@ ggplot(site_freq_fig, aes(x = pct, y = site, fill = category)) +
   )
 ```
 
-## Extensions (2006–2007) {#sec-treat-ext}
+## Extensions: three additional cases (2006–2007) {#sec-treat-ext}
 
-Three additional observatory–PA pairs provide shorter exposure windows (see [Chapter 5](05_extensions.qmd)):
+The donor-pool audit (@sec-donor-pool) reveals that four donor observatories are themselves adjacent to PAs created during the study period. Three of these provide usable treatment variation — Farafangana (2006), Toliara North (2007), and Fénérive East (2007) — and are analysed as extension cases in @sec-extensions and [Chapter 5](05_extensions.qmd).
 
-- **Farafangana / CFAV** (IUCN VI, 2006) — Corridor Forestier Ambositra-Vondrozo
-- **Toliara North / Amoron'i Onilahy** (IUCN VI, 2007)
-- **Fénérive East / Tampolo** (IUCN IV, 2007) — coastal forest reserve
 
-# Outcome variable and panel construction {#sec-outcome}
+# From households to villages {#sec-panel}
 
-## Equivalised income
+## The rotating panel constraint {#sec-rotating-panel}
 
-Total household income (`revtot`) is adjusted for household composition using the **OECD-modified equivalence scale**:
+The ROS operates as a **rotating panel**, not a strict re-interview panel. This is a critical distinction for estimation. Each observatory tracks approximately 500 households per year, but approximately 15% leave the sample each year through death, migration, or attrition. Departing households are replaced by newly sampled ones following the original random sampling design. Over a 10-year horizon, cumulative attrition reaches roughly 80% of the initial cohort [@ChabeFerret2024].
 
-$$
-\text{equiv} = 1 + 0.5 \times (\text{additional adults}) + 0.3 \times (\text{children under 14})
-$$
+This design means that the standard econometric approach — following the same households over time and using household fixed effects to control for unobserved heterogeneity — is not feasible. Only about 44% of households surveyed in 1998 remain in 2003, and fewer than 6% survive to 2014. Furthermore, attrition is **non-random**: the dominant cause is out-migration (65% of traceable attritors), which correlates with income and shock exposure. The 2025 resurvey uses entirely new household identifiers that carry no continuity with the 1995–2014 series.
 
-computed from individual-level demographic data in the ROS survey. The resulting equivalised income is winsorised at the 1st and 99th percentiles within each year to limit the influence of extreme observations. The primary outcome is **log equivalised income**.
+The rotating design does, however, preserve **cross-sectional representativeness** at each survey wave: because replacement households are randomly drawn from the same villages, village-year statistics consistently estimate the same population quantity across years, even as the composition of surveyed households changes.
+
+::: {.callout-note title="What this means in practice"}
+A household-level panel regression with household fixed effects would produce misleading results here: it would estimate effects only for the shrinking minority of households that remain in the sample for multiple years — a selected, non-representative sub-population. Village-level aggregation avoids this problem entirely.
+:::
 
 ## Village-level aggregation {#sec-aggregation}
 
-The ROS operates as a **rotating panel**: each observatory tracks a fixed set of households, but approximately 15% of households leave the sample each year (through death, migration, or attrition), with replacement by newly sampled households following the original random sampling design. Over a 10-year horizon, cumulative attrition reaches roughly 80% of the initial cohort [@ChabeFerret2024]. Attrition is non-random: traceable attritors disproportionately include migrants whose departure is itself potentially income-related, which would violate the balanced-panel assumptions underlying individual-level panel estimators.
+We therefore analyse the data at the **village (*fokontany*) level**, aggregating household-level income to village-year medians. This addresses both the attrition problem and the estimation requirements:
 
-We therefore analyse the data at the **village (*fokontany*) level**, aggregating household-level income to village-year medians. This choice is justified on two grounds. First, the rotating design with random replacement preserves cross-sectional representativeness at each wave: village-year statistics consistently estimate the same population quantity across years, even as the composition of surveyed households changes. Second, gsynth requires a balanced unit-by-year panel matrix and is designed for unit-level (here village-level) variation; household-level estimation with an interactive FE model would require substantially more pre-treatment periods to identify individual-level factor loadings.
+1. **Cross-sectional representativeness is preserved.** Random replacement of attrited households ensures that village-year medians estimate the same population parameter across waves, even though the specific households change.
+2. **The estimator requires a balanced panel.** The generalized synthetic control method (described below) requires a complete unit-by-year matrix. Village-level aggregation produces this, while household-level data would have pervasive gaps.
+3. **Treatment is assigned at the village level.** PA exposure depends on the village's distance to the park boundary, not on individual household characteristics. Village-level analysis matches the unit of treatment assignment to the unit of analysis.
 
-# Donor pool selection {#sec-donor-pool}
+The median is preferred to the mean because rural income distributions are right-skewed with occasional extreme values. Village-level medians are more robust to the specific composition of households surveyed in any given year.
 
-The generalized synthetic control method requires that donor units be **unexposed to treatment**. We start with 9 donor observatories (Antsirabe, Antsohihy, Tsiroanomandidy, Farafangana, Ambovombe, Toliara North, Fénérive East, Mahanoro, Itasy), providing approximately 60 donor sites.
+## Outcome variable {#sec-outcome}
 
-A systematic spatial audit ([Appendix B](A2_donor_validity.qmd)) checks whether these donors are themselves adjacent to active PAs during the study period. Using a dynamic WDPA layer that records when each PA became legally operative, we flag any donor commune within 20 km of an active PA boundary as **also exposed**.
+The primary outcome is **log equivalised household income**. Construction proceeds in four steps:
+
+1. **Total income** (`revtot`) — the sum of current income components: rice revenue, other crop revenue, livestock revenue, fishing revenue, principal activity income, and secondary activity income. Missing components are set to zero.
+
+2. **Equivalisation** — using the OECD-modified scale to adjust for household composition:
+$$\text{equiv} = 1 + 0.5 \times (\text{additional adults}) + 0.3 \times (\text{children under 14})$$
+This ensures that a large household with higher total income is not misleadingly compared to a small household with lower total but similar per-person income.
+
+3. **Winsorisation** — at the 1st and 99th percentiles within each year to limit the influence of extreme values.
+
+4. **Log transformation** — $y_{it} = \log(\text{equivalised income}_{it} + 1)$, which compresses the right tail and allows treatment effects to be interpreted as approximate percentage changes.
+
+Cross-year harmonisation is non-trivial: variable names, questionnaire modules, and income definitions changed across survey waves. The full details of these adjustments are documented in [Appendix A](A1_data_pipeline.qmd).
+
+
+# Building the counterfactual {#sec-estimation}
+
+The fundamental challenge is that we observe what happened to communities near the PA, but not what *would have happened* to them without the PA. The statistical method must therefore construct a credible counterfactual — an estimate of the income trajectory these communities would have followed had the PA never been created.
+
+## Selecting donor communities {#sec-donor-pool}
+
+The counterfactual is built from **donor communities** — rural observatory villages that were not exposed to any PA during the study period. We start with 9 donor observatories providing approximately 60 donor sites across the country.
+
+A systematic spatial audit ([Appendix B](A2_donor_validity.qmd)) checks whether these donors are themselves adjacent to PAs created during 1999–2014. Using a dynamic WDPA layer that records when each PA became legally operative, we flag any donor commune within 20 km of an active PA boundary as **also exposed**:
 
 | Status | Observatories | Reason |
 |---|---|---|
@@ -440,46 +486,88 @@ A systematic spatial audit ([Appendix B](A2_donor_validity.qmd)) checks whether 
 
 : Donor pool PA exposure classification. {#tbl-donor-status}
 
-The main results use the full 9-donor pool; robustness checks ([Appendix C](A3_robustness.qmd)) confirm that restricting to the 5 clean donors does not materially change the estimates. In the extension analysis ([Chapter 5](05_extensions.qmd)), the also-exposed donors become *treated* units with their own PA exposure — a design feature rather than a threat.
+The main results use the full 9-donor pool; robustness checks ([Appendix C](A3_robustness.qmd)) confirm that restricting to the 5 clean donors does not materially change the estimates. In the extension analysis ([Chapter 5](05_extensions.qmd)), the four also-exposed observatories become *treated units* with their own PA exposure events.
 
-# Generalized synthetic control {#sec-gsynth}
+## Generalized synthetic control {#sec-gsynth}
 
-We use the generalized synthetic control method (gsynth) of @Xu2017 to estimate treatment effects. For each treated unit $i$ in post-treatment period $t$, gsynth models the outcome as:
+### Intuition {#sec-gsynth-intuition}
+
+Standard difference-in-differences (DiD) assumes that treated and control communities would have followed **parallel trends** in the absence of treatment — that is, that income would have evolved at the same rate in PA-adjacent and distant villages. This is a strong assumption: rural villages may diverge over time for reasons unrelated to PAs, such as changing weather patterns, road construction, commodity price shifts, or local governance quality.
+
+The generalized synthetic control method (gsynth) of @Xu2017 relaxes this assumption. Instead of requiring parallel trends, it allows each village to follow its own trajectory driven by unobserved factors — the method then *learns* these factors from the pre-treatment data and uses them to project what would have happened after the PA was created.
+
+In plain language: gsynth looks at how the treated villages' income moved *before* the PA, identifies which combination of donor villages best reproduces that pattern, and then uses those same donors to predict what the treated villages' income would have been *after* the PA — had the PA never existed. The difference between the actual income and this predicted counterfactual is the estimated treatment effect.
+
+### Formal specification {#sec-gsynth-formal}
+
+For each treated unit $i$ in post-treatment period $t$, gsynth models the outcome as:
 
 $$
 Y_{it} = \alpha_i + \xi_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + D_{it} \cdot \delta_{it} + \varepsilon_{it}
 $$
 
-where $\alpha_i$ are unit fixed effects, $\xi_t$ are time fixed effects, $\boldsymbol{\lambda}_i$ are unit-specific factor loadings, $\boldsymbol{f}_t$ are common time factors, and $D_{it}$ is the exposure indicator. The interactive fixed effects ($\boldsymbol{\lambda}_i' \boldsymbol{f}_t$) relax the parallel trends assumption by allowing units to follow heterogeneous time paths driven by unobserved factors.
+where $\alpha_i$ are unit fixed effects (each village has its own baseline income level), $\xi_t$ are time fixed effects (all villages share common year-to-year shocks like droughts or price changes), $\boldsymbol{\lambda}_i' \boldsymbol{f}_t$ are interactive fixed effects (each village responds differently to unobserved time-varying factors), and $D_{it}$ is the treatment indicator. The interactive term $\boldsymbol{\lambda}_i' \boldsymbol{f}_t$ is what distinguishes gsynth from standard DiD: it allows for heterogeneous trends driven by unobserved factors.
 
 Key implementation choices:
 
-- **Unit of analysis** — site-level (*fokontany*) medians of log equivalised income (see @sec-outcome).
-- **Factor selection** — leave-one-out cross-validation over $r \in \{0, 1, 2, 3, 4, 5\}$.
+- **Factor selection** — leave-one-out cross-validation over $r \in \{0, 1, 2, 3, 4, 5\}$ determines the number of latent factors.
 - **Inference** — parametric bootstrap with 200 replications.
-- **Minimum pre-treatment periods** — $\text{min.T0} = 3$ to ensure adequate pre-treatment fit.
+- **Minimum pre-treatment periods** — $\min(T_0) = 3$ to ensure adequate pre-treatment fit.
+
+### Two separate models {#sec-two-models}
 
 We estimate **two separate models**, reflecting the distinct nature of each treatment:
 
-1. **Marovoay model**: Treated units = Madiromiongana and Bepako (east bank, from 2003). Donors = all other rural observatory sites, including the Marovoay west-bank sites (Ampijoroa, Maroala). With 2 treated sites, gsynth estimates unit-specific counterfactuals.
+1. **Marovoay model**: Treated units = Madiromiongana and Bepako (east bank, from 2003). Donors = all other rural observatory sites, including the Marovoay west-bank sites (Ampijoroa, Maroala). With 2 treated sites and ~60 donors, gsynth estimates unit-specific counterfactuals for each village.
 
-2. **Alaotra model**: Treated unit = aggregated Alaotra observatory "ALA" (from 2008). Donors = all non-Alaotra rural observatory sites, including all four Marovoay *fokontany*. With a single treated unit, this reduces to interactive FE synthetic control.
+2. **Alaotra model**: Treated unit = aggregated Alaotra observatory (from 2008). Donors = all non-Alaotra rural observatory sites, including all four Marovoay *fokontany*. With a single treated unit, this reduces to a synthetic control with interactive fixed effects.
 
 ## Inference with few treated units {#sec-inference}
 
-A fundamental constraint of this design is the small number of treated units: 2 sites for Marovoay, 1 for Alaotra. With so few treated clusters, asymptotic inference is unreliable regardless of the estimator chosen. The parametric bootstrap standard errors from gsynth are correspondingly wide.
+A fundamental constraint of this design is the small number of treated units: 2 sites for Marovoay, 1 for Alaotra. With so few treated clusters, standard statistical tests are unreliable regardless of the estimator chosen.
 
-An exact permutation bound is informative. For Marovoay, the set of observable units within the observatory comprises 4 sites (2 east-bank, 2 west-bank). The number of ways to assign exactly 2 of these 4 units as "exposed" is $\binom{4}{2} = 6$. Under Fisher's sharp null, the **minimum achievable p-value** is therefore $1/6 \approx 0.167$ for a one-sided test. No test based solely on these 4 sites can produce a p-value below 0.167 for the one-sided hypothesis, regardless of the observed effect magnitude. When the three Alaotra sites are included as additional control donors in a long-run DiD (thereby expanding the donor pool for permutation), the allocation count rises to $\binom{7}{2} = 21$ and the minimum achievable p-value falls to $1/21 \approx 0.048$.
+To understand this constraint concretely: for Marovoay, the set of observable units within the observatory comprises 4 sites (2 east-bank, 2 west-bank). The number of ways to assign exactly 2 of these 4 units as "exposed" is $\binom{4}{2} = 6$. Under the sharp null hypothesis of no treatment effect, the **minimum achievable p-value** is therefore $1/6 \approx 0.167$ for a one-sided test. No statistical test based solely on these 4 sites can produce a p-value below 0.167, regardless of how large the observed effect is.
 
-We report gsynth bootstrap confidence intervals and p-values throughout but interpret them in light of this power ceiling. The inability to reject the null at conventional thresholds does not imply absence of effect; it reflects the inherent inferential limitations of quasi-experimental designs with a handful of geographic units. Placebo-in-space tests ([Appendix C](A3_robustness.qmd)) provide complementary evidence on the uniqueness of estimated effects.
+When all three Alaotra sites are included as additional control donors (expanding the permutation pool to 7 units), the allocation count rises to $\binom{7}{2} = 21$ and the minimum achievable p-value falls to $1/21 \approx 0.048$ — just below the conventional 5% threshold.
 
-# Towards household-level DiD {#sec-did-roadmap}
+We report gsynth bootstrap confidence intervals and p-values throughout, but interpret them in light of this **power ceiling**. The inability to reject the null at conventional thresholds does not imply absence of effect; it may simply reflect the inherent inferential limitations of quasi-experimental designs with few geographic units. Placebo-in-space tests ([Appendix C](A3_robustness.qmd)) provide complementary evidence on the uniqueness of estimated effects.
 
-The gsynth approach is well-suited to the current data but has an important limitation: it operates at the site level, discarding within-site household heterogeneity. A household-level DiD is not feasible with the current rotating-panel design: approximately 80% of households are replaced between survey waves, making panel-based estimation unreliable. The 2026 survey wave will enable a richer design:
+## Complementary estimators {#sec-complementary}
 
-- **Callaway–Sant'Anna DiD** at the household level, exploiting four staggered treatment cohorts (Ankarafantsika 2003, Farafangana/Toliara/Fénérive 2006–07, Alaotra 2008, plus never-treated).
-- **Not-yet-treated controls** — Alaotra households observed in 2003–2007 (before their own treatment) serve as additional controls for the Ankarafantsika cohort.
-- **Household covariates** for conditional parallel trends (demographics, pre-treatment income, agricultural dependence).
-- **Sun–Abraham event studies** via `fixest::sunab()` as a complementary estimator.
+To assess the sensitivity of our findings to modelling choices, we complement the main gsynth analysis with two alternative approaches (detailed in [Appendix C](A3_robustness.qmd)):
 
-This forward-looking design is discussed further in [Chapter 6](06_discussion.qmd).
+**Synthetic Difference-in-Differences (SDID).** SDID [@Arkhangelsky2021] combines the strengths of traditional DiD and synthetic control. Like DiD, it is invariant to additive shifts across units (no need for exact pre-treatment level matching). Like synthetic control, it reweights control units to match pre-treatment *trends*. It also adds **time weights** that concentrate comparison on the pre-treatment periods most predictive of post-treatment outcomes. The key property is **double robustness**: SDID is consistent if *either* the unit weights or the time weights successfully remove confounding — the factor structure need not be correctly specified in both dimensions simultaneously.
+
+**Two-way fixed effects (TWFE).** Standard TWFE DiD serves as a benchmark. Where pre-treatment trends are approximately parallel, TWFE and gsynth should agree; divergence signals that the parallel-trends assumption is consequential.
+
+The key diagnostic across all three approaches is whether they **agree on the sign and approximate magnitude** of the treatment effect. Convergence across estimators with different identifying assumptions strengthens causal claims; divergence signals sensitivity to modelling choices.
+
+
+# Extensions to three additional observatories {#sec-extensions}
+
+The two-case comparison above — strict enforcement at Ankarafantsika versus participatory conservation at Lac Alaotra — limits external validity. Three additional observatory–PA pairs identified in the donor-pool audit (@sec-donor-pool) provide shorter but informative extensions:
+
+| Observatory | Protected area | IUCN | Year | Governance |
+|---|---|---|---|---|
+| Farafangana | Corridor Forestier Ambositra-Vondrozo (CFAV) | V | 2006 | Multipurpose highland corridor |
+| Toliara North | Amoron'i Onilahy | V | 2007 | Coastal and dry-forest protections |
+| Fénérive East | Réserve de Tampolo | IV | 2007 | Small (~7.3 km²) research forest |
+
+: Extension observatories. {#tbl-ext-cases}
+
+These three observatories move from liabilities in the donor pool to informative treated units, enabling a five-case comparison of how conservation governance type, enforcement intensity, and PA size shape household-income outcomes. The shorter post-treatment windows (8–9 years versus 12 for Marovoay and 7 for Alaotra) limit precision but broaden the institutional variation. The full analysis is presented in [Chapter 5](05_extensions.qmd).
+
+
+# Looking ahead: household-level estimation {#sec-did-roadmap}
+
+The gsynth approach is well-suited to the current data but operates at the village level, discarding within-village household heterogeneity. A richer household-level analysis requires a different strategy.
+
+Because the ROS is a rotating panel, the valid household-level approach is a **repeated cross-section DiD** — treating each survey wave as an independent cross-section and using site and year fixed effects (not household fixed effects) to absorb unobserved heterogeneity. The estimating equation is:
+
+$$
+\ln y_{ist} = \alpha_s + \lambda_t + \delta \cdot D_{st} + \varepsilon_{ist}
+$$
+
+where $\alpha_s$ are site fixed effects, $\lambda_t$ year fixed effects, and $D_{st}$ the treatment indicator for site $s$ at time $t$. Standard errors are clustered at the site level.
+
+The 2025 resurvey opens a particularly powerful design: a **long-run 2×2 DiD** comparing the pre-treatment period (1999–2002) to the 2025 wave — a 23-year post-treatment observation that bypasses all intermediate panel-gap issues. Combined with a **Callaway–Sant'Anna** estimator exploiting four staggered treatment cohorts (Ankarafantsika 2003, Farafangana/Toliara/Fénérive 2006–07, Alaotra 2008, plus never-treated), and **Sun–Abraham event studies** via `fixest::sunab()`, the 2026 survey wave will enable fully household-level inference. This forward-looking design is discussed further in [Chapter 6](06_discussion.qmd).
