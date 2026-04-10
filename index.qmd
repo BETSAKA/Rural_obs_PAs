@@ -29,7 +29,7 @@ decades of household survey data from the Rural Observatory System (ROS,
 on household income.
 
 Using generalized synthetic control methods with interactive fixed effects
-— a technique that constructs data-driven counterfactuals for each treated
+— a technique that constructs data-driven counterfactuals for each exposed
 unit by modelling unobserved common factors — we compare two governance
 archetypes:
 
@@ -53,7 +53,7 @@ The analysis chapters present the core argument:
    research question.
 2. [**Data**](02_data.qmd) — The Rural Observatory Surveys, georeferencing,
    and variable construction.
-3. [**Identification Strategy**](03_strategy.qmd) — Treatment definitions,
+3. [**Identification Strategy**](03_strategy.qmd) — Exposure definitions,
    donor pool selection, and the generalized synthetic control method.
 4. [**Results**](04_results.qmd) — Comparing strict vs. multipurpose
    conservation impacts on household income.

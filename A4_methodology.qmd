@@ -106,7 +106,7 @@ Each observatory-level gsynth model has exactly one treated unit. Standard asymp
 
 2. **Permutation inference**: for each control unit, re-estimate gsynth treating that unit as if it were treated. The $p$-value is the fraction of placebo ATTs exceeding the true ATT. With $N$ donor units, the minimum achievable $p$-value is $1/N$. With \~50--60 donor sites, this gives a floor of $\approx 0.017$ --- sufficient to detect large effects but limiting for moderate ones.
 
-3. **Wild cluster bootstrap** (planned for DiD): the Cameron, Gelbach & Miller [-@Cameron2008] wild bootstrap applies to the few-cluster problem in DiD estimation. With 43 site-level clusters (5 treated observatories + 38 control sites), inference is feasible though conservative.
+3. **Wild cluster bootstrap** (planned for DiD): the Cameron, Gelbach & Miller [-@Cameron2008] wild bootstrap applies to the few-cluster problem in DiD estimation. With 43 site-level clusters (5 exposed observatories + 38 control sites), inference is feasible though conservative.
 
 ## Practical implications
 

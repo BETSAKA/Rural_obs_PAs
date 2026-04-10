@@ -49,7 +49,6 @@ rsconnect/
 *_files/
 *_cache/
 _freeze/
-docs/
 
 # data
 data/*

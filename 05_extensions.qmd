@@ -17,9 +17,9 @@ The two-case comparison in [Chapter 4](04_results.qmd) --- strict enforcement at
 - **Toliara North** (obs. 23): adjacent to Amoron'i Onilahy (IUCN V, January 2007), Mikea National Park (IUCN II, April 2007), and Ranobe PK 32 (IUCN V, December 2008) --- a rapid cascade of coastal and dry-forest protections. Survey window: 1999--2014.
 - **Fénérive East** (obs. 24): adjacent to the Réserve de Tampolo (IUCN IV, August 2007), a small (\~7.3 km²) research forest managed by ESSA-Forêts. Survey window: 1999--2014.
 
-These three observatories move from liabilities in the donor pool to informative treated units. Together with Marovoay and Alaotra, they enable a five-case examination of how conservation governance type, enforcement intensity, and PA size shape household-income outcomes.
+These three observatories move from liabilities in the donor pool to informative exposed units. Together with Marovoay and Alaotra, they enable a five-case examination of how conservation governance type, enforcement intensity, and PA size shape household-income outcomes.
 
-A critical methodological change: the **donor pool is restricted to five clean observatories** (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy) as identified in [Appendix B](A2_donor_validity.qmd). The four also-exposed donors used in [Chapter 4](04_results.qmd) are now treated units here. Marovoay and Alaotra ATT estimates will therefore differ slightly from their Chapter 4 counterparts.
+A critical methodological change: the **donor pool is restricted to five clean observatories** (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy) as identified in [Appendix B](A2_donor_validity.qmd). The four also-exposed donors used in [Chapter 4](04_results.qmd) are now exposed units here. Marovoay and Alaotra ATT estimates will therefore differ slightly from their Chapter 4 counterparts.
 
 
 # Study sites {#sec-additional-sites}
@@ -30,18 +30,18 @@ The CFAV (\~300 km, IUCN V) runs along the eastern highland escarpment. A tempor
 
 The Farafangana observatory lies on the southeastern coastal plain; its nearest commune (Mahatsinjo) borders the CFAV at \~14 km. A complication: Manombo Special Reserve (IUCN IV, 1962) lies \~12 km from a second commune. Because Manombo predates the study period with unchanged boundaries and management, it constitutes a constant background condition absorbed into the unit fixed effect. The ATT for Farafangana therefore identifies the **additional** income effect of the 2006 CFAV decree.
 
-All survey sites are treated at observatory level from 2006; no within-observatory split is possible. **Caution**: with only 3 post-treatment years (2006--2008), gsynth estimates should be treated as illustrative.
+All survey sites are exposed at observatory level from 2006; no within-observatory split is possible. **Caution**: with only 3 post-treatment years (2006--2008), gsynth estimates should be treated as illustrative.
 
 ```{r}
 #| label: fig-map-fara
-#| fig-cap: "Farafangana observatory and nearby protected areas. The CFAV (treatment PA, red) and Manombo SR (pre-existing, yellow) are shown over surveyed fokontany."
+#| fig-cap: "Farafangana observatory and nearby protected areas. The CFAV (exposure PA, red) and Manombo SR (pre-existing, yellow) are shown over surveyed fokontany."
 #| fig-height: 7
 #| fig-width: 7
 
 fara_pas <- dyn_study |>
   filter(str_detect(NAME, "Corridor Forestier Ambositra Vondrozo|Manombo")) |>
   mutate(pa_type = if_else(str_detect(NAME, "Corridor"),
-                           "Treatment PA (CFAV, 2006)",
+                           "Exposure PA (CFAV, 2006)",
                            "Pre-existing PA (Manombo, 1962)"))
 
 fara_fkt_bb <- st_bbox(fara_fokontany)
@@ -63,13 +63,13 @@ tm_shape(fara_mad_c) +
 tm_shape(fara_pas_c) +
   tm_fill(fill = "pa_type",
           fill.scale = tm_scale_categorical(
-            values = c("Treatment PA (CFAV, 2006)" = "#EF9A9A",
+            values = c("Exposure PA (CFAV, 2006)" = "#EF9A9A",
                        "Pre-existing PA (Manombo, 1962)" = "#FFF59D")),
           fill.legend = tm_legend(title = ""),
           fill_alpha = 0.5) +
   tm_borders(col = "pa_type",
              col.scale = tm_scale_categorical(
-               values = c("Treatment PA (CFAV, 2006)" = "#D32F2F",
+               values = c("Exposure PA (CFAV, 2006)" = "#D32F2F",
                           "Pre-existing PA (Manombo, 1962)" = "#F9A825")),
              col.legend = tm_legend(show = FALSE),
              lwd = 0.8) +
@@ -93,7 +93,7 @@ Observatory 23 sits on Madagascar's arid southwest coast, a landscape of spiny t
 2. **Mikea National Park** (IUCN II, 13 April 2007, \~16 km): strict reserve protecting Mikea dry spiny-thicket forest.
 3. **Ranobe PK 32** (IUCN V, 2 December 2008, \~1.4 km): large terrestrial PA (1,685 km²) bordering the observatory at extremely close range.
 
-Treatment year is **{{< var treat_year_tol >}}** --- the first full survey year following the initial January 2007 decree. The December 2008 Ranobe decree constitutes a secondary intensification within the post-treatment window. The dominant conservation character is IUCN V / multipurpose, though the presence of Mikea NP (IUCN II) at 16 km introduces a strict element.
+Exposure year is **{{< var treat_year_tol >}}** --- the first full survey year following the initial January 2007 decree. The December 2008 Ranobe decree constitutes a secondary intensification within the post-exposure window. The dominant conservation character is IUCN V / multipurpose, though the presence of Mikea NP (IUCN II) at 16 km introduces a strict element.
 
 ```{r}
 #| label: fig-map-tol
@@ -148,9 +148,9 @@ tm_layout(legend.position = c("right", "top"))
 
 ## Fénérive East and the Réserve de Tampolo {#sec-fen-site}
 
-The Réserve de Tampolo (IUCN IV, \~7.3 km²) is a small coastal littoral forest managed by ESSA-Forêts as a research and teaching forest. A temporary protection decree was issued on 20 August 2007 (WDPA 354011). The reserve's primary function is scientific access and conservation research, not community resource exclusion. Its small footprint and institutional character suggest **low treatment intensity**.
+The Réserve de Tampolo (IUCN IV, \~7.3 km²) is a small coastal littoral forest managed by ESSA-Forêts as a research and teaching forest. A temporary protection decree was issued on 20 August 2007 (WDPA 354011). The reserve's primary function is scientific access and conservation research, not community resource exclusion. Its small footprint and institutional character suggest **low exposure intensity**.
 
-Treatment year is **{{< var treat_year_fen >}}**. The survey has 8 pre-treatment years (1999--2006) and 8 post-treatment years (2007--2014) --- the most symmetric panel among the new sites.
+Exposure year is **{{< var treat_year_fen >}}**. The survey has 8 pre-treatment years (1999--2006) and 8 post-treatment years (2007--2014) --- the most symmetric panel among the new sites.
 
 ```{r}
 #| label: fig-map-fen
@@ -200,7 +200,7 @@ tm_layout(legend.position = c("right", "top"))
 
 ```{r}
 #| label: tbl-ext-design
-#| tbl-cap: "Five treated observatories: design summary"
+#| tbl-cap: "Five exposed observatories: design summary"
 
 tribble(
   ~Observatory,        ~`PA (primary)`,                     ~IUCN, ~Type,            ~`Treat yr`, ~Pre, ~Post, ~Survey,
@@ -212,7 +212,7 @@ tribble(
 ) |>
   gt() |>
   tab_header(
-    title = md("**Five Treated Observatories: Design Summary**"),
+    title = md("**Five Exposed Observatories: Design Summary**"),
     subtitle = "\u26a0 Farafangana: only 3 post-treatment years \u2014 estimates are indicative only"
   ) |>
   tab_style(style = cell_fill(color = "#FFCDD2"),
@@ -230,7 +230,7 @@ tribble(
 
 # Results by observatory {#sec-ext-results}
 
-The identification strategy and estimator are identical to [Chapter 4](04_results.qmd). We estimate the gsynth ATT separately for each treated observatory. Each model specifies $D_{it} = 1$ only for the target observatory's treated unit(s) from its treatment year onward; all other units carry $D_{it} = 0$ and serve as additional factors for counterfactual construction. This within-model use of other treated observatories as donors is consistent with the interactive FE framework so long as treatment timing differs across observatories [@Xu2017]. The number of latent factors $r$ is selected by leave-one-out cross-validation; inference is parametric bootstrap with 200 replications.
+The identification strategy and estimator are identical to [Chapter 4](04_results.qmd). We estimate the gsynth ATT separately for each exposed observatory. Each model specifies $D_{it} = 1$ only for the target observatory's exposed unit(s) from its exposure year onward; all other units carry $D_{it} = 0$ and serve as additional factors for counterfactual construction. This within-model use of other exposed observatories as donors is consistent with the interactive FE framework so long as exposure timing differs across observatories [@Xu2017]. The number of latent factors $r$ is selected by leave-one-out cross-validation; inference is parametric bootstrap with 200 replications.
 
 ## Ankarafantsika (clean donors) {#sec-ext-maro}
 
@@ -238,7 +238,7 @@ Re-estimating the Marovoay east-bank model with the restricted donor pool yields
 
 ```{r}
 #| label: fig-att-maro-clean
-#| fig-cap: "Ankarafantsika gsynth ATT path (clean donor pool). Treatment onset 2003."
+#| fig-cap: "Ankarafantsika gsynth ATT path (clean donor pool). Exposure onset 2003."
 #| fig-height: 4.5
 #| fig-width: 8
 
@@ -257,7 +257,7 @@ ggplot(att_maro_df, aes(rel_time, att)) +
   geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
   geom_line(color = "#D32F2F", linewidth = 0.8) +
   geom_point(color = "#D32F2F", size = 2.5) +
-  labs(x = "Years relative to treatment (2003)",
+  labs(x = "Years relative to exposure (2003)",
        y = "ATT (log equiv. income)",
        title = "Ankarafantsika (strict, IUCN II)",
        subtitle = paste0(gs_maro$N_co, " donor sites; r* = ", gs_maro$r_cv)) +
@@ -270,7 +270,7 @@ The Alaotra observatory-level ATT with clean donors remains near zero and statis
 
 ```{r}
 #| label: fig-att-ala-clean
-#| fig-cap: "Lac Alaotra gsynth ATT path (clean donor pool). Treatment onset 2008."
+#| fig-cap: "Lac Alaotra gsynth ATT path (clean donor pool). Exposure onset 2008."
 #| fig-height: 4.5
 #| fig-width: 8
 
@@ -289,7 +289,7 @@ ggplot(att_ala_df, aes(rel_time, att)) +
   geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
   geom_line(color = "#1565C0", linewidth = 0.8) +
   geom_point(color = "#1565C0", size = 2.5) +
-  labs(x = "Years relative to treatment (2008)",
+  labs(x = "Years relative to exposure (2008)",
        y = "ATT (log equiv. income)",
        title = "Lac Alaotra (multipurpose, IUCN V)",
        subtitle = paste0(gs_ala$N_co, " donor sites; r* = ", gs_ala$r_cv)) +
@@ -306,7 +306,7 @@ The point estimate is **{{< var att_fara >}} log points** ($\approx$ {{< var att
 
 ```{r}
 #| label: fig-att-fara
-#| fig-cap: "Farafangana gsynth ATT path (1999--2008). Treatment onset 2006. Wide CIs reflect only 3 post-treatment years."
+#| fig-cap: "Farafangana gsynth ATT path (1999--2008). Exposure onset 2006. Wide CIs reflect only 3 post-treatment years."
 #| fig-height: 4.5
 #| fig-width: 8
 
@@ -325,7 +325,7 @@ ggplot(att_fara_df, aes(rel_time, att)) +
   geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#2E7D32", alpha = 0.15) +
   geom_line(color = "#2E7D32", linewidth = 0.8) +
   geom_point(color = "#2E7D32", size = 2.5) +
-  labs(x = "Years relative to treatment (2006)",
+  labs(x = "Years relative to exposure (2006)",
        y = "ATT (log equiv. income)",
        title = "Farafangana (multipurpose, IUCN V) \u2014 INDICATIVE ONLY",
        subtitle = paste0(gs_fara$N_co, " donor sites; r* = ", gs_fara$r_cv,
@@ -339,7 +339,7 @@ The Toliara North ATT estimates a composite treatment effect from the 2007--2008
 
 ```{r}
 #| label: fig-att-tol
-#| fig-cap: "Toliara North gsynth ATT path. Treatment onset 2007 (Amoron'i Onilahy decree). An annotation marks the December 2008 Ranobe PK 32 secondary decree."
+#| fig-cap: "Toliara North gsynth ATT path. Exposure onset 2007 (Amoron'i Onilahy decree). An annotation marks the December 2008 Ranobe PK 32 secondary decree."
 #| fig-height: 4.5
 #| fig-width: 8
 
@@ -363,7 +363,7 @@ ggplot(att_tol_df, aes(rel_time, att)) +
   annotate("text", x = 1.2, y = max(att_tol_df$ci_hi, na.rm = TRUE) * 0.85,
            label = "Ranobe PK 32\n(Dec 2008)", color = "#E65100",
            hjust = 0, size = 2.8) +
-  labs(x = "Years relative to treatment (2007)",
+  labs(x = "Years relative to exposure (2007)",
        y = "ATT (log equiv. income)",
        title = "Toliara North (mixed IUCN V/II)",
        subtitle = paste0(gs_tol$N_co, " donor sites; r* = ", gs_tol$r_cv)) +
@@ -376,7 +376,7 @@ The Fénérive East ATT shows a small positive but nonsignificant effect (**{{< 
 
 ```{r}
 #| label: fig-att-fen
-#| fig-cap: "Fénérive East gsynth ATT path. Treatment onset 2007 (Réserve de Tampolo decree)."
+#| fig-cap: "Fénérive East gsynth ATT path. Exposure onset 2007 (Réserve de Tampolo decree)."
 #| fig-height: 4.5
 #| fig-width: 8
 
@@ -395,7 +395,7 @@ ggplot(att_fen_df, aes(rel_time, att)) +
   geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#6A1B9A", alpha = 0.15) +
   geom_line(color = "#6A1B9A", linewidth = 0.8) +
   geom_point(color = "#6A1B9A", size = 2.5) +
-  labs(x = "Years relative to treatment (2007)",
+  labs(x = "Years relative to exposure (2007)",
        y = "ATT (log equiv. income)",
        title = "F\u00e9n\u00e9rive East (low-intensity, IUCN IV)",
        subtitle = paste0(gs_fen$N_co, " donor sites; r* = ", gs_fen$r_cv)) +
@@ -462,7 +462,7 @@ tibble(
 
 ```{r}
 #| label: fig-att-all-overlay
-#| fig-cap: "ATT paths for all five treated observatories on the same relative-time axis. CI bands suppressed for legibility."
+#| fig-cap: "ATT paths for all five exposed observatories on the same relative-time axis. CI bands suppressed for legibility."
 #| fig-height: 5.5
 #| fig-width: 11
 
@@ -497,7 +497,7 @@ ggplot(all_att, aes(rel_time, att, color = color_grp, linetype = color_grp)) +
                "F\u00e9n\u00e9rive East (low int.)" = "solid"),
     name = NULL
   ) +
-  labs(x = "Years relative to treatment onset",
+  labs(x = "Years relative to exposure onset",
        y = "ATT (log equiv. income)",
        title = "ATT Paths: Five Conservation Governance Models",
        subtitle = "Dashed = Farafangana (indicative only, 3 post-treatment years)") +
@@ -561,4 +561,4 @@ Several limitations temper interpretation of the extended comparison:
 2. **Toliara North treatment complexity**: the three-PA cascade (January 2007 + April 2007 + December 2008) means the ATT estimates a composite treatment rather than a clean single event.
 3. **Clean donor pool size**: using only five donors (vs. nine in [Chapter 4](04_results.qmd)) reduces counterfactual precision. Comparisons between Chapter 4 and Chapter 5 ATT estimates for Marovoay and Alaotra may partly reflect this difference.
 4. **No 2025 validation for new sites**: identification for the three new observatories rests on decree dates and proximity without the behavioural validation available for Marovoay and Alaotra.
-5. **Single-unit power floor**: each observatory-level model has exactly one treated unit. The permutation $p$-value floor is $\approx 1/N_{\text{donors}}$; with \~50--60 donor sites, effects smaller than \~20% are difficult to distinguish from zero.
+5. **Single-unit power floor**: each observatory-level model has exactly one exposed unit. The permutation $p$-value floor is $\approx 1/N_{\text{donors}}$; with \~50--60 donor sites, effects smaller than \~20% are difficult to distinguish from zero.

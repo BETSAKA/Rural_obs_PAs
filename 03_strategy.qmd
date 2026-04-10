@@ -11,7 +11,7 @@ source("R/gsynth_helpers.R")
 
 The central question of this study is whether the creation or expansion of protected areas *caused* changes in household income — or whether observed income differences merely reflect pre-existing trends. This chapter explains how we isolate causal effects despite the fact that PA placement is not random and household surveys were not designed for conservation impact evaluation.
 
-The strategy has four parts. First, we define two natural experiments that provide plausible treatment–control comparisons (@sec-treatment). Second, we explain how the survey design constrains the unit of analysis (@sec-panel). Third, we describe the statistical method used to construct counterfactual income trajectories (@sec-estimation). Fourth, we briefly introduce three additional cases that extend the analysis (@sec-extensions).
+The strategy has four parts. First, we define two natural experiments that provide plausible exposure–control comparisons (@sec-treatment). Second, we explain how the survey design constrains the unit of analysis (@sec-panel). Third, we describe the statistical method used to construct counterfactual income trajectories (@sec-estimation). Fourth, we briefly introduce three additional cases that extend the analysis (@sec-extensions).
 
 # Two natural experiments {#sec-treatment}
 
@@ -21,14 +21,14 @@ We exploit two events during the ROS survey period where a new or expanded PA be
 
 ### The 2002 park extension {#sec-maro-history}
 
-The Ankarafantsika National Park was formally extended by Decree 2002-798 on 7 August 2002, merging the former *Réserve Naturelle Intégrale* (60,500 ha, 1927) with forest reserves into a 136,500 ha national park under IUCN Category II (strict nature conservation). We set the exposure year to **2003** — the first full ROS survey year following the decree.^[Decree 2002-798 was signed on 7 August 2002. Because the ROS survey is conducted annually and we attribute any treatment effect to the first full survey year following the decree, we set the treatment year to 2003. Using 2002 instead has negligible impact on the estimated ATT.]
+The Ankarafantsika National Park was formally extended by Decree 2002-798 on 7 August 2002, merging the former *Réserve Naturelle Intégrale* (60,500 ha, 1927) with forest reserves into a 136,500 ha national park under IUCN Category II (strict nature conservation). We set the exposure year to **2003** — the first full ROS survey year following the decree.^[Decree 2002-798 was signed on 7 August 2002. Because the ROS survey is conducted annually and we attribute any effect to the first full survey year following the decree, we set the exposure year to 2003. Using 2002 instead has negligible impact on the estimated ATT.]
 
 Critically, the 2002 extension was the **first event to impose binding land-use restrictions** on the communities adjacent to the forest reserve zone. The earlier designations had very different *de facto* implications:
 
 - **The 1927 *Réserve Naturelle Intégrale*** covered the inland plateau to the north-east, geographically separate from the Marovoay communities. The east-bank *fokontany* had no direct interface with the strictly protected RNI.
 - **The 1929 forest reserve** was not a conservation zone but a timber and resource reserve under the forest administration. Analyses of this period found no effective enforcement: subsistence agriculture, cattle grazing, and charcoal production continued unimpeded [@brondeau1999].
 
-The 2002 reclassification merged these into a single national park where slash-and-burn agriculture (*tavy*), charcoal production, and non-timber forest product extraction were explicitly prohibited — and, crucially, enforced. Enforcement capacity was supported by international conservation funding from the World Bank and bilateral donors as part of Madagascar's third Environmental Action Plan. @fig-expansion, reproduced from @alonso2002, illustrates the spatial extent of the consolidation.
+The 2002 reclassification merged these into a single national park where slash-and-burn agriculture (*tavy*), charcoal production, and non-timber forest product extraction were explicitly prohibited — and, crucially, enforced. Enforcement capacity was supported by international conservation funding from the World Bank and bilateral donors as part of Madagascar's third Environmental Action Plan. @fig-map-maro maps the spatial extent of the consolidation using dynamic WDPA boundary data: the original RNI (dark green) covered the inland plateau to the north-east, while the 2002 extension (light green) more than doubled the protected area to encompass forest reserves abutting the Marovoay communities [@alonso2002].
 
 ### The Betsiboka River as a natural barrier {#sec-maro-barrier}
 
@@ -36,83 +36,163 @@ The Marovoay observatory comprises four *fokontany* (villages) split by the Bets
 
 This geographic feature creates a natural experiment: east-bank communities have direct walking access to the park, while west-bank communities face a substantial access penalty — roughly tripling the effective travel distance. We formalize this with a **river-crossing penalty** of 15 km added to the straight-line distance for west-bank fokontany, reflecting the detour required to reach the park on foot (no bridge exists in the immediate vicinity):
 
-| Fokontany | Bank | Distance to PA | Effective distance | Role |
-|---|---|---|---|---|
-| Bepako | East | 5.2 km | 5.2 km | **Treated** (from 2003) |
-| Madiromiongana | East | 11.7 km | 11.7 km | **Treated** (from 2003) |
-| Ampijoroa | West | 3.5 km | 18.5 km (river detour) | Donor (control) |
-| Maroala | West | 5.8 km | 20.8 km (river detour) | Donor (control) |
+```{r}
+#| label: tbl-maro-sites
+#| tbl-cap: "Marovoay site exposure assignments. Distance to RNI = straight-line distance to the pre-2002 *Réserve Naturelle Intégrale*; Distance to NP = distance to the post-2002 national park boundary. Effective distance adds a 15 km river-crossing penalty for west-bank fokontany."
 
-: Marovoay site treatment assignments. Effective distances account for the Betsiboka River crossing. {#tbl-maro-sites}
+maro_fkt |>
+  st_drop_geometry() |>
+  mutate(
+    Bank = str_to_title(river_side),
+    `Dist. to RNI (pre-2002)` = paste0(dist_rni_km, " km"),
+    `Dist. to NP (post-2002)` = paste0(dist_km, " km"),
+    `Effective dist.` = if_else(
+      river_side == "west",
+      paste0(dist_km + 15, " km (river detour)"),
+      paste0(dist_km, " km")
+    ),
+    Role = if_else(treated, "**Exposed** (from 2003)", "Donor (control)")
+  ) |>
+  select(Fokontany = fokontany, Bank,
+         `Dist. to RNI (pre-2002)`, `Dist. to NP (post-2002)`,
+         `Effective dist.`, Role) |>
+  gt() |>
+  fmt_markdown(columns = Role) |>
+  tab_footnote("Effective distance adds a 15 km river-crossing penalty for west-bank fokontany.")
+```
 
-The 15 km river-crossing penalty is conservative. In rural Madagascar, where most travel is on foot, the actual additional travel time likely exceeds the implied 3-hour walk. An effective distance threshold of 12 km — corresponding to approximately a 2.5-hour daily commuting limit — places both east-bank villages within the PA's zone of influence and both west-bank villages outside it, cleanly separating "treated" from "donor" communities.
+The 15 km river-crossing penalty is conservative. In rural Madagascar, where most travel is on foot, the actual additional travel time likely exceeds the implied 3-hour walk. An effective distance threshold of 12 km — corresponding to approximately a 2.5-hour daily commuting limit — places both east-bank villages within the PA's zone of influence and both west-bank villages outside it, cleanly separating "exposed" from "donor" communities.
 
 ```{r}
 #| label: fig-map-maro
-#| fig-cap: "Marovoay observatory and Ankarafantsika National Park. The Betsiboka River separates west-bank fokontany (control, grey) from east-bank fokontany (exposed, orange). Water features from OpenStreetMap."
+#| fig-cap: "Marovoay observatory and the 2002 Ankarafantsika expansion. Dark green: the original 1927 *Réserve Naturelle Intégrale* (~571 km²). Light green: the 2002 national park extension (~1,351 km²). The Betsiboka River separates west-bank fokontany (donors, grey) from east-bank fokontany (exposed, orange). Labels show distance to NP boundary. Water features from OpenStreetMap."
 #| fig-height: 8
 #| fig-width: 9
 
-# Bounding box: show the whole of Ankarafantsika plus the fokontany
+# Bounding box: show the whole of Ankarafantsika NP plus the fokontany
 ank_bb <- st_bbox(ankarafantsika_pa)
 fkt_bb <- st_bbox(maro_fkt)
-maro_bbox <- st_bbox(c(
-  xmin = min(ank_bb["xmin"], fkt_bb["xmin"]) - 0.08,
-  ymin = min(ank_bb["ymin"], fkt_bb["ymin"]) - 0.08,
-  xmax = max(ank_bb["xmax"], fkt_bb["xmax"]) + 0.08,
-  ymax = max(ank_bb["ymax"], fkt_bb["ymax"]) + 0.08
-), crs = 4326)
+maro_bbox <- st_bbox(
+  c(
+    xmin = min(ank_bb["xmin"], fkt_bb["xmin"]) - 0.08,
+    ymin = min(ank_bb["ymin"], fkt_bb["ymin"]) - 0.08,
+    xmax = max(ank_bb["xmax"], fkt_bb["xmax"]) + 0.08,
+    ymax = max(ank_bb["ymax"], fkt_bb["ymax"]) + 0.08
+  ),
+  crs = 4326
+)
 
 # Filter water features: Betsiboka river + water bodies within 1 km
 betsiboka_named <- osm_water_maro$lines |> filter(name == "Betsiboka")
 betsiboka_buf <- betsiboka_named |>
-  st_transform(32738) |> st_union() |> st_buffer(1000) |> st_transform(4326)
+  st_transform(32738) |>
+  st_union() |>
+  st_buffer(1000) |>
+  st_transform(4326)
 
-water_lines <- tryCatch(st_crop(betsiboka_named, maro_bbox), error = function(e) NULL)
-water_polys <- tryCatch({
-  wp <- st_crop(osm_water_maro$polys, maro_bbox)
-  wp[st_intersects(wp, betsiboka_buf, sparse = FALSE)[, 1], ]
-}, error = function(e) NULL)
-water_mpolys <- tryCatch({
-  wm <- st_crop(osm_water_maro$mpolys, maro_bbox)
-  wm[st_intersects(wm, betsiboka_buf, sparse = FALSE)[, 1], ]
-}, error = function(e) NULL)
+water_lines <- tryCatch(
+  st_crop(betsiboka_named, maro_bbox),
+  error = function(e) NULL
+)
+water_polys <- tryCatch(
+  {
+    wp <- st_crop(osm_water_maro$polys, maro_bbox)
+    wp[st_intersects(wp, betsiboka_buf, sparse = FALSE)[, 1], ]
+  },
+  error = function(e) NULL
+)
+water_mpolys <- tryCatch(
+  {
+    wm <- st_crop(osm_water_maro$mpolys, maro_bbox)
+    wm[st_intersects(wm, betsiboka_buf, sparse = FALSE)[, 1], ]
+  },
+  error = function(e) NULL
+)
 
 WATER_COL <- "#1976D2"
-ank_centroid <- st_coordinates(st_centroid(st_union(ankarafantsika_pa)))
 
+# Centroids for annotation labels
+rni_centroid <- st_coordinates(st_centroid(st_union(ankarafantsika_rni)))
+
+# Build map: post-2002 NP (background) + pre-2002 RNI (foreground)
 p <- ggplot() +
-  geom_sf(data = ankarafantsika_pa, fill = "#A5D6A7", color = "#388E3C",
-          alpha = 0.4, linewidth = 0.6)
+  # Post-2002 national park extension (light green)
+  geom_sf(
+    data = ankarafantsika_pa,
+    aes(fill = "2002 National Park extension"),
+    color = "#388E3C", alpha = 0.35, linewidth = 0.5
+  ) +
+  # Pre-2002 RNI (dark green, on top)
+  geom_sf(
+    data = ankarafantsika_rni,
+    aes(fill = "1927 Réserve Naturelle Intégrale"),
+    color = "#1B5E20", alpha = 0.55, linewidth = 0.7
+  ) +
+  scale_fill_manual(
+    values = c(
+      "1927 Réserve Naturelle Intégrale" = "#2E7D32",
+      "2002 National Park extension" = "#A5D6A7"
+    ),
+    name = NULL
+  )
 
-if (!is.null(water_polys) && nrow(water_polys) > 0)
-  p <- p + geom_sf(data = water_polys, fill = WATER_COL, color = WATER_COL,
-                   linewidth = 0.1)
-if (!is.null(water_mpolys) && nrow(water_mpolys) > 0)
-  p <- p + geom_sf(data = water_mpolys, fill = WATER_COL, color = WATER_COL,
-                   linewidth = 0.1)
-if (!is.null(water_lines) && nrow(water_lines) > 0)
+# Water layers
+if (!is.null(water_polys) && nrow(water_polys) > 0) {
+  p <- p +
+    geom_sf(
+      data = water_polys,
+      fill = WATER_COL, color = WATER_COL, linewidth = 0.1
+    )
+}
+if (!is.null(water_mpolys) && nrow(water_mpolys) > 0) {
+  p <- p +
+    geom_sf(
+      data = water_mpolys,
+      fill = WATER_COL, color = WATER_COL, linewidth = 0.1
+    )
+}
+if (!is.null(water_lines) && nrow(water_lines) > 0) {
   p <- p + geom_sf(data = water_lines, color = WATER_COL, linewidth = 0.7)
+}
 
 maro_fkt_lab <- maro_fkt |>
   mutate(
     lon = st_coordinates(geometry)[, 1],
     lat = st_coordinates(geometry)[, 2],
     nudge_x = if_else(fokontany == "Maroala", -0.06, 0),
-    nudge_y = if_else(fokontany == "Maroala",  0.04, 0)
+    nudge_y = if_else(fokontany == "Maroala", 0.04, 0)
   )
 
 p +
-  annotate("text", x = ank_centroid[1], y = ank_centroid[2],
-           label = "Ankarafantsika\nNational Park",
-           color = "#1B5E20", fontface = "bold.italic", size = 4.5, alpha = 0.8) +
-  geom_sf(data = maro_fkt, aes(color = river_side, shape = river_side),
-          size = 4, stroke = 1.2) +
+  # RNI label
+  annotate(
+    "label",
+    x = rni_centroid[1], y = rni_centroid[2],
+    label = "RNI\n(1927\u20132002)",
+    fill = "#2E7D32", color = "white",
+    fontface = "bold.italic", size = 3.5, alpha = 0.85
+  ) +
+  # NP extension label
+  annotate(
+    "label",
+    x = ank_bb["xmin"] + 0.12, y = ank_bb["ymin"] + 0.06,
+    label = "National Park\nextension (2002)",
+    fill = "#A5D6A7", color = "#1B5E20",
+    fontface = "bold.italic", size = 3.5, alpha = 0.85
+  ) +
+  # Fokontany points
+  geom_sf(
+    data = maro_fkt,
+    aes(color = river_side, shape = river_side),
+    size = 4, stroke = 1.2
+  ) +
   geom_label_repel(
     data = maro_fkt_lab,
-    aes(x = lon, y = lat,
-        label = paste0(fokontany, "\n(", dist_km, " km)"),
-        color = river_side),
+    aes(
+      x = lon, y = lat,
+      label = paste0(fokontany, "\n(", dist_km, " km)"),
+      color = river_side
+    ),
     size = 3, fontface = "bold", box.padding = 0.8,
     nudge_x = maro_fkt_lab$nudge_x,
     nudge_y = maro_fkt_lab$nudge_y,
@@ -129,17 +209,18 @@ p +
     name = NULL
   ) +
   annotation_scale(location = "bl", width_hint = 0.25) +
-  coord_sf(xlim = c(maro_bbox["xmin"], maro_bbox["xmax"]),
-           ylim = c(maro_bbox["ymin"], maro_bbox["ymax"])) +
+  coord_sf(
+    xlim = c(maro_bbox["xmin"], maro_bbox["xmax"]),
+    ylim = c(maro_bbox["ymin"], maro_bbox["ymax"])
+  ) +
+  guides(fill = guide_legend(order = 1)) +
   theme_minimal(base_size = 11) +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom", legend.box = "vertical")
 ```
-
-![Spatial extent of the 2002 Ankarafantsika expansion, from the original RNI (dark green) to the national park (light green). Source: @alonso2002.](media/Alonso_Shuldenberg_2002.png){#fig-expansion width=80%}
 
 ### Behavioural validation from the 2025 resurvey {#sec-maro-usage}
 
-The treatment assignment rests on the assumption that the Betsiboka River effectively separates communities into "exposed" and "not exposed" groups. The 2025 resurvey provides a direct test of this assumption through its dedicated protected area usage module (UM), which asked all 1,026 households whether they visit the PA zone, what activities they pursue there, and why non-visitors stay away.
+The exposure assignment rests on the assumption that the Betsiboka River effectively separates communities into "exposed" and "not exposed" groups. The 2025 resurvey provides a direct test of this assumption through its dedicated protected area usage module (UM), which asked all 1,026 households whether they visit the PA zone, what activities they pursue there, and why non-visitors stay away.
 
 ```{r}
 #| label: tbl-maro-usage
@@ -149,19 +230,20 @@ res_deb_25 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   mutate(
     j5 = as.character(j5),
     Observatory = case_when(
-      as.character(j0) == "3"  ~ "Marovoay",
+      as.character(j0) == "3" ~ "Marovoay",
       as.character(j0) == "21" ~ "Alaotra"
     ),
     Site = case_when(
-      j0 == 3 & str_detect(str_to_lower(j4), "^bepako")          ~ "Bepako",
-      j0 == 3 & str_detect(str_to_lower(j4), "^madiromiongana")  ~ "Madiromiongana",
-      j0 == 3 & str_detect(str_to_lower(j4), "^ampijoroa")       ~ "Ampijoroa",
-      j0 == 3 & str_detect(str_to_lower(j4), "^maroala")         ~ "Maroala",
+      j0 == 3 & str_detect(str_to_lower(j4), "^bepako") ~ "Bepako",
+      j0 == 3 &
+        str_detect(str_to_lower(j4), "^madiromiongana") ~ "Madiromiongana",
+      j0 == 3 & str_detect(str_to_lower(j4), "^ampijoroa") ~ "Ampijoroa",
+      j0 == 3 & str_detect(str_to_lower(j4), "^maroala") ~ "Maroala",
       j0 == 21 ~ j4
     ),
     bank = case_when(
       Site %in% c("Bepako", "Madiromiongana") ~ "East",
-      Site %in% c("Ampijoroa", "Maroala")     ~ "West"
+      Site %in% c("Ampijoroa", "Maroala") ~ "West"
     )
   )
 
@@ -189,7 +271,8 @@ res_deb_25 |>
     `% visit PA zone` = round(sum(um1 == 1, na.rm = TRUE) / n() * 100, 0),
     `% extractive use` = round(sum(extractive) / n() * 100, 0),
     `% cite 'forbidden'` = round(
-      sum(um1d_a == 1, na.rm = TRUE) / sum(um1 == 2, na.rm = TRUE) * 100, 0
+      sum(um1d_a == 1, na.rm = TRUE) / sum(um1 == 2, na.rm = TRUE) * 100,
+      0
     ),
     .by = c(Site, bank)
   ) |>
@@ -202,7 +285,7 @@ res_deb_25 |>
   )
 ```
 
-Three findings support the treatment assignment:
+Three findings support the exposure assignment:
 
 1. **Visitation asymmetry.** 38% of east-bank households report visiting the park zone versus 15% on the west bank. However, among visitors on both banks, the dominant activity is leisure walks (67%); only 10% of east-bank households report extractive use (food gathering, woodcutting). 91% of all visitors go only a few times per year.
 
@@ -215,17 +298,17 @@ Three findings support the treatment assignment:
 
 ### A different conservation model {#sec-ala-history}
 
-Lac Alaotra is Madagascar's largest lake and a critical habitat for the Alaotran gentle lemur (*Hapalemur alaotrensis*). The Ramsar Convention listed the site in 2003. In 2015, the lake and its marshlands were formally designated as a *Paysage Harmonieux Protégé* (PHP, 425 km², IUCN Category V — a multipurpose landscape where sustainable use is permitted). However, enforcement through community-based natural resource management (CBNRM) agreements and *transferts de gestion* had intensified from around 2008 under the management of Durrell Wildlife Conservation Trust. A temporary protection decree (*Arrêté* 381/2007, 1 August 2007) preceded the intensification. We set the exposure year to **2008**, consistent with the annual-survey convention applied to Ankarafantsika.^[An alternative treatment year of 2007 is defensible; using 2007 instead has negligible impact on the estimated ATT, given that the post-treatment window contains up to seven observations under either assumption.]
+Lac Alaotra is Madagascar's largest lake and a critical habitat for the Alaotran gentle lemur (*Hapalemur alaotrensis*). The Ramsar Convention listed the site in 2003. In 2015, the lake and its marshlands were formally designated as a *Paysage Harmonieux Protégé* (PHP, 425 km², IUCN Category V — a multipurpose landscape where sustainable use is permitted). However, enforcement through community-based natural resource management (CBNRM) agreements and *transferts de gestion* had intensified from around 2008 under the management of Durrell Wildlife Conservation Trust. A temporary protection decree (*Arrêté* 381/2007, 1 August 2007) preceded the intensification. We set the exposure year to **2008**, consistent with the annual-survey convention applied to Ankarafantsika.^[An alternative exposure year of 2007 is defensible; using 2007 instead has negligible impact on the estimated ATT, given that the post-exposure window contains up to seven observations under either assumption.]
 
 The key difference from Ankarafantsika is governance: rather than exclusionary enforcement prohibiting all resource extraction, Alaotra's CBNRM framework regulates lake-marsh use through community-managed access rules, seasonal fishing closures, and habitat restoration agreements. This participatory model is designed to accommodate livelihoods rather than exclude them.
 
-### Why all Alaotra communities are treated {#sec-ala-all-treated}
+### Why all Alaotra communities are exposed {#sec-ala-all-treated}
 
 Unlike Marovoay, there is no natural barrier separating "exposed" from "unexposed" communities at Alaotra. The observatory's seven *fokontany* (across three historical survey sites) all depend on the lake-marsh ecosystem. The CBNRM enforcement mechanism — seasonal closures, gear restrictions, marsh-burning bans — applies to all lake-adjacent communities through *transferts de gestion*.
 
 A complication specific to Alaotra is the proximity of some eastern hamlets to two additional protected areas: the **Corridor Ankeniheny-Zahamena** (CAZ, IUCN Category VI, managed by Conservation International) and the **Zahamena National Park** (IUCN Category II), which lies north of the CAZ. The hamlet of Mangabe lies closer to the CAZ boundary (~14 km) than to the Lac Alaotra PHP, creating dual-PA exposure.
 
-We therefore treat the **entire observatory as a single treated unit**, aggregated to a site-level mean. This is a stronger assumption than the site-level assignment at Marovoay, but it is supported by the uniform enforcement mechanism (CBNRM applies to all lake-adjacent communities) and the behavioural data from the 2025 resurvey discussed below.
+We therefore treat the **entire observatory as a single exposed unit**, aggregated to a site-level mean. This is a stronger assumption than the site-level assignment at Marovoay, but it is supported by the uniform enforcement mechanism (CBNRM applies to all lake-adjacent communities) and the behavioural data from the 2025 resurvey discussed below.
 
 ```{r}
 #| label: fig-map-ala
@@ -233,8 +316,10 @@ We therefore treat the **entire observatory as a single treated unit**, aggregat
 #| fig-height: 8
 #| fig-width: 8
 
-ala_bbox <- st_bbox(c(xmin = 48.00, ymin = -18.10, xmax = 48.80, ymax = -17.20),
-                    crs = 4326)
+ala_bbox <- st_bbox(
+  c(xmin = 48.00, ymin = -18.10, xmax = 48.80, ymax = -17.20),
+  crs = 4326
+)
 
 ala_clip <- tryCatch(st_crop(alaotra_pa, ala_bbox), error = function(e) NULL)
 caz_clip <- tryCatch(st_crop(caz_pa, ala_bbox), error = function(e) NULL)
@@ -245,39 +330,96 @@ p <- ggplot()
 # PA polygons
 if (!is.null(ala_clip) && nrow(ala_clip) > 0) {
   ala_centroid <- st_coordinates(st_centroid(st_union(ala_clip)))
-  p <- p + geom_sf(data = ala_clip, fill = "#A5D6A7", color = "#388E3C",
-                   alpha = 0.4, linewidth = 0.6) +
-    annotate("text", x = ala_centroid[1], y = ala_centroid[2],
-             label = "Lac Alaotra\nPHP", color = "#1B5E20",
-             fontface = "bold.italic", size = 3.5, alpha = 0.8)
+  p <- p +
+    geom_sf(
+      data = ala_clip,
+      fill = "#A5D6A7",
+      color = "#388E3C",
+      alpha = 0.4,
+      linewidth = 0.6
+    ) +
+    annotate(
+      "text",
+      x = ala_centroid[1],
+      y = ala_centroid[2],
+      label = "Lac Alaotra\nPHP",
+      color = "#1B5E20",
+      fontface = "bold.italic",
+      size = 3.5,
+      alpha = 0.8
+    )
 }
 if (!is.null(caz_clip) && nrow(caz_clip) > 0) {
   caz_centroid <- st_coordinates(st_centroid(st_union(caz_clip)))
-  p <- p + geom_sf(data = caz_clip, fill = "#FFE0B2", color = "#E65100",
-                   alpha = 0.3, linewidth = 0.6) +
-    annotate("text", x = caz_centroid[1], y = caz_centroid[2],
-             label = "Corridor\nAnkeniheny-\nZahamena",
-             color = "#BF360C", fontface = "bold.italic", size = 3, alpha = 0.8)
+  p <- p +
+    geom_sf(
+      data = caz_clip,
+      fill = "#FFE0B2",
+      color = "#E65100",
+      alpha = 0.3,
+      linewidth = 0.6
+    ) +
+    annotate(
+      "text",
+      x = caz_centroid[1],
+      y = caz_centroid[2],
+      label = "Corridor\nAnkeniheny-\nZahamena",
+      color = "#BF360C",
+      fontface = "bold.italic",
+      size = 3,
+      alpha = 0.8
+    )
 }
 if (!is.null(zah_clip) && nrow(zah_clip) > 0) {
   zah_centroid <- st_coordinates(st_centroid(st_union(zah_clip)))
-  p <- p + geom_sf(data = zah_clip, fill = "#FFCCBC", color = "#BF360C",
-                   alpha = 0.3, linewidth = 0.5) +
-    annotate("text", x = zah_centroid[1], y = zah_centroid[2],
-             label = "Zahamena\nNational Park",
-             color = "#BF360C", fontface = "bold.italic", size = 3, alpha = 0.8)
+  p <- p +
+    geom_sf(
+      data = zah_clip,
+      fill = "#FFCCBC",
+      color = "#BF360C",
+      alpha = 0.3,
+      linewidth = 0.5
+    ) +
+    annotate(
+      "text",
+      x = zah_centroid[1],
+      y = zah_centroid[2],
+      label = "Zahamena\nNational Park",
+      color = "#BF360C",
+      fontface = "bold.italic",
+      size = 3,
+      alpha = 0.8
+    )
 }
 
 # Fokontany points
 p +
-  geom_sf(data = ala_fkt, aes(shape = nearest_pa), size = 3,
-          color = "#1B5E20", stroke = 1) +
+  geom_sf(
+    data = ala_fkt,
+    aes(shape = nearest_pa),
+    size = 3,
+    color = "#1B5E20",
+    stroke = 1
+  ) +
   geom_label_repel(
-    data = ala_fkt |> mutate(lon = st_coordinates(geometry)[, 1],
-                             lat = st_coordinates(geometry)[, 2]),
-    aes(x = lon, y = lat,
-        label = paste0(fokontany, " (", round(pmin(dist_php, dist_caz), 1), " km)")),
-    size = 2.5, fontface = "bold", box.padding = 0.6,
+    data = ala_fkt |>
+      mutate(
+        lon = st_coordinates(geometry)[, 1],
+        lat = st_coordinates(geometry)[, 2]
+      ),
+    aes(
+      x = lon,
+      y = lat,
+      label = paste0(
+        fokontany,
+        " (",
+        round(pmin(dist_php, dist_caz), 1),
+        " km)"
+      )
+    ),
+    size = 2.5,
+    fontface = "bold",
+    box.padding = 0.6,
     min.segment.length = 0
   ) +
   scale_shape_manual(
@@ -288,8 +430,10 @@ p +
   labs(
     subtitle = "All fokontany exposed at observatory level from 2008 (CBNRM enforcement)"
   ) +
-  coord_sf(xlim = c(ala_bbox["xmin"], ala_bbox["xmax"]),
-           ylim = c(ala_bbox["ymin"], ala_bbox["ymax"])) +
+  coord_sf(
+    xlim = c(ala_bbox["xmin"], ala_bbox["xmax"]),
+    ylim = c(ala_bbox["ymin"], ala_bbox["ymax"])
+  ) +
   theme_minimal(base_size = 11) +
   theme(legend.position = "bottom")
 ```
@@ -305,8 +449,10 @@ res_deb_25 |>
   left_join(um1_25 |> select(j5, um1), by = "j5") |>
   left_join(extractive_hh, by = "j5") |>
   left_join(
-    um2_25 |> filter(um2_a == 1, um2_lig == 4) |>
-      distinct(j5) |> mutate(fishes = TRUE),
+    um2_25 |>
+      filter(um2_a == 1, um2_lig == 4) |>
+      distinct(j5) |>
+      mutate(fishes = TRUE),
     by = "j5"
   ) |>
   mutate(
@@ -350,10 +496,14 @@ The relatively uniform *visiting* rate but sharply differentiated *extractive* r
 hh_site_fig <- res_deb_25 |>
   mutate(
     site = case_when(
-      Observatory == "Marovoay" & str_detect(j4, "(?i)bepako|bepàko")     ~ "Bepako",
-      Observatory == "Marovoay" & str_detect(j4, "(?i)madiro")             ~ "Madiromiongana",
-      Observatory == "Marovoay" & str_detect(j4, "(?i)ampijoroa|ampijoro") ~ "Ampijoroa",
-      Observatory == "Marovoay" & str_detect(j4, "(?i)maroala|maroàla")    ~ "Maroala",
+      Observatory == "Marovoay" &
+        str_detect(j4, "(?i)bepako|bepàko") ~ "Bepako",
+      Observatory == "Marovoay" &
+        str_detect(j4, "(?i)madiro") ~ "Madiromiongana",
+      Observatory == "Marovoay" &
+        str_detect(j4, "(?i)ampijoroa|ampijoro") ~ "Ampijoroa",
+      Observatory == "Marovoay" &
+        str_detect(j4, "(?i)maroala|maroàla") ~ "Maroala",
       TRUE ~ j4
     )
   )
@@ -370,16 +520,22 @@ visit_data <- hh_site_fig |>
   mutate(
     category = case_when(
       um1 == 2 | is.na(um1) ~ "Does not visit",
-      is.na(freq_max)       ~ "Does not visit",
+      is.na(freq_max) ~ "Does not visit",
       freq_max == 1 ~ "Few times/year",
       freq_max == 2 ~ "Few times/month",
       freq_max == 3 ~ "Once/week",
       freq_max == 4 ~ "Several times/week"
     ),
-    category = factor(category, levels = c(
-      "Does not visit", "Few times/year", "Few times/month",
-      "Once/week", "Several times/week"
-    ))
+    category = factor(
+      category,
+      levels = c(
+        "Does not visit",
+        "Few times/year",
+        "Few times/month",
+        "Once/week",
+        "Several times/week"
+      )
+    )
   )
 
 # --- Percentages by site ---
@@ -401,15 +557,15 @@ ggplot(site_freq_fig, aes(x = pct, y = site, fill = category)) +
   geom_col(position = "stack", width = 0.7, color = "grey80", linewidth = 0.2) +
   scale_fill_manual(
     values = c(
-      "Does not visit"       = "white",
-      "Few times/year"       = "#B0BEC5",
-      "Few times/month"      = "#FFB74D",
-      "Once/week"            = "#FF7043",
-      "Several times/week"   = "#D32F2F"
+      "Does not visit" = "white",
+      "Few times/year" = "#B0BEC5",
+      "Few times/month" = "#FFB74D",
+      "Once/week" = "#FF7043",
+      "Several times/week" = "#D32F2F"
     ),
     name = NULL
   ) +
-  facet_wrap(~ Observatory, scales = "free_y", ncol = 1) +
+  facet_wrap(~Observatory, scales = "free_y", ncol = 1) +
   labs(
     x = "% of all households",
     y = NULL
@@ -425,7 +581,7 @@ ggplot(site_freq_fig, aes(x = pct, y = site, fill = category)) +
 
 ## Extensions: three additional cases (2006–2007) {#sec-treat-ext}
 
-The donor-pool audit (@sec-donor-pool) reveals that four donor observatories are themselves adjacent to PAs created during the study period. Three of these provide usable treatment variation — Farafangana (2006), Toliara North (2007), and Fénérive East (2007) — and are analysed as extension cases in @sec-extensions and [Chapter 5](05_extensions.qmd).
+The donor-pool audit (@sec-donor-pool) reveals that four donor observatories are themselves adjacent to PAs created during the study period. Three of these provide usable exposure variation — Farafangana (2006), Toliara North (2007), and Fenérive East (2007) — and are analysed as extension cases in @sec-extensions and [Chapter 5](05_extensions.qmd).
 
 
 # From households to villages {#sec-panel}
@@ -448,7 +604,7 @@ We therefore analyse the data at the **village (*fokontany*) level**, aggregatin
 
 1. **Cross-sectional representativeness is preserved.** Random replacement of attrited households ensures that village-year medians estimate the same population parameter across waves, even though the specific households change.
 2. **The estimator requires a balanced panel.** The generalized synthetic control method (described below) requires a complete unit-by-year matrix. Village-level aggregation produces this, while household-level data would have pervasive gaps.
-3. **Treatment is assigned at the village level.** PA exposure depends on the village's distance to the park boundary, not on individual household characteristics. Village-level analysis matches the unit of treatment assignment to the unit of analysis.
+3. **Exposure is assigned at the village level.** PA exposure depends on the village's distance to the park boundary, not on individual household characteristics. Village-level analysis matches the unit of exposure assignment to the unit of analysis.
 
 The median is preferred to the mean because rural income distributions are right-skewed with occasional extreme values. Village-level medians are more robust to the specific composition of households surveyed in any given year.
 
@@ -486,21 +642,21 @@ A systematic spatial audit ([Appendix B](A2_donor_validity.qmd)) checks whether 
 
 : Donor pool PA exposure classification. {#tbl-donor-status}
 
-The main results use the full 9-donor pool; robustness checks ([Appendix C](A3_robustness.qmd)) confirm that restricting to the 5 clean donors does not materially change the estimates. In the extension analysis ([Chapter 5](05_extensions.qmd)), the four also-exposed observatories become *treated units* with their own PA exposure events.
+The main results use the **5 clean donor observatories**; the [extension analysis](05_extensions.qmd) confirms that including the 4 also-exposed donors does not materially change the estimates. In the extension analysis ([Chapter 5](05_extensions.qmd)), the four also-exposed observatories become *exposed units* with their own PA exposure events.
 
 ## Generalized synthetic control {#sec-gsynth}
 
 ### Intuition {#sec-gsynth-intuition}
 
-Standard difference-in-differences (DiD) assumes that treated and control communities would have followed **parallel trends** in the absence of treatment — that is, that income would have evolved at the same rate in PA-adjacent and distant villages. This is a strong assumption: rural villages may diverge over time for reasons unrelated to PAs, such as changing weather patterns, road construction, commodity price shifts, or local governance quality.
+Standard difference-in-differences (DiD) assumes that exposed and control communities would have followed **parallel trends** in the absence of the PA — that is, that income would have evolved at the same rate in PA-adjacent and distant villages. This is a strong assumption: rural villages may diverge over time for reasons unrelated to PAs, such as changing weather patterns, road construction, commodity price shifts, or local governance quality.
 
 The generalized synthetic control method (gsynth) of @Xu2017 relaxes this assumption. Instead of requiring parallel trends, it allows each village to follow its own trajectory driven by unobserved factors — the method then *learns* these factors from the pre-treatment data and uses them to project what would have happened after the PA was created.
 
-In plain language: gsynth looks at how the treated villages' income moved *before* the PA, identifies which combination of donor villages best reproduces that pattern, and then uses those same donors to predict what the treated villages' income would have been *after* the PA — had the PA never existed. The difference between the actual income and this predicted counterfactual is the estimated treatment effect.
+In plain language: gsynth looks at how the exposed villages' income moved *before* the PA, identifies which combination of donor villages best reproduces that pattern, and then uses those same donors to predict what the exposed villages' income would have been *after* the PA — had the PA never existed. The difference between the actual income and this predicted counterfactual is the estimated effect.
 
 ### Formal specification {#sec-gsynth-formal}
 
-For each treated unit $i$ in post-treatment period $t$, gsynth models the outcome as:
+For each exposed unit $i$ in post-treatment period $t$, gsynth models the outcome as:
 
 $$
 Y_{it} = \alpha_i + \xi_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + D_{it} \cdot \delta_{it} + \varepsilon_{it}
@@ -516,15 +672,15 @@ Key implementation choices:
 
 ### Two separate models {#sec-two-models}
 
-We estimate **two separate models**, reflecting the distinct nature of each treatment:
+We estimate **two separate models**, reflecting the distinct nature of each case:
 
-1. **Marovoay model**: Treated units = Madiromiongana and Bepako (east bank, from 2003). Donors = all other rural observatory sites, including the Marovoay west-bank sites (Ampijoroa, Maroala). With 2 treated sites and ~60 donors, gsynth estimates unit-specific counterfactuals for each village.
+1. **Marovoay model**: Exposed units = Madiromiongana and Bepako (east bank, from 2003). Donors = all other rural observatory sites, including the Marovoay west-bank sites (Ampijoroa, Maroala). With 2 exposed sites and ~60 donors, gsynth estimates unit-specific counterfactuals for each village.
 
-2. **Alaotra model**: Treated unit = aggregated Alaotra observatory (from 2008). Donors = all non-Alaotra rural observatory sites, including all four Marovoay *fokontany*. With a single treated unit, this reduces to a synthetic control with interactive fixed effects.
+2. **Alaotra model**: Exposed unit = aggregated Alaotra observatory (from 2008). Donors = all non-Alaotra rural observatory sites, including all four Marovoay *fokontany*. With a single exposed unit, this reduces to a synthetic control with interactive fixed effects.
 
-## Inference with few treated units {#sec-inference}
+## Inference with few exposed units {#sec-inference}
 
-A fundamental constraint of this design is the small number of treated units: 2 sites for Marovoay, 1 for Alaotra. With so few treated clusters, standard statistical tests are unreliable regardless of the estimator chosen.
+A fundamental constraint of this design is the small number of exposed units: 2 sites for Marovoay, 1 for Alaotra. With so few exposed clusters, standard statistical tests are unreliable regardless of the estimator chosen.
 
 To understand this constraint concretely: for Marovoay, the set of observable units within the observatory comprises 4 sites (2 east-bank, 2 west-bank). The number of ways to assign exactly 2 of these 4 units as "exposed" is $\binom{4}{2} = 6$. Under the sharp null hypothesis of no treatment effect, the **minimum achievable p-value** is therefore $1/6 \approx 0.167$ for a one-sided test. No statistical test based solely on these 4 sites can produce a p-value below 0.167, regardless of how large the observed effect is.
 
@@ -555,7 +711,7 @@ The two-case comparison above — strict enforcement at Ankarafantsika versus pa
 
 : Extension observatories. {#tbl-ext-cases}
 
-These three observatories move from liabilities in the donor pool to informative treated units, enabling a five-case comparison of how conservation governance type, enforcement intensity, and PA size shape household-income outcomes. The shorter post-treatment windows (8–9 years versus 12 for Marovoay and 7 for Alaotra) limit precision but broaden the institutional variation. The full analysis is presented in [Chapter 5](05_extensions.qmd).
+These three observatories move from liabilities in the donor pool to informative exposed units, enabling a five-case comparison of how conservation governance type, enforcement intensity, and PA size shape household-income outcomes. The shorter post-exposure windows (8–9 years versus 12 for Marovoay and 7 for Alaotra) limit precision but broaden the institutional variation. The full analysis is presented in [Chapter 5](05_extensions.qmd).
 
 
 # Looking ahead: household-level estimation {#sec-did-roadmap}
@@ -570,4 +726,4 @@ $$
 
 where $\alpha_s$ are site fixed effects, $\lambda_t$ year fixed effects, and $D_{st}$ the treatment indicator for site $s$ at time $t$. Standard errors are clustered at the site level.
 
-The 2025 resurvey opens a particularly powerful design: a **long-run 2×2 DiD** comparing the pre-treatment period (1999–2002) to the 2025 wave — a 23-year post-treatment observation that bypasses all intermediate panel-gap issues. Combined with a **Callaway–Sant'Anna** estimator exploiting four staggered treatment cohorts (Ankarafantsika 2003, Farafangana/Toliara/Fénérive 2006–07, Alaotra 2008, plus never-treated), and **Sun–Abraham event studies** via `fixest::sunab()`, the 2026 survey wave will enable fully household-level inference. This forward-looking design is discussed further in [Chapter 6](06_discussion.qmd).
+The 2025 resurvey opens a particularly powerful design: a **long-run 2×2 DiD** comparing the pre-treatment period (1999–2002) to the 2025 wave — a 23-year post-exposure observation that bypasses all intermediate panel-gap issues. Combined with a **Callaway–Sant’Anna** estimator exploiting four staggered exposure cohorts (Ankarafantsika 2003, Farafangana/Toliara/Fenérive 2006–07, Alaotra 2008, plus never-exposed), and **Sun–Abraham event studies** via `fixest::sunab()`, the 2026 survey wave will enable fully household-level inference. This forward-looking design is discussed further in [Chapter 6](06_discussion.qmd).

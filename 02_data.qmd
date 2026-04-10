@@ -101,12 +101,12 @@ treated_cov <- coverage |>
     status = case_when(
       obs == "03" &
         grepl("Bepako|Madiromiongana", unit_label) &
-        year >= TREAT_YEAR_MARO ~ "Treated (post)",
+        year >= TREAT_YEAR_MARO ~ "Exposed (post)",
       obs == "03" &
-        grepl("Bepako|Madiromiongana", unit_label) ~ "Treated (pre)",
+        grepl("Bepako|Madiromiongana", unit_label) ~ "Exposed (pre)",
       obs == "03" ~ "Maro. control",
-      obs == "21" & year >= TREAT_YEAR_ALA ~ "Treated (post)",
-      obs == "21" ~ "Treated (pre)"
+      obs == "21" & year >= TREAT_YEAR_ALA ~ "Exposed (post)",
+      obs == "21" ~ "Exposed (pre)"
     ),
     group = if_else(obs == "03", "Marovoay", "Alaotra")
   )
@@ -141,8 +141,8 @@ ggplot(all_cov, aes(x = factor(year), y = unit_label, fill = status)) +
   geom_tile(color = "white", linewidth = 0.3) +
   scale_fill_manual(
     values = c(
-      "Treated (post)" = "#EF9A9A",
-      "Treated (pre)" = "#A5D6A7",
+      "Exposed (post)" = "#EF9A9A",
+      "Exposed (pre)" = "#A5D6A7",
       "Maro. control" = "#90CAF9",
       "Donor" = "#E0E0E0"
     ),
@@ -394,7 +394,7 @@ maro_trends <- maro_panel |>
     se_ln = sd(ln_rev, na.rm = TRUE) / sqrt(n()),
     .by = c(year, treated)
   ) |>
-  mutate(group = if_else(treated, "East bank (treated)", "West bank (donor)"))
+  mutate(group = if_else(treated, "East bank (exposed)", "West bank (donor)"))
 
 p1 <- ggplot(maro_trends, aes(year, mean_ln, color = group, shape = group)) +
   annotate(
@@ -420,7 +420,7 @@ p1 <- ggplot(maro_trends, aes(year, mean_ln, color = group, shape = group)) +
   ) +
   scale_color_manual(
     values = c(
-      "East bank (treated)" = "#D32F2F",
+      "East bank (exposed)" = "#D32F2F",
       "West bank (donor)" = "#1565C0"
     )
   ) +
@@ -484,7 +484,7 @@ p1 +
   p2 +
   plot_annotation(
     title = "Income Trends by Observatory",
-    subtitle = "Shaded regions = post-treatment"
+    subtitle = "Shaded regions = post-exposure"
   )
 ```
 
@@ -501,9 +501,9 @@ analysis_sample <- household_consolidated |>
   ) |>
   mutate(
     group = case_when(
-      obs == "03" & site_id %in% c("031", "032") ~ "Marovoay treated (east)",
+      obs == "03" & site_id %in% c("031", "032") ~ "Marovoay exposed (east)",
       obs == "03" ~ "Marovoay control (west)",
-      obs == "21" ~ "Alaotra (treated)",
+      obs == "21" ~ "Alaotra (exposed)",
       TRUE ~ "Donor pool"
     ),
     revtot_eq = revtot / oecd_equiv
@@ -525,9 +525,9 @@ analysis_sample |>
   arrange(match(
     group,
     c(
-      "Marovoay treated (east)",
+      "Marovoay exposed (east)",
       "Marovoay control (west)",
-      "Alaotra (treated)",
+      "Alaotra (exposed)",
       "Donor pool"
     )
   )) |>

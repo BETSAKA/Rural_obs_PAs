@@ -13,9 +13,9 @@ library(synthdid)
 ```{r}
 #| label: load-robustness
 
-# Primary specification (cached)
-gs_main_maro  <- read_rds("data/paper12_gsynth_maro_oecd.rds")
-gs_main_ala   <- read_rds("data/paper12_gsynth_ala_oecd.rds")
+# Primary specification (cached, clean 5-donor pool)
+gs_main_maro  <- read_rds("data/paper14_gsynth_maro_oecd.rds")
+gs_main_ala   <- read_rds("data/paper14_gsynth_ala_oecd.rds")
 
 # Robustness 1: unadjusted log income (no OECD equivalisation)
 gs_unadj_maro <- read_rds("data/paper12_gsynth_maro.rds")
@@ -26,20 +26,22 @@ gs_lev_maro   <- read_rds("data/robustness_gsynth_levels_maro.rds")
 gs_lev_ala    <- read_rds("data/robustness_gsynth_levels_ala.rds")
 
 # Helper: extract period-by-period ATT path from cached gsynth object
+# NOTE: gsynth $est_att rownames are *relative* time (e.g. -4, -3, ..., 11),
+# not calendar years. We use them directly as rel_time.
 extract_att_path <- function(gs, treat_year) {
   mat <- gs$est_att
   if (is.null(mat)) {
-    return(tibble(year = integer(), att = double(),
+    return(tibble(rel_time = integer(), att = double(),
                   ci_lo = double(), ci_hi = double(),
-                  rel_time = double()))
+                  year = integer()))
   }
   tibble(
-    year  = as.integer(rownames(mat)),
-    att   = mat[, "ATT"],
-    ci_lo = mat[, "CI.lower"],
-    ci_hi = mat[, "CI.upper"]
+    rel_time = as.integer(rownames(mat)),
+    att      = mat[, "ATT"],
+    ci_lo    = mat[, "CI.lower"],
+    ci_hi    = mat[, "CI.upper"]
   ) |>
-    mutate(rel_time = year - treat_year)
+    mutate(year = rel_time + treat_year)
 }
 
 # Helper: extract a single statistic from cached gsynth est_avg
@@ -96,7 +98,7 @@ p_unadj_m + p_unadj_a +
   plot_annotation(title = "Unadjusted Log Income: gsynth ATT Paths")
 ```
 
-The unadjusted Ankarafantsika ATT is slightly larger in magnitude than the OECD-equivalised estimate, consistent with east-bank treated households being slightly larger on average (larger households receive a smaller OECD adjustment, attenuating the per-capita gap). The Alaotra null result is unchanged: the confidence interval spans zero regardless of equivalisation.
+The unadjusted Ankarafantsika ATT is slightly larger in magnitude than the OECD-equivalised estimate, consistent with east-bank exposed households being slightly larger on average (larger households receive a smaller OECD adjustment, attenuating the per-capita gap). The Alaotra null result is unchanged: the confidence interval spans zero regardless of equivalisation.
 
 
 # Income in levels {#sec-c-levels}
@@ -118,7 +120,7 @@ panel_desc <- household_consolidated |>
     revtot_w = pmin(revtot, quantile(revtot, 0.99, na.rm = TRUE)),
     revtot_w_k = revtot_w / 1000,
     group = case_when(
-      site_id %in% c("031", "032") ~ "Marovoay east (treated)",
+      site_id %in% c("031", "032") ~ "Marovoay east (exposed)",
       site_id %in% c("033", "034") ~ "Marovoay west (control)",
       obs == "21" ~ "Lac Alaotra",
       TRUE ~ "Donor pool"
@@ -133,7 +135,7 @@ panel_desc |>
     `N (HH-years)` = n(),
     .by = group
   ) |>
-  arrange(match(group, c("Marovoay east (treated)", "Marovoay west (control)",
+  arrange(match(group, c("Marovoay east (exposed)", "Marovoay west (control)",
                          "Lac Alaotra", "Donor pool"))) |>
   gt() |>
   tab_header(
@@ -222,10 +224,10 @@ Synthetic Difference-in-Differences [SDID; @Arkhangelsky2021] provides a doubly-
 ```{r}
 #| label: sdid-compute
 
-# Build OECD-equivalised panel for SDID
+# Build OECD-equivalised panel for SDID (clean donors only)
 panel_hh_sdid <- household_consolidated |>
   filter(
-    obs %in% c("03", "21", ALL_DONOR_OBS),
+    obs %in% c("03", "21", CLEAN_DONOR_OBS),
     year %in% STUDY_START:STUDY_END,
     !(obs == "03" & year == 2005)
   ) |>
@@ -337,6 +339,10 @@ plot(sdid_maro) +
   theme_minimal(base_size = 11)
 ```
 
+::: {.callout-note title="Reading the SDID plot"}
+The triangles at the bottom of the SDID plot represent **time weights** ($\hat{\lambda}_t$). These indicate how much each pre-treatment period contributes to the counterfactual construction. Larger triangles mean that period receives more weight. Time weighting is a distinctive feature of SDID: it concentrates the comparison on the pre-treatment periods most predictive of post-treatment outcomes, improving efficiency relative to standard DiD (which implicitly weights all pre-treatment periods equally).
+:::
+
 ## Alaotra (SDID)
 
 ```{r}
@@ -359,6 +365,10 @@ tibble(
   )
 ```
 
+
+::: {.callout-warning title="Interpreting the synthetic control estimates"}
+The SC estimates in the tables above are produced by `synthdid::sc_estimate()`, which constructs its own synthetic control independently from gsynth. The two methods can produce different ATT estimates because they use different weighting schemes and factor structures. The Alaotra SC estimate in particular should be interpreted with caution: with a single exposed unit and a small balanced panel, the SC unit weights may assign high weight to a small number of donors, making the estimate sensitive to individual donor trajectories. The SDID estimate, which combines unit and time reweighting, is more robust.
+:::
 
 # Summary of robustness {#sec-c-summary}
 

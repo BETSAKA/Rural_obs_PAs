@@ -147,7 +147,7 @@ household_consolidated |>
 Three scenarios determine usability for impact evaluation:
 
 1. **PA predates ROS entirely** → no pre-treatment baseline → unusable (e.g. Ranomafana, created 1991).
-2. **PA created during ROS surveys** → impact analysis possible → *these are our treatment cases*.
+2. **PA created during ROS surveys** → impact analysis possible → *these are our exposure cases*.
 3. **PA created after ROS ended** → baseline only; resurvey needed for evaluation.
 
 ## Decree date revision
@@ -210,7 +210,7 @@ ggplot() +
 
 ## Priority pairs
 
-The spatial and temporal overlay identifies Marovoay--Ankarafantsika and Alaotra--Lac Alaotra as the most promising pairs for causal analysis (long panels, clear treatment dates). Farafangana, Toliara North, and Fénérive East are secondary candidates explored in [Chapter 5](05_extensions.qmd). A 10 km buffer (CRS EPSG:29701, Laborde Madagascar) around PAs is used for the proximity screening.
+The spatial and temporal overlay identifies Marovoay--Ankarafantsika and Alaotra--Lac Alaotra as the most promising pairs for causal analysis (long panels, clear exposure dates). Farafangana, Toliara North, and Fénérive East are secondary candidates explored in [Chapter 5](05_extensions.qmd). A 10 km buffer (CRS EPSG:29701, Laborde Madagascar) around PAs is used for the proximity screening.
 
 ::: {.callout-note}
 ROS observatories were selected for agricultural and socio-economic monitoring, not proximity to PAs. Overlaps are partly coincidental and require cautious interpretation.

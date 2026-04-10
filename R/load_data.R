@@ -87,11 +87,18 @@ dyn_study <- wdpa |>
   ) |>
   st_make_valid()
 
-# Individual PA extractions — latest non-Ramsar polygon only
+# Individual PA extractions — latest non-Ramsar external boundary only
 ankarafantsika_pa <- wdpa |>
-  filter(grepl("Ankarafantsika", NAME), !grepl("Ramsar", DESIG_ENG)) |>
+  filter(grepl("Ankarafantsika", NAME), !grepl("Ramsar", DESIG_ENG),
+         zone_type == "external_boundary") |>
   filter(is.na(valid_to)) |>
   slice_max(valid_from, n = 1)
+
+# Pre-2002 RNI boundary (before the 2002 national park extension)
+ankarafantsika_rni <- wdpa |>
+  filter(grepl("Ankarafantsika", NAME), !grepl("Ramsar", DESIG_ENG),
+         zone_type == "external_boundary", state_id == "1299_1927")
+
 alaotra_pa <- wdpa |>
   filter(grepl("Lac Alaotra", NAME), !grepl("Ramsar", DESIG_ENG)) |>
   filter(is.na(valid_to)) |>
@@ -155,6 +162,10 @@ maro_fkt <- tibble(
   st_as_sf(coords = c("lon", "lat"), crs = 4326)
 maro_fkt$dist_km <- round(
   as.numeric(st_distance(maro_fkt, st_union(ankarafantsika_pa))) / 1000,
+  1
+)
+maro_fkt$dist_rni_km <- round(
+  as.numeric(st_distance(maro_fkt, st_union(ankarafantsika_rni))) / 1000,
   1
 )
 

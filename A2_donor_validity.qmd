@@ -68,7 +68,7 @@ proximity <- which(dist_mat <= THRESHOLD_KM, arr.ind = TRUE) |>
       within_study ~ "New during study (1999–2014)",
       post_study   ~ "Post-study (after 2014)"
     ),
-    role = if_else(OBS_CODE %in% DONOR_OBS_CODES, "Donor pool", "Treated")
+    role = if_else(OBS_CODE %in% DONOR_OBS_CODES, "Donor pool", "Exposed")
   )
 
 # --- Classify donor observatories ---
@@ -106,7 +106,7 @@ donor_status <- all_donors_base |>
   arrange(exposure_status, OBS_CODE)
 ```
 
-The generalised synthetic control estimator requires that **donor pool units are never exposed to the treatment of interest**. In this study, the nine donor observatories used in the primary analysis ([Chapter 4](04_results.qmd)) should not themselves be adjacent to protected areas that became actively enforced during the 1999--2014 study period. This assumption is plausible by design --- ROS observatories were chosen for agricultural monitoring, not PA proximity --- but has never been systematically verified. This appendix provides a spatial audit.
+The generalised synthetic control estimator requires that **donor pool units are never exposed to the conservation intervention of interest**. In this study, the nine donor observatories used in the primary analysis ([Chapter 4](04_results.qmd)) should not themselves be adjacent to protected areas that became actively enforced during the 1999--2014 study period. This assumption is plausible by design --- ROS observatories were chosen for agricultural monitoring, not PA proximity --- but has never been systematically verified. This appendix provides a spatial audit.
 
 
 # Why static PA boundaries are insufficient {#sec-b-static}
@@ -133,18 +133,18 @@ timeline_data <- proximity |>
   left_join(obs_code_names, by = "OBS_CODE") |>
   mutate(
     panel_role = case_when(
-      OBS_CODE %in% TREATED_CODES ~ "Treated",
+      OBS_CODE %in% TREATED_CODES ~ "Exposed",
       exposure_type == "New during study (1999–2014)" ~ "Also-exposed donor",
       exposure_type == "Pre-existing (before 1999)"   ~ "Pre-existing donor",
       TRUE ~ "Clean donor"
     ),
     panel_role = factor(panel_role,
-                        levels = c("Treated", "Also-exposed donor",
+                        levels = c("Exposed", "Also-exposed donor",
                                    "Pre-existing donor", "Clean donor"))
   ) |>
   filter(!is.na(valid_from))
 
-role_rank <- c("Treated" = 1, "Also-exposed donor" = 2,
+role_rank <- c("Exposed" = 1, "Also-exposed donor" = 2,
                "Pre-existing donor" = 3, "Clean donor" = 4)
 obs_order <- timeline_data |>
   mutate(rrank = role_rank[as.character(panel_role)]) |>
@@ -157,7 +157,7 @@ timeline_data <- timeline_data |>
   mutate(obs_label = factor(obs_label, levels = obs_order))
 
 role_cols <- c(
-  "Treated"             = "#D32F2F",
+  "Exposed"             = "#D32F2F",
   "Also-exposed donor"  = "#E65100",
   "Pre-existing donor"  = "#F9A825",
   "Clean donor"         = "#388E3C"
@@ -213,7 +213,7 @@ proximity |>
   slice_min(dist_km, by = c(OBS_CODE, WDPAID)) |>
   left_join(obs_code_names, by = "OBS_CODE") |>
   mutate(
-    panel_role = if_else(OBS_CODE %in% TREATED_CODES, "Treated", "Donor pool")
+    panel_role = if_else(OBS_CODE %in% TREATED_CODES, "Exposed", "Donor pool")
   ) |>
   select(
     `Observatory`    = obs_label,
@@ -245,7 +245,7 @@ proximity |>
   ) |>
   tab_style(
     style = list(cell_text(weight = "bold")),
-    locations = cells_body(rows = `Role` == "Treated")
+    locations = cells_body(rows = `Role` == "Exposed")
   ) |>
   fmt_date(columns = `Active from`, date_style = "yMd")
 ```
@@ -267,8 +267,8 @@ The nine donor observatories fall into three categories:
 
 **Also exposed** (new PA within 20 km during study period):
 
-- **Antsohihy (12)** --- within 0.3 km of Corridor forestier Bongolava (IUCN V, 15 September 2006). The commune of Tsarahasina borders the corridor directly. However, Antsohihy's survey ends in 2005, providing only 1 post-2006 year. It is excluded from both the donor pool and the treated sample.
-- **Farafangana (15)** --- within 14 km of Corridor Forestier Ambositra-Vondrozo (IUCN V, 15 September 2006), and with pre-existing proximity to Manombo SR (IUCN IV, 1962). Pre-existing exposure is absorbed by the unit fixed effect; the 2006 CFAV decree represents new treatment.
+- **Antsohihy (12)** --- within 0.3 km of Corridor forestier Bongolava (IUCN V, 15 September 2006). The commune of Tsarahasina borders the corridor directly. However, Antsohihy's survey ends in 2005, providing only 1 post-2006 year. It is excluded from both the donor pool and the exposed sample.
+- **Farafangana (15)** --- within 14 km of Corridor Forestier Ambositra-Vondrozo (IUCN V, 15 September 2006), and with pre-existing proximity to Manombo SR (IUCN IV, 1962). Pre-existing exposure is absorbed by the unit fixed effect; the 2006 CFAV decree represents new exposure.
 - **Toliara North (23)** --- within 1.4 km of Ranobe PK 32 (December 2008), 12 km of Amoron'i Onilahy (January 2007), and 16 km of Mikea NP (April 2007). The most problematic case: a cascade of three PAs starting January 2007.
 - **Fénérive East (24)** --- within 6 km of Réserve de Tampolo (IUCN IV, August 2007). Small reserve with low enforcement intensity, but proximity is clear.
 
@@ -443,15 +443,15 @@ The contamination audit has two consequences:
 
 ## For the extended analysis
 
-The four also-exposed donors become **treated units** in the extended analysis ([Chapter 5](05_extensions.qmd)). Antsohihy is excluded (insufficient post-treatment coverage). Farafangana, Toliara North, and Fénérive East are viable treated cases with ≥3 post-treatment years and plausible identification stories. Their redesignation from donors to treated units simultaneously:
+The four also-exposed donors become **exposed units** in the extended analysis ([Chapter 5](05_extensions.qmd)). Antsohihy is excluded (insufficient post-treatment coverage). Farafangana, Toliara North, and Fénérive East are viable exposed cases with ≥3 post-treatment years and plausible identification stories. Their redesignation from donors to exposed units simultaneously:
 
 - Purifies the donor pool (removing also-exposed units).
-- Enriches the treated sample (five observatory--PA pairs instead of two).
+- Enriches the exposed sample (five observatory--PA pairs instead of two).
 - Enables a broader comparison of conservation governance types.
 
 ```{r}
 #| label: fig-clean-donors
-#| fig-cap: "Map of Madagascar with observatory locations coloured by status: treated (Ch. 4), new treated (Ch. 5), clean donor, excluded."
+#| fig-cap: "Map of Madagascar with observatory locations coloured by status: exposed (Ch. 4), newly exposed (Ch. 5), clean donor, excluded."
 #| fig-height: 7
 #| fig-width: 7
 
@@ -464,22 +464,22 @@ obs_locs_full <- bind_rows(
 ) |>
   mutate(
     status = case_when(
-      OBS_CODE %in% c(3L, 21L) ~ "Treated (Ch. 4)",
-      OBS_CODE %in% c(15L, 23L, 24L) ~ "New treated (Ch. 5)",
+      OBS_CODE %in% c(3L, 21L) ~ "Exposed (Ch. 4)",
+      OBS_CODE %in% c(15L, 23L, 24L) ~ "Newly exposed (Ch. 5)",
       OBS_CODE == 12L ~ "Excluded (insufficient coverage)",
       OBS_CODE %in% as.integer(CLEAN_DONOR_OBS) ~ "Clean donor"
     )
   )
 
 status_pal <- c(
-  "Treated (Ch. 4)"                 = "#D32F2F",
-  "New treated (Ch. 5)"             = "#E65100",
+  "Exposed (Ch. 4)"                 = "#D32F2F",
+  "Newly exposed (Ch. 5)"             = "#E65100",
   "Clean donor"                     = "#388E3C",
   "Excluded (insufficient coverage)" = "grey60"
 )
 status_shapes <- c(
-  "Treated (Ch. 4)"                 = 17,
-  "New treated (Ch. 5)"             = 18,
+  "Exposed (Ch. 4)"                 = 17,
+  "Newly exposed (Ch. 5)"             = 18,
   "Clean donor"                     = 16,
   "Excluded (insufficient coverage)" = 4
 )
@@ -500,7 +500,7 @@ ggplot() +
   scale_colour_manual(values = status_pal, name = NULL) +
   scale_shape_manual(values = status_shapes, name = NULL) +
   labs(title = "Donor Pool Classification",
-       subtitle = "Green = clean donors · Orange = also exposed (→ new treated in Ch. 5)") +
+       subtitle = "Green = clean donors · Orange = also exposed (→ newly exposed in Ch. 5)") +
   theme_void(base_size = 11) +
   theme(legend.position = "bottom")
 ```
