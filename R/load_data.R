@@ -89,15 +89,22 @@ dyn_study <- wdpa |>
 
 # Individual PA extractions — latest non-Ramsar external boundary only
 ankarafantsika_pa <- wdpa |>
-  filter(grepl("Ankarafantsika", NAME), !grepl("Ramsar", DESIG_ENG),
-         zone_type == "external_boundary") |>
+  filter(
+    grepl("Ankarafantsika", NAME),
+    !grepl("Ramsar", DESIG_ENG),
+    zone_type == "external_boundary"
+  ) |>
   filter(is.na(valid_to)) |>
   slice_max(valid_from, n = 1)
 
 # Pre-2002 RNI boundary (before the 2002 national park extension)
 ankarafantsika_rni <- wdpa |>
-  filter(grepl("Ankarafantsika", NAME), !grepl("Ramsar", DESIG_ENG),
-         zone_type == "external_boundary", state_id == "1299_1927")
+  filter(
+    grepl("Ankarafantsika", NAME),
+    !grepl("Ramsar", DESIG_ENG),
+    zone_type == "external_boundary",
+    state_id == "1299_1927"
+  )
 
 alaotra_pa <- wdpa |>
   filter(grepl("Lac Alaotra", NAME), !grepl("Ramsar", DESIG_ENG)) |>
