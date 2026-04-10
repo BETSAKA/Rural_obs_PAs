@@ -1,0 +1,388 @@
+---
+title: "Conservation in Madagascar"
+subtitle: "Protected areas, governance models, and rural livelihoods"
+---
+
+# Madagascar's protected area expansion {#sec-pa-system}
+
+The international community has committed to protecting 30% of global land and sea by 2030 under the Kunming-Montréal Global Biodiversity Framework. For biodiversity-rich countries like Madagascar, this target translates into a sustained impulsion to expand and strengthen protected area (PA) networks. Madagascar responded early: at the 2003 Durban World Parks Congress, President Ravalomanana announced the *Durban Vision* — a commitment to triple the country's PA surface from 1.7 million to 6 million hectares [@Kremen2006]. By 2015, the *Système des Aires Protégées de Madagascar* (SAPM) had grown from 47 to over 160 protected areas, covering roughly 12% of the national territory.
+
+This expansion was not monolithic. The SAPM introduced a diversity of governance models, ranging from strictly protected national parks under Madagascar National Parks (MNP) management to multipurpose landscapes co-managed by international NGOs and local communities through *transferts de gestion*. The IUCN classification system captures this spectrum: Category II parks prioritise ecosystem integrity with limited human use, while Categories V and VI allow sustainable resource extraction and community participation.
+
+The welfare consequences of this expansion for adjacent rural communities remain contested. A growing quasi-experimental literature finds heterogeneous effects of PAs worldwide: some studies document negative impacts on local incomes and consumption [@Andam2010; @Sims2010], while others find neutral or positive effects, particularly when PAs generate tourism revenues or ecosystem services [@Naidoo2019]. In Madagascar specifically, evidence remains thin and largely cross-sectional [@Ferraro2011]. The few causal studies focus on deforestation outcomes rather than household livelihoods.
+
+A central question in this debate is whether the **governance model** of a protected area matters for the people living around it. Strict exclusionary conservation and participatory community-based management represent fundamentally different social contracts with local populations. Yet most empirical studies treat PAs as homogeneous interventions, comparing "protected" with "unprotected" rather than examining how different institutional arrangements mediate livelihood impacts.
+
+```{r}
+#| label: fig-pa-cumarea
+#| fig-cap: "Cumulative protected area coverage in Madagascar by IUCN category. Data from the dynamic WDPA layer; each PA enters at its earliest legal creation date. The post-Durban surge (after 2003) is dominated by Categories V and VI (multipurpose)."
+#| fig-height: 5
+#| fig-width: 8
+
+library(tidyverse)
+library(sf)
+
+dyn_wdpa <- read_rds("data/dynamic_wdpa.rds")
+
+# Filter to terrestrial designated PAs (exclude marine, Ramsar, MAB, WHS)
+pa_summary <- dyn_wdpa |>
+  st_drop_geometry() |>
+  filter(
+    STATUS == "Designated",
+    MARINE == "0",
+    !DESIG %in%
+      c(
+        "UNESCO-MAB Biosphere Reserve",
+        "Ramsar Site, Wetland of International Importance",
+        "World Heritage Site (natural or mixed)"
+      )
+  ) |>
+  mutate(rep_area = as.numeric(REP_AREA)) |>
+  filter(!is.na(rep_area), rep_area > 0) |>
+  summarise(
+    creation_year = min(year(valid_from)),
+    iucn_cat = last(IUCN_CAT),
+    area_km2 = max(rep_area),
+    .by = NAME
+  ) |>
+  filter(creation_year > 0)
+
+# Order IUCN categories
+iucn_levels <- c(
+  "Ia",
+  "Ib",
+  "II",
+  "III",
+  "IV",
+  "V",
+  "VI",
+  "Not Reported",
+  "Not Applicable"
+)
+iucn_colours <- c(
+  "Ia" = "#1B5E20",
+  "Ib" = "#2E7D32",
+  "II" = "#388E3C",
+  "III" = "#43A047",
+  "IV" = "#66BB6A",
+  "V" = "#A5D6A7",
+  "VI" = "#C8E6C9",
+  "Not Reported" = "#BDBDBD",
+  "Not Applicable" = "#E0E0E0"
+)
+
+pa_summary <- pa_summary |>
+  mutate(iucn_cat = factor(iucn_cat, levels = iucn_levels))
+
+# Expand to year grid and compute cumulative area per category
+year_range <- seq(min(pa_summary$creation_year), max(pa_summary$creation_year))
+
+cum_area <- pa_summary |>
+  expand_grid(year = year_range) |>
+  filter(year >= creation_year) |>
+  summarise(area_km2 = sum(area_km2), .by = c(year, iucn_cat)) |>
+  # Ensure all category-year combos exist
+  complete(year, iucn_cat, fill = list(area_km2 = 0))
+
+ggplot(cum_area, aes(x = year, y = area_km2, fill = iucn_cat)) +
+  geom_area(alpha = 0.85) +
+  geom_vline(xintercept = 2003, linetype = "dashed", colour = "grey30") +
+  annotate(
+    "text",
+    x = 2003.5,
+    y = max(cumsum(pa_summary$area_km2)) * 0.95,
+    label = "Durban Vision\n(2003)",
+    hjust = 0,
+    size = 3,
+    colour = "grey30",
+    fontface = "italic"
+  ) +
+  scale_fill_manual(
+    values = iucn_colours,
+    name = "IUCN Category",
+    drop = FALSE
+  ) +
+  scale_x_continuous(breaks = seq(1930, 2020, 10)) +
+  scale_y_continuous(labels = scales::label_comma()) +
+  labs(x = NULL, y = expression("Cumulative area (km"^2 * ")")) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom", legend.key.size = unit(0.4, "cm"))
+```
+
+# The Rural Observatory Surveys {#sec-ros}
+
+This study exploits a rare longitudinal dataset: the Rural Observatory System (ROS), a network of rural observatories conducted across Madagascar between 1995 and 2015. Coordinated by INSTAT then the Ministry of Agriculture, with technical support from IRD and financial support from international donors, the ROS surveyed approximately 500 households per observatory per year across up to 28 observatory sites spanning the country's diverse agroecological zones — from the humid eastern lowlands to the semi-arid south [@Razafindrakoto2015].
+
+```{r}
+#| label: fig-hist-ros
+#| fig-cap: "Coarse location of rural observatory and survey years"
+
+# Load required libraries
+library(tidyverse) # A series of packages for data manipulation
+library(haven) # Required for reading STATA files (.dta)
+library(labelled) # To work with labelled data from STATA
+library(sf) # for spatial data handling
+library(tmap) # for mapping
+library(readxl) # Read data frames to Excel format
+library(cowplot) # to combine plots
+
+# Select appropriate folder as data source
+data_path <- "data/ROS_MDG_microdata/"
+
+# Define a function to load and count surveys per observatory for a given year
+load_and_count <- function(year, factorize = FALSE) {
+  # Define file path
+  file_path <- paste0(data_path, year, "/res_deb.dta")
+
+  # Load data
+  data <- read_dta(file_path)
+
+  # Extract label and convert to factors if option
+  if (factorize) {
+    data <- data %>%
+      mutate(
+        across(everything(), as.character),
+        across(where(is.labelled), ~ as.character(as_factor(.)))
+      )
+  }
+
+  # Count surveys per observatory
+  count_data <- data %>%
+    group_by(j0) %>%
+    summarise(survey_count = n()) %>%
+    ungroup() %>%
+    mutate(year = year) # Add year column
+
+  return(count_data)
+}
+
+# Generate a list of years
+years <- c(1995:2015, 2025)
+
+# Use purrr::map_df to loop through each year and bind results
+obs_count <- map_df(years, load_and_count) %>%
+  # Remove rows with observatory "7 " and "NA", which are errors
+  filter(j0 != 7 & !is.na(j0) & survey_count > 1) %>%
+  rename(observatory = j0)
+
+# Read observatory names
+observatory_names <- readxl::read_xlsx(
+  "data/georeferencing/observatory_names.xlsx"
+) %>%
+  select(code, observatory_name = name)
+
+# PAss it to wide.
+obs_count <- obs_count %>%
+  left_join(observatory_names, by = c("observatory" = "code")) %>%
+  group_by(observatory_name, year) %>%
+  summarise(survey_count = sum(survey_count))
+
+obs_count_wide <- obs_count %>%
+  pivot_wider(names_from = year, values_from = survey_count)
+
+# Add observatory approximate location
+locations <- tibble(
+  code = c(
+    1,
+    2,
+    3,
+    4,
+    12,
+    13,
+    15,
+    16,
+    21,
+    22,
+    23,
+    24,
+    31,
+    25,
+    41,
+    42,
+    43,
+    51,
+    44,
+    45,
+    61,
+    17,
+    18,
+    19,
+    71,
+    52
+  ),
+  name = c(
+    "Antalaha",
+    "Antsirabe",
+    "Marovoay",
+    "Toliara coastal",
+    "Antsohihy",
+    "Tsiroanomandidy",
+    "Farafangana",
+    "Ambovombe",
+    "Alaotra",
+    "Manjakandriana",
+    "Toliara North",
+    "Fenerive East",
+    "Bekily",
+    "Mahanoro",
+    "Itasy",
+    "Menabe-Belo",
+    "Fianarantsoa",
+    "Tsivory",
+    "Morondava",
+    "Manandriana",
+    "Tanandava",
+    "Ihosy",
+    "Ambohimahasoa",
+    "Manakara",
+    "Tolanaro",
+    "Menabe North-East"
+  ),
+  latitude = c(
+    -14.8833,
+    -19.8659,
+    -16.1000,
+    -23.7574,
+    -14.8796,
+    -18.7713,
+    -22.8167,
+    -25.1667,
+    -17.8319,
+    -18.9167,
+    -23.2941,
+    -17.3500,
+    -24.6900,
+    -19.9000,
+    -19.1686,
+    -19.6975,
+    -21.4527,
+    -24.4667,
+    -20.2833,
+    -20.2333,
+    -22.5711,
+    -22.4000,
+    -20.7145,
+    -22.1333,
+    -25.0381,
+    -20.5486
+  ),
+  longitude = c(
+    50.2833,
+    47.0333,
+    46.6333,
+    43.6770,
+    47.9875,
+    46.0546,
+    47.8333,
+    46.0833,
+    48.4167,
+    47.8000,
+    43.7761,
+    49.4167,
+    45.1700,
+    48.8000,
+    46.7354,
+    44.5419,
+    47.0857,
+    45.4667,
+    44.2833,
+    47.3833,
+    45.0439,
+    46.1167,
+    47.0389,
+    48.0167,
+    46.9562,
+    47.1597
+  )
+)
+
+obs_count <- left_join(
+  obs_count,
+  locations,
+  by = c("observatory_name" = "name")
+)
+
+
+madagascar <- st_read(
+  paste0(
+    "data/georeferencing/OCHA_BNGRC admin boundaries/",
+    "mdg_admbnda_adm0_BNGRC_OCHA_20181031.shp"
+  ),
+  quiet = TRUE
+)
+
+# Sort locations by latitude to generate sequence numbers
+locations <- locations %>%
+  arrange(desc(latitude)) %>%
+  mutate(seq_num = 1:n())
+
+# Create map plot with labels
+map_plot <- ggplot(data = madagascar) +
+  geom_sf(fill = "lightgray", colour = "dimgrey") +
+  geom_point(
+    data = locations,
+    aes(x = longitude, y = latitude, color = name),
+    size = 3
+  ) +
+  geom_text(
+    data = locations,
+    aes(x = longitude, y = latitude, label = seq_num),
+    vjust = -1,
+    hjust = 1,
+    size = 3, # check_overlap = TRUE,
+    fontface = "bold"
+  ) +
+  theme_void() +
+  theme(legend.position = "none")
+
+# Add sequence numbers to observatory names in obs_count dataframe
+obs_count <- obs_count %>%
+  left_join(
+    locations %>%
+      select(name, seq_num),
+    by = c("observatory_name" = "name")
+  ) %>%
+  mutate(observatory_with_num = paste0(seq_num, ". ", observatory_name))
+
+# Create timeline plot using modified obs_count with observatory_with_num
+timeline_plot <- ggplot(
+  obs_count,
+  aes(
+    x = year,
+    y = fct_reorder(observatory_with_num, latitude),
+    color = observatory_name
+  )
+) +
+  geom_point(aes(size = 1), show.legend = F) +
+  theme_minimal() +
+  labs(y = NULL, x = NULL) +
+  theme(
+    axis.text.y = element_text(size = 8, face = "bold"),
+    legend.position = "none"
+  )
+
+# Stitch the plots together
+combined_plot <- plot_grid(map_plot, timeline_plot, rel_widths = c(1.3, 2))
+
+print(combined_plot)
+```
+
+The ROS operates as a **rotating panel**: each observatory tracks a fixed set of households, but approximately 15% leave the sample each year through death, migration, or attrition, with replacement drawn from the original sampling frame. Over a decade, cumulative attrition reaches roughly 80% of the initial cohort. While this design limits individual-level panel analysis, it preserves **cross-sectional representativeness** at each wave: village-year aggregates consistently estimate the same population quantities, making the data well-suited for site-level quasi-experimental methods.
+
+Critically, several rural observatories are located adjacent to protected areas that were extended or created during the survey period (2002–2008). This overlap between a two-decade household survey and staggered conservation interventions provides a natural laboratory for impact evaluation — one that has not been systematically exploited until now.
+
+A 2025 resurvey of two key sites (Marovoay and Alaotra) adds a long-run perspective, enabling us to assess whether short-run effects persist more than two decades after exposure onset. A further 2026 wave is planned to extend coverage to additional observatories.
+
+# Research question {#sec-research-question}
+
+We ask: **does the governance model of a protected area affect household income in surrounding communities?**
+
+We compare two natural experiments embedded in the ROS data:
+
+1. **Strict conservation** — The 2002 extension of Ankarafantsika National Park (IUCN Category II), managed by MNP. The Marovoay observatory straddles the park boundary, with the Betsiboka River creating a natural exposure–control divide between east-bank villages (adjacent to the park) and west-bank villages (effectively separated by the river).
+
+2. **Multipurpose conservation** — The creation of the Lac Alaotra new protected area (IUCN Category VI), managed by Durrell Wildlife Conservation Trust through community-based natural resource management (CBNRM), with effective enforcement from approximately 2008. The entire Alaotra observatory shares dependence on the lake-marsh ecosystem.
+
+Using generalized synthetic control methods [@Xu2017] with an extended donor pool of up to nine additional observatories, we estimate the average treatment effect on the treated (ATT) for equivalised household income. We then extend the analysis to three additional observatory–PA pairs (Farafangana, Toliara North, Fénérive East) where PAs were created in 2006–2007, exploiting the staggered timing to strengthen identification.
+
+The remainder of this document is structured as follows. [Chapter 2](02_data.qmd) describes the data sources and variable construction. [Chapter 3](03_strategy.qmd) details the identification strategy and estimation methods. [Chapter 4](04_results.qmd) presents the main results for Ankarafantsika and Alaotra. [Chapter 5](05_extensions.qmd) extends the analysis to three additional sites. [Chapter 6](06_discussion.qmd) discusses policy implications and outlines plans for the 2026 survey wave.

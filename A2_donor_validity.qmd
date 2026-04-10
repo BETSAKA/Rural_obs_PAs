@@ -1,0 +1,506 @@
+---
+title: "Appendix B: Donor Pool Validity"
+subtitle: "Are donor observatories truly unexposed to conservation interventions?"
+---
+
+```{r}
+#| label: setup
+source("R/load_data.R")
+library(ggrepel)
+
+# Observatory code-name lookup (including Antsohihy which is not in obs_locations)
+obs_code_names <- tibble(
+  OBS_CODE = c(2L, 3L, 12L, 13L, 15L, 16L, 21L, 23L, 24L, 25L, 41L),
+  obs_label = c("Antsirabe (02)", "Marovoay (03)", "Antsohihy (12)",
+                "Tsiroanomandidy (13)", "Farafangana (15)", "Ambovombe (16)",
+                "Alaotra (21)", "Toliara North (23)", "Fénérive East (24)",
+                "Mahanoro (25)", "Itasy (41)")
+)
+
+DONOR_OBS_CODES <- as.integer(ALL_DONOR_OBS)
+TREATED_CODES   <- c(3L, 21L)
+ALL_STUDY_CODES <- c(TREATED_CODES, DONOR_OBS_CODES)
+```
+
+```{r}
+#| label: compute-proximity
+
+# --- Proximity computation chain ---
+# Project to metric CRS (UTM 38S) for distance computation
+study_communes <- obs_communes |>
+  filter(OBS_CODE %in% ALL_STUDY_CODES) |>
+  st_make_valid()
+
+obs_proj <- study_communes |> st_transform(32738)
+dyn_proj <- dyn_study |> st_transform(32738)
+obs_centroids <- st_centroid(obs_proj)
+
+# Full distance matrix (commune × PA), in km
+dist_mat <- st_distance(obs_centroids, dyn_proj) |>
+  units::set_units("km") |>
+  units::drop_units()
+
+# Build attribute lookups
+obs_attr <- study_communes |>
+  st_drop_geometry() |>
+  select(OBS_CODE, OBS_NAME, ADM3_EN) |>
+  mutate(row_idx = row_number())
+
+pa_attr <- dyn_study |>
+  st_drop_geometry() |>
+  select(WDPAID, pa_name = NAME, valid_from) |>
+  mutate(col_idx = row_number())
+
+# Long-form proximity: all (commune, PA) pairs within threshold
+proximity <- which(dist_mat <= THRESHOLD_KM, arr.ind = TRUE) |>
+  as_tibble() |>
+  rename(row_idx = row, col_idx = col) |>
+  mutate(dist_km = dist_mat[cbind(row_idx, col_idx)]) |>
+  left_join(obs_attr, by = "row_idx") |>
+  left_join(pa_attr, by = "col_idx") |>
+  arrange(OBS_CODE, dist_km) |>
+  mutate(
+    pre_study    = valid_from < STUDY_START_DT,
+    within_study = valid_from >= STUDY_START_DT & valid_from <= STUDY_END_DT,
+    post_study   = valid_from > STUDY_END_DT,
+    exposure_type = case_when(
+      pre_study    ~ "Pre-existing (before 1999)",
+      within_study ~ "New during study (1999–2014)",
+      post_study   ~ "Post-study (after 2014)"
+    ),
+    role = if_else(OBS_CODE %in% DONOR_OBS_CODES, "Donor pool", "Exposed")
+  )
+
+# --- Classify donor observatories ---
+all_donors_base <- study_communes |>
+  st_drop_geometry() |>
+  filter(OBS_CODE %in% DONOR_OBS_CODES) |>
+  distinct(OBS_CODE, OBS_NAME) |>
+  filter(!is.na(OBS_NAME)) |>
+  left_join(obs_code_names, by = "OBS_CODE")
+
+contam_summary <- proximity |>
+  filter(role == "Donor pool") |>
+  summarise(
+    any_new_during    = any(within_study),
+    any_pre_existing  = any(pre_study),
+    n_pas_within      = n_distinct(WDPAID),
+    closest_km        = min(dist_km),
+    nearest_pa        = pa_name[which.min(dist_km)],
+    nearest_pa_from   = valid_from[which.min(dist_km)],
+    .by = OBS_CODE
+  )
+
+donor_status <- all_donors_base |>
+  left_join(contam_summary, by = "OBS_CODE") |>
+  mutate(
+    any_new_during    = replace_na(any_new_during, FALSE),
+    any_pre_existing  = replace_na(any_pre_existing, FALSE),
+    n_pas_within      = replace_na(n_pas_within, 0L),
+    exposure_status = case_when(
+      any_new_during   ~ "Also exposed",
+      any_pre_existing ~ "Pre-existing exposure (constant)",
+      TRUE             ~ "Clean"
+    )
+  ) |>
+  arrange(exposure_status, OBS_CODE)
+```
+
+The generalised synthetic control estimator requires that **donor pool units are never exposed to the conservation intervention of interest**. In this study, the nine donor observatories used in the primary analysis ([Chapter 4](04_results.qmd)) should not themselves be adjacent to protected areas that became actively enforced during the 1999--2014 study period. This assumption is plausible by design --- ROS observatories were chosen for agricultural monitoring, not PA proximity --- but has never been systematically verified. This appendix provides a spatial audit.
+
+
+# Why static PA boundaries are insufficient {#sec-b-static}
+
+Standard PA databases --- including the current WDPA and the Vahatra dataset --- record the **most recent boundary and designation** of each protected area. They do not convey:
+
+1. **Boundary changes**: many Malagasy PAs were significantly extended or reorganised between 1999 and 2015.
+2. **Temporary protection decrees**: Madagascar's post-2003 SAPM expansion created PAs first via temporary decrees (*décrets provisoires*) before formal designation.
+3. **Date accuracy**: numerous PAs in the static WDPA carry incorrect or missing `STATUS_YR` values.
+
+
+# Dynamic WDPA construction {#sec-b-wdpa}
+
+We use the **dynamic WDPA for Madagascar** (`dynamic_wdpa.rds`), a temporally explicit database that corrects and extends the standard WDPA with historical states derived from legal texts, multiple institutional datasets, and spatially referenced decree dates. Each record carries a valid-from / valid-to date range, allowing us to reconstruct which PA boundaries were legally operative in any given year.
+
+```{r}
+#| label: fig-wdpa-timeline
+#| fig-cap: "Timeline of PA activation dates by observatory. Study period (1999–2014) shaded."
+#| fig-height: 7
+#| fig-width: 11
+
+timeline_data <- proximity |>
+  slice_min(dist_km, by = c(OBS_CODE, WDPAID)) |>
+  left_join(obs_code_names, by = "OBS_CODE") |>
+  mutate(
+    panel_role = case_when(
+      OBS_CODE %in% TREATED_CODES ~ "Exposed",
+      exposure_type == "New during study (1999–2014)" ~ "Also-exposed donor",
+      exposure_type == "Pre-existing (before 1999)"   ~ "Pre-existing donor",
+      TRUE ~ "Clean donor"
+    ),
+    panel_role = factor(panel_role,
+                        levels = c("Exposed", "Also-exposed donor",
+                                   "Pre-existing donor", "Clean donor"))
+  ) |>
+  filter(!is.na(valid_from))
+
+role_rank <- c("Exposed" = 1, "Also-exposed donor" = 2,
+               "Pre-existing donor" = 3, "Clean donor" = 4)
+obs_order <- timeline_data |>
+  mutate(rrank = role_rank[as.character(panel_role)]) |>
+  slice_min(rrank, n = 1, with_ties = FALSE, by = obs_label) |>
+  arrange(rrank, desc(obs_label)) |>
+  pull(obs_label) |>
+  unique()
+
+timeline_data <- timeline_data |>
+  mutate(obs_label = factor(obs_label, levels = obs_order))
+
+role_cols <- c(
+  "Exposed"             = "#D32F2F",
+  "Also-exposed donor"  = "#E65100",
+  "Pre-existing donor"  = "#F9A825",
+  "Clean donor"         = "#388E3C"
+)
+
+ggplot(timeline_data,
+       aes(x = valid_from, y = obs_label, colour = panel_role)) +
+  annotate("rect",
+           xmin = STUDY_START_DT, xmax = STUDY_END_DT,
+           ymin = -Inf, ymax = Inf,
+           fill = "#E3F2FD", alpha = 0.5) +
+  geom_vline(xintercept = c(STUDY_START_DT, STUDY_END_DT),
+             linetype = "dashed", colour = "grey50", linewidth = 0.4) +
+  geom_point(aes(size = 1 / (dist_km + 0.5)), alpha = 0.85, shape = 16) +
+  geom_label_repel(
+    aes(label = pa_name),
+    size = 2.3, box.padding = 0.35, max.overlaps = 15,
+    show.legend = FALSE, segment.alpha = 0.5
+  ) +
+  scale_colour_manual(values = role_cols, name = "Observatory role") +
+  scale_size_continuous(guide = "none") +
+  scale_x_date(date_breaks = "5 years", date_labels = "%Y",
+               limits = as.Date(c("1955-01-01", "2016-01-01"))) +
+  labs(
+    x = "Year PA became legally operative (dynamic WDPA)",
+    y = NULL,
+    title = "PA Activation Dates Relative to Study Period",
+    subtitle = "Points sized inversely by distance; shaded region = study period (1999–2014)"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom",
+        panel.grid.minor = element_blank())
+```
+
+
+# Proximity analysis {#sec-b-proximity}
+
+## Method
+
+Observatory locations are represented by commune-level polygon centroids from `Observatories_ROS_communes_COD_v4.gpkg`. The dynamic WDPA is filtered to external boundaries active during 1999--2014, then unioned per WDPAID. Both layers are projected to UTM 38S for distance computation.
+
+For each (commune centroid, PA boundary) pair, we compute centroid-to-boundary distance in km. All pairs within **{{< var threshold_km >}} km** are retained and classified by exposure timing:
+
+- **Pre-existing**: PA active before 1999 with unchanged boundaries throughout.
+- **New during study**: PA became operative between 1999 and 2014.
+- **Post-study**: PA created after 2014.
+
+```{r}
+#| label: tbl-proximity
+#| tbl-cap: "All observatory–PA pairs within 20 km, colour-coded by exposure type."
+
+proximity |>
+  slice_min(dist_km, by = c(OBS_CODE, WDPAID)) |>
+  left_join(obs_code_names, by = "OBS_CODE") |>
+  mutate(
+    panel_role = if_else(OBS_CODE %in% TREATED_CODES, "Exposed", "Donor pool")
+  ) |>
+  select(
+    `Observatory`    = obs_label,
+    `Role`           = panel_role,
+    `Closest commune`= ADM3_EN,
+    `Dist. (km)`     = dist_km,
+    `PA name`        = pa_name,
+    `Active from`    = valid_from,
+    `Exposure type`  = exposure_type
+  ) |>
+  mutate(`Dist. (km)` = round(`Dist. (km)`, 1)) |>
+  gt() |>
+  tab_header(
+    title = md("**Observatory–PA Proximity**"),
+    subtitle = md(paste0("All pairs within **", THRESHOLD_KM,
+                         " km** · Dynamic WDPA (1999–2014 study window)"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFCDD2"),
+    locations = cells_body(rows = `Exposure type` == "New during study (1999–2014)")
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFF9C4"),
+    locations = cells_body(rows = `Exposure type` == "Pre-existing (before 1999)")
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#F5F5F5"),
+    locations = cells_body(rows = `Exposure type` == "Post-study (after 2014)")
+  ) |>
+  tab_style(
+    style = list(cell_text(weight = "bold")),
+    locations = cells_body(rows = `Role` == "Exposed")
+  ) |>
+  fmt_date(columns = `Active from`, date_style = "yMd")
+```
+
+
+# Results {#sec-b-results}
+
+## Exposure classification
+
+The nine donor observatories fall into three categories:
+
+**Clean** (no PA within 20 km during study period):
+
+- Antsirabe (02)
+- Tsiroanomandidy (13)
+- Ambovombe (16)
+- Mahanoro (25)
+- Itasy (41)
+
+**Also exposed** (new PA within 20 km during study period):
+
+- **Antsohihy (12)** --- within 0.3 km of Corridor forestier Bongolava (IUCN V, 15 September 2006). The commune of Tsarahasina borders the corridor directly. However, Antsohihy's survey ends in 2005, providing only 1 post-2006 year. It is excluded from both the donor pool and the exposed sample.
+- **Farafangana (15)** --- within 14 km of Corridor Forestier Ambositra-Vondrozo (IUCN V, 15 September 2006), and with pre-existing proximity to Manombo SR (IUCN IV, 1962). Pre-existing exposure is absorbed by the unit fixed effect; the 2006 CFAV decree represents new exposure.
+- **Toliara North (23)** --- within 1.4 km of Ranobe PK 32 (December 2008), 12 km of Amoron'i Onilahy (January 2007), and 16 km of Mikea NP (April 2007). The most problematic case: a cascade of three PAs starting January 2007.
+- **Fénérive East (24)** --- within 6 km of Réserve de Tampolo (IUCN IV, August 2007). Small reserve with low enforcement intensity, but proximity is clear.
+
+```{r}
+#| label: tbl-donor-status
+#| tbl-cap: "Donor pool PA exposure status summary."
+
+donor_status |>
+  mutate(
+    `Closest PA (km)` = if_else(n_pas_within > 0, round(closest_km, 1), NA_real_),
+    `Nearest PA`      = if_else(n_pas_within > 0, nearest_pa, "—"),
+    `PA active from`  = if_else(n_pas_within > 0, nearest_pa_from, NA_Date_)
+  ) |>
+  select(
+    Observatory          = obs_label,
+    `PA exposure status` = exposure_status,
+    `# PAs within 20 km` = n_pas_within,
+    `Closest PA (km)`,
+    `Nearest PA`,
+    `PA active from`
+  ) |>
+  gt() |>
+  tab_header(
+    title = md("**Donor Pool: PA Exposure Status**"),
+    subtitle = "Based on 20 km proximity threshold and dynamic WDPA temporal states"
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFCDD2"),
+    locations = cells_body(rows = `PA exposure status` == "Also exposed")
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFF9C4"),
+    locations = cells_body(rows = `PA exposure status` == "Pre-existing exposure (constant)")
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#E8F5E9"),
+    locations = cells_body(rows = `PA exposure status` == "Clean")
+  ) |>
+  fmt_date(columns = `PA active from`, date_style = "yMd",
+           rows = !is.na(`PA active from`))
+```
+
+```{r}
+#| label: fig-map-exposure
+#| fig-cap: "Map of observatory communes coloured by exposure status. Nearby PA polygons shown."
+#| fig-height: 10
+#| fig-width: 8
+
+# PA polygons that appear in proximity table
+pa_wdpaid_show <- proximity |> pull(WDPAID) |> unique()
+pa_display <- dyn_study |>
+  filter(WDPAID %in% pa_wdpaid_show) |>
+  left_join(
+    proximity |>
+      distinct(WDPAID, exposure_type) |>
+      slice_min(order_by = match(exposure_type,
+                                 c("New during study (1999–2014)",
+                                   "Pre-existing (before 1999)",
+                                   "Post-study (after 2014)")),
+                n = 1, by = WDPAID),
+    by = "WDPAID"
+  )
+
+# Observatory communes coloured by worst exposure
+obs_display <- study_communes |>
+  left_join(
+    proximity |>
+      summarise(
+        worst_exposure = if (any(within_study)) "New during study (1999–2014)"
+                        else if (any(pre_study)) "Pre-existing (before 1999)"
+                        else "Clean (no nearby PA)",
+        .by = OBS_CODE
+      ),
+    by = "OBS_CODE"
+  ) |>
+  mutate(worst_exposure = replace_na(worst_exposure, "Clean (no nearby PA)"))
+
+exp_pal <- c(
+  "New during study (1999–2014)" = "#EF9A9A",
+  "Pre-existing (before 1999)"   = "#FFF59D",
+  "Clean (no nearby PA)"         = "#C8E6C9",
+  "Post-study (after 2014)"      = "#F5F5F5"
+)
+
+ggplot() +
+  geom_sf(data = madagascar, fill = "grey97", colour = "grey80", linewidth = 0.2) +
+  geom_sf(data = pa_display, aes(fill = exposure_type),
+          colour = NA, alpha = 0.35) +
+  geom_sf(data = pa_display, aes(colour = exposure_type),
+          fill = NA, linewidth = 0.5) +
+  geom_sf(data = obs_display, aes(fill = worst_exposure),
+          colour = "grey30", linewidth = 0.25, alpha = 0.8) +
+  geom_sf_label(
+    data = obs_display |>
+      group_by(OBS_CODE) |>
+      summarise(.groups = "drop") |>
+      left_join(obs_code_names, by = "OBS_CODE") |>
+      st_centroid(),
+    aes(label = obs_label),
+    size = 2.2, label.padding = unit(0.12, "lines"), label.size = 0.15,
+    fill = "white", alpha = 0.85
+  ) +
+  scale_fill_manual(values = exp_pal, name = "Exposure type",
+                    aesthetics = c("fill", "colour")) +
+  guides(colour = "none") +
+  labs(title = "Observatory PA Exposure Status",
+       subtitle = "Commune fill = worst exposure during 1999–2014") +
+  theme_void(base_size = 10) +
+  theme(legend.position = "bottom",
+        plot.title = element_text(face = "bold"))
+```
+
+## Detailed exposure profiles
+
+```{r}
+#| label: fig-exposure-detail
+#| fig-cap: "Distance-to-PA for each also-exposed donor observatory."
+#| fig-height: 6
+#| fig-width: 11
+
+exposed_codes <- donor_status |>
+  filter(exposure_status == "Also exposed") |>
+  pull(OBS_CODE)
+
+detail_data <- proximity |>
+  filter(OBS_CODE %in% exposed_codes) |>
+  left_join(obs_code_names, by = "OBS_CODE") |>
+  mutate(
+    pa_label = paste0(pa_name, "\n(", format(valid_from, "%Y"), ")")
+  ) |>
+  slice_min(dist_km, by = c(OBS_CODE, WDPAID))
+
+ggplot(detail_data, aes(x = pa_label, y = dist_km, colour = exposure_type)) +
+  geom_hline(yintercept = THRESHOLD_KM, linetype = "dashed",
+             colour = "grey40", linewidth = 0.4) +
+  geom_segment(aes(xend = pa_label, yend = 0), linewidth = 0.7, alpha = 0.5) +
+  geom_point(size = 3) +
+  facet_wrap(~obs_label, scales = "free_x", nrow = 1) +
+  scale_colour_manual(
+    values = c(
+      "New during study (1999–2014)" = "#D32F2F",
+      "Pre-existing (before 1999)"   = "#F9A825",
+      "Post-study (after 2014)"      = "grey60"
+    ),
+    name = "PA exposure type"
+  ) +
+  annotate("text", x = -Inf, y = THRESHOLD_KM + 0.8,
+           label = paste0(THRESHOLD_KM, " km threshold"),
+           hjust = -0.05, size = 3, colour = "grey40") +
+  labs(
+    x = NULL, y = "Distance to PA boundary (km)",
+    title = "PA Proximity: Also-Exposed Donor Observatories"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    axis.text.x = element_text(angle = 35, hjust = 1, size = 8),
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold")
+  )
+```
+
+
+# Implications {#sec-b-implications}
+
+## For the primary analysis
+
+The contamination audit has two consequences:
+
+1. **Restricted donor pool**: removing the four also-exposed observatories leaves five clean donors (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). Gsynth estimates for Marovoay and Alaotra should be re-run with this restricted pool as a robustness check.
+
+2. **Pre-treatment validity preserved for Marovoay**: the exposure onset (2003) predates all secondary PA events (earliest 2006). Pre-treatment balance tests (placebo ATTs before 2003) are unaffected by post-2006 donor exposure.
+
+## For the extended analysis
+
+The four also-exposed donors become **exposed units** in the extended analysis ([Chapter 5](05_extensions.qmd)). Antsohihy is excluded (insufficient post-treatment coverage). Farafangana, Toliara North, and Fénérive East are viable exposed cases with ≥3 post-treatment years and plausible identification stories. Their redesignation from donors to exposed units simultaneously:
+
+- Purifies the donor pool (removing also-exposed units).
+- Enriches the exposed sample (five observatory--PA pairs instead of two).
+- Enables a broader comparison of conservation governance types.
+
+```{r}
+#| label: fig-clean-donors
+#| fig-cap: "Map of Madagascar with observatory locations coloured by status: exposed (Ch. 4), newly exposed (Ch. 5), clean donor, excluded."
+#| fig-height: 7
+#| fig-width: 7
+
+# Include Antsohihy manually (not in obs_locations)
+obs_locs_full <- bind_rows(
+  obs_locations |> st_drop_geometry() |>
+    mutate(OBS_CODE = as.integer(code)),
+  tibble(OBS_CODE = 12L, code = "12", name = "Antsohihy",
+         latitude = -14.8781, longitude = 47.9875, role = NA_character_)
+) |>
+  mutate(
+    status = case_when(
+      OBS_CODE %in% c(3L, 21L) ~ "Exposed (Ch. 4)",
+      OBS_CODE %in% c(15L, 23L, 24L) ~ "Newly exposed (Ch. 5)",
+      OBS_CODE == 12L ~ "Excluded (insufficient coverage)",
+      OBS_CODE %in% as.integer(CLEAN_DONOR_OBS) ~ "Clean donor"
+    )
+  )
+
+status_pal <- c(
+  "Exposed (Ch. 4)"                 = "#D32F2F",
+  "Newly exposed (Ch. 5)"             = "#E65100",
+  "Clean donor"                     = "#388E3C",
+  "Excluded (insufficient coverage)" = "grey60"
+)
+status_shapes <- c(
+  "Exposed (Ch. 4)"                 = 17,
+  "Newly exposed (Ch. 5)"             = 18,
+  "Clean donor"                     = 16,
+  "Excluded (insufficient coverage)" = 4
+)
+
+ggplot() +
+  geom_sf(data = madagascar, fill = "grey95", colour = "grey70", linewidth = 0.3) +
+  geom_point(
+    data = obs_locs_full,
+    aes(x = longitude, y = latitude, colour = status, shape = status),
+    size = 3.5, stroke = 1.1
+  ) +
+  geom_label_repel(
+    data = obs_locs_full,
+    aes(x = longitude, y = latitude, label = name, colour = status),
+    size = 2.5, fontface = "bold", box.padding = 0.5,
+    min.segment.length = 0, show.legend = FALSE, max.overlaps = 20
+  ) +
+  scale_colour_manual(values = status_pal, name = NULL) +
+  scale_shape_manual(values = status_shapes, name = NULL) +
+  labs(title = "Donor Pool Classification",
+       subtitle = "Green = clean donors · Orange = also exposed (→ newly exposed in Ch. 5)") +
+  theme_void(base_size = 11) +
+  theme(legend.position = "bottom")
+```
