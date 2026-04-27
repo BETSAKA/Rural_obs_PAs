@@ -4,7 +4,7 @@ project:
 
 book:
   title: "Conservation Governance and Rural Livelihoods in Madagascar"
-  subtitle: "Long-Run Evidence from Rural Observatory Surveys (1995–2025)"
+  subtitle: "Long-Run Analysis of Rural Observatory Surveys (1995–2025)"
   author:
     - name: Florent Bédécarrats
       affiliations:
@@ -26,12 +26,11 @@ book:
         - 04_results.qmd
         - 05_extensions.qmd
         - 06_discussion.qmd
-    - part: "Appendices"
-      chapters:
-        - A1_data_pipeline.qmd
-        - A2_donor_validity.qmd
-        - A3_robustness.qmd
-        - A4_methodology.qmd
+  appendices:
+    - A1_data_pipeline.qmd
+    - A2_donor_validity.qmd
+    - A3_robustness.qmd
+    - A4_methodology.qmd
 
 # -- Bilingual setup (uncomment when .fr.qmd files are ready) -----------------
 # babelquarto:

@@ -1,5 +1,5 @@
 ---
-title: "Appendix C: Robustness Tests"
+title: "Robustness Tests"
 subtitle: "Alternative specifications and sensitivity analysis"
 ---
 
