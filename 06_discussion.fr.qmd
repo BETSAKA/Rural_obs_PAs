@@ -1,0 +1,88 @@
+```quarto
+---
+title: "Discussion"
+subtitle: "Implications politiques, limites et perspectives"
+---
+
+# Résumé des résultats {#sec-summary}
+
+Cette analyse estime l'effet de la création d'aires protégées sur le revenu des ménages en milieu rural malgache à l'aide de la méthode du contrôle synthétique généralisé [@Xu2017] sur cinq paires observatoire–AP couvrant la période d'étude 1999–2014, avec une extension à long terme à 2025 pour le cas de Marovoay. Les résultats doivent être lus comme des données suggestives plutôt que comme des estimations causales définitives, compte tenu du faible nombre d'unités traitées et des difficultés d'identification discutées ci-dessous.
+
+La principale conclusion des deux sites primaires est une divergence dans les trajectoires de revenus estimées. À Ankarafantsika, l'extension d'une réserve forestière en un parc national strictement patrouillé (catégorie II UICN, 2002) est associée à un écart de {{< var att_maro >}} points logarithmiques dans le revenu équivalisé OCDE par rapport au contrefactuel synthétique (environ {{< var att_maro_pct >}}), statistiquement significatif et persistant jusqu'en 2025. Cependant, comme discuté à @sec-maro-rcs, une comparaison entre les villages de la rive est et de la rive ouest au sein du même observatoire ne révèle aucune différence de revenu détectable entre les deux côtés de la rivière. Ce diagnostic soulève une lecture alternative importante : l'estimation gsynth pourrait capturer le déclin économique régional à long terme de la plaine de Marovoay par rapport aux sites donneurs sur le plateau des hautes terres ou dans le sud. Marovoay était historiquement le paysage rizicole irrigué le plus productif de Madagascar, le *grenier à blé* du pays. À partir des années 1980, la région a connu un déclin documenté alimenté par l'envasement de la Betsiboka, la dégradation des canaux d'irrigation coloniaux et le retrait des soutiens étatiques à la commercialisation du riz. Cette trajectoire est antérieure à l'extension du parc de 2002 et pourrait expliquer une grande partie de la divergence que gsynth enregistre. L'attribution de l'écart de revenu estimé au parc spécifiquement reste donc incertaine ; les résultats à Marovoay doivent être lus comme indicatifs plutôt que conclusifs.
+
+Au Lac Alaotra, la création d'un paysage protégé participatif sous gestion communautaire des ressources naturelles (catégorie V UICN, 2008) produit un ATT estimé proche de zéro, indiscernable de zéro. Les communautés ont conservé l'accès à l'écosystème lac-marais sous la gestion de Durrell ; aucun coût agrégé de revenu n'est détectable, bien que ce résultat nul puisse également refléter une faible puissance statistique.
+
+L'extension de l'analyse à Farafangana, Toliara Nord et Fénérive Est donne des ATT proches de zéro, statistiquement non significatifs, dans les trois cas. Ces sites font face à des aires protégées dont la gouvernance est soit multifonctionnelle, soit la superficie est faible, soit les deux. La ré-enquête 2025 à Marovoay confirme que l'écart de revenu est-ouest persiste vingt-deux ans après l'extension du parc, bien que son interprétation reste soumise à la mise en garde sur le déclin régional discutée ci-dessus.
+
+
+# Implications politiques {#sec-policy}
+
+## La gouvernance de la conservation est déterminante
+
+Les résultats, pris au pied de la lettre, suggèrent que la façon dont une aire protégée est gouvernée peut importer au moins autant que le fait qu'elle existe. Sur l'ensemble des cinq cas, seul le site à gestion strictement exclusive (Ankarafantsika, catégorie II UICN) affiche un grand écart de revenu négatif ; les sites à gouvernance multifonctionnelle ou à faible intensité affichent des effets proches de zéro. Ceci est cohérent avec une littérature croissante montrant que les compromis conservation–revenus dépendent fortement de la conception institutionnelle plutôt que du seul fait de la protection [@Ferraro2011 ; @Sims2010 ; @Oldekop2016].
+
+Cela dit, le résultat de Marovoay nécessite la mise en garde exposée à @sec-summary : l'écart gsynth peut refléter, au moins en partie, le déclin économique régional de la plaine de Marovoay plutôt qu'un effet spécifique au parc. Pris ensemble, les éléments sont suggestifs plutôt que conclusifs quant au fait que la conservation stricte impose des coûts de revenu aux ménages, et ils soutiennent l'architecture de l'expansion du SAPM malgache post-2003, qui a associé une protection stricte à de vastes approches communautaires et multifonctionnelles.
+
+## Compensation et intégration des moyens de subsistance
+
+Même sous l'interprétation prudente, deux décennies de données d'enquête montrent que l'écart de revenu entre les villages de la rive est de Marovoay et des sites comparables ne s'est pas refermé. Qu'il soit principalement lié au parc ou au déclin plus large de l'économie d'irrigation, les ménages de cette zone sont sensiblement plus pauvres que les communautés rurales comparables. Si la conservation génère des biens publics nationaux et mondiaux — stockage de carbone, préservation de la biodiversité — les coûts du parc et du désavantage régional ne devraient pas peser de manière disproportionnée sur certains des ménages ruraux les plus pauvres de Madagascar.
+
+Parmi les options politiques qui méritent d'être examinées figurent les transferts directs liés à la proximité du parc et à l'intensité de l'enforcement, les programmes de diversification des moyens de subsistance dans les zones tampons, et, lorsque l'enforcement strict n'est pas écologiquement nécessaire, une reconsidération du bien-fondé d'un classement catégorie II UICN dans certains sites particuliers.
+
+## Limites de l'inférence politique
+
+Ces résultats ne disent rien sur l'efficacité de la conservation multifonctionnelle pour atteindre ses objectifs écologiques. L'effet nul sur le revenu au Lac Alaotra peut refléter une gouvernance genuinement bénigne ou un enforcement qui existe sur le papier mais a peu d'effet pratique sur le comportement des communautés. Sans données sur les résultats écologiques — tendances de couverture forestière, qualité de l'eau, abondance des espèces — les implications de bien-être nettes de l'un ou l'autre modèle de gouvernance restent incomplètes.
+
+
+# Validité du contrefactuel {#sec-counterfactual}
+
+La principale menace à l'interprétation est de savoir si le contrefactuel synthétique — « qu'aurait été le revenu en l'absence de l'AP ? » — est crédible. Un bon ajustement pré-traitement est nécessaire mais non suffisant : la structure factorielle estimée avant l'AP doit continuer à se maintenir après. Avec seulement une ou deux unités traitées, cette hypothèse ne peut pas être testée directement.
+
+## Marovoay : explications alternatives
+
+L'estimation Ankarafantsika repose sur la rivière Betsiboka fournissant une division géographique entre les communautés avec et sans accès direct au parc. Plusieurs préoccupations tempèrent l'interprétation causale.
+
+Premièrement, le diagnostic le plus important : la comparaison intra-observatoire entre les villages de la rive est et de la rive ouest ne révèle aucune différence de revenu détectable sur la période d'étude (@sec-maro-rcs). C'est la principale raison d'être prudent quant à l'attribution de l'écart gsynth au parc. Le gsynth compare les sites de Marovoay contre des donneurs sur le plateau des hautes terres ou dans les zones sèches du sud. Si la région de Marovoay dans son ensemble a pris du retard par rapport à ces autres endroits — en raison de l'envasement de la Betsiboka, de la dégradation des infrastructures d'irrigation, de la perte de sa position historique de principal fournisseur de riz de Madagascar — alors gsynth attribuera cette divergence régionale à l'exposition au parc simplement parce que le calendrier s'aligne. La comparaison intra-observatoire contrôle automatiquement ce choc régional. Le fait que les revenus de la rive est et de la rive ouest aient évolué ensemble est cohérent avec un driver régional commun plutôt qu'un effet spécifique au parc.
+
+Deuxièmement, la rive est s'est retrouvée adjacente à la Réserve Naturelle Intégrale d'Ankarafantsika (1927) avant l'extension de 2002. La RNI peut avoir imposé des contraintes partielles avant le début de la période d'étude.
+
+Troisièmement, les villages de la rive est et de la rive ouest diffèrent en termes de types de sol, d'exposition aux inondations et d'accès à l'irrigation. Si ces différences interagissent avec des tendances post-2002 — à travers un cyclone, une sécheresse ou un investissement d'infrastructure ayant affecté différentiellement une rive — l'écart estimé confondrait des effets de conservation avec d'autres chocs.
+
+Quatrièmement, la migration sélective hors de la rive est pourrait faire apparaître la population enquêtée restante comme plus pauvre sans aucun vrai déclin de revenu.
+
+## Alaotra : identification à unité unique
+
+Le modèle Alaotra agrège l'ensemble de l'observatoire en une seule unité exposée. L'ATT proche de zéro pourrait refléter (i) une gouvernance de conservation genuinement bénigne, (ii) un contrefactuel mal construit masquant un effet réel, ou (iii) une puissance statistique insuffisante pour détecter un effet modéré.
+
+## Implications pour l'interprétation
+
+Compte tenu de ces préoccupations, nous caractérisons les résultats comme fortement suggestifs plutôt que définitivement causaux. Trois caractéristiques des données augmentent la confiance que les régularités sont réelles, même sous l'interprétation prudente. Le signe et la persistance de l'écart Ankarafantsika sont robustes à travers les spécifications. Le contraste de gouvernance entre résultats négatifs stricts et nuls multifonctionnels apparaît sur cinq cas indépendants. Et la ré-enquête 2025 à Marovoay confirme directement que les communautés de la rive est font face à des contraintes contraignantes du parc.
+
+
+# Limites {#sec-limitations}
+
+Plusieurs limites tempèrent l'interprétation causale et devraient guider l'utilisation de ces résultats.
+
+La puissance statistique est la contrainte la plus fondamentale. Chaque modèle gsynth a exactement une unité exposée, ce qui impose une p-valeur minimale atteignable d'environ $1/N_{\text{donneurs}}$. Le résultat nul d'Alaotra peut refléter une puissance insuffisante plutôt qu'un vrai effet zéro ; les effets inférieurs à environ 20% sont difficiles à distinguer de zéro dans ce dispositif.
+
+La création des AP à Madagascar implique plusieurs étapes administratives — décret, gazette, enforcement sur le terrain. Nous assignons l'exposition à la première année complète d'enquête après le décret, mais l'enforcement réel peut avoir progressé sur un à trois ans.
+
+Le cadre gsynth opère sur des données de panel au niveau du site, réduisant environ 130–260 ménages par année d'enquête en une seule moyenne village-année. Cette agrégation absorbe la variation intra-site de l'intensité d'exposition, de la stratégie de subsistance et de la composition du revenu.
+
+Les effets de débordement pourraient biaiser les villages de la rive ouest de Marovoay comme témoins si la main-d'œuvre ou le capital déplacés de la rive est ont migré vers l'ouest à travers la rivière.
+
+Nous estimons des effets uniquement sur le revenu total. La pression de conservation peut remodeler la composition du revenu sans nécessairement changer le total.
+
+La mesure du revenu par enquête dans les économies de subsistance est intrinsèquement approximative. Le biais de rappel et la variation saisonnière sont inévitables.
+
+Les cinq observatoires propres couvrent des zones agro-écologiques très différentes — plateau des hautes terres, sud semi-aride, côte est humide. La question de savoir si une moyenne pondérée de ces économies diverses peut représenter de manière crédible ce que la plaine rizicole irriguée de Marovoay, ou la pêcherie lacustre d'Alaotra, aurait gagné en l'absence de l'AP reste ouverte.
+
+
+# Perspectives {#sec-next-steps}
+
+La vague d'enquête 2026 prévue étendra la couverture à des observatoires supplémentaires et permettra une analyse au niveau des ménages poolant tous les observatoires exposés dans un dispositif à traitement échelonné. L'estimateur naturel est Callaway–Sant'Anna avec `panel = FALSE`, complété par des études d'événements Sun–Abraham via `fixest::sunab()`.
+
+La priorité analytique immédiate est de tester empiriquement l'hypothèse de déclin régional pour Marovoay. Deux approches sont envisagées : premièrement, incorporer des données sur les rendements rizicoles régionaux ou la productivité agricole comme covariables dans le modèle gsynth pour contrôler directement la trajectoire économique régionale ; deuxièmement, identifier des sites donneurs comparables sur des plaines irriguées de basse altitude au lieu de sites sur le plateau des hautes terres ou dans les zones sèches.
+
+Les résultats de cette analyse constituent une estimation de première génération qui motive, et sera affinée par, l'analyse au niveau des ménages prévue pour 2026.
+```

@@ -33,13 +33,15 @@ book:
     - A3_robustness.qmd
     - A4_methodology.qmd
 
-# -- Bilingual setup (uncomment when .fr.qmd files are ready) -----------------
-# babelquarto:
-#   mainlanguage: en
-#   languages:
-#     - fr
-#   title-fr: >
-#     Gouvernance de la conservation et conditions de vie rurales à Madagascar
+# -- Bilingual setup ----------------------------------------------------------
+babelquarto:
+  mainlanguage: en
+  languages:
+    - fr
+  title-fr: >
+    Gouvernance de la conservation et conditions de vie rurales à Madagascar
+  description-fr: >
+    Analyse de long terme des Observatoires Ruraux (1995–2025)
 
 format:
   html:

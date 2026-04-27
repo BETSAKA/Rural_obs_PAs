@@ -1,0 +1,22 @@
+````quarto
+---
+title: "Pipeline de données"
+subtitle: "Géoréférencement, chevauchements avec les AP et harmonisation des variables"
+---
+
+```{r}
+#| label: setup
+source("R/load_data.R")
+```
+
+Cette annexe documente le pipeline de données reproductible complet, des fichiers d'enquête SOR bruts au jeu de données de panel consolidé au niveau des ménages. Le chapitre principal ([Chapitre 2](02_data.qmd)) en donne un résumé condensé ; cette annexe fournit tous les détails nécessaires à la reproductibilité.
+
+# Géoréférencement des localités SOR {#sec-a-georef}
+
+## Le problème
+
+Le Système des Observatoires Ruraux a collecté des données de panel auprès de ménages ruraux à Madagascar de 1995 à 2015. De manière cruciale, les enquêtes n'étaient pas géolocalisées : les champs de localisation étaient en texte libre, non liés à des codes administratifs officiels. Pour permettre l'analyse spatiale — notamment le croisement avec les limites des aires protégées — chaque observation SOR doit être alignée avec une commune et un *fokontany* standardisés à l'aide des P-codes des Ensembles de Données Opérationnelles Communes (COD) OCHA/BNGRC.
+
+## Jeux de données de référence
+
+````

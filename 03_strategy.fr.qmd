@@ -1,0 +1,404 @@
+````quarto
+---
+title: "Stratégie d'identification"
+subtitle: "Comment nous estimons l'effet causal des aires protégées sur le revenu des ménages"
+---
+
+```{r}
+#| label: setup
+source("R/load_data.R")
+source("R/gsynth_helpers.R")
+```
+
+La question centrale de cette étude est de savoir si la création ou l'extension d'aires protégées a causé des changements dans le revenu des ménages, ou si les différences de revenus observées reflètent simplement des tendances préexistantes. Ce chapitre explique comment nous tentons d'isoler les effets causaux.
+
+La stratégie comporte quatre parties. Premièrement, nous définissons deux expériences naturelles proposant des comparaisons exposition–contrôle plausibles (@sec-treatment). Deuxièmement, nous expliquons comment le dispositif d'enquête contraint l'unité d'analyse (@sec-panel). Troisièmement, nous décrivons la méthode statistique utilisée pour construire des trajectoires de revenu contrefactuelles (@sec-estimation). Quatrièmement, nous présentons brièvement trois cas supplémentaires qui étendent l'analyse (@sec-extensions).
+
+# Deux expériences naturelles {#sec-treatment}
+
+Nous exploitons deux événements survenus pendant la période d'enquête SOR où une AP nouvelle ou étendue a commencé à imposer des restrictions à des communautés précédemment enquêtées. Les deux cas diffèrent dans leur modèle de gouvernance de conservation — exclusion stricte à Ankarafantsika versus gestion participative au Lac Alaotra — offrant une comparaison intégrée de la façon dont le type de gouvernance médiatise les effets sur le revenu.
+
+## Marovoay et le Parc National d'Ankarafantsika (2003) {#sec-treat-maro}
+
+### L'extension du parc en 2002 {#sec-maro-history}
+
+Comme illustré sur @fig-map-maro, le Parc National d'Ankarafantsika a été formellement étendu par le Décret 2002-798 du 7 août 2002, fusionnant l'ancienne Réserve Naturelle Intégrale (60 500 ha, créée en 1927) avec une réserve forestière en un parc national de 136 500 ha sous catégorie II UICN (conservation stricte de la nature).
+
+Nous fixons l'année d'exposition à 2003, qui est la première année complète d'enquête ROS suivant le décret. Nous testons également si l'utilisation de 2002 au lieu de 2003 modifie le résultat estimé et trouvons une incidence négligeable.
+
+Selon la littérature grise concordante que nous avons examinée, nous considérons que l'extension de 2002 a été le premier événement à imposer des restrictions d'utilisation des terres contraignantes aux communautés adjacentes à la zone de réserve forestière. Les classements antérieurs avaient des implications *de facto* très différentes :
+
+- La *Réserve Naturelle Intégrale* de 1927 couvrait le plateau intérieur au nord-est, géographiquement séparé des communautés de Marovoay.
+- La réserve forestière de 1929 n'était pas une zone de conservation mais une réserve de bois et de ressources. Les analyses de cette période n'ont trouvé aucune application effective.
+
+Le reclassement de 2002 a fusionné ces zones en un seul parc national où l'agriculture sur brûlis (*tavy*), la production de charbon de bois et l'extraction de produits forestiers non ligneux étaient explicitement interdits et, de manière cruciale, mis en vigueur.
+
+### La rivière Betsiboka comme barrière naturelle {#sec-maro-barrier}
+
+L'observatoire de Marovoay comprend quatre *fokontany* (villages) séparés par la rivière Betsiboka — un cours d'eau important à écoulement permanent. La traversée n'est possible que dans certaines conditions hydrologiques, nécessitant souvent de longs détours ou un transport en bateau coûteux. En pratique, les flux de personnes, de biens et de services s'écoulent le long de l'axe aval de Marovoay plutôt que de traverser la rivière.
+
+Cette caractéristique géographique crée une expérience naturelle : les communautés de la rive est ont un accès pédestre direct au parc, tandis que les communautés de la rive ouest font face à une pénalité d'accès substantielle.
+
+```{r}
+#| label: tbl-maro-sites
+#| tbl-cap: "Assignations d'exposition des sites de Marovoay. Distance à la RNI = distance en ligne droite vers la *Réserve Naturelle Intégrale* pré-2002 ; Distance au PN = distance vers la limite du parc national post-2002. La distance effective ajoute une pénalité de 15 km de traversée de rivière pour les fokontany de la rive ouest."
+maro_fkt |>
+  st_drop_geometry() |>
+  mutate(
+    suffix = if_else(river_side == "west", " (+ traversée de rivière)", ""),
+    Rive = str_to_title(river_side),
+    `Dist. à la RNI (pré-2002)` = paste0(dist_rni_km, " km", suffix),
+    `Dist. au PN (post-2002)` = paste0(dist_km, " km", suffix),
+    Rôle = if_else(treated, "Exposé (à partir de 2003)", "Donneur (contrôle)")
+  ) |>
+  select(
+    Fokontany = fokontany, Rive,
+    `Dist. à la RNI (pré-2002)`, `Dist. au PN (post-2002)`, Rôle
+  ) |>
+  gt() |>
+  fmt_markdown(columns = Rôle)
+```
+
+```{r}
+#| label: fig-map-maro
+#| fig-cap: "Observatoire de Marovoay et l'extension Ankarafantsika de 2002. Vert foncé : la *Réserve Naturelle Intégrale* originale de 1927. Vert clair : l'extension du parc national de 2002. La rivière Betsiboka sépare les fokontany de la rive ouest (donneurs, gris) de ceux de la rive est (exposés, orange)."
+#| fig-height: 8
+#| fig-width: 9
+ank_bb <- st_bbox(ankarafantsika_pa)
+fkt_bb <- st_bbox(maro_fkt)
+maro_bbox <- st_bbox(
+  c(xmin = min(ank_bb["xmin"], fkt_bb["xmin"]) - 0.08, ymin = min(ank_bb["ymin"], fkt_bb["ymin"]) - 0.08,
+    xmax = max(ank_bb["xmax"], fkt_bb["xmax"]) + 0.08, ymax = max(ank_bb["ymax"], fkt_bb["ymax"]) + 0.08),
+  crs = 4326
+)
+betsiboka_named <- osm_water_maro$lines |> filter(name == "Betsiboka")
+betsiboka_buf <- betsiboka_named |> st_transform(32738) |> st_union() |> st_buffer(1000) |> st_transform(4326)
+water_lines <- tryCatch(st_crop(betsiboka_named, maro_bbox), error = function(e) NULL)
+water_polys <- tryCatch({
+  wp <- st_crop(osm_water_maro$polys, maro_bbox)
+  wp[st_intersects(wp, betsiboka_buf, sparse = FALSE)[, 1], ]
+}, error = function(e) NULL)
+water_mpolys <- tryCatch({
+  wm <- st_crop(osm_water_maro$mpolys, maro_bbox)
+  wm[st_intersects(wm, betsiboka_buf, sparse = FALSE)[, 1], ]
+}, error = function(e) NULL)
+WATER_COL <- "#1976D2"
+rni_centroid <- st_coordinates(st_centroid(st_union(ankarafantsika_rni)))
+p <- ggplot() +
+  geom_sf(data = ankarafantsika_pa, aes(fill = "Extension Parc National 2002"),
+          color = "#388E3C", alpha = 0.35, linewidth = 0.5) +
+  geom_sf(data = ankarafantsika_rni, aes(fill = "RNI 1927"),
+          color = "#1B5E20", alpha = 0.55, linewidth = 0.7) +
+  scale_fill_manual(
+    values = c("RNI 1927" = "#2E7D32", "Extension Parc National 2002" = "#A5D6A7"),
+    name = NULL)
+if (!is.null(water_polys) && nrow(water_polys) > 0)
+  p <- p + geom_sf(data = water_polys, fill = WATER_COL, color = WATER_COL, linewidth = 0.1)
+if (!is.null(water_mpolys) && nrow(water_mpolys) > 0)
+  p <- p + geom_sf(data = water_mpolys, fill = WATER_COL, color = WATER_COL, linewidth = 0.1)
+if (!is.null(water_lines) && nrow(water_lines) > 0)
+  p <- p + geom_sf(data = water_lines, color = WATER_COL, linewidth = 0.7)
+maro_fkt_lab <- maro_fkt |>
+  mutate(lon = st_coordinates(geometry)[, 1], lat = st_coordinates(geometry)[, 2],
+         nudge_x = if_else(fokontany == "Maroala", -0.06, 0),
+         nudge_y = if_else(fokontany == "Maroala", 0.04, 0))
+p +
+  annotate("label", x = rni_centroid[1], y = rni_centroid[2],
+           label = "RNI\n(1927\u20132002)", fill = "#2E7D32", color = "white",
+           fontface = "bold.italic", size = 3.5, alpha = 0.85) +
+  annotate("label", x = ank_bb["xmin"] + 0.12, y = ank_bb["ymin"] + 0.06,
+           label = "Extension\nParc National\n(2002)", fill = "#A5D6A7", color = "#1B5E20",
+           fontface = "bold.italic", size = 3.5, alpha = 0.85) +
+  geom_sf(data = maro_fkt, aes(color = river_side, shape = river_side), size = 4, stroke = 1.2) +
+  geom_label_repel(data = maro_fkt_lab,
+    aes(x = lon, y = lat, label = paste0(fokontany, "\n(", dist_km, " km)"), color = river_side),
+    size = 3, fontface = "bold", box.padding = 0.8,
+    nudge_x = maro_fkt_lab$nudge_x, nudge_y = maro_fkt_lab$nudge_y,
+    min.segment.length = 0, show.legend = FALSE) +
+  scale_color_manual(values = c("east" = "#E65100", "west" = "#616161"),
+                     labels = c("east" = "Rive est (exposée)", "west" = "Rive ouest (donneur)"), name = NULL) +
+  scale_shape_manual(values = c("east" = 17, "west" = 16),
+                     labels = c("east" = "Rive est (exposée)", "west" = "Rive ouest (donneur)"), name = NULL) +
+  annotation_scale(location = "bl", width_hint = 0.25) +
+  coord_sf(xlim = c(maro_bbox["xmin"], maro_bbox["xmax"]), ylim = c(maro_bbox["ymin"], maro_bbox["ymax"])) +
+  guides(fill = guide_legend(order = 1)) +
+  theme_minimal(base_size = 11) + theme(legend.position = "bottom", legend.box = "vertical")
+```
+
+### Validation comportementale à partir de la ré-enquête 2025 {#sec-maro-usage}
+
+L'assignation d'exposition repose sur l'hypothèse que la rivière Betsiboka sépare effectivement les communautés en groupes « exposés » et « non exposés ». La ré-enquête 2025 fournit un test direct de cette hypothèse.
+
+```{r}
+#| label: tbl-maro-usage
+#| tbl-cap: "Interaction avec l'AP à Marovoay par fokontany (ré-enquête 2025)."
+res_deb_25 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
+  mutate(j5 = as.character(j5),
+         Observatory = case_when(as.character(j0) == "3" ~ "Marovoay", as.character(j0) == "21" ~ "Alaotra"),
+         Site = case_when(
+           j0 == 3 & str_detect(str_to_lower(j4), "^bepako") ~ "Bepako",
+           j0 == 3 & str_detect(str_to_lower(j4), "^madiromiongana") ~ "Madiromiongana",
+           j0 == 3 & str_detect(str_to_lower(j4), "^ampijoroa|ampijoro") ~ "Ampijoroa",
+           j0 == 3 & str_detect(str_to_lower(j4), "^maroala") ~ "Maroala",
+           j0 == 21 ~ j4),
+         bank = case_when(Site %in% c("Bepako", "Madiromiongana") ~ "Est",
+                          Site %in% c("Ampijoroa", "Maroala") ~ "Ouest"))
+um1_25 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_um1.dta") |>
+  mutate(j5 = as.character(j5)) |>
+  inner_join(res_deb_25 |> select(j5, Observatory, Site, bank), by = "j5")
+um2_25 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_um2.dta") |>
+  mutate(j5 = as.character(j5)) |>
+  inner_join(res_deb_25 |> select(j5, Observatory, Site, bank), by = "j5")
+extractive_hh <- um2_25 |>
+  filter(um2_a == 1, um2_lig %in% 1:8) |>
+  distinct(j5) |>
+  mutate(extractive = TRUE)
+res_deb_25 |>
+  filter(Observatory == "Marovoay") |>
+  left_join(um1_25 |> select(j5, um1, um1d_a), by = "j5") |>
+  left_join(extractive_hh, by = "j5") |>
+  mutate(extractive = replace_na(extractive, FALSE)) |>
+  summarise(N = n(),
+            `% visite zone AP` = round(sum(um1 == 1, na.rm = TRUE) / n() * 100, 0),
+            `% usage extractif` = round(sum(extractive) / n() * 100, 0),
+            `% cite 'interdit'` = round(sum(um1d_a == 1, na.rm = TRUE) / sum(um1 == 2, na.rm = TRUE) * 100, 0),
+            .by = c(Site, bank)) |>
+  arrange(match(Site, c("Bepako", "Madiromiongana", "Ampijoroa", "Maroala"))) |>
+  gt() |>
+  cols_label(bank = "Rive") |>
+  tab_header(title = "Interaction avec l'AP par Fokontany",
+             subtitle = "Observatoire de Marovoay, ré-enquête 2025 (N = 519 ménages)")
+```
+
+Trois résultats soutiennent l'assignation d'exposition : (1) l'asymétrie de visite (38% des ménages de la rive est visitent le parc contre 15% à l'ouest) ; (2) la conscience de l'interdiction (34% des non-visiteurs à Madiromiongana citent l'interdiction légale) ; (3) la distance comme barrière dominante (54% des non-visiteurs sur les deux rives citent la distance).
+
+## Lac Alaotra et le Paysage Protégé (2008) {#sec-treat-ala}
+
+### Un modèle de conservation différent {#sec-ala-history}
+
+Le Lac Alaotra est le plus grand lac de Madagascar et un habitat critique pour le lémur des marais d'Alaotra (*Hapalemur alaotrensis*). La Convention de Ramsar a inscrit le site en 2003. En 2015, le lac et ses zones marécageuses ont été officiellement désignés comme Paysage Harmonieux Protégé (PHP, 425 km², catégorie V UICN). L'application via des accords de gestion communautaire des ressources naturelles (CBNRM) et des *transferts de gestion* s'est intensifiée à partir d'environ 2008 sous la gestion du Durrell Wildlife Conservation Trust. Nous fixons l'année d'exposition à 2008.
+
+La différence clé par rapport à Ankarafantsika est la gouvernance : plutôt qu'une application exclusive interdisant toute extraction de ressources, le cadre CBNRM d'Alaotra régule l'utilisation du lac-marais à travers des règles d'accès gérées communautairement, des fermetures saisonnières de pêche et des accords de restauration des habitats.
+
+### Pourquoi toutes les communautés d'Alaotra sont exposées {#sec-ala-all-treated}
+
+Contrairement à Marovoay, il n'y a pas de barrière naturelle séparant les communautés « exposées » des communautés « non exposées » à Alaotra. Les sept *fokontany* de l'observatoire affichent tous des interactions modestes mais non négligeables avec l'écosystème lac-marais. Nous traitons donc l'ensemble de l'observatoire comme une unité unique exposée, agrégée à une moyenne de site.
+
+```{r}
+#| label: fig-map-ala
+#| fig-cap: "Observatoire d'Alaotra et aires protégées environnantes. PHP du Lac Alaotra (vert), Corridor Ankeniheny-Zahamena (orange), Parc National de Zahamena (orange clair)."
+#| fig-height: 8
+#| fig-width: 8
+ala_bbox <- st_bbox(c(xmin = 48.00, ymin = -18.10, xmax = 48.80, ymax = -17.20), crs = 4326)
+ala_clip <- tryCatch(st_crop(alaotra_pa, ala_bbox), error = function(e) NULL)
+caz_clip <- tryCatch(st_crop(caz_pa, ala_bbox), error = function(e) NULL)
+zah_clip <- tryCatch(st_crop(zahamena_pa, ala_bbox), error = function(e) NULL)
+p <- ggplot()
+if (!is.null(ala_clip) && nrow(ala_clip) > 0) {
+  ala_centroid <- st_coordinates(st_centroid(st_union(ala_clip)))
+  p <- p + geom_sf(data = ala_clip, fill = "#A5D6A7", color = "#388E3C", alpha = 0.4, linewidth = 0.6) +
+    annotate("text", x = ala_centroid[1], y = ala_centroid[2], label = "Lac Alaotra\nPHP",
+             color = "#1B5E20", fontface = "bold.italic", size = 3.5, alpha = 0.8)
+}
+if (!is.null(caz_clip) && nrow(caz_clip) > 0) {
+  caz_centroid <- st_coordinates(st_centroid(st_union(caz_clip)))
+  p <- p + geom_sf(data = caz_clip, fill = "#FFE0B2", color = "#E65100", alpha = 0.3, linewidth = 0.6) +
+    annotate("text", x = caz_centroid[1], y = caz_centroid[2],
+             label = "Corridor\nAnkeniheny-\nZahamena", color = "#BF360C", fontface = "bold.italic", size = 3, alpha = 0.8)
+}
+if (!is.null(zah_clip) && nrow(zah_clip) > 0) {
+  zah_centroid <- st_coordinates(st_centroid(st_union(zah_clip)))
+  p <- p + geom_sf(data = zah_clip, fill = "#FFCCBC", color = "#BF360C", alpha = 0.3, linewidth = 0.5) +
+    annotate("text", x = zah_centroid[1], y = zah_centroid[2],
+             label = "Parc National\nde Zahamena", color = "#BF360C", fontface = "bold.italic", size = 3, alpha = 0.8)
+}
+p + geom_sf(data = ala_fkt, aes(shape = nearest_pa), size = 3, color = "#1B5E20", stroke = 1) +
+  geom_label_repel(data = ala_fkt |> mutate(lon = st_coordinates(geometry)[, 1], lat = st_coordinates(geometry)[, 2]),
+    aes(x = lon, y = lat, label = paste0(fokontany, " (", round(pmin(dist_php, dist_caz), 1), " km)")),
+    size = 2.5, fontface = "bold", box.padding = 0.6, min.segment.length = 0) +
+  scale_shape_manual(values = c("Lac Alaotra PHP" = 16, "Corridor Ankeniheny-Zahamena" = 17), name = "AP la plus proche") +
+  annotation_scale(location = "bl", width_hint = 0.25) +
+  labs(subtitle = "Tous les fokontany exposés au niveau de l'observatoire à partir de 2008 (application CBNRM)") +
+  coord_sf(xlim = c(ala_bbox["xmin"], ala_bbox["xmax"]), ylim = c(ala_bbox["ymin"], ala_bbox["ymax"])) +
+  theme_minimal(base_size = 11) + theme(legend.position = "bottom")
+```
+
+### Validation comportementale à partir de la ré-enquête 2025 {#sec-ala-usage}
+
+```{r}
+#| label: tbl-ala-usage
+#| tbl-cap: "Interaction avec l'AP à Alaotra par fokontany (ré-enquête 2025)."
+res_deb_25 |>
+  filter(Observatory == "Alaotra") |>
+  left_join(um1_25 |> select(j5, um1), by = "j5") |>
+  left_join(extractive_hh, by = "j5") |>
+  left_join(um2_25 |> filter(um2_a == 1, um2_lig == 4) |> distinct(j5) |> mutate(fishes = TRUE), by = "j5") |>
+  mutate(extractive = replace_na(extractive, FALSE), fishes = replace_na(fishes, FALSE)) |>
+  summarise(N = n(),
+            `% visite zone` = round(sum(um1 == 1, na.rm = TRUE) / n() * 100, 0),
+            `% extractif` = round(sum(extractive) / n() * 100, 0),
+            `% pêche/chasse` = round(sum(fishes) / n() * 100, 0),
+            .by = Site) |>
+  arrange(desc(`% extractif`)) |>
+  gt() |>
+  tab_header(title = "Interaction avec l'AP par Fokontany",
+             subtitle = "Observatoire d'Alaotra, ré-enquête 2025 (N = 507 ménages)")
+```
+
+```{r}
+#| label: fig-visit-freq
+#| fig-cap: "Fréquence de visite de la zone AP par site (ré-enquête 2025)."
+#| fig-height: 7
+#| fig-width: 9
+hh_site_fig <- res_deb_25 |>
+  mutate(site = case_when(
+    Observatory == "Marovoay" & str_detect(j4, "(?i)bepako|bepàko") ~ "Bepako",
+    Observatory == "Marovoay" & str_detect(j4, "(?i)madiro") ~ "Madiromiongana",
+    Observatory == "Marovoay" & str_detect(j4, "(?i)ampijoroa|ampijoro") ~ "Ampijoroa",
+    Observatory == "Marovoay" & str_detect(j4, "(?i)maroala|maroàla") ~ "Maroala",
+    TRUE ~ j4))
+hh_freq_fig <- um2_25 |>
+  filter(um2_a == 1, !is.na(um2_b)) |>
+  summarise(freq_max = max(um2_b), .by = j5)
+visit_data <- hh_site_fig |>
+  left_join(um1_25 |> select(j5, um1), by = "j5") |>
+  left_join(hh_freq_fig, by = "j5") |>
+  mutate(category = case_when(
+    um1 == 2 | is.na(um1) ~ "Ne visite pas",
+    is.na(freq_max) ~ "Ne visite pas",
+    freq_max == 1 ~ "Quelques fois/an",
+    freq_max == 2 ~ "Quelques fois/mois",
+    freq_max == 3 ~ "Une fois/semaine",
+    freq_max == 4 ~ "Plusieurs fois/semaine"),
+    category = factor(category, levels = c("Ne visite pas","Quelques fois/an","Quelques fois/mois","Une fois/semaine","Plusieurs fois/semaine")))
+site_freq_fig <- visit_data |>
+  count(Observatory, site, category) |>
+  mutate(pct = n / sum(n) * 100, .by = c(Observatory, site))
+visit_order <- site_freq_fig |>
+  filter(category != "Ne visite pas") |>
+  summarise(pct_visit = sum(pct), .by = site) |>
+  arrange(pct_visit)
+site_freq_fig <- site_freq_fig |> mutate(site = factor(site, levels = visit_order$site))
+ggplot(site_freq_fig, aes(x = pct, y = site, fill = category)) +
+  geom_col(position = "stack", width = 0.7, color = "grey80", linewidth = 0.2) +
+  scale_fill_manual(values = c("Ne visite pas" = "white", "Quelques fois/an" = "#B0BEC5",
+                                "Quelques fois/mois" = "#FFB74D", "Une fois/semaine" = "#FF7043",
+                                "Plusieurs fois/semaine" = "#D32F2F"), name = NULL) +
+  facet_wrap(~Observatory, scales = "free_y", ncol = 1) +
+  labs(x = "% de tous les ménages", y = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom", panel.grid.minor = element_blank(),
+        panel.grid.major.y = element_blank(), strip.text = element_text(face = "bold", size = 11))
+```
+
+# Des ménages aux villages {#sec-panel}
+
+## La contrainte du panel rotatif {#sec-rotating-panel}
+
+Le SOR peut être interprété comme un panel rotatif plutôt qu'un panel de réinterviews strictes. Cette distinction est cruciale pour l'estimation. Sur un horizon de 10 ans, l'attrition cumulée atteint environ 80% de la cohorte initiale. En conséquence, nous ne pouvons pas suivre les mêmes ménages dans le temps.
+
+Le dispositif rotatif préserve cependant la représentativité transversale à chaque vague d'enquête : le remplacement aléatoire des ménages sortants garantit que les statistiques village-année estiment le même paramètre de population d'une vague à l'autre.
+
+## Agrégation au niveau du village {#sec-aggregation}
+
+Nous analysons donc les données au niveau du village (*fokontany*), en agrégeant les revenus des ménages en médianes village-année. La médiane est préférée à la moyenne car les distributions de revenus ruraux sont asymétriques à droite.
+
+## Variable de résultat {#sec-outcome}
+
+La variable de résultat principale est le logarithme du revenu équivalisé des ménages, construit en quatre étapes :
+
+1. Revenu total (`revtot`) : somme des composantes de revenus.
+2. Équivalisation selon l'échelle OCDE modifiée : $\text{equiv} = 1 + 0{,}5 \times (\text{adultes supplémentaires}) + 0{,}3 \times (\text{enfants de moins de 14 ans})$.
+3. Winsorisation aux 1er et 99e percentiles intrayear.
+4. Transformation logarithmique : $y_{it} = \log(\text{revenu équivalisé}_{it} + 1)$.
+
+# Construction du contrefactuel {#sec-estimation}
+
+## Sélection des communautés donneurs {#sec-donor-pool}
+
+Le contrefactuel est construit à partir de *pools de donneurs* — des villages d'observatoires ruraux non exposés à aucune AP pendant la période d'étude. Nous commençons avec 9 observatoires donneurs fournissant environ 60 sites donneurs à travers le pays.
+
+Un audit spatial systématique ([Annexe B](A2_donor_validity.qmd)) vérifie si ces donneurs sont eux-mêmes adjacents à des AP créées durant 1999–2014 :
+
+| Statut | Observatoires |
+|---|---|
+| « Propres » | Antsirabe (02), Tsiroanomandidy (13), Ambovombe (16), Mahanoro (25), Itasy (41) |
+| Aussi exposés | Antsohihy (12), Farafangana (15), Toliara Nord (23), Fénérive Est (24) |
+
+## Contrôle synthétique généralisé {#sec-gsynth}
+
+### Intuition {#sec-gsynth-intuition}
+
+La méthode standard de différence-en-différences (DiD) suppose que les communautés exposées et de contrôle auraient suivi des tendances parallèles en l'absence de l'AP. Le contrôle synthétique généralisé (gsynth) de @Xu2017 assouplit cette hypothèse. Au lieu d'exiger des tendances parallèles, il permet à chaque village de suivre sa propre trajectoire conduite par des facteurs non observés — la méthode *apprend* ensuite ces facteurs à partir des données pré-traitement et les utilise pour projeter ce qui se serait passé après la création de l'AP.
+
+### Spécification formelle {#sec-gsynth-formal}
+
+Pour chaque unité exposée $i$ en période post-traitement $t$, gsynth modélise le résultat comme :
+
+$$Y_{it} = \alpha_i + \xi_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + D_{it} \cdot \delta_{it} + \varepsilon_{it}$$
+
+où $\alpha_i$ sont des effets fixes unité, $\xi_t$ des effets fixes temps, $\boldsymbol{\lambda}_i' \boldsymbol{f}_t$ des effets fixes interactifs, et $D_{it}$ l'indicateur de traitement. La sélection du nombre de facteurs utilise la validation croisée leave-one-out sur $r \in \{0, 1, 2, 3, 4, 5\}$.
+
+### Deux modèles séparés {#sec-two-models}
+
+Nous estimons deux modèles distincts :
+
+1. Modèle Marovoay : unités exposées = Madiromiongana et Bepako (rive est, à partir de 2003) ; donneurs = tous les autres sites.
+2. Modèle Alaotra : unité exposée = observatoire d'Alaotra agrégé (à partir de 2008) ; donneurs = tous les sites non-Alaotra.
+
+## Inférence avec peu d'unités exposées {#sec-inference}
+
+Une contrainte fondamentale est le petit nombre d'unités exposées : 2 sites pour Marovoay, 1 pour Alaotra. Pour Marovoay, la p-valeur minimale atteignable est $1/6 \approx 0{,}167$ (test unilatéral). Nous rapportons les intervalles de confiance bootstrap gsynth et les p-valeurs tout au long, mais les interprétons à la lumière de ce plafond de puissance.
+
+## Dispositifs complémentaires au niveau des ménages {#sec-complementary}
+
+Nous complétons l'analyse gsynth par deux dispositifs de coupes transversales répétées (CTR) au niveau des ménages basés sur le cadre Callaway–Sant'Anna [@CallawayS2021] avec `panel = FALSE`. Pour chaque observatoire, nous construisons un indicateur de traitement binaire à partir d'un des deux contrastes d'intensité d'exposition intra-observatoire : l'exposition géographique (distance à la limite de l'AP ou assignation rive) et l'exposition comportementale (part de ménages déclarant au moins un usage extractif dépendant de l'AP en 2025).
+
+```{r}
+#| label: secondary-did-build
+#| include: false
+source("R/secondary_did.R")
+sec_did <- read_rds("data/secondary_did_results.rds")
+```
+
+```{r}
+#| label: tbl-secondary-design
+#| tbl-cap: "Classifications d'intensité d'exposition intra-observatoire utilisées par les dispositifs secondaires CTR."
+maro_class <- tibble(
+  Observatoire = "Marovoay",
+  Site = c("Bepako", "Madiromiongana", "Ampijoroa", "Maroala"),
+  `Distance / rive` = c("est", "est", "ouest", "ouest"),
+  `% extractif (2025)` = c(11.4, 8.8, 0.7, 1.7),
+  `Géographique` = c("traité", "traité", "contrôle", "contrôle"),
+  `Comportemental` = c("—", "—", "—", "—")
+)
+ala_summary <- sec_did$ala$panel |>
+  distinct(site, dist, g_dist, g_ext) |>
+  left_join(sec_did$ala$ext_share, by = "site") |>
+  arrange(dist) |>
+  transmute(
+    Observatoire = "Alaotra",
+    Site = case_when(site == "Maritampona" ~ "Ambodivoara-Maritampona",
+                     site == "Analamiranga" ~ "Ambatoharanana-Analamiranga", TRUE ~ site),
+    `Distance / rive` = sprintf("%.1f km", dist),
+    `% extractif (2025)` = round(pct, 1),
+    `Géographique` = if_else(g_dist > 0, "traité", "contrôle"),
+    `Comportemental` = if_else(g_ext > 0, "traité", "contrôle")
+  )
+bind_rows(maro_class, ala_summary) |>
+  gt(groupname_col = "Observatoire") |>
+  fmt_number(columns = `% extractif (2025)`, decimals = 1) |>
+  tab_header(title = "CTR secondaire : classifications d'intensité d'exposition")
+```
+
+# Extensions à trois observatoires supplémentaires {#sec-extensions}
+
+Trois paires observatoire–AP supplémentaires identifiées lors de l'audit du pool de donneurs fournissent des extensions de l'analyse principale :
+
+| Observatoire | Aire protégée | UICN | Année | Gouvernance |
+|---|---|---|---|---|
+| Farafangana | Corridor Forestier Ambositra-Vondrozo (CFAV) | V | 2006 | Corridor de hautes terres multifonctionnel |
+| Toliara Nord | Amoron'i Onilahy | V | 2007 | Protections côtières et forêt sèche |
+| Fénérive Est | Réserve de Tampolo | IV | 2007 | Petite forêt de recherche (~7,3 km²) |
+
+````

@@ -1,0 +1,41 @@
+```quarto
+---
+title: "Méthodologie"
+subtitle: "Détails techniques sur les méthodes d'estimation"
+---
+
+Cette annexe fournit les descriptions formelles des méthodes d'estimation utilisées dans cet article. Le texte principal ([Chapitre 3](03_strategy.qmd), [Chapitre 4](04_results.qmd)) décrit les méthodes au niveau nécessaire pour suivre l'argumentation ; cette annexe donne les détails techniques nécessaires à la réplication et à l'évaluation méthodologique.
+
+
+# Contrôle synthétique généralisé {#sec-d-gsynth}
+
+## Modèle à effets fixes interactifs
+
+La méthode du contrôle synthétique généralisé [@Xu2017] étend le cadre du contrôle synthétique standard pour accueillir plusieurs unités traitées et permet l'estimation des effets traitement en présence de facteurs de confusion inobservés variant dans le temps. Le processus générateur de données est :
+
+$$Y_{it} = \delta_{it} D_{it} + \mathbf{x}_{it}'\boldsymbol{\beta} + \boldsymbol{\lambda}_i' \mathbf{f}_t + \varepsilon_{it}$$
+
+où $Y_{it}$ est le résultat pour l'unité $i$ à la période $t$ ; $D_{it}$ est l'indicateur de traitement ; $\boldsymbol{\lambda}_i$ est un vecteur $r \times 1$ de chargements factoriels spécifiques à l'unité ; $\mathbf{f}_t$ est un vecteur $r \times 1$ de facteurs communs variant dans le temps ; et $\varepsilon_{it}$ est une erreur idiosyncrasique.
+
+L'hypothèse d'identification clé est que la structure factorielle $\boldsymbol{\lambda}_i' \mathbf{f}_t$ est partagée entre les unités traitées et témoins. Cela généralise l'hypothèse de tendances parallèles : plutôt que de requérir que les unités traitées et témoins suivent la même tendance, cela permet des tendances différentes tant que ces tendances sont engendrées par le même ensemble de facteurs latents.
+
+## Estimation
+
+L'algorithme procède en trois étapes :
+
+1. Estimer les facteurs à partir des unités témoins : en utilisant la matrice $N_0 \times T$ des résultats témoin, estimer $\hat{\mathbf{f}}_t$ et $\hat{\boldsymbol{\lambda}}_i$ par analyse en composantes principales. Le nombre de facteurs $r$ est sélectionné par validation croisée leave-one-out sur $r = 0, 1, \ldots, r_{\max}$.
+
+2. Estimer les chargements factoriels traités : pour chaque unité traitée $i$, régresser les résultats pré-traitement $Y_{i1}, \ldots, Y_{i,T_0}$ sur les facteurs estimés $\hat{\mathbf{f}}_1, \ldots, \hat{\mathbf{f}}_{T_0}$ pour obtenir $\hat{\boldsymbol{\lambda}}_i$.
+
+3. Construire le contrefactuel : le résultat contrefactuel estimé pour l'unité traitée $i$ en période post-traitement $t > T_0$ est $\hat{Y}_{it}(0) = \hat{\boldsymbol{\lambda}}_i' \hat{\mathbf{f}}_t$. L'ATT à la période $t$ est $\hat{\delta}_{it} = Y_{it} - \hat{Y}_{it}(0)$.
+
+
+# Coupes transversales répétées Callaway–Sant'Anna {#sec-d-rcs}
+
+Le dispositif CTR ([Chapitre 3](03_strategy.qmd)) utilise l'estimateur Callaway–Sant'Anna [@CallawayS2021] avec `panel = FALSE`, qui traite chaque vague comme une coupe transversale indépendante de ménages dans les sites et agrège à travers les observations par le doubly-robust de @SantAnnaZhao2020. Les effets fixes de site absorbent l'hétérogénéité inobservée invariante dans le temps.
+
+
+# Différences-en-différences synthétiques {#sec-d-sdid}
+
+Les tests de robustesse incluent également l'estimateur de différences-en-différences synthétiques de @Arkhangelsky2021, qui pondère à la fois les unités témoins et les périodes pré-traitement pour construire une tendance préliminaire commune entre les unités exposées et le pool de donneurs.
+```

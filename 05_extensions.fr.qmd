@@ -1,0 +1,162 @@
+````quarto
+---
+title: "Extensions"
+subtitle: "Trois paires observatoire–AP supplémentaires"
+---
+
+```{r}
+#| label: setup
+source("R/load_data.R")
+source("R/gsynth_helpers.R")
+source("R/plot_themes.R")
+library(tmap)
+```
+
+La comparaison à deux cas du [Chapitre 4](04_results.qmd) — enforcement strict à Ankarafantsika versus conservation participative au Lac Alaotra — limite la validité externe. Ce chapitre étend l'analyse à trois observatoires ruraux supplémentaires que l'audit du pool de donneurs ([Annexe B](A2_donor_validity.qmd)) a identifiés comme eux-mêmes adjacents à des aires protégées créées pendant la période d'étude :
+
+- Farafangana (obs. 15) : adjacent au Corridor Forestier Ambositra-Vondrozo (catégorie V UICN, septembre 2006). Fenêtre d'enquête : 1999–2008 (3 années post-traitement seulement).
+- Toliara Nord (obs. 23) : adjacent à Amoron'i Onilahy (catégorie V UICN, janvier 2007), Parc National de Mikea (catégorie II, avril 2007) et Ranobe PK 32 (catégorie V, décembre 2008). Fenêtre d'enquête : 1999–2014.
+- Fénérive Est (obs. 24) : adjacent à la Réserve de Tampolo (catégorie IV UICN, août 2007), une petite forêt de recherche (~7,3 km²) gérée par ESSA-Forêts. Fenêtre d'enquête : 1999–2014.
+
+Ces trois observatoires passent de contraintes dans le pool de donneurs à des unités exposées informatives. Ensemble avec Marovoay et Alaotra, ils permettent un examen à cinq cas de la façon dont le type de gouvernance de conservation, l'intensité d'application et la taille de l'AP façonnent les résultats de revenu des ménages. Les résultats de ces trois sites doivent toutefois être interprétés avec prudence, car les fenêtres post-traitement plus courtes limitent la précision des estimateurs.
+
+Une note méthodologique : le pool de donneurs dans ce chapitre est restreint aux cinq observatoires propres (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). Les quatre donneurs aussi exposés utilisés au [Chapitre 4](04_results.qmd) sont maintenant traités comme unités exposées. Les estimations ATT pour Marovoay et Alaotra différeront donc légèrement de leurs équivalents du Chapitre 4.
+
+# Sites d'étude {#sec-additional-sites}
+
+## Farafangana et le Corridor Forestier Ambositra-Vondrozo {#sec-fara-site}
+
+Le CFAV (~300 km, catégorie V UICN) longe l'escarpement oriental des hautes terres. Un décret de protection temporaire a été émis le 15 septembre 2006 dans le cadre de l'expansion SAPM post-2003. Le statut catégorie V implique une réglementation de l'utilisation des terres à la lisière forestière — principalement des restrictions sur le tavy et la production de charbon de bois dans les zones tampons — plutôt qu'un enforcement d'exclusion.
+
+L'observatoire de Farafangana est situé sur la plaine côtière sud-est ; sa commune la plus proche (Mahatsinjo) borde le CFAV à ~14 km. Avec seulement 3 années post-traitement (2006–2008), les estimations gsynth doivent être considérées comme illustratives.
+
+```{r}
+#| label: fig-map-fara
+#| fig-cap: "Observatoire de Farafangana et aires protégées à proximité."
+#| fig-height: 7
+#| fig-width: 7
+fara_pas <- dyn_study |>
+  filter(str_detect(NAME, "Corridor Forestier Ambositra Vondrozo|Manombo")) |>
+  mutate(pa_type = if_else(str_detect(NAME, "Corridor"),
+                           "AP d'exposition (CFAV, 2006)",
+                           "AP préexistante (Manombo, 1962)"))
+fara_fkt_bb <- st_bbox(fara_fokontany)
+fara_bbox <- st_bbox(c(
+  xmin = unname(fara_fkt_bb["xmin"]) - 0.3, ymin = unname(fara_fkt_bb["ymin"]) - 0.3,
+  xmax = unname(fara_fkt_bb["xmax"]) + 0.3, ymax = unname(fara_fkt_bb["ymax"]) + 0.3), crs = 4326)
+fara_mad_c <- st_crop(madagascar, fara_bbox)
+fara_pas_c <- tryCatch(st_crop(fara_pas, fara_bbox), error = function(e) fara_pas)
+fara_fkt_c <- fara_fokontany |> mutate(layer = "Fokontany enquêtés")
+tm_shape(fara_mad_c) +
+  tm_borders(col = "grey75", lwd = 0.3) +
+  tm_shape(fara_pas_c) + tm_fill(col = "pa_type", palette = c("#EF9A9A", "#FFF9C4"), alpha = 0.5, title = "AP") +
+  tm_borders(col = "pa_type", palette = c("#C62828", "#F9A825"), lwd = 1.2) +
+  tm_shape(fara_fkt_c) + tm_dots(col = "#1B5E20", size = 0.3) +
+  tm_layout(legend.outside = TRUE, frame = FALSE)
+```
+
+## Résultats : Farafangana {#sec-fara-results}
+
+```{r}
+#| label: fig-fara-att
+#| fig-cap: "Farafangana : trajectoire ATT gsynth (CFAV, catégorie V UICN, 2006). La courte fenêtre post-traitement (3 ans) limite la précision."
+#| fig-height: 5
+#| fig-width: 8
+gs_fara <- read_rds("data/paper14_gsynth_fara_oecd.rds")
+att_fara_df <- tibble(
+  rel_time = as.numeric(rownames(gs_fara$est_att)),
+  att = gs_fara$est_att[, "ATT"],
+  ci_lo = gs_fara$est_att[, "CI.lower"],
+  ci_hi = gs_fara$est_att[, "CI.upper"]
+)
+ggplot(att_fara_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#FF8F00", alpha = 0.15) +
+  geom_line(color = "#FF8F00", linewidth = 0.8) +
+  geom_point(color = "#FF8F00", size = 2.5) +
+  labs(x = "Années relatives à l'exposition (2006)", y = "ATT (revenu log équivalisé)",
+       title = "Farafangana : trajectoire ATT gsynth",
+       subtitle = paste0(gs_fara$N_co, " sites donneurs. r* = ", gs_fara$r_cv, " facteur(s).")) +
+  theme_minimal(base_size = 12)
+```
+
+## Toliara Nord et l'AP Amoron'i Onilahy {#sec-tol-site}
+
+L'observatoire de Toliara Nord (obs. 23) est adjacent à plusieurs aires protégées créées en 2007–2008 dans la région côtière du sud-ouest. Amoron'i Onilahy (catégorie V UICN) est la plus proche, à ~8 km de plusieurs communes de l'observatoire. La multiplicité des AP adjacentes et leurs catégories UICN variables compliquent l'identification d'une exposition nette.
+
+```{r}
+#| label: fig-tol-att
+#| fig-cap: "Toliara Nord : trajectoire ATT gsynth (Amoron'i Onilahy, catégorie V UICN, 2007)."
+#| fig-height: 5
+#| fig-width: 8
+gs_tol <- read_rds("data/paper14_gsynth_tol_oecd.rds")
+att_tol_df <- tibble(
+  rel_time = as.numeric(rownames(gs_tol$est_att)),
+  att = gs_tol$est_att[, "ATT"],
+  ci_lo = gs_tol$est_att[, "CI.lower"],
+  ci_hi = gs_tol$est_att[, "CI.upper"]
+)
+ggplot(att_tol_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#FF8F00", alpha = 0.15) +
+  geom_line(color = "#FF8F00", linewidth = 0.8) +
+  geom_point(color = "#FF8F00", size = 2.5) +
+  labs(x = "Années relatives à l'exposition (2007)", y = "ATT (revenu log équivalisé)",
+       title = "Toliara Nord : trajectoire ATT gsynth",
+       subtitle = paste0(gs_tol$N_co, " sites donneurs. r* = ", gs_tol$r_cv, " facteur(s).")) +
+  theme_minimal(base_size = 12)
+```
+
+## Fénérive Est et la Réserve de Tampolo {#sec-fen-site}
+
+L'observatoire de Fénérive Est (obs. 24) est adjacent à la Réserve de Tampolo (catégorie IV UICN), une petite réserve de recherche forestière de ~7,3 km² gérée par ESSA-Forêts. Sa taille est un ordre de grandeur inférieure à celle des autres AP examinées dans cette étude, ce qui rend moins plausible une perturbation substantielle des moyens de subsistance.
+
+```{r}
+#| label: fig-fen-att
+#| fig-cap: "Fénérive Est : trajectoire ATT gsynth (Réserve de Tampolo, catégorie IV UICN, 2007)."
+#| fig-height: 5
+#| fig-width: 8
+gs_fen <- read_rds("data/paper14_gsynth_fen_oecd.rds")
+att_fen_df <- tibble(
+  rel_time = as.numeric(rownames(gs_fen$est_att)),
+  att = gs_fen$est_att[, "ATT"],
+  ci_lo = gs_fen$est_att[, "CI.lower"],
+  ci_hi = gs_fen$est_att[, "CI.upper"]
+)
+ggplot(att_fen_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#FF8F00", alpha = 0.15) +
+  geom_line(color = "#FF8F00", linewidth = 0.8) +
+  geom_point(color = "#FF8F00", size = 2.5) +
+  labs(x = "Années relatives à l'exposition (2007)", y = "ATT (revenu log équivalisé)",
+       title = "Fénérive Est : trajectoire ATT gsynth",
+       subtitle = paste0(gs_fen$N_co, " sites donneurs. r* = ", gs_fen$r_cv, " facteur(s).")) +
+  theme_minimal(base_size = 12)
+```
+
+# Trois régularités dans cinq cas {#sec-patterns}
+
+En combinant les résultats des deux cas primaires (Chapitre 4) et des trois extensions (Chapitre 5), trois régularités apparaissent :
+
+**Régularité 1 : Seul l'enforcement strict est associé à un écart de revenu négatif.** Le site présentant l'enforcement le plus exclusif — Ankarafantsika (catégorie II UICN) — est le seul pour lequel gsynth identifie un ATT substantiellement négatif. Cette régularité persiste à travers les spécifications et jusqu'en 2025. L'interprétation reste cependant prudente en raison du déclin régional documenté de la plaine de Marovoay, qui prédate l'exposition au parc et pourrait contribuer à l'écart observé.
+
+**Régularité 2 : La conservation multifonctionnelle et le parc de recherche produisent des effets proches de zéro.** Alaotra (catégorie V), Farafangana (catégorie V), Toliara Nord (catégorie V) et Fénérive Est (catégorie IV) présentent tous des ATT proches de zéro et statistiquement non significatifs. La cohérence de ce résultat nul sur quatre cas indépendants renforce la conclusion que les dispositifs de conservation participatifs ou à intensité modérée n'imposent pas de coût de revenu agrégé aux ménages adjacents.
+
+**Régularité 3 : Les effets nuls ne prouvent pas l'absence d'impact.** Avec un seul site exposé pour several cas, la puissance minimale réalisable est insuffisante pour détecter des effets inférieurs à 15–20%. Les résultats nuls doivent être interprétés comme « aucun effet détectable » plutôt que comme « certitude d'absence d'effet ».
+
+# Mises en garde {#sec-caveats}
+
+Plusieurs mises en garde s'appliquent à l'ensemble des résultats de ce chapitre. 
+
+La courte fenêtre post-traitement pour Farafangana (3 ans) ne permet pas à gsynth d'établir une trajectoire ATT stable ; les résultats doivent être considérés comme illustratifs plutôt qu'informatifs. 
+
+Pour Toliara Nord, la proximité simultanée de plusieurs aires protégées de catégories et dates différentes complique l'identification d'une exposition nette à une AP spécifique. L'ATT estimé absorbe potentiellement des signaux d'exposition multiples.
+
+La Réserve de Tampolo à Fénérive Est est si petite (~7,3 km²) que son footprint spatial délimite seulement une infime fraction des terres utilisées par l'observatoire. Même si une exclusion réelle avait lieu, l'effet agrégé au niveau de l'observatoire pourrait rester indétectable.
+
+Enfin, la restriction du pool de donneurs aux cinq observatoires propres dans ce chapitre réduit le nombre de sites donneurs par rapport au Chapitre 4, ce qui peut augmenter la variabilité des estimations pour les cas à pool de donneurs réduit.
+
+````

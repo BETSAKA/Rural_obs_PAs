@@ -1,0 +1,297 @@
+````quarto
+---
+title: "Résultats"
+subtitle: "Impacts de la conservation stricte et multifonctionnelle sur le revenu des ménages"
+---
+
+```{r}
+#| label: setup
+source("R/load_data.R")
+source("R/gsynth_helpers.R")
+source("R/plot_themes.R")
+```
+
+```{r}
+#| label: load-results
+gs_maro <- read_rds("data/paper14_gsynth_maro_oecd.rds")
+gs_ala <- read_rds("data/paper14_gsynth_ala_oecd.rds")
+gs_maro_ext <- read_rds("data/paper12_gsynth_maro_ext_oecd.rds")
+maro_gs_ext <- read_rds("data/maro_gs_ext_panel.rds")
+```
+
+# Ankarafantsika : conservation stricte (catégorie II UICN) {#sec-maro}
+
+## Construction du panel
+
+Le modèle Marovoay comprend 2 sites exposés (Bepako et Madiromiongana, rive est) et des sites donneurs issus des 5 observatoires propres identifiés à l'[Annexe B](A2_donor_validity.qmd) (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). La période d'exposition commence en 2003, offrant 4 années de pré-exposition (1999–2002) et jusqu'à 12 années de post-exposition (2003–2014).
+
+## Trajectoire ATT gsynth {#sec-maro-att}
+
+```{r}
+#| label: fig-maro-att
+#| fig-cap: "Ankarafantsika : trajectoire ATT gsynth pour les sites de la rive est par rapport au début de l'exposition (2003). Variable de résultat : revenu logarithmique équivalisé OCDE. Bande ombrée : IC bootstrap paramétrique à 95%."
+#| fig-height: 5
+#| fig-width: 8
+att_maro_df <- tibble(
+  rel_time = as.numeric(rownames(gs_maro$est_att)),
+  att = gs_maro$est_att[, "ATT"],
+  ci_lo = gs_maro$est_att[, "CI.lower"],
+  ci_hi = gs_maro$est_att[, "CI.upper"]
+)
+
+ggplot(att_maro_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
+  geom_line(color = "#D32F2F", linewidth = 0.8) +
+  geom_point(color = "#D32F2F", size = 2.5) +
+  labs(x = "Années relatives à l'exposition (2003)", y = "ATT (revenu log équivalisé)",
+       title = "Ankarafantsika : trajectoire ATT gsynth",
+       subtitle = paste0("Exposition au niveau site vs ", gs_maro$N_co,
+                         " sites donneurs. r* = ", gs_maro$r_cv, " facteur(s).")) +
+  theme_minimal(base_size = 12)
+```
+
+Le modèle de contrôle synthétique généralisé trouve un écart négatif persistant entre les sites de la rive est de Marovoay et leur contrefactuel synthétique. L'effet moyen du traitement sur les traités (ATT) post-exposition est d'environ {{< var att_maro >}} points logarithmiques (IC 95% : [{{< var att_maro_ci_lo >}}, {{< var att_maro_ci_hi >}}], *p* = {{< var att_maro_p >}}), correspondant à une différence d'environ {{< var att_maro_pct >}} par rapport au contrefactuel projeté. L'écart s'ouvre peu après l'extension du parc de 2002 et ne se referme pas sur la période d'observation.
+
+Dans quelle mesure cet écart est attribuable au parc lui-même — plutôt qu'à la trajectoire économique plus large de la région de Marovoay — est une question que les données seules ne peuvent pas résoudre de manière définitive. Marovoay était historiquement la zone rizicole irriguée la plus productive de Madagascar, souvent désignée comme le *grenier à blé* du pays. À partir des années 1980, la région a connu un déclin bien documenté, alimenté par l'envasement de la Betsiboka, la dégradation des infrastructures d'irrigation coloniales et l'effondrement du soutien agricole de l'État. Cette trajectoire régionale est antérieure à l'extension du parc de 2002 et pourrait raisonnablement expliquer une partie de la divergence que gsynth attribue à l'exposition à la conservation, si les observatoires donneurs sur le plateau des hautes terres ou dans les zones sèches du sud n'étaient pas similairement affectés par la détérioration de l'agriculture irriguée des basses terres.
+
+### Vérification CTR ménages intra-Marovoay {#sec-maro-rcs}
+
+```{r}
+#| label: tbl-maro-rcs
+#| tbl-cap: "Estimation CTR Callaway–Sant'Anna intra-Marovoay (panel = FALSE), rive est contre rive ouest. Deux erreurs standards sont rapportées : basée sur le plan (fonction d'influence, sans clustering) et groupée par site."
+sec_did <- read_rds("data/secondary_did_results.rds")
+sec_did$maro$summary |>
+  transmute(
+    Dispositif = "Rive est vs rive ouest",
+    Estimation = estimate,
+    `ES (FI)` = se_if,
+    `ES (cluster)` = se_cluster,
+    `% revenu` = sprintf("%+.1f%%", pct_income)
+  ) |>
+  gt() |>
+  fmt_number(columns = c(Estimation, `ES (FI)`, `ES (cluster)`), decimals = 3) |>
+  tab_header(title = "Marovoay : CTR ménages DiD")
+```
+
+L'estimation intra-Marovoay est proche de zéro avec une erreur standard cluster-robuste resserrée — différant de manière frappante par son ordre de grandeur de l'écart gsynth de {{< var att_maro >}} points logarithmiques rapporté ci-dessus. Ce contraste est un diagnostic clé qui ne peut pas simplement être mis de côté comme deux méthodes répondant à des questions différentes.
+
+Le gsynth compare les villages de la rive est contre des observatoires donneurs situés sur le plateau des hautes terres ou dans les zones sèches du sud — des endroits avec des systèmes agronomiques différents, une exposition différente à l'envasement de la Betsiboka. Si la région de Marovoay dans son ensemble a décliné par rapport à ces observatoires pour des raisons sans lien avec le parc — l'effondrement des infrastructures d'irrigation, le retrait de l'État de l'économie rizicole — alors gsynth attribuera cette divergence régionale à l'AP, car le calendrier de l'exposition coïncide avec le début du panel observable. Le dispositif intra-Marovoay contrôle pour ce choc régional : les villages de la rive est et de la rive ouest partagent la même rivière, la même économie rizicole en aval et le même marché local.
+
+Le fait que les revenus de la rive est et de la rive ouest aient évolué si étroitement tout au long de la période d'étude constitue donc un avertissement sérieux. Il suggère que la majeure partie de la divergence identifiée par gsynth est un phénomène régional — le déclin d'une région agricole autrefois prospère — plutôt qu'un effet pouvant être attribué avec confiance à la limite du parc. Les deux résultats doivent être lus ensemble, aucun ne l'emportant sur l'autre.
+
+## Effets spécifiques aux unités
+
+```{r}
+#| label: fig-maro-units
+#| fig-cap: "Effets d'exposition spécifiques aux deux fokontany de la rive est."
+#| fig-height: 5
+#| fig-width: 9
+eff_mat <- gs_maro$eff
+years <- as.numeric(rownames(eff_mat))
+
+unit_effects <- bind_rows(
+  tibble(
+    year = years,
+    effect = eff_mat[, "031"],
+    village = "Bepako (rive est)"
+  ),
+  tibble(
+    year = years,
+    effect = eff_mat[, "032"],
+    village = "Madiromiongana (rive est)"
+  )
+) |>
+  filter(year >= TREAT_YEAR_MARO)
+
+ggplot(unit_effects, aes(x = factor(year), y = effect, fill = village)) +
+  geom_col(position = "dodge") +
+  geom_hline(yintercept = 0, color = "grey60") +
+  scale_fill_manual(
+    values = c(
+      "Bepako (rive est)" = "#fb6a4a",
+      "Madiromiongana (rive est)" = "#cb181d"
+    )
+  ) +
+  facet_wrap(~village) +
+  labs(
+    x = NULL,
+    y = "Effet d'exposition (revenu log équivalisé)",
+    title = "Effets post-exposition spécifiques aux unités"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+
+# Lac Alaotra : conservation multifonctionnelle (catégorie V UICN) {#sec-ala}
+
+## Construction du panel
+
+Le modèle Alaotra traite l'ensemble de l'observatoire comme une seule unité exposée, agrégeant les sept fokontany en une médiane annuelle au niveau du site. L'exposition commence en 2008.
+
+## Trajectoire ATT gsynth {#sec-ala-att}
+
+```{r}
+#| label: fig-ala-att
+#| fig-cap: "Lac Alaotra : trajectoire ATT gsynth. Variable de résultat : revenu logarithmique équivalisé OCDE."
+#| fig-height: 5
+#| fig-width: 8
+att_ala_df <- tibble(
+  rel_time = as.numeric(rownames(gs_ala$est_att)),
+  att = gs_ala$est_att[, "ATT"],
+  ci_lo = gs_ala$est_att[, "CI.lower"],
+  ci_hi = gs_ala$est_att[, "CI.upper"]
+)
+
+ggplot(att_ala_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
+  geom_line(color = "#1565C0", linewidth = 0.8) +
+  geom_point(color = "#1565C0", size = 2.5) +
+  labs(x = "Années relatives à l'exposition (2008)", y = "ATT (revenu log équivalisé)",
+       title = "Lac Alaotra : trajectoire ATT gsynth",
+       subtitle = paste0("Pool de donneurs complet : ", gs_ala$N_co,
+                         " sites. r* = ", gs_ala$r_cv, " facteur(s).")) +
+  theme_minimal(base_size = 12)
+```
+
+Le modèle gsynth pour Alaotra produit un ATT moyen de {{< var att_ala >}} points de log, statistiquement indiscernable de zéro (IC 95% : [{{< var att_ala_ci_lo >}}, {{< var att_ala_ci_hi >}}], *p* = {{< var att_ala_p >}}). L'absence d'impact détectable sur le revenu au Lac Alaotra contraste avec l'écart négatif à Ankarafantsika. L'interprétation la plus parcimonieuse est que le cadre CBNRM de Durrell, qui régule l'accès aux ressources de manière participative plutôt que de les prohiber entièrement, a préservé les moyens de subsistance des ménages tandis que les restrictions d'exclusion à Ankarafantsika les ont érodés.
+
+## Vérification CTR intra-Alaotra {#sec-ala-rcs}
+
+```{r}
+#| label: tbl-ala-rcs
+#| tbl-cap: "CTR Callaway–Sant'Anna intra-Alaotra (panel = FALSE). Résultats pour les proxys d'exposition géographique (distance) et comportemental (usage extractif)."
+sec_did_ala <- read_rds("data/secondary_did_results.rds")$ala
+sec_did_ala$summary |>
+  transmute(
+    Dispositif = recode(
+      design,
+      dist = "Distance ≤ 10 km",
+      ext = "Usage extractif ≥ 12,5%"
+    ),
+    Estimation = estimate,
+    `ES (FI)` = se_if,
+    `ES (cluster)` = se_cluster,
+    `% revenu` = sprintf("%+.1f%%", pct_income)
+  ) |>
+  gt() |>
+  fmt_number(columns = c(Estimation, `ES (FI)`, `ES (cluster)`), decimals = 3) |>
+  tab_header(title = "Alaotra : CTR ménages DiD")
+```
+
+## Comparaison des deux cas {#sec-comparison}
+
+```{r}
+#| label: fig-att-comparison
+#| fig-cap: "Comparaison des trajectoires ATT gsynth : Ankarafantsika (rouge) vs Lac Alaotra (bleu). L'échelle horizontale est normalisée par rapport au début de l'exposition."
+#| fig-height: 5
+#| fig-width: 9
+bind_rows(
+  att_maro_df |> mutate(case = "Ankarafantsika (strict)"),
+  att_ala_df |> mutate(case = "Lac Alaotra (multifonctionnel)")
+) |>
+  ggplot(aes(rel_time, att, color = case, fill = case)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), alpha = 0.12, color = NA) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  scale_color_manual(values = c("Ankarafantsika (strict)" = "#D32F2F",
+                                "Lac Alaotra (multifonctionnel)" = "#1565C0"), name = NULL) +
+  scale_fill_manual(values = c("Ankarafantsika (strict)" = "#D32F2F",
+                               "Lac Alaotra (multifonctionnel)" = "#1565C0"), name = NULL) +
+  labs(x = "Années relatives à l'exposition", y = "ATT (revenu log équivalisé)",
+       title = "Comparaison des trajectoires ATT") +
+  theme_minimal(base_size = 12) + theme(legend.position = "bottom")
+```
+
+La comparaison entre les deux cas primaires est saisissante mais doit être interprétée avec prudence. À Ankarafantsika, la conservation stricte est associée à un effet négatif persistant, mais sa magnitude et son attribution restent incertaines en raison du déclin régional documenté de la plaine de Marovoay. À Alaotra, la conservation multifonctionnelle est associée à un effet nul, mais cette absence de détection pourrait également refléter une puissance statistique insuffisante. Avant de tirer des conclusions de gouvernance, une certaine prudence s'impose.
+
+## Robustesse {#sec-robustness}
+
+```{r}
+#| label: fig-robustness-maro
+#| fig-cap: "Vérification de robustesse pour Marovoay : ATT gsynth sous des spécifications alternatives. 'Niveaux' = revenu sans transformation log ; 'Pool étendu' = inclut les 4 donneurs aussi exposés."
+#| fig-height: 5
+#| fig-width: 9
+gs_maro_lev <- read_rds("data/robustness_gsynth_levels_maro.rds")
+gs_maro_ext2 <- read_rds("data/robustness_gsynth_oecd_maro.rds")
+
+rob_maro <- bind_rows(
+  tibble(rel_time = as.numeric(rownames(gs_maro$est_att)),
+         att = gs_maro$est_att[, "ATT"],
+         ci_lo = gs_maro$est_att[, "CI.lower"],
+         ci_hi = gs_maro$est_att[, "CI.upper"],
+         spec = "Référence (log, pool propre)"),
+  tibble(rel_time = as.numeric(rownames(gs_maro_lev$est_att)),
+         att = gs_maro_lev$est_att[, "ATT"],
+         ci_lo = gs_maro_lev$est_att[, "CI.lower"],
+         ci_hi = gs_maro_lev$est_att[, "CI.upper"],
+         spec = "Niveaux (non-log)"),
+  tibble(rel_time = as.numeric(rownames(gs_maro_ext2$est_att)),
+         att = gs_maro_ext2$est_att[, "ATT"],
+         ci_lo = gs_maro_ext2$est_att[, "CI.lower"],
+         ci_hi = gs_maro_ext2$est_att[, "CI.upper"],
+         spec = "Pool étendu (12 donneurs)")
+)
+
+ggplot(rob_maro, aes(rel_time, att, color = spec, fill = spec)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), alpha = 0.08, color = NA) +
+  geom_line(linewidth = 0.7) +
+  geom_point(size = 1.8) +
+  scale_color_brewer(palette = "Set1", name = NULL) +
+  scale_fill_brewer(palette = "Set1", name = NULL) +
+  labs(x = "Années relatives à l'exposition", y = "ATT",
+       title = "Robustesse : Marovoay") +
+  theme_minimal(base_size = 11) + theme(legend.position = "bottom")
+```
+
+Les vérifications de robustesse confirment la direction et la persistance de l'écart à Marovoay dans l'ensemble des spécifications. Ce qui reste non résolu, c'est de savoir si cet écart reflète une exposition cumulée au parc ou les effets à long terme du même déclin régional — une question que ces données seules ne peuvent pas trancher.
+
+```{r}
+#| label: fig-robustness-ala
+#| fig-cap: "Vérification de robustesse pour Alaotra : ATT gsynth sous des spécifications alternatives."
+#| fig-height: 5
+#| fig-width: 9
+gs_ala_lev <- read_rds("data/robustness_gsynth_levels_ala.rds")
+gs_ala_ext2 <- read_rds("data/robustness_gsynth_oecd_ala.rds")
+
+rob_ala <- bind_rows(
+  tibble(rel_time = as.numeric(rownames(gs_ala$est_att)),
+         att = gs_ala$est_att[, "ATT"],
+         ci_lo = gs_ala$est_att[, "CI.lower"],
+         ci_hi = gs_ala$est_att[, "CI.upper"],
+         spec = "Référence (log, pool propre)"),
+  tibble(rel_time = as.numeric(rownames(gs_ala_lev$est_att)),
+         att = gs_ala_lev$est_att[, "ATT"],
+         ci_lo = gs_ala_lev$est_att[, "CI.lower"],
+         ci_hi = gs_ala_lev$est_att[, "CI.upper"],
+         spec = "Niveaux (non-log)"),
+  tibble(rel_time = as.numeric(rownames(gs_ala_ext2$est_att)),
+         att = gs_ala_ext2$est_att[, "ATT"],
+         ci_lo = gs_ala_ext2$est_att[, "CI.lower"],
+         ci_hi = gs_ala_ext2$est_att[, "CI.upper"],
+         spec = "Pool étendu (12 donneurs)")
+)
+
+ggplot(rob_ala, aes(rel_time, att, color = spec, fill = spec)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), alpha = 0.08, color = NA) +
+  geom_line(linewidth = 0.7) +
+  geom_point(size = 1.8) +
+  scale_color_brewer(palette = "Set1", name = NULL) +
+  scale_fill_brewer(palette = "Set1", name = NULL) +
+  labs(x = "Années relatives à l'exposition", y = "ATT", title = "Robustesse : Alaotra") +
+  theme_minimal(base_size = 11) + theme(legend.position = "bottom")
+```
+
+````

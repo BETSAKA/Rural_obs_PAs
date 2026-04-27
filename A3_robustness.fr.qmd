@@ -1,0 +1,16 @@
+````quarto
+---
+title: "Robustesse"
+subtitle: "Tests de sensibilité et placebo"
+---
+
+```{r}
+#| label: setup
+source("R/load_data.R")
+source("R/gsynth_helpers.R")
+source("R/plot_themes.R")
+```
+
+Cette annexe présente des tests de robustesse complémentaires pour les estimations principales des Chapitres 4 et 5. Les vérifications incluent : des tests placebo dans l'espace (permutation des unités exposées et témoins), des spécifications alternatives du résultat (niveaux au lieu du logarithme, revenu brut au lieu de l'équivalence OCDE), l'inclusion des quatre donneurs aussi exposés, et des estimateurs alternatifs (différences-en-différences synthétiques, effets fixes birectionnels).
+
+````
