@@ -46,7 +46,32 @@ po/*~
 rsconnect/
 
 /.quarto/
+*_files/
+*_cache/
+_freeze/
 
 # data
-
 data/*
+
+# legacy directories (kept on main, removed from paper-website)
+archive/
+documentation/
+output/
+exemples_stata/
+utils/
+images/
+
+# working notes
+todo
+website_migration_plan.md
+
+# legacy script (not used in website)
+R/calc_incomes_all_years.R
+
+# positron/vscode settings
+.vscode/
+extensions.json
+settings.json
+air.toml
+**/*.quarto_ipynb
+bash.exe.stackdump

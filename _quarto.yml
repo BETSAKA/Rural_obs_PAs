@@ -1,28 +1,86 @@
 project:
-  type: book
+  type: website
   output-dir: docs
+  render:
+    - "*.qmd"
+    - "!archive/"
 
-book:
-  title: "Evaluating the socioeconomic impacts of protected areas from rural observatories' data"
-  author: "BETSAKA project"
-  date: "02/04/2024"
+website:
+  title: "Conservation Governance and Rural Livelihoods in Madagascar"
   repo-url: https://github.com/BETSAKA/Rural_obs_PAs
-  # cover-image: figs/IRD_010664_ORI_small.png
-  # cover-image-alt: Déforestation à Madagascar © IRD - Bernard Moizo
-  chapters:
-    - index.qmd
-    - 01_Georeference_observatories.qmd
-    - 02_Overlaps_PAs_observatories.qmd
-    - 03_Variable_computation.qmd
-    - 04_Marovoay-Ankarafantsika.qmd
-bibliography: references.bib
+  repo-actions: [source, issue]
+  navbar:
+    left:
+      - text: Analysis
+        menu:
+          - text: "1. Context"
+            href: 01_context.qmd
+          - text: "2. Data"
+            href: 02_data.qmd
+          - text: "3. Identification Strategy"
+            href: 03_strategy.qmd
+          - text: "4. Results"
+            href: 04_results.qmd
+          - text: "5. Extensions"
+            href: 05_extensions.qmd
+          - text: "6. Discussion"
+            href: 06_discussion.qmd
+      - text: Appendices
+        menu:
+          - text: "A. Data Pipeline"
+            href: A1_data_pipeline.qmd
+          - text: "B. Donor Pool Validity"
+            href: A2_donor_validity.qmd
+          - text: "C. Robustness Tests"
+            href: A3_robustness.qmd
+          - text: "D. Methodology"
+            href: A4_methodology.qmd
+
+    right:
+      - icon: github
+        href: https://github.com/BETSAKA/Rural_obs_PAs
+  sidebar:
+    style: floating
+    contents:
+      - index.qmd
+      - section: "Analysis"
+        contents:
+          - 01_context.qmd
+          - 02_data.qmd
+          - 03_strategy.qmd
+          - 04_results.qmd
+          - 05_extensions.qmd
+          - 06_discussion.qmd
+      - section: "Appendices"
+        contents:
+          - A1_data_pipeline.qmd
+          - A2_donor_validity.qmd
+          - A3_robustness.qmd
+          - A4_methodology.qmd
+
+
+# -- Bilingual setup (uncomment when .fr.qmd files are ready) -----------------
+# babelquarto:
+#   mainlanguage: en
+#   languages:
+#     - fr
+#   title-fr: >
+#     Gouvernance de la conservation et conditions de vie rurales à Madagascar
 
 format:
   html:
     theme: cosmo
     code-fold: true
+    toc: true
+    number-sections: true
+    fig-width: 8
+    fig-height: 6
 
 execute:
+  echo: false
   warning: false
-  error: false
+  message: false
+  freeze: auto
+
+bibliography: references.bib
 

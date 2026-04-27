@@ -1,0 +1,642 @@
+---
+title: "Appendix C: Robustness Tests"
+subtitle: "Alternative specifications and sensitivity analysis"
+---
+
+```{r}
+#| label: setup
+source("R/load_data.R")
+source("R/gsynth_helpers.R")
+library(synthdid)
+library(did)
+```
+
+```{r}
+#| label: load-robustness
+
+# Primary specification (cached, clean 5-donor pool)
+gs_main_maro  <- read_rds("data/paper14_gsynth_maro_oecd.rds")
+gs_main_ala   <- read_rds("data/paper14_gsynth_ala_oecd.rds")
+
+# Robustness 1: unadjusted log income (no OECD equivalisation)
+gs_unadj_maro <- read_rds("data/paper12_gsynth_maro.rds")
+gs_unadj_ala  <- read_rds("data/paper12_gsynth_ala.rds")
+
+# Robustness 2: income in levels (thousands of Ariary)
+gs_lev_maro   <- read_rds("data/robustness_gsynth_levels_maro.rds")
+gs_lev_ala    <- read_rds("data/robustness_gsynth_levels_ala.rds")
+
+# Helper: extract period-by-period ATT path from cached gsynth object
+# NOTE: gsynth $est_att rownames are *relative* time (e.g. -4, -3, ..., 11),
+# not calendar years. We use them directly as rel_time.
+extract_att_path <- function(gs, treat_year) {
+  mat <- gs$est_att
+  if (is.null(mat)) {
+    return(tibble(rel_time = integer(), att = double(),
+                  ci_lo = double(), ci_hi = double(),
+                  year = integer()))
+  }
+  tibble(
+    rel_time = as.integer(rownames(mat)),
+    att      = mat[, "ATT"],
+    ci_lo    = mat[, "CI.lower"],
+    ci_hi    = mat[, "CI.upper"]
+  ) |>
+    mutate(year = rel_time + treat_year)
+}
+
+# Helper: extract a single statistic from cached gsynth est_avg
+gsynth_stat <- function(gs, what = c("se", "ci_lo", "ci_hi", "pval")) {
+  what <- match.arg(what)
+  if (is.null(gs$est_avg)) return(NA_real_)
+  col <- switch(what,
+    se    = "S.E.",
+    ci_lo = "CI.lower",
+    ci_hi = "CI.upper",
+    pval  = "p.value"
+  )
+  gs$est_avg[1, col]
+}
+```
+
+This appendix presents three robustness tests for the main gsynth results ([Chapter 4](04_results.qmd)). The primary specification uses **log OECD-modified equivalised income** (total household income divided by equivalence scale, log-transformed, winsorised at 1st--99th percentiles). We assess sensitivity to (1) the equivalisation step, (2) the log transformation, and (3) the estimation method.
+
+
+# Unadjusted log income {#sec-c-unadj}
+
+We re-estimate both gsynth models using log total household income (`revtot`) without any household-composition adjustment. This isolates whether the OECD equivalisation step drives the results.
+
+```{r}
+#| label: fig-unadj-att
+#| fig-cap: "gsynth ATT paths using unadjusted log income (no OECD equivalisation). Left: Ankarafantsika. Right: Alaotra."
+#| fig-height: 5
+#| fig-width: 12
+
+att_unadj_m <- extract_att_path(gs_unadj_maro, TREAT_YEAR_MARO)
+att_unadj_a <- extract_att_path(gs_unadj_ala, TREAT_YEAR_ALA)
+
+p_unadj_m <- ggplot(att_unadj_m, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", colour = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
+  geom_line(colour = "#D32F2F", linewidth = 0.8) +
+  geom_point(colour = "#D32F2F", size = 2) +
+  labs(x = "Relative time", y = "ATT (log income)",
+       title = "Ankarafantsika (unadjusted)") +
+  theme_minimal(base_size = 11)
+
+p_unadj_a <- ggplot(att_unadj_a, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", colour = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
+  geom_line(colour = "#1565C0", linewidth = 0.8) +
+  geom_point(colour = "#1565C0", size = 2) +
+  labs(x = "Relative time", y = "ATT (log income)",
+       title = "Lac Alaotra (unadjusted)") +
+  theme_minimal(base_size = 11)
+
+p_unadj_m + p_unadj_a +
+  plot_annotation(title = "Unadjusted Log Income: gsynth ATT Paths")
+```
+
+The unadjusted Ankarafantsika ATT is slightly larger in magnitude than the OECD-equivalised estimate, consistent with east-bank exposed households being slightly larger on average (larger households receive a smaller OECD adjustment, attenuating the per-capita gap). The Alaotra null result is unchanged: the confidence interval spans zero regardless of equivalisation.
+
+
+# Income in levels {#sec-c-levels}
+
+We re-estimate both models using income in levels (thousands of Malagasy Ariary, winsorised at the 99th percentile). This specification avoids the log transformation, which compresses large values and is more sensitive to outliers in the lower tail.
+
+```{r}
+#| label: tbl-income-scale
+#| tbl-cap: "Descriptive statistics of winsorised income (thousands of Ariary) by group."
+
+panel_desc <- household_consolidated |>
+  filter(
+    obs %in% c("03", "21", ALL_DONOR_OBS),
+    year %in% STUDY_START:STUDY_END,
+    !(obs == "03" & year == 2005)
+  ) |>
+  mk_income_ext() |>
+  mutate(
+    revtot_w = pmin(revtot, quantile(revtot, 0.99, na.rm = TRUE)),
+    revtot_w_k = revtot_w / 1000,
+    group = case_when(
+      site_id %in% c("031", "032") ~ "Marovoay east (exposed)",
+      site_id %in% c("033", "034") ~ "Marovoay west (control)",
+      obs == "21" ~ "Lac Alaotra",
+      TRUE ~ "Donor pool"
+    )
+  )
+
+panel_desc |>
+  summarise(
+    `Mean (k Ar)` = round(mean(revtot_w_k, na.rm = TRUE), 1),
+    Median = round(median(revtot_w_k, na.rm = TRUE), 1),
+    SD = round(sd(revtot_w_k, na.rm = TRUE), 1),
+    `N (HH-years)` = n(),
+    .by = group
+  ) |>
+  arrange(match(group, c("Marovoay east (exposed)", "Marovoay west (control)",
+                         "Lac Alaotra", "Donor pool"))) |>
+  gt() |>
+  tab_header(
+    title = "Income in Levels: Descriptive Statistics",
+    subtitle = "Winsorised total income (thousands of Ariary, 99th percentile cap)"
+  ) |>
+  fmt_number(columns = c(`Mean (k Ar)`, Median, SD), decimals = 1) |>
+  fmt_number(columns = `N (HH-years)`, decimals = 0, use_seps = TRUE)
+```
+
+```{r}
+#| label: fig-levels-att
+#| fig-cap: "gsynth ATT paths using income in levels (thousands of Ariary). Left: Ankarafantsika. Right: Alaotra."
+#| fig-height: 5
+#| fig-width: 12
+
+att_lev_m <- extract_att_path(gs_lev_maro, TREAT_YEAR_MARO)
+att_lev_a <- extract_att_path(gs_lev_ala, TREAT_YEAR_ALA)
+
+p_lev_m <- ggplot(att_lev_m, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", colour = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
+  geom_line(colour = "#D32F2F", linewidth = 0.8) +
+  geom_point(colour = "#D32F2F", size = 2) +
+  labs(x = "Relative time", y = "ATT (thousands Ariary)",
+       title = "Ankarafantsika (levels)") +
+  theme_minimal(base_size = 11)
+
+p_lev_a <- ggplot(att_lev_a, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", colour = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
+  geom_line(colour = "#1565C0", linewidth = 0.8) +
+  geom_point(colour = "#1565C0", size = 2) +
+  labs(x = "Relative time", y = "ATT (thousands Ariary)",
+       title = "Lac Alaotra (levels)") +
+  theme_minimal(base_size = 11)
+
+p_lev_m + p_lev_a +
+  plot_annotation(title = "Income in Levels: gsynth ATT Paths")
+```
+
+The levels-based Ankarafantsika ATT translates to a negative effect in thousands of Ariary that, as a percentage of the pre-treatment mean, is broadly consistent with the log-based estimate. The Alaotra levels estimate remains statistically insignificant.
+
+```{r}
+#| label: fig-pretreat-fit
+#| fig-cap: "Pre-treatment fit comparison: log specification (left) vs. levels (right) for Ankarafantsika."
+#| fig-height: 5
+#| fig-width: 12
+
+att_main_m <- extract_att_path(gs_main_maro, TREAT_YEAR_MARO)
+
+p_log <- ggplot(att_main_m, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", colour = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
+  geom_line(colour = "#D32F2F", linewidth = 0.8) +
+  geom_point(colour = "#D32F2F", size = 2) +
+  labs(x = "Relative time", y = "ATT (log equiv. income)",
+       title = "Log specification (primary)") +
+  theme_minimal(base_size = 11)
+
+p_lev <- ggplot(att_lev_m, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", colour = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
+  geom_line(colour = "#D32F2F", linewidth = 0.8) +
+  geom_point(colour = "#D32F2F", size = 2) +
+  labs(x = "Relative time", y = "ATT (thousands of Ariary)",
+       title = "Levels specification") +
+  theme_minimal(base_size = 11)
+
+p_log + p_lev +
+  plot_annotation(
+    title = "Ankarafantsika: Pre-Treatment Fit Comparison",
+    subtitle = "Log vs levels specification"
+  )
+```
+
+
+# Synthetic Difference-in-Differences {#sec-c-sdid}
+
+Synthetic Difference-in-Differences [SDID; @Arkhangelsky2021] provides a doubly-robust alternative: it constructs **unit weights** $\hat{\omega}$ to balance pre-treatment trajectories (like synthetic control) and **time weights** $\hat{\lambda}$ to concentrate comparisons on the most informative pre-treatment periods (like DiD). Under the latent factor model $Y_{it}(0) = \alpha_i + \beta_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + \varepsilon_{it}$, SDID is consistent if either dimension of reweighting succeeds. Inference uses Algorithm 4 (placebo method) from @Arkhangelsky2021, valid even with $N_{tr} = 1$.
+
+```{r}
+#| label: sdid-compute
+
+# Build OECD-equivalised panel for SDID (clean donors only)
+panel_hh_sdid <- household_consolidated |>
+  filter(
+    obs %in% c("03", "21", CLEAN_DONOR_OBS),
+    year %in% STUDY_START:STUDY_END,
+    !(obs == "03" & year == 2005)
+  ) |>
+  mk_income_ext() |>
+  mutate(
+    revtot_eq = revtot / oecd_equiv,
+    revtot_w  = pmin(revtot_eq, quantile(revtot_eq, 0.99, na.rm = TRUE)),
+    ln_y      = log(pmax(revtot_w, 0) + 1)
+  )
+
+panel_site_sdid <- panel_hh_sdid |>
+  summarise(ln_y = mean(ln_y, na.rm = TRUE), .by = c(obs, site_id, year))
+
+# Helper: build balanced SDID block
+build_sdid_block <- function(treated_ids, treat_year, year_set, panel_data) {
+  df <- panel_data |>
+    filter(year %in% year_set) |>
+    mutate(treatment = as.integer(site_id %in% treated_ids & year >= treat_year))
+  balanced <- df |>
+    count(site_id) |>
+    filter(n == length(year_set)) |>
+    pull(site_id)
+  df |> filter(site_id %in% balanced)
+}
+
+# --- Block 1: Marovoay (Ankarafantsika, exposed 2003) ---
+maro_years <- c(1999:2004, 2006:2008)
+
+blk_maro <- build_sdid_block(
+  c("031", "032"), TREAT_YEAR_MARO, maro_years, panel_site_sdid
+)
+
+sdid_df_maro <- blk_maro |>
+  select(unit = site_id, time = year, outcome = ln_y, treatment) |>
+  as.data.frame()
+
+s_maro    <- panel.matrices(sdid_df_maro)
+sdid_maro <- synthdid_estimate(s_maro$Y, s_maro$N0, s_maro$T0)
+sc_maro   <- sc_estimate(s_maro$Y, s_maro$N0, s_maro$T0)
+did_maro  <- did_estimate(s_maro$Y, s_maro$N0, s_maro$T0)
+
+se_sdid_maro <- tryCatch(synthdid_se(sdid_maro, method = "placebo"),
+                          error = \(e) NA_real_)
+se_sc_maro   <- tryCatch(synthdid_se(sc_maro, method = "placebo"),
+                          error = \(e) NA_real_)
+se_did_maro  <- tryCatch(synthdid_se(did_maro, method = "placebo"),
+                          error = \(e) NA_real_)
+
+# --- Block 2: Alaotra (Lac Alaotra, exposed 2008) ---
+# Aggregate Alaotra to observatory level
+panel_sdid_ala <- panel_hh_sdid |>
+  mutate(unit_id = if_else(obs == "21", "ALA", site_id)) |>
+  summarise(ln_y = mean(ln_y, na.rm = TRUE), .by = c(obs, unit_id, year))
+
+ala_years <- c(1999:2004, 2006:2008, 2010:2014)
+
+blk_ala <- build_sdid_block(
+  "ALA", TREAT_YEAR_ALA, ala_years,
+  panel_sdid_ala |> rename(site_id = unit_id)
+)
+
+sdid_df_ala <- blk_ala |>
+  select(unit = site_id, time = year, outcome = ln_y, treatment) |>
+  as.data.frame()
+
+s_ala    <- panel.matrices(sdid_df_ala)
+sdid_ala <- synthdid_estimate(s_ala$Y, s_ala$N0, s_ala$T0)
+sc_ala   <- sc_estimate(s_ala$Y, s_ala$N0, s_ala$T0)
+did_ala  <- did_estimate(s_ala$Y, s_ala$N0, s_ala$T0)
+
+se_sdid_ala <- tryCatch(synthdid_se(sdid_ala, method = "placebo"),
+                         error = \(e) NA_real_)
+se_sc_ala   <- tryCatch(synthdid_se(sc_ala, method = "placebo"),
+                         error = \(e) NA_real_)
+se_did_ala  <- tryCatch(synthdid_se(did_ala, method = "placebo"),
+                         error = \(e) NA_real_)
+```
+
+## Ankarafantsika (SDID)
+
+```{r}
+#| label: tbl-sdid-maro
+#| tbl-cap: "SDID, SC, and DID estimates for Ankarafantsika (exposure onset 2003)."
+
+tibble(
+  Method = c("SDID", "Synthetic Control", "DID"),
+  ATT = round(c(as.numeric(sdid_maro), as.numeric(sc_maro),
+                as.numeric(did_maro)), 3),
+  `SE (placebo)` = round(c(se_sdid_maro, se_sc_maro, se_did_maro), 3),
+  `% change` = paste0(round((exp(ATT) - 1) * 100, 1), "%")
+) |>
+  gt() |>
+  tab_header(
+    title = "Block 1: Marovoay (Ankarafantsika, 2003)",
+    subtitle = sprintf("T\u2080 = %d, T\u2081 = %d",
+                       sum(maro_years < TREAT_YEAR_MARO),
+                       sum(maro_years >= TREAT_YEAR_MARO))
+  )
+```
+
+```{r}
+#| label: fig-sdid-maro
+#| fig-cap: "SDID trend plot for Ankarafantsika. Solid lines: reweighted treated and synthetic control trajectories."
+#| fig-height: 5
+#| fig-width: 8
+
+plot(sdid_maro) +
+  labs(title = "SDID: Marovoay vs Synthetic Control (2003)") +
+  theme_minimal(base_size = 11)
+```
+
+::: {.callout-note title="Reading the SDID plot"}
+The triangles at the bottom of the SDID plot represent **time weights** ($\hat{\lambda}_t$). These indicate how much each pre-treatment period contributes to the counterfactual construction. Larger triangles mean that period receives more weight. Time weighting is a distinctive feature of SDID: it concentrates the comparison on the pre-treatment periods most predictive of post-treatment outcomes, improving efficiency relative to standard DiD (which implicitly weights all pre-treatment periods equally).
+:::
+
+## Alaotra (SDID)
+
+```{r}
+#| label: tbl-sdid-ala
+#| tbl-cap: "SDID, SC, and DID estimates for Alaotra (exposure onset 2008)."
+
+tibble(
+  Method = c("SDID", "Synthetic Control", "DID"),
+  ATT = round(c(as.numeric(sdid_ala), as.numeric(sc_ala),
+                as.numeric(did_ala)), 3),
+  `SE (placebo)` = round(c(se_sdid_ala, se_sc_ala, se_did_ala), 3),
+  `% change` = paste0(round((exp(ATT) - 1) * 100, 1), "%")
+) |>
+  gt() |>
+  tab_header(
+    title = "Block 2: Alaotra (Lac Alaotra PHP, 2008)",
+    subtitle = sprintf("T\u2080 = %d, T\u2081 = %d",
+                       sum(ala_years < TREAT_YEAR_ALA),
+                       sum(ala_years >= TREAT_YEAR_ALA))
+  )
+```
+
+
+::: {.callout-warning title="Interpreting the synthetic control estimates"}
+The SC estimates in the tables above are produced by `synthdid::sc_estimate()`, which constructs its own synthetic control independently from gsynth. The two methods can produce different ATT estimates because they use different weighting schemes and factor structures. The Alaotra SC estimate in particular should be interpreted with caution: with a single exposed unit and a small balanced panel, the SC unit weights may assign high weight to a small number of donors, making the estimate sensitive to individual donor trajectories. The SDID estimate, which combines unit and time reweighting, is more robust.
+:::
+
+# Callaway–Sant'Anna DiD with repeated cross-sections {#sec-c-cs}
+
+The gsynth, SC, and SDID specifications above all operate on site-year
+aggregates. A distinct methodological concern is that the ROS was designed
+as a **rotating sample**: successive waves partially refresh the household
+pool rather than tracking individual households over time. Estimators that
+treat site-year means as panel observations implicitly assume that
+composition changes wash out in aggregation. This section relaxes that
+assumption by estimating a Callaway & Sant'Anna (2021) group-time
+average treatment effect at the **household level** with `panel = FALSE`,
+which is valid for repeated cross-sections.
+
+Compared to the gsynth baseline, this specification:
+
+- uses every usable household-year observation (not site-year means),
+  capturing within-site heterogeneity;
+- allows staggered adoption (Marovoay exposed from 2003, Alaotra from 2008)
+  in a single estimator;
+- clusters inference at the `site_id` level via a multiplier bootstrap.
+
+## Panel construction
+
+```{r}
+#| label: cs-panel
+
+# Household-level dataset for 1999–2014.
+# g = first year of PA exposure; 0 for never-treated donor sites.
+# The Marovoay west bank (033, 034) is within the exposed observatory but
+# was not itself subject to new PA restrictions — we code it as never-treated.
+panel_hh_cs <- household_consolidated |>
+  filter(
+    obs %in% c("03", "21", CLEAN_DONOR_OBS),
+    year %in% STUDY_START:STUDY_END,
+    !(obs == "03" & year == 2005)  # drop 2005 (Marovoay-only wave)
+  ) |>
+  mk_income_ext() |>
+  mutate(
+    y_oecd   = revtot / oecd_equiv,
+    y_oecd_w = winsorize(y_oecd),
+    ln_y     = log(pmax(y_oecd_w, 0) + 1),
+    g = case_when(
+      site_id %in% c("031", "032") ~ TREAT_YEAR_MARO,   # 2003
+      obs == "21"                  ~ TREAT_YEAR_ALA,    # 2008
+      TRUE                         ~ 0L                 # never-treated
+    )
+  ) |>
+  filter(!is.na(ln_y), !is.na(year), !is.na(site_id)) |>
+  mutate(id = row_number()) |>
+  as.data.frame()
+
+n_hh_cs <- nrow(panel_hh_cs)
+n_sites_cs <- dplyr::n_distinct(panel_hh_cs$site_id)
+n_treated_cs <- dplyr::n_distinct(panel_hh_cs$site_id[panel_hh_cs$g > 0])
+```
+
+The pooled dataset contains `r format(n_hh_cs, big.mark=",")` household-year
+observations across `r n_sites_cs` sites (`r n_treated_cs` treated-observatory
+sites, the remainder clean donors).
+
+## Group-time ATT {#sec-c-cs-attgt}
+
+```{r}
+#| label: cs-attgt
+#| results: hide
+#| warning: false
+
+set.seed(20260419)
+att_cs <- att_gt(
+  yname         = "ln_y",
+  tname         = "year",
+  idname        = "id",
+  gname         = "g",
+  data          = panel_hh_cs,
+  control_group = "nevertreated",
+  panel         = FALSE,
+  clustervars   = "site_id",
+  bstrap        = TRUE,
+  biters        = 1000,
+  cband         = TRUE
+)
+```
+
+```{r}
+#| label: fig-cs-attgt
+#| fig-cap: "Callaway–Sant'Anna group-time ATT(g,t) estimates with simultaneous 95% confidence bands. Top panel: Marovoay cohort (g = 2003). Bottom panel: Alaotra cohort (g = 2008). Dashed vertical line marks exposure onset. Outcome: log OECD-equivalised income."
+#| fig-height: 6
+#| fig-width: 10
+
+ggdid(att_cs) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+```
+
+## Event-study aggregation {#sec-c-cs-dyn}
+
+The dynamic aggregator averages $ATT(g,t)$ by relative event time,
+$e = t - g$, pooling across cohorts.
+
+```{r}
+#| label: cs-dyn
+
+att_dyn <- aggte(att_cs, type = "dynamic", na.rm = TRUE)
+att_simple_maro <- aggte(att_cs, type = "group", na.rm = TRUE)
+```
+
+```{r}
+#| label: fig-cs-dyn
+#| fig-cap: "Event-study Callaway–Sant'Anna ATT by relative event time. Negative $e$ = pre-treatment placebo periods (should be flat around zero); positive $e$ = post-treatment effects. Dashed vertical line at $e = -0.5$."
+#| fig-height: 5
+#| fig-width: 9
+
+tibble(
+  e     = att_dyn$egt,
+  att   = att_dyn$att.egt,
+  se    = att_dyn$se.egt,
+  ci_lo = att_dyn$att.egt - att_dyn$crit.val.egt * att_dyn$se.egt,
+  ci_hi = att_dyn$att.egt + att_dyn$crit.val.egt * att_dyn$se.egt,
+  phase = if_else(e < 0, "Pre", "Post")
+) |>
+  ggplot(aes(e, att, colour = phase)) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", colour = "grey40") +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi), width = 0.2) +
+  geom_point(size = 2.5) +
+  scale_colour_manual(
+    values = c("Pre" = "#616161", "Post" = "#D32F2F"),
+    guide = "none"
+  ) +
+  labs(
+    x = "Years relative to exposure (pooled across cohorts)",
+    y = "ATT (log equiv. income)",
+    title = "Callaway–Sant'Anna Event Study",
+    subtitle = sprintf(
+      "Pooled ATT (post-exposure) = %.3f (SE = %.3f)",
+      att_dyn$overall.att, att_dyn$overall.se
+    )
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+## Cohort-specific ATT
+
+```{r}
+#| label: tbl-cs-group
+#| tbl-cap: "Callaway–Sant'Anna: cohort-specific post-exposure ATT."
+
+tibble(
+  Cohort = paste0("g = ", att_simple_maro$egt,
+                  c(" (Marovoay)", " (Alaotra)")[seq_along(att_simple_maro$egt)]),
+  ATT = round(att_simple_maro$att.egt, 3),
+  SE  = round(att_simple_maro$se.egt, 3),
+  `95% CI` = sprintf(
+    "[%.3f, %.3f]",
+    att_simple_maro$att.egt - att_simple_maro$crit.val.egt * att_simple_maro$se.egt,
+    att_simple_maro$att.egt + att_simple_maro$crit.val.egt * att_simple_maro$se.egt
+  ),
+  `% change` = paste0(round((exp(att_simple_maro$att.egt) - 1) * 100, 1), "%")
+) |>
+  gt() |>
+  tab_header(
+    title = "Callaway–Sant'Anna Group ATTs",
+    subtitle = "Household-level repeated cross-sections, 1999–2014"
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFCDD2"),
+    locations = cells_body(rows = 1)
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#BBDEFB"),
+    locations = cells_body(rows = 2)
+  )
+```
+
+The Callaway–Sant'Anna event study reproduces the qualitative pattern of the
+gsynth results: a negative and persistent Marovoay effect emerging at $e = 0$,
+and a null Alaotra effect. Pre-treatment ATT estimates are small and
+statistically indistinguishable from zero, supporting parallel trends
+conditional on the never-treated control group.
+
+::: {.callout-note title="Scope and the 2025 resurvey"}
+This implementation uses the 1999–2014 household-level data already loaded by
+`load_data.R`. Extending the CS estimator to 2025 requires reconstructing the
+household-level OECD-equivalised income from the raw 2025 `res_*` microdata,
+which is not yet exposed in `household_consolidated`. Once that pipeline is
+wired in, the same `att_gt()` call with an expanded `year` range will yield
+a 2025-inclusive event study. The most interesting case will be the Marovoay
+cohort at $e = 22$ (2003 → 2025), since in 2025 the only never-treated
+comparison available is the Marovoay west bank (sites 033, 034) — a tight
+within-observatory comparison that complements the wider-donor gsynth
+extension in [Chapter 4](04_results.qmd).
+:::
+
+# Summary of robustness {#sec-c-summary}
+
+```{r}
+#| label: tbl-robustness-summary
+#| tbl-cap: "Robustness summary: ATT estimates across all specifications for both PAs."
+
+tibble(
+  PA = rep(c("Ankarafantsika", "Lac Alaotra"), 4),
+  Specification = c(
+    rep("Primary: log(OECD-equivalised income)", 2),
+    rep("Robustness 1: log(total income, unadjusted)", 2),
+    rep("Robustness 2: levels (thousands Ariary)", 2),
+    rep("Robustness 3: SDID (log OECD-equivalised)", 2)
+  ),
+  ATT = c(
+    round(gs_main_maro$att_avg, 3),
+    round(gs_main_ala$att_avg, 3),
+    round(gs_unadj_maro$att_avg, 3),
+    round(gs_unadj_ala$att_avg, 3),
+    round(gs_lev_maro$att_avg, 1),
+    round(gs_lev_ala$att_avg, 1),
+    round(as.numeric(sdid_maro), 3),
+    round(as.numeric(sdid_ala), 3)
+  ),
+  SE = round(c(
+    gsynth_stat(gs_main_maro, "se"),
+    gsynth_stat(gs_main_ala, "se"),
+    gsynth_stat(gs_unadj_maro, "se"),
+    gsynth_stat(gs_unadj_ala, "se"),
+    gsynth_stat(gs_lev_maro, "se"),
+    gsynth_stat(gs_lev_ala, "se"),
+    se_sdid_maro,
+    se_sdid_ala
+  ), 3),
+  `p-value` = round(c(
+    gsynth_stat(gs_main_maro, "pval"),
+    gsynth_stat(gs_main_ala, "pval"),
+    gsynth_stat(gs_unadj_maro, "pval"),
+    gsynth_stat(gs_unadj_ala, "pval"),
+    gsynth_stat(gs_lev_maro, "pval"),
+    gsynth_stat(gs_lev_ala, "pval"),
+    NA_real_,
+    NA_real_
+  ), 3),
+  Unit = c(
+    "log pts", "log pts",
+    "log pts", "log pts",
+    "k Ariary", "k Ariary",
+    "log pts", "log pts"
+  )
+) |>
+  gt() |>
+  tab_header(
+    title = "Robustness Summary",
+    subtitle = "Primary specification vs three robustness checks"
+  ) |>
+  tab_row_group(label = "Robustness 3: SDID", rows = 7:8) |>
+  tab_row_group(label = "Robustness 2: Levels (Ariary)", rows = 5:6) |>
+  tab_row_group(label = "Robustness 1: Unadjusted log income", rows = 3:4) |>
+  tab_row_group(label = "Primary: log(OECD-equivalised income)", rows = 1:2) |>
+  tab_style(
+    style = cell_fill(color = "#FFCDD2"),
+    locations = cells_body(rows = c(1, 3, 5, 7))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#BBDEFB"),
+    locations = cells_body(rows = c(2, 4, 6, 8))
+  )
+```
+
+Three key findings:
+
+1. **Unadjusted log income**: the Ankarafantsika negative effect is modestly larger without equivalisation, consistent with east-bank households being slightly larger. The qualitative conclusion is unchanged.
+2. **Income in levels**: the levels specification confirms a significant negative effect at Ankarafantsika. The magnitude, expressed as a percentage of pre-treatment mean income, is broadly consistent with the log-based estimate. Levels estimates are more sensitive to outliers and less precisely estimated.
+3. **Lac Alaotra**: the null result is **robust across all specifications**. Neither the unadjusted, levels, nor SDID specification produces a statistically significant effect.
+
+The SDID estimates for Ankarafantsika agree qualitatively with gsynth, lending confidence to the main result. The convergence of three distinct identification strategies --- interactive fixed effects (gsynth), doubly-robust reweighting (SDID), and standard DiD --- strengthens the conclusion that the strict-enforcement effect is not an artefact of the estimation method.

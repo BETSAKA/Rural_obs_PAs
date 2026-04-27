@@ -1,0 +1,120 @@
+---
+title: "Appendix D: Methodology"
+subtitle: "Technical details on estimation methods"
+---
+
+This appendix provides formal descriptions of the estimation methods used in this paper. The main text ([Chapter 3](03_strategy.qmd), [Chapter 4](04_results.qmd)) describes the methods at the level needed to follow the argument; this appendix gives the technical details needed for replication and methodological evaluation.
+
+
+# Generalised synthetic control {#sec-d-gsynth}
+
+## Interactive fixed-effects model
+
+The generalised synthetic control method [@Xu2017] extends the standard synthetic control framework to accommodate multiple treated units and allows for estimation of treatment effects in the presence of unobserved time-varying confounders. The data-generating process is:
+
+$$
+Y_{it} = \delta_{it} D_{it} + \mathbf{x}_{it}'\boldsymbol{\beta} + \boldsymbol{\lambda}_i' \mathbf{f}_t + \varepsilon_{it}
+$$
+
+where $Y_{it}$ is the outcome for unit $i$ at time $t$; $D_{it}$ is the treatment indicator; $\mathbf{x}_{it}$ is a vector of observed covariates (not used in our site-level specifications); $\boldsymbol{\lambda}_i$ is a $r \times 1$ vector of unit-specific factor loadings; $\mathbf{f}_t$ is a $r \times 1$ vector of common time-varying factors; and $\varepsilon_{it}$ is an idiosyncratic error.
+
+The key identification assumption is that the factor structure $\boldsymbol{\lambda}_i' \mathbf{f}_t$ is shared between treated and control units. This generalises the parallel-trends assumption: rather than requiring that treated and control units follow the same trend, it allows for **different trends** as long as those trends are spanned by the same set of latent factors.
+
+## Estimation
+
+The algorithm proceeds in three steps:
+
+1. **Estimate factors from control units**: using the $N_0 \times T$ matrix of control outcomes, estimate $\hat{\mathbf{f}}_t$ and $\hat{\boldsymbol{\lambda}}_i$ via principal component analysis (or nuclear norm minimisation). The number of factors $r$ is selected by leave-one-out cross-validation over $r = 0, 1, \ldots, r_{\max}$.
+
+2. **Estimate treated factor loadings**: for each treated unit $i$, regress the pre-treatment outcomes $Y_{i1}, \ldots, Y_{i,T_0}$ on the estimated factors $\hat{\mathbf{f}}_1, \ldots, \hat{\mathbf{f}}_{T_0}$ to obtain $\hat{\boldsymbol{\lambda}}_i$.
+
+3. **Construct counterfactual**: the estimated counterfactual outcome for treated unit $i$ in post-treatment period $t > T_0$ is $\hat{Y}_{it}(0) = \hat{\boldsymbol{\lambda}}_i' \hat{\mathbf{f}}_t$. The ATT at time $t$ is $\hat{\delta}_{it} = Y_{it} - \hat{Y}_{it}(0)$.
+
+## Cross-validation for factor selection
+
+In our implementation, $r$ is selected by leave-one-out cross-validation (LOOCV) over $r \in \{0, 1, 2, 3, 4, 5\}$. For each candidate $r$, each control unit is temporarily removed, the factor model is re-estimated, and the prediction error for the held-out unit's pre-treatment outcomes is computed. The $r$ minimising the mean squared prediction error is selected. When $r^* = 0$, the model reduces to a two-way fixed-effects specification.
+
+## Inference
+
+We use parametric bootstrap with 200 replications, as implemented in the `gsynth` R package. The bootstrap resamples residuals from the estimated factor model, re-estimates the ATT path, and constructs pointwise 95% confidence intervals. For the average post-treatment ATT, we report the bootstrap standard error and a Wald-type $p$-value.
+
+## Relationship to standard synthetic control
+
+When there is a single treated unit and $r$ is chosen to minimise pre-treatment fit, gsynth nests the Abadie, Diamond & Hainmueller [-@Abadie2010] synthetic control estimator. The advantage of gsynth is that it (i) selects $r$ via cross-validation rather than exact pre-treatment matching, (ii) accommodates multiple treated units, and (iii) provides valid frequentist inference via the bootstrap rather than relying on permutation $p$-values.
+
+
+# Callaway--Sant'Anna staggered DiD {#sec-d-csdid}
+
+## Group-time ATT framework
+
+The Callaway & Sant'Anna [-@CallawayS2021] estimator is designed for settings with staggered treatment adoption. Define $G_i$ as the first period in which unit $i$ is treated ($G_i = \infty$ for never-treated units). The target parameter is the **group-time ATT**:
+
+$$
+ATT(g, t) = \mathbb{E}[Y_t(g) - Y_t(\infty) \mid G = g]
+$$
+
+where $Y_t(g)$ is the potential outcome under treatment adoption at time $g$, and $Y_t(\infty)$ is the never-treated potential outcome. $ATT(g, t)$ is identified under two assumptions:
+
+1. **No-anticipation**: $Y_t(g) = Y_t(\infty)$ for all $t < g$.
+2. **Conditional parallel trends**: $\mathbb{E}[Y_t(\infty) - Y_{t-1}(\infty) \mid X, G = g] = \mathbb{E}[Y_t(\infty) - Y_{t-1}(\infty) \mid X, G = \infty]$ (or using not-yet-treated groups as the comparison).
+
+## Repeated cross-sections
+
+The ROS data are repeated cross-sections at the household level (new households sampled each year within the same sites). The CS estimator uses the repeated-cross-section variant, where identification relies on comparing the distribution of outcomes across cohorts and time periods, rather than tracking individual units.
+
+## Aggregation
+
+Group-time ATTs can be aggregated into:
+
+- **Dynamic effects** $\theta_e = \sum_g w_g \cdot ATT(g, g + e)$: average ATT at relative time $e$, yielding an event-study plot with explicit pre-trend tests.
+- **Group-specific effects**: $\bar{ATT}(g) = \sum_{t \geq g} w_t \cdot ATT(g, t)$.
+- **Overall ATT**: weighted average across all $(g, t)$ cells.
+
+## Implementation (planned for 2026 data)
+
+We will use the `did` R package with doubly-robust estimation (inverse-probability weighting combined with outcome regression), household-level covariates (household size, head's education, agricultural activity), and clustering at the site level.
+
+
+# Synthetic Difference-in-Differences {#sec-d-sdid}
+
+## Framework
+
+SDID [@Arkhangelsky2021] combines unit reweighting (synthetic control) with time reweighting (DiD):
+
+$$
+\hat{\tau}^{sdid} = \sum_{i: D_i = 1} \sum_{t: \text{post}} \left( Y_{it} - \hat{\omega}_0' Y_{\text{co},t} - \hat{\lambda}_0 - \hat{\lambda}_t' \mathbf{1} \right)
+$$
+
+where $\hat{\omega}_0$ are unit weights that balance pre-treatment outcome trajectories and $\hat{\lambda}_t$ are time weights that upweight pre-treatment periods most predictive of post-treatment outcomes.
+
+## Comparison with gsynth
+
+Both SDID and gsynth generalise the parallel-trends assumption via latent factors. The key difference is that SDID uses explicit reweighting while gsynth uses factor estimation. SDID is doubly robust: it is consistent if either the unit weights or the time weights correctly specify the counterfactual. gsynth is consistent under the interactive fixed-effects model regardless of reweighting, but requires correct specification of the number of factors.
+
+## Inference
+
+We use the placebo method (Algorithm 4 of @Arkhangelsky2021): for each control unit, the SDID estimator is re-computed treating that unit as if it were treated. The distribution of placebo effects yields a standard error estimate. This is valid even when $N_{tr} = 1$, as in our observatory-level models.
+
+
+# Inference with few clusters {#sec-d-inference}
+
+## The power problem
+
+Each observatory-level gsynth model has exactly one treated unit. Standard asymptotic inference (which requires $N_{tr} \to \infty$) is not applicable. We address this via:
+
+1. **Parametric bootstrap** (gsynth): resampling residuals from the estimated factor model. This is valid under the factor model assumptions but does not account for treatment-effect heterogeneity across treated units.
+
+2. **Permutation inference**: for each control unit, re-estimate gsynth treating that unit as if it were treated. The $p$-value is the fraction of placebo ATTs exceeding the true ATT. With $N$ donor units, the minimum achievable $p$-value is $1/N$. With \~50--60 donor sites, this gives a floor of $\approx 0.017$ --- sufficient to detect large effects but limiting for moderate ones.
+
+3. **Wild cluster bootstrap** (planned for DiD): the Cameron, Gelbach & Miller [-@Cameron2008] wild bootstrap applies to the few-cluster problem in DiD estimation. With 43 site-level clusters (5 exposed observatories + 38 control sites), inference is feasible though conservative.
+
+## Practical implications
+
+The power constraints imply that:
+
+- The **Ankarafantsika negative effect** (large, \~27% of income) is detectable even with one treated unit and permutation-based inference.
+- The **Alaotra null result** may reflect insufficient power rather than a true zero. Effects smaller than \~15--20% would be undetectable with the available sample.
+- The **three extension sites** ([Chapter 5](05_extensions.qmd)) face the same power floor. Near-zero point estimates should not be over-interpreted as evidence of "no effect" --- they are consistent with both a true null and a moderate effect below the detection threshold.
+
+
+# References {.unnumbered}

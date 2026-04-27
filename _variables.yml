@@ -1,0 +1,66 @@
+# Shared parameters across chapters
+# Reference these in QMD files with {{< var param_name >}}
+
+# -- Study period --------------------------------------------------------------
+study_start: 1999
+study_end: 2014
+resurvey_year: 2025
+next_survey: 2026
+
+# -- Treatment years -----------------------------------------------------------
+treat_year_maro: 2003
+treat_year_ala: 2008
+treat_year_fara: 2006
+treat_year_tol: 2007
+treat_year_fen: 2007
+
+# -- Sample sizes --------------------------------------------------------------
+n_observatories: 11
+n_donor_obs: 9
+n_clean_donor_obs: 5
+n_household_years: "101,253"
+
+# -- PA names ------------------------------------------------------------------
+pa_strict: "Ankarafantsika National Park"
+pa_multipurpose: "Lac Alaotra New Protected Area"
+pa_strict_iucn: "II"
+pa_multipurpose_iucn: "V"
+
+# -- Key results (clean 5-donor pool, paper14) ---------------------------------
+att_maro: "-0.312"
+att_maro_pct: "27%"
+att_maro_ci_lo: "-0.550"
+att_maro_ci_hi: "-0.073"
+att_maro_p: "0.010"
+att_ala: "+0.014"
+att_ala_p: "0.928"
+att_ext: "-0.403"
+att_ext_pct: "33%"
+att_2025: "-0.841"
+att_2025_pct: "57%"
+
+# -- Proximity threshold -------------------------------------------------------
+threshold_km: 20
+
+# -- Aliases used in appendices ------------------------------------------------
+n_hh_obs: "101,253"
+n_obs: 11
+
+# -- Clean donor observatories -------------------------------------------------
+clean_donors: "Antsirabe (02), Tsiroanomandidy (13), Ambovombe (16), Mahanoro (25), Itasy (41)"
+
+# -- Chapter 5: clean-donor-pool estimates ------------------------------------
+att_maro_clean: "-0.312"
+att_maro_clean_pct: "27%"
+att_maro_clean_p: "0.010"
+att_ala_clean: "+0.014"
+att_ala_clean_p: "0.928"
+att_fara: "-0.260"
+att_fara_pct: "23%"
+att_fara_p: "0.301"
+att_tol: "+0.129"
+att_tol_pct: "14%"
+att_tol_p: "0.512"
+att_fen: "+0.114"
+att_fen_pct: "12%"
+att_fen_p: "0.619"

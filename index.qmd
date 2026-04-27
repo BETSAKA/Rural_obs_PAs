@@ -1,12 +1,74 @@
-# Using the rural observatory data to assess the protected areas impacts on household living conditions.
+---
+title: "Conservation Governance and Rural Livelihoods in Madagascar"
+subtitle: "Long-Run Evidence from Rural Observatory Surveys (1995–2025)"
+author:
+  - name: Florent Bédécarrats
+    affiliations:
+      - UMI SOURCE (IRD / UVSQ)
+  - name: Véromanitra Razafimahenina
+    affiliations:
+      - Université d'Antananarivo
+---
 
-This document presents the first steps of an evaluation of the socio-economic impacts of protected areas in Madagascar, based on the Rural Observatory Surveys (ROS) conducted between 1995 and 2015. These longitudinal household surveys offer a rare opportunity to study rural livelihoods over two decades. By linking the ROS to official administrative boundaries and protected area limits, we want to analyze how conservation policies intersect with local livelihoods. 
+::: {.callout-note}
+## Living document
+This website is a companion to an academic paper in preparation. It will be
+updated when data from the 2026 survey round becomes available. All code is
+available in the [GitHub repository](https://github.com/BETSAKA/Rural_obs_PAs).
+:::
 
-This work combines several methodoligcal approaches to identify impacts of protected areas. The aim is to produce a transparent and reproducible workflow, where each chapter builds the foundations for robust causal analysis, from data cleaning to impact estimation. The provisional results are exploratory, but they already provide insights into the complex and often non-linear relationships between conservation policies and household living conditions.
+![Marovoay, Véromanitra Ramizason](media/Photo_Marovoay_Veromanitra_Ramizason_01.jpeg){fig-alt="Field photo from the Marovoay observatory site near Ankarafantsika National Park."}
 
-The document is composed by the following sections:
+## Abstract
 
-- [ROS historical data georeferencing](01_Georeference_observatories.qmd). The available ROS surveys (1995–2015) were not precisely georeferenced and contained variations in place names. We applied a cleaning process and fuzzy matching based on the Common Operational Datasets (CODs) to link each observation to the official communes and fokontany.
-- [Overlaps between ROS data and PAs](02_Overlaps_PAs_observatories.qmd). Here we analyze the overlap between ROS sites (1995–2015) and the protected areas of the SAPM. Some PAs existed before the surveys, two were created during the survey period, and several after the monitoring ended. This analysis led us to prioritize the Marovoay/Ankarafantsika and Alaotra/Alaotra-CAZ observatory/protected area pairs.
-- [Variable computation](03_Variable computation.qmd) calculates and compounds household-level variables from the ROS surveys (1995–2015), covering georeferencing, demographics, education, food security, activities, and income. We systematically address inconsistencies across years—such as changing identifiers, missing modules, and shifts in questionnaire design—while reconstructing comparable indicators at the household level. The result is a consolidated dataset, including partial income measures, that provides a consistent basis for analyzing the impact of protected areas on rural livelihoods over time.
-- [Marovoay-Ankarafantsika](04_Marovoay-Ankarafantsika.qmd) section assesses the socio-economic impacts of the 2002 expansion of Ankarafantsika into a national park, combining historical context, spatial mapping of survey sites, and reconstruction of household panels. Treated and control groups were defined across the Betsiboka river and extended to other observatories, and synthetic control methods were applied to income and welfare indicators. At this very preliminary stage, results show no robust positive effects, with agricultural revenues slightly negatively affected and no consistent changes in diversification, food self-sufficiency, or schooling.
+Does the governance model of a protected area matter for the livelihoods of
+surrounding communities? We exploit the staggered creation and extension
+of protected areas in Madagascar between 2002 and 2008, combined with two
+decades of household survey data from the Rural Observatory System (ROS,
+1995–2015) and a 2025 resurvey, to estimate the causal impacts of conservation
+on household income.
+
+Using generalized synthetic control methods with interactive fixed effects
+— a technique that constructs data-driven counterfactuals for each exposed
+unit by modelling unobserved common factors — we compare two governance
+archetypes:
+
+- **Strict conservation** (IUCN category II): the 2002 extension of
+  Ankarafantsika National Park, monitored via the Marovoay observatory.
+- **Multipurpose conservation** (IUCN category VI): the 2008 creation of the
+  Lac Alaotra new protected area, monitored via the Alaotra observatory.
+
+We find a persistent negative effect of strict conservation at Ankarafantsika on
+equivalised household income (ATT ≈ {{< var att_maro >}} log points), while
+multipurpose conservation at Alaotra shows no detectable effect (ATT ≈
+{{< var att_ala >}} log points).
+These results extend to three additional observatory–PA pairs. A 2025 resurvey
+confirms the long-run persistence of these patterns.
+
+## Structure
+
+The analysis chapters present the core argument:
+
+1. [**Context**](01_context.qmd) — Conservation policy in Madagascar and the
+   research question.
+2. [**Data**](02_data.qmd) — The Rural Observatory Surveys, georeferencing,
+   and variable construction.
+3. [**Identification Strategy**](03_strategy.qmd) — Exposure definitions,
+   donor pool selection, and the generalized synthetic control method.
+4. [**Results**](04_results.qmd) — Comparing strict vs. multipurpose
+   conservation impacts on household income.
+5. [**Extensions**](05_extensions.qmd) — Three additional observatories
+   near protected areas created during 2006–2007.
+6. [**Discussion**](06_discussion.qmd) — Policy implications, limitations,
+   and the roadmap for the 2026 survey wave.
+
+The appendices provide full methodological and data details:
+
+- [**A. Data Pipeline**](A1_data_pipeline.qmd) — Reproducible georeferencing,
+  PA overlap analysis, and variable harmonisation.
+- [**B. Donor Pool Validity**](A2_donor_validity.qmd) — Spatial audit of PA
+  exposure across all donor observatories.
+- [**C. Robustness Tests**](A3_robustness.qmd) — Alternative specifications,
+  SDID, and sensitivity analysis.
+- [**D. Methodology**](A4_methodology.qmd) — Technical details on gsynth,
+  Callaway–Sant'Anna DiD, and interactive fixed effects.
