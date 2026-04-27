@@ -148,7 +148,7 @@ tm_layout(legend.position = c("right", "top"))
 
 ## Fénérive East and the Réserve de Tampolo {#sec-fen-site}
 
-The Réserve de Tampolo (IUCN IV, \~7.3 km²) is a small coastal littoral forest managed by ESSA-Forêts as a research and teaching forest. A temporary protection decree was issued on 20 August 2007 (WDPA 354011). The reserve's primary function is scientific access and conservation research, not community resource exclusion. Its small footprint and institutional character suggest **low exposure intensity**.
+The Réserve de Tampolo (IUCN IV, \~7.3 km²) is a small coastal littoral forest managed by ESSA-Forêts as a research and teaching forest. A temporary protection decree was issued on 20 August 2007 (WDPA 354011). The reserve's primary function is scientific access and conservation research, not community resource exclusion. Its small footprint and institutional character suggest low exposure intensity.
 
 Exposure year is **{{< var treat_year_fen >}}**. The survey has 8 pre-treatment years (1999--2006) and 8 post-treatment years (2007--2014) --- the most symmetric panel among the new sites.
 
@@ -234,7 +234,7 @@ The identification strategy and estimator are identical to [Chapter 4](04_result
 
 ## Ankarafantsika (clean donors) {#sec-ext-maro}
 
-Re-estimating the Marovoay east-bank model with the restricted donor pool yields an average post-treatment ATT of **{{< var att_maro_clean >}} log points** ($\approx$ {{< var att_maro_clean_pct >}}, $p$ = {{< var att_maro_clean_p >}}), consistent with the full-donor estimate in [Chapter 4](04_results.qmd). The point estimate is slightly attenuated because the smaller donor pool supports fewer latent factors, but the qualitative conclusion is unchanged: strict enforcement is associated with a persistent, statistically significant income decline.
+Re-estimating the Marovoay east-bank model with the restricted donor pool yields an average post-treatment ATT of {{< var att_maro_clean >}} log points ($\approx$ {{< var att_maro_clean_pct >}}, $p$ = {{< var att_maro_clean_p >}}), consistent with the full-donor estimate in [Chapter 4](04_results.qmd). The point estimate is slightly attenuated because the smaller donor pool supports fewer latent factors, but the qualitative conclusion is unchanged: strict enforcement is associated with a persistent, statistically significant income decline.
 
 ```{r}
 #| label: fig-att-maro-clean
@@ -266,7 +266,7 @@ ggplot(att_maro_df, aes(rel_time, att)) +
 
 ## Lac Alaotra (clean donors) {#sec-ext-ala}
 
-The Alaotra observatory-level ATT with clean donors remains near zero and statistically insignificant: **{{< var att_ala_clean >}} log points** ($p$ = {{< var att_ala_clean_p >}}). The null result is robust to the donor-pool change, reinforcing the interpretation that participatory conservation under CBNRM did not impose detectable aggregate income costs.
+The Alaotra observatory-level ATT with clean donors remains near zero and statistically insignificant: {{< var att_ala_clean >}} log points ($p$ = {{< var att_ala_clean_p >}}). The null result is robust to the donor-pool change, reinforcing the interpretation that participatory conservation under CBNRM did not impose detectable aggregate income costs.
 
 ```{r}
 #| label: fig-att-ala-clean
@@ -302,7 +302,7 @@ ggplot(att_ala_df, aes(rel_time, att)) +
 Farafangana has only 3 post-treatment survey years (2006--2008). The gsynth estimates are presented for completeness but should be treated with extreme caution. Pre-treatment fit is assessed over 7 years; post-treatment precision is insufficient for firm conclusions.
 :::
 
-The point estimate is **{{< var att_fara >}} log points** ($\approx$ {{< var att_fara_pct >}}), but with very wide confidence intervals ($p$ = {{< var att_fara_p >}}) that span both negative and positive values. With only 3 post-treatment observations, this estimate has low reliability and should not be interpreted independently.
+The point estimate is {{< var att_fara >}} log points ($\approx$ {{< var att_fara_pct >}}), but with very wide confidence intervals ($p$ = {{< var att_fara_p >}}) that span both negative and positive values. With only 3 post-treatment observations, this estimate has low reliability and should not be interpreted independently.
 
 ```{r}
 #| label: fig-att-fara
@@ -335,7 +335,7 @@ ggplot(att_fara_df, aes(rel_time, att)) +
 
 ## Toliara North: coastal PA cascade {#sec-ext-tol}
 
-The Toliara North ATT estimates a composite treatment effect from the 2007--2008 PA cascade. The point estimate is **{{< var att_tol >}} log points** ($p$ = {{< var att_tol_p >}}), not statistically significant. The December 2008 secondary shock (Ranobe PK 32, the closest PA at <1.5 km) coincides with a visible shift in the ATT path, but it is impossible to separate the 2007 and 2008 effects without additional micro-data. The dominant conservation character of the three PAs is multipurpose (IUCN V), consistent with the near-zero aggregate income effect.
+The Toliara North ATT estimates a composite treatment effect from the 2007--2008 PA cascade. The point estimate is {{< var att_tol >}} log points ($p$ = {{< var att_tol_p >}}), not statistically significant. The December 2008 secondary shock (Ranobe PK 32, the closest PA at <1.5 km) coincides with a visible shift in the ATT path, but it is impossible to separate the 2007 and 2008 effects without additional micro-data. The dominant conservation character of the three PAs is multipurpose (IUCN V), consistent with the near-zero aggregate income effect.
 
 ```{r}
 #| label: fig-att-tol
@@ -372,7 +372,7 @@ ggplot(att_tol_df, aes(rel_time, att)) +
 
 ## Fénérive East: low-intensity reserve {#sec-ext-fen}
 
-The Fénérive East ATT shows a small positive but nonsignificant effect (**{{< var att_fen >}} log points**, $p$ = {{< var att_fen_p >}}) --- perhaps the most interpretively clear result among the three new sites. A 7.3 km² research forest cannot plausibly impose population-level income costs on a multi-commune observatory. The 8/8 pre-/post-treatment symmetry provides the most credible pre-trend assessment of the new sites.
+The Fénérive East ATT shows a small positive but nonsignificant effect ({{< var att_fen >}} log points, $p$ = {{< var att_fen_p >}}) --- perhaps the most interpretively clear result among the three new sites. A 7.3 km² research forest cannot plausibly impose population-level income costs on a multi-commune observatory. The 8/8 pre-/post-treatment symmetry provides the most credible pre-trend assessment of the new sites.
 
 ```{r}
 #| label: fig-att-fen
@@ -545,13 +545,12 @@ ggplot(forest_df, aes(y = obs, x = att, xmin = ci_lo, xmax = ci_hi,
 
 The five-case comparison reveals three patterns:
 
-**Pattern 1 --- Negative income effect under strict enforcement.** Ankarafantsika (Marovoay) shows the largest and most persistent negative ATT, statistically significant and --- as shown in [Chapter 4](04_results.qmd) --- deepening through the 2025 resurvey. This is consistent with direct resource exclusion from a large, actively patrolled park after its extension from an open-access forest reserve.
+**Pattern 1 --- Negative income effect under strict enforcement**: Ankarafantsika (Marovoay) shows the largest and most persistent negative ATT, statistically significant and --- as shown in [Chapter 4](04_results.qmd) --- deepening through the 2025 resurvey. This is consistent with direct resource exclusion from a large, actively patrolled park after its extension from an open-access forest reserve.
 
-**Pattern 2 --- Near-zero effect under participatory/multipurpose conservation.** Lac Alaotra, Toliara North, and (tentatively) Farafangana show point estimates clustered near zero. None produces a statistically significant effect. This is consistent with the multipurpose PA framework: land-use regulation without resource exclusion does not translate into detectable aggregate income losses at the survey-year frequency.
+**Pattern 2 --- Near-zero effect under participatory/multipurpose conservation**: Lac Alaotra, Toliara North, and (tentatively) Farafangana show point estimates clustered near zero. None produces a statistically significant effect. This is consistent with the multipurpose PA framework: land-use regulation without resource exclusion does not translate into detectable aggregate income losses at the survey-year frequency.
 
-**Pattern 3 --- Low-intensity reserve, near-zero effect.** Fénérive East shows a near-zero ATT with a moderately narrow CI, consistent with the Réserve de Tampolo's small footprint and research-oriented management.
+**Pattern 3 --- Low-intensity reserve, near-zero effect**: Fénérive East shows a near-zero ATT with a moderately narrow CI, consistent with the Réserve de Tampolo's small footprint and research-oriented management.
 
-Together, these results suggest that the **conservation governance model matters more than geographic proximity** for household-income outcomes. The two variables that predict negative effects are (i) strict IUCN category (II vs. V/VI) and (ii) large PA size constraining broad livelihood activities. The three new observatories all face PAs that are either multipurpose, small-footprint, or both --- and none shows evidence of harm at the aggregate income level.
 
 ## Caveats
 

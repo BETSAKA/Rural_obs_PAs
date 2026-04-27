@@ -1,63 +1,37 @@
 project:
-  type: website
+  type: book
   output-dir: docs
-  render:
-    - "*.qmd"
-    - "!archive/"
 
-website:
+book:
   title: "Conservation Governance and Rural Livelihoods in Madagascar"
+  subtitle: "Long-Run Analysis of Rural Observatory Surveys (1995–2025)"
+  author:
+    - name: Florent Bédécarrats
+      affiliations:
+        - UMI SOURCE (IRD / UVSQ)
+    - name: Véromanitra Razafimahenina
+      affiliations:
+        - Université d'Antananarivo
+  date: today
   repo-url: https://github.com/BETSAKA/Rural_obs_PAs
   repo-actions: [source, issue]
-  navbar:
-    left:
-      - text: Analysis
-        menu:
-          - text: "1. Context"
-            href: 01_context.qmd
-          - text: "2. Data"
-            href: 02_data.qmd
-          - text: "3. Identification Strategy"
-            href: 03_strategy.qmd
-          - text: "4. Results"
-            href: 04_results.qmd
-          - text: "5. Extensions"
-            href: 05_extensions.qmd
-          - text: "6. Discussion"
-            href: 06_discussion.qmd
-      - text: Appendices
-        menu:
-          - text: "A. Data Pipeline"
-            href: A1_data_pipeline.qmd
-          - text: "B. Donor Pool Validity"
-            href: A2_donor_validity.qmd
-          - text: "C. Robustness Tests"
-            href: A3_robustness.qmd
-          - text: "D. Methodology"
-            href: A4_methodology.qmd
-
-    right:
-      - icon: github
-        href: https://github.com/BETSAKA/Rural_obs_PAs
-  sidebar:
-    style: floating
-    contents:
-      - index.qmd
-      - section: "Analysis"
-        contents:
-          - 01_context.qmd
-          - 02_data.qmd
-          - 03_strategy.qmd
-          - 04_results.qmd
-          - 05_extensions.qmd
-          - 06_discussion.qmd
-      - section: "Appendices"
-        contents:
-          - A1_data_pipeline.qmd
-          - A2_donor_validity.qmd
-          - A3_robustness.qmd
-          - A4_methodology.qmd
-
+  output-file: rural-obs-PAs
+  chapters:
+    - index.qmd
+    - part: "Analysis"
+      chapters:
+        - 01_context.qmd
+        - 02_data.qmd
+        - 03_strategy.qmd
+        - 04_results.qmd
+        - 05_extensions.qmd
+        - 06_discussion.qmd
+    - references.qmd
+  appendices:
+    - A1_data_pipeline.qmd
+    - A2_donor_validity.qmd
+    - A3_robustness.qmd
+    - A4_methodology.qmd
 
 # -- Bilingual setup (uncomment when .fr.qmd files are ready) -----------------
 # babelquarto:
@@ -71,6 +45,30 @@ format:
   html:
     theme: cosmo
     code-fold: true
+    toc: true
+    number-sections: true
+    fig-width: 8
+    fig-height: 6
+  typst:
+    toc: true
+    number-sections: true
+    fig-width: 8
+    fig-height: 5
+    fig-format: png
+    include-before-body:
+      - text: |
+          #v(2fr)
+          #align(center)[
+            #image("media/Photo_Marovoay_Veromanitra_Ramizason_01.jpeg", width: 80%)
+            #v(0.5em)
+            #text(size: 9pt, style: "italic")[
+              Marovoay observatory site near Ankarafantsika National Park. \
+              Photo: Véromanitra Ramizason.
+            ]
+          ]
+          #v(1fr)
+          #pagebreak()
+  docx:
     toc: true
     number-sections: true
     fig-width: 8

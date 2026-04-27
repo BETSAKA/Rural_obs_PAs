@@ -1,5 +1,5 @@
 ---
-title: "Appendix A: Data Pipeline"
+title: "Data Pipeline"
 subtitle: "Georeferencing, PA overlaps, and variable harmonisation"
 ---
 

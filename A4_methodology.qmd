@@ -1,5 +1,5 @@
 ---
-title: "Appendix D: Methodology"
+title: "Methodology"
 subtitle: "Technical details on estimation methods"
 ---
 

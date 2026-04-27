@@ -1,0 +1,16 @@
+[ 1/12] index.qmd
+[ 2/12] 01_context.qmd
+[ 3/12] 02_data.qmd
+[ 4/12] 03_strategy.qmd
+[ 5/12] 04_results.qmd
+[ 6/12] 05_extensions.qmd
+[ 7/12] 06_discussion.qmd
+[ 8/12] references.qmd
+[ 9/12] A1_data_pipeline.qmd
+[10/12] A2_donor_validity.qmd
+[11/12] A3_robustness.qmd
+[12/12] A4_methodology.qmd
+
+Output created: docs\index.html
+
+EXIT:0
