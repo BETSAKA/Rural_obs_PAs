@@ -11,15 +11,15 @@ source("R/plot_themes.R")
 library(tmap)
 ```
 
-The two-case comparison in [Chapter 4](04_results.qmd) --- strict enforcement at Ankarafantsika versus participatory conservation at Lac Alaotra --- limits external validity. This chapter extends the analysis to three additional rural observatories that the donor-pool audit ([Appendix B](A2_donor_validity.qmd)) flagged as themselves adjacent to PAs created during the study period:
+The two-case comparison in [Chapter 4](04_results.qmd) — strict enforcement at Ankarafantsika versus participatory conservation at Lac Alaotra — limits external validity. This chapter extends the analysis to three additional rural observatories that the donor-pool audit ([Appendix B](A2_donor_validity.qmd)) flagged as themselves adjacent to protected areas created during the study period:
 
-- **Farafangana** (obs. 15): adjacent to the Corridor Forestier Ambositra-Vondrozo (IUCN V, September 2006), a large highland corridor under light-touch regulation. Survey window: 1999--2008 (3 post-treatment years only).
-- **Toliara North** (obs. 23): adjacent to Amoron'i Onilahy (IUCN V, January 2007), Mikea National Park (IUCN II, April 2007), and Ranobe PK 32 (IUCN V, December 2008) --- a rapid cascade of coastal and dry-forest protections. Survey window: 1999--2014.
-- **Fénérive East** (obs. 24): adjacent to the Réserve de Tampolo (IUCN IV, August 2007), a small (\~7.3 km²) research forest managed by ESSA-Forêts. Survey window: 1999--2014.
+- Farafangana (obs. 15): adjacent to the Corridor Forestier Ambositra-Vondrozo (IUCN V, September 2006), a large highland corridor under light-touch regulation. Survey window: 1999--2008 (3 post-treatment years only).
+- Toliara North (obs. 23): adjacent to Amoron'i Onilahy (IUCN V, January 2007), Mikea National Park (IUCN II, April 2007), and Ranobe PK 32 (IUCN V, December 2008) — a rapid cascade of coastal and dry-forest protections. Survey window: 1999--2014.
+- Fénérive East (obs. 24): adjacent to the Réserve de Tampolo (IUCN IV, August 2007), a small (~7.3 km²) research forest managed by ESSA-Forêts. Survey window: 1999--2014.
 
 These three observatories move from liabilities in the donor pool to informative exposed units. Together with Marovoay and Alaotra, they enable a five-case examination of how conservation governance type, enforcement intensity, and PA size shape household-income outcomes.
 
-A critical methodological change: the **donor pool is restricted to five clean observatories** (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy) as identified in [Appendix B](A2_donor_validity.qmd). The four also-exposed donors used in [Chapter 4](04_results.qmd) are now exposed units here. Marovoay and Alaotra ATT estimates will therefore differ slightly from their Chapter 4 counterparts.
+A methodological note: the donor pool in this chapter is restricted to five clean observatories (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy) as identified in [Appendix B](A2_donor_validity.qmd). The four also-exposed donors used in [Chapter 4](04_results.qmd) are now treated as exposed units here. Marovoay and Alaotra ATT estimates will therefore differ slightly from their Chapter 4 counterparts.
 
 
 # Study sites {#sec-additional-sites}
@@ -28,9 +28,9 @@ A critical methodological change: the **donor pool is restricted to five clean o
 
 The CFAV (\~300 km, IUCN V) runs along the eastern highland escarpment. A temporary protection decree was issued on 15 September 2006 (WDPA 555697881) as part of the post-2003 SAPM expansion. Category V status implies land-use regulation at the forest margin --- primarily restrictions on slash-and-burn (*tavy*) and charcoal production in buffer zones --- rather than exclusionary enforcement.
 
-The Farafangana observatory lies on the southeastern coastal plain; its nearest commune (Mahatsinjo) borders the CFAV at \~14 km. A complication: Manombo Special Reserve (IUCN IV, 1962) lies \~12 km from a second commune. Because Manombo predates the study period with unchanged boundaries and management, it constitutes a constant background condition absorbed into the unit fixed effect. The ATT for Farafangana therefore identifies the **additional** income effect of the 2006 CFAV decree.
+The Farafangana observatory lies on the southeastern coastal plain; its nearest commune (Mahatsinjo) borders the CFAV at \~14 km. A complication: Manombo Special Reserve (IUCN IV, 1962) lies \~12 km from a second commune. Because Manombo predates the study period with unchanged boundaries and management, it constitutes a constant background condition absorbed into the unit fixed effect. The ATT for Farafangana therefore identifies the additional income effect of the 2006 CFAV decree.
 
-All survey sites are exposed at observatory level from 2006; no within-observatory split is possible. **Caution**: with only 3 post-treatment years (2006--2008), gsynth estimates should be treated as illustrative.
+All survey sites are exposed at observatory level from 2006; no within-observatory split is possible. With only 3 post-treatment years (2006--2008), gsynth estimates should be treated as illustrative.
 
 ```{r}
 #| label: fig-map-fara
@@ -89,11 +89,11 @@ tm_layout(legend.position = c("right", "top"))
 
 Observatory 23 sits on Madagascar's arid southwest coast, a landscape of spiny thicket and dry deciduous forest. Three PAs became operative in rapid succession:
 
-1. **Amoron'i Onilahy** (IUCN V, 17 January 2007, \~12 km): riparian and coastal landscape PA covering the Onilahy estuary.
-2. **Mikea National Park** (IUCN II, 13 April 2007, \~16 km): strict reserve protecting Mikea dry spiny-thicket forest.
-3. **Ranobe PK 32** (IUCN V, 2 December 2008, \~1.4 km): large terrestrial PA (1,685 km²) bordering the observatory at extremely close range.
+1. Amoron'i Onilahy (IUCN V, 17 January 2007, ~12 km): riparian and coastal landscape PA covering the Onilahy estuary.
+2. Mikea National Park (IUCN II, 13 April 2007, ~16 km): strict reserve protecting Mikea dry spiny-thicket forest.
+3. Ranobe PK 32 (IUCN V, 2 December 2008, ~1.4 km): large terrestrial PA (1,685 km²) bordering the observatory at extremely close range.
 
-Exposure year is **{{< var treat_year_tol >}}** --- the first full survey year following the initial January 2007 decree. The December 2008 Ranobe decree constitutes a secondary intensification within the post-exposure window. The dominant conservation character is IUCN V / multipurpose, though the presence of Mikea NP (IUCN II) at 16 km introduces a strict element.
+Exposure year is {{< var treat_year_tol >}} — the first full survey year following the initial January 2007 decree. The December 2008 Ranobe decree constitutes a secondary intensification within the post-exposure window. The dominant conservation character is IUCN V / multipurpose, though the presence of Mikea NP (IUCN II) at 16 km introduces a strict element.
 
 ```{r}
 #| label: fig-map-tol
@@ -150,7 +150,7 @@ tm_layout(legend.position = c("right", "top"))
 
 The Réserve de Tampolo (IUCN IV, \~7.3 km²) is a small coastal littoral forest managed by ESSA-Forêts as a research and teaching forest. A temporary protection decree was issued on 20 August 2007 (WDPA 354011). The reserve's primary function is scientific access and conservation research, not community resource exclusion. Its small footprint and institutional character suggest low exposure intensity.
 
-Exposure year is **{{< var treat_year_fen >}}**. The survey has 8 pre-treatment years (1999--2006) and 8 post-treatment years (2007--2014) --- the most symmetric panel among the new sites.
+Exposure year is {{< var treat_year_fen >}}. The survey has 8 pre-treatment years (1999--2006) and 8 post-treatment years (2007--2014) — the most symmetric panel among the new sites.
 
 ```{r}
 #| label: fig-map-fen
@@ -543,21 +543,15 @@ ggplot(forest_df, aes(y = obs, x = att, xmin = ci_lo, xmax = ci_hi,
 
 ## Three patterns {#sec-patterns}
 
-The five-case comparison reveals three patterns:
+The five-case comparison suggests three broad patterns, each of which warrants careful interpretation given the small number of exposed units per model.
 
-**Pattern 1 --- Negative income effect under strict enforcement**: Ankarafantsika (Marovoay) shows the largest and most persistent negative ATT, statistically significant and --- as shown in [Chapter 4](04_results.qmd) --- deepening through the 2025 resurvey. This is consistent with direct resource exclusion from a large, actively patrolled park after its extension from an open-access forest reserve.
+The first pattern is a large negative income gap under strict enforcement. Ankarafantsika (Marovoay) shows the largest and most persistent negative gap relative to its synthetic counterfactual, statistically significant and apparent through the 2025 resurvey. This is consistent with direct resource exclusion from a large, actively patrolled park. However, as discussed in @sec-maro-rcs and @sec-counterfactual, the within-Marovoay comparison between east-bank and west-bank villages finds no equivalent income difference, which raises the possibility that the gsynth is capturing regional economic decline — the long-run deterioration of the Marovoay irrigated rice economy — rather than a park-specific effect. The Marovoay result should therefore be treated as suggestive rather than conclusive evidence of a conservation-driven income loss.
 
-**Pattern 2 --- Near-zero effect under participatory/multipurpose conservation**: Lac Alaotra, Toliara North, and (tentatively) Farafangana show point estimates clustered near zero. None produces a statistically significant effect. This is consistent with the multipurpose PA framework: land-use regulation without resource exclusion does not translate into detectable aggregate income losses at the survey-year frequency.
+The second pattern is near-zero estimated effects under participatory or multipurpose governance. Lac Alaotra, Toliara North, and tentatively Farafangana all show point estimates clustered near zero with no statistically significant departure. The community-based management framework at Alaotra, and the lighter regulatory touch at the other sites, appears consistent with no detectable aggregate income costs at the survey-year frequency — though low statistical power (one exposed unit per model) means that moderate effects cannot be ruled out.
 
-**Pattern 3 --- Low-intensity reserve, near-zero effect**: Fénérive East shows a near-zero ATT with a moderately narrow CI, consistent with the Réserve de Tampolo's small footprint and research-oriented management.
+The third pattern is that a small, research-oriented reserve with minimal enforcement leaves estimated income unchanged. Fénérive East shows a near-zero ATT with a moderately narrow confidence interval, which is the result one would expect from a 7.3 km² scientific forest that does not constrain community livelihoods at scale.
 
 
 ## Caveats
 
-Several limitations temper interpretation of the extended comparison:
-
-1. **Farafangana power**: with only 3 post-treatment years, the Farafangana estimate is unreliable and should not be compared numerically to the others.
-2. **Toliara North treatment complexity**: the three-PA cascade (January 2007 + April 2007 + December 2008) means the ATT estimates a composite treatment rather than a clean single event.
-3. **Clean donor pool size**: using only five donors (vs. nine in [Chapter 4](04_results.qmd)) reduces counterfactual precision. Comparisons between Chapter 4 and Chapter 5 ATT estimates for Marovoay and Alaotra may partly reflect this difference.
-4. **No 2025 validation for new sites**: identification for the three new observatories rests on decree dates and proximity without the behavioural validation available for Marovoay and Alaotra.
-5. **Single-unit power floor**: each observatory-level model has exactly one exposed unit. The permutation $p$-value floor is $\approx 1/N_{\text{donors}}$; with \~50--60 donor sites, effects smaller than \~20% are difficult to distinguish from zero.
+Several limitations temper interpretation of the extended comparison. With only three post-treatment years, the Farafangana estimate has low reliability and should not be compared numerically to the others. At Toliara North, the rapid succession of three protected areas in 2007–2008 means the estimated ATT captures a composite of overlapping events rather than a clean single intervention. Using only five donor observatories rather than the nine available in Chapter 4 reduces counterfactual precision, which is why ATT estimates for Marovoay and Alaotra differ slightly between the two chapters. Identification for the three new sites rests on decree dates and spatial proximity without the behavioural validation available for Marovoay and Alaotra, since no 2025 resurvey covered these observatories. Finally, each observatory-level model has exactly one exposed unit, which imposes a minimum permutation p-value of roughly $1/N_{\text{donors}}$; effects below around 20% cannot be reliably distinguished from chance.

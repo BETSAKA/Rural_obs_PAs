@@ -373,13 +373,13 @@ A 2025 resurvey of two key sites (Marovoay and Alaotra) adds a long-run perspect
 
 # Research question {#sec-research-question}
 
-We ask: **does the governance model of a protected area affect household income in surrounding communities?**
+We ask: does the governance model of a protected area affect household income in surrounding communities?
 
 We compare two natural experiments embedded in the ROS data:
 
-1. **Strict conservation**: The 2002 extension of Ankarafantsika National Park (IUCN Category II), managed by MNP. The Marovoay observatory straddles the park boundary, with the Betsiboka River creating a natural exposure–control divide between east-bank villages (adjacent to the park) and west-bank villages (effectively separated by the river).
+1. Strict conservation: the 2002 extension of Ankarafantsika National Park (IUCN Category II), managed by MNP. The Marovoay observatory straddles the park boundary, with the Betsiboka River creating a natural exposure–control divide between east-bank villages (adjacent to the park) and west-bank villages (effectively separated by the river).
 
-2. **Multipurpose conservation**: The creation of the Lac Alaotra new protected area (IUCN Category VI), managed by Durrell Wildlife Conservation Trust through community-based natural resource management, with effective enforcement from approximately 2008. The entire Alaotra observatory shares dependence on the lake-marsh ecosystem.
+2. Multipurpose conservation: the creation of the Lac Alaotra new protected area (IUCN Category VI), managed by Durrell Wildlife Conservation Trust through community-based natural resource management, with effective enforcement from approximately 2008. The entire Alaotra observatory shares dependence on the lake-marsh ecosystem.
 
 Using generalized synthetic control methods [@Xu2017] with an extended donor pool of up to nine additional observatories, we estimate the average treatment effect on the treated (ATT) for equivalised household income. We then extend the analysis to three additional observatory–PA pairs (Farafangana, Toliara North, Fénérive East) where PAs were created in 2006–2007, exploiting the staggered timing to strengthen identification.
 

@@ -8,10 +8,10 @@ book:
   author:
     - name: Florent Bédécarrats
       affiliations:
-        - UMI SOURCE (IRD / UVSQ)
+        - UMI SOURCE (IRD / Université Paris Saclay)
     - name: Véromanitra Razafimahenina
       affiliations:
-        - Université d'Antananarivo
+        - IRD, CERED, Université d'Antananarivo
   date: today
   repo-url: https://github.com/BETSAKA/Rural_obs_PAs
   repo-actions: [source, issue]

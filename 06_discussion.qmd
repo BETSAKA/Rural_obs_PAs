@@ -7,54 +7,47 @@ subtitle: "Policy implications, limitations, and next steps"
 
 This analysis estimates the effect of protected-area creation on household income in rural Madagascar using the generalised synthetic control method [@Xu2017] across five observatory--PA pairs spanning the 1999--2014 study period, with a long-run extension to 2025 for the Marovoay case. The results should be read as suggestive evidence rather than definitive causal estimates, given the small number of treated units and the identification challenges discussed below.
 
-**Two models, two patterns**: The core finding from the two primary sites is a sharp divergence:
+The core finding from the two primary sites is a divergence in estimated income trajectories. At Ankarafantsika, the extension of a forest reserve into a strictly patrolled national park (IUCN II, 2002) is associated with a {{< var att_maro >}} log-point gap in OECD-equivalised household income relative to the synthetic counterfactual (approximately {{< var att_maro_pct >}}), statistically significant and persistent through 2025. However, as discussed in @sec-maro-rcs, a comparison between east-bank and west-bank villages within the same observatory finds no detectable income difference between the two sides of the river. This diagnostic raises an important alternative reading: the gsynth estimate may be capturing the long-run regional economic decline of the Marovoay plain relative to the donor sites on the highland plateau or in the south. Marovoay was historically Madagascar's most productive irrigated rice landscape, the *grenier à blé* of the country. From the 1980s onward the region experienced a documented decline driven by the silting of the Betsiboka, the deterioration of colonial-era irrigation canals, and the withdrawal of state-led rice marketing support. This trajectory predates the 2002 park extension and could account for much of the divergence that gsynth records, if the donor observatories were not similarly exposed to the collapse of lowland irrigated agriculture. Attribution of the estimated income gap to the park specifically therefore remains uncertain; the results at Marovoay should be read as indicative rather than conclusive.
 
-- At Ankarafantsika, the extension of an open-access forest reserve into a strictly patrolled national park (IUCN II, 2002) is associated with a {{< var att_maro >}} log-point decline in OECD-equivalised household income ($\approx$ {{< var att_maro_pct >}}), statistically significant and deepening through 2025 — twenty-two years after the park extension. However, attribution to the PA per se depends on the quality of the synthetic counterfactual (see @sec-counterfactual below).
-- At Lac Alaotra, creation of a participatory protected landscape under CBNRM (IUCN V, 2008) produces an ATT of {{< var att_ala >}} log points, indistinguishable from zero. Communities retained access to the lake-marsh ecosystem under Durrell's management; no aggregate income cost is detectable — though this null could equally reflect low statistical power (see @sec-limitations).
+At Lac Alaotra, creation of a participatory protected landscape under community-based natural resource management (IUCN V, 2008) produces an estimated ATT close to zero, indistinguishable from zero. Communities retained access to the lake-marsh ecosystem under Durrell's management; no aggregate income cost is detectable, though this null could equally reflect low statistical power.
 
-**Three additional sites support the pattern**: Extending the analysis to Farafangana (CFAV corridor, IUCN V, 2006), Toliara North (Amoron'i Onilahy + Mikea + Ranobe, mixed V/II, 2007), and Fénérive East (Réserve de Tampolo, IUCN IV, 2007) yields near-zero, statistically insignificant ATTs in all three cases. These sites face PAs that are either multipurpose, small-footprint, or both. Only strict exclusionary conservation at a large park produces a detectable income decline.
-
-**Long-run persistence.** The 2025 resurvey at Marovoay shows the negative ATT deepening rather than recovering, with the 2025-specific gap larger than the 1999--2014 average. Five robustness checks --- balanced resurvey windows, winsorisation sensitivity, resurvey-only comparison, pre-trend test, and donor composition --- all support the interpretation that the strict-enforcement effect persists and compounds over two decades.
+Extending the analysis to Farafangana, Toliara North, and Fénérive East yields near-zero, statistically insignificant ATTs in all three cases. These sites face protected areas that are either multipurpose in governance, small in footprint, or both. The 2025 resurvey at Marovoay confirms that the east-west income gap persists twenty-two years after the park extension, though its interpretation remains subject to the regional-decline caveat discussed above.
 
 
 # Policy implications {#sec-policy}
 
 ## Conservation governance matters
 
-The primary policy implication is that *how* a PA is governed matters at least as much as *whether* it is created. The two variables that predict negative income effects in these data are (i) strict IUCN category (II vs. V/VI) and (ii) large PA size that constrains broad livelihood activities across an observable area. The multipurpose framework --- which allows regulated use of natural resources under community co-management --- does not translate into detectable aggregate income losses at the survey-year frequency.
+The results, taken at face value, suggest that how a protected area is governed may matter at least as much as whether it exists. Across all five cases, only the site with strict exclusionary management (Ankarafantsika, IUCN II) shows a large negative income gap; sites with multipurpose or low-intensity governance show near-zero effects. This is consistent with a growing literature showing that conservation-income trade-offs depend heavily on institutional design rather than the fact of protection alone [@Ferraro2011; @Sims2010; @Oldekop2016].
 
-This finding aligns with a growing body of evidence that conservation-income trade-offs are not automatic but depend on governance design [@Ferraro2011; @Sims2010; @Oldekop2016]. It lends support to the architecture of Madagascar's post-2003 SAPM expansion, which emphasised community-based approaches and multipurpose categories alongside strict protection.
+That said, the Marovoay result requires the caveat outlined in @sec-summary: the gsynth gap may reflect, at least in part, the regional economic decline of the Marovoay plain rather than a park-specific effect. Taken together, the evidence is suggestive rather than conclusive that strict conservation imposes household income costs, and it supports the architecture of Madagascar's post-2003 SAPM expansion, which paired strict protection with extensive community-based and multipurpose approaches.
 
 ## Compensation and livelihood integration
 
-The Ankarafantsika result implies that communities adjacent to strict PAs bear real and persistent costs. Two decades after the park extension, the income gap has not closed --- and there is no mechanism in the current PA management framework to compensate adjacent households for foregone resource access. This raises a question of distributional justice: if conservation generates national and global public goods (carbon storage, biodiversity preservation), the costs should not be borne disproportionately by the poorest rural households.
+Even under the cautious interpretation, two decades of survey data show that the income gap between east-bank Marovoay villages and comparable sites has not closed. Whether driven primarily by the park or by the broader decline of the irrigation economy, households in this area are measurably poorer than comparable rural communities. If conservation generates national and global public goods — carbon storage, biodiversity preservation — the costs of both the park and the regional disadvantage should not fall disproportionately on some of Madagascar's poorest rural households.
 
-Policy options include:
-
-- **Direct transfers** tied to PA proximity and enforcement intensity (analogous to Payments for Ecosystem Services).
-- **Livelihood diversification programmes** targeting communities within buffer zones of strict PAs.
-- **Governance recategorisation**: where strict enforcement is not ecologically necessary, converting from IUCN II to IUCN V/VI could reduce livelihood costs while maintaining conservation objectives.
+Policy options worth examining include direct transfers tied to park proximity and enforcement intensity, livelihood diversification programmes in buffer zones, and, where strict enforcement is not ecologically necessary, a reconsideration of whether IUCN II classification still serves its intended purpose in particular sites.
 
 ## Limitations of the policy inference
 
-These results cannot establish that multipurpose conservation is *effective at conservation*. The null income effect at Lac Alaotra may reflect genuine governance success (access preserved, resource base maintained) or enforcement failure (the PA exists on paper but does not constrain behaviour). Assessing conservation outcomes requires ecological data (forest cover, species abundance, water quality) that are outside the scope of this analysis.
+These results say nothing about whether multipurpose conservation is effective at achieving its ecological aims. The null income effect at Lac Alaotra may reflect genuinely benign governance or enforcement that exists on paper but has little practical effect on community behaviour. Without ecological outcome data — forest cover trends, water quality, species abundance — the net welfare implications of either governance model remain incomplete.
 
 
 # Counterfactual validity {#sec-counterfactual}
 
-The central threat to interpretation is whether the synthetic counterfactual — "what would income have been absent the PA?" — is credible. Good pre-treatment fit is **necessary but not sufficient**: the factor structure estimated before the PA must continue to hold after it. With only 1–2 treated units, this assumption is fundamentally untestable.
+The central threat to interpretation is whether the synthetic counterfactual — 'what would income have been absent the PA?' — is credible. Good pre-treatment fit is necessary but not sufficient: the factor structure estimated before the PA must continue to hold after it. With only one or two treated units, this assumption cannot be tested directly.
 
 ## Marovoay: alternative explanations
 
-The Ankarafantsika result rests on the Betsiboka River providing a clear geographic split between exposed and unexposed communities. Several concerns temper the causal interpretation:
+The Ankarafantsika estimate rests on the Betsiboka River providing a geographic split between communities with and without direct park access. Several concerns temper the causal interpretation.
 
-1. **Pre-existing east–west differences**: The east bank was already adjacent to the Réserve Naturelle Intégrale d'Ankarafantsika (RNI, 1927) before the 2002 national park extension. The RNI imposed stricter access rules than the surrounding forest reserve, meaning east-bank communities may have faced partial resource constraints *before* the study period. Our design treats the 2002 extension as the sharp onset of strict enforcement, but enforcement may have intensified gradually.
+First, the most important diagnostic: the within-observatory comparison between east-bank and west-bank villages finds no detectable income difference over the study period (@sec-maro-rcs). This is the main reason to be cautious about attributing the gsynth gap to the park. The gsynth compares Marovoay sites against donors on the highland plateau or in the southern drylands. If the Marovoay region as a whole has fallen behind those other places — because of the Betsiboka siltation, the degradation of irrigation infrastructure, the loss of its historical position as Madagascar's primary rice supplier — then gsynth will attribute that regional divergence to park exposure simply because the timing happens to align. The within-observatory comparison controls for this regional shock automatically. The fact that east-bank and west-bank incomes moved together is consistent with a common regional driver rather than a park-specific effect.
 
-2. **Agro-ecological heterogeneity**: East-bank and west-bank *fokontany* differ in soil types, irrigation access, and market connectivity. If these differences interact with post-2002 trends — for example, if a drought or cyclone differentially affected the east bank — the estimated ATT would conflate PA effects with climate or infrastructure shocks.
+Second, the east bank was already adjacent to the Réserve Naturelle Intégrale d'Ankarafantsika (1927) before the 2002 extension. The RNI may have imposed partial constraints before the study period began, making the 2002 extension a less clean sharp onset than the design assumes.
 
-3. **Migration and selection**: If PA-induced hardship prompted selective out-migration of higher-income households from east-bank villages, the remaining surveyed population would appear poorer even absent a true income decline. The ROS sampling frame was not designed to track migrants.
+Third, east-bank and west-bank villages differ in soil types, flood exposure, and irrigation access. If these differences interact with post-2002 trends — through a cyclone, drought, or infrastructure investment that differentially affected one bank — the estimated gap would conflate conservation effects with other shocks.
 
-4. **Counterfactual trajectory**: The gsynth counterfactual assumes that, absent the PA, east-bank income would have evolved like a weighted combination of donor villages. But donor villages in the Hauts Plateaux or the arid south may respond to different economic shocks than the Marovoay irrigated rice plain. The four pre-treatment years (1999–2002) provide a short window to validate this projection.
+Fourth, selective out-migration from the east bank could make the remaining surveyed population appear poorer without any true income decline, since the ROS sampling frame was not designed to track migrants.
 
 ## Alaotra: single-unit identification
 
@@ -62,34 +55,32 @@ The Alaotra model aggregates the entire observatory into a single exposed unit. 
 
 ## Implications for interpretation
 
-Given these concerns, we characterise the results as **strongly suggestive** rather than definitively causal:
+Given these concerns, we characterise the results as strongly suggestive rather than definitively causal.
 
-- The **sign and persistence** of the Ankarafantsika effect are robust across specifications (gsynth, SDID, unadjusted income, levels), which increases confidence that something real is happening — even if the precise magnitude and causal channel remain uncertain.
-- The **governance contrast** (strict negative vs. multipurpose null) is consistent across five independent cases, reducing the likelihood that the pattern is driven by a single confounded comparison.
-- The **2025 resurvey** at Marovoay, with its behavioural module documenting actual PA usage patterns, provides corroborating qualitative evidence that east-bank communities are constrained by the park — but this validation is available for only one site.
+Three features of the evidence increase confidence that the patterns are real, even under the cautious interpretation. The sign and persistence of the Ankarafantsika gap are robust across specifications — generalized synthetic control, synthetic difference-in-differences, unadjusted income, and levels all tell the same directional story. The governance contrast between strict-negative and multipurpose-null outcomes appears across all five independent cases, making it less likely to be driven by a single confounded comparison. And the 2025 resurvey at Marovoay, which directly documents park-interaction behaviour, provides corroborating evidence that east-bank communities face binding constraints from the park, even if the size of the income gap cannot be fully attributed to those constraints alone.
 
-These results are best understood as a first-generation estimate that motivates — and will be refined by — the household-level DiD analysis planned for the 2026 data.
+These results are best read as a first-generation estimate that motivates, and will be refined by, the household-level analysis planned for the 2026 data.
 
 
 # Limitations {#sec-limitations}
 
-Several limitations temper causal interpretation:
+Several limitations temper causal interpretation and should inform how these results are used.
 
-1. **Statistical power**: Each observatory-level gsynth model has exactly one exposed unit, imposing a permutation $p$-value floor of $\approx 1/N_{\text{donors}}$. The Alaotra null result may reflect insufficient power rather than a true zero effect. Effects smaller than \~20% are difficult to distinguish from zero.
+Statistical power is the most fundamental constraint. Each gsynth model has exactly one exposed unit, which imposes a minimum achievable p-value of roughly $1/N_{\text{donors}}$. The Alaotra null result may reflect insufficient power rather than a true zero effect; effects below around 20% are difficult to distinguish from zero in this design.
 
-2. **Exposure-year uncertainty**: PA creation in Madagascar involves multiple administrative steps (decree, gazette, enforcement). We assign exposure to the first full survey year after the decree, but actual enforcement ramp-up may lag by 1--3 years. This attenuates estimated effects in the early post-exposure period.
+PA creation in Madagascar involves multiple administrative steps — decree, gazette, enforcement on the ground. We assign exposure to the first full survey year after the decree, but actual enforcement may have ramped up over one to three years. This attenuates early post-exposure estimates.
 
-3. **Observatory-level aggregation**: The gsynth framework requires site-level panel data, collapsing \~130--260 households per survey year into a single site-year mean. Within-site variation in PA exposure, livelihood strategies, and income composition is entirely absorbed. This aggregation discards statistical power and precludes household-level covariate adjustment.
+The gsynth framework operates on site-level panel data, collapsing roughly 130–260 households per survey year into a single village-year mean. This aggregation absorbs within-site variation in exposure intensity, livelihood strategy, and income composition, discarding information that household-level analysis could use.
 
-4. **Spillover and general-equilibrium effects**: The stable unit treatment value assumption (SUTVA) may be violated if PA creation affects commodity prices, labour markets, or migration patterns at a scale beyond the exposed fokontany. The Marovoay west-bank control *fokontany* may benefit from spillover if displaced east-bank labour or capital migrates westward.
+Spillover effects could bias the west-bank Marovoay villages as controls if displaced east-bank labour or capital migrated westward across the river; the stable unit treatment value assumption cannot be verified.
 
-5. **Single outcome**: We estimate effects on total income only. Conservation may shift income composition (e.g., from forest extraction to wage labour) without changing the total. Decomposing the ATT by income source would require component-level gsynth models with further power constraints.
+We estimate effects on total income only. Conservation pressure may reshape the composition of income — shifting households from forest-product extraction toward wage labour, for example — without necessarily changing the total. Decomposing effects by income source would require separate models for each component with even lower power.
 
-6. **Income measurement**: Survey-based income in subsistence economies is measured with substantial error. The Rural Observatories use a comprehensive 100+ item module, but recall bias and seasonal variation are unavoidable. The OECD equivalence scale adjusts for household composition but assumes adult-equivalent consumption relationships that may not hold in rural Madagascar.
+Survey-based income measurement in subsistence economies is inherently approximate. Recall bias and seasonal variation are unavoidable. The OECD equivalence scale adjusts for household size but assumes consumption patterns that may not hold in rural Madagascar.
 
-7. **Donor pool heterogeneity**: The five clean donor observatories span widely different agro-ecological zones (highland plateau, semi-arid south, humid east coast). Whether a weighted combination of such diverse economies can approximate the counterfactual trajectory of a specific irrigated-rice (Marovoay) or lake-fishery (Alaotra) economy is an open question. The gsynth cross-validation procedure selects factor loadings that minimise pre-treatment prediction error, but four pre-treatment years (Marovoay) or nine (Alaotra) may be too few to distinguish genuine common factors from spurious correlations.
+The five clean donor observatories span very different agro-ecological zones — highland plateau, semi-arid south, humid east coast. Whether a weighted average of such diverse economies can credibly represent what Marovoay's irrigated rice plain, or Alaotra's lake fishery, would have earned absent the PA is an open question. The Marovoay model has only four pre-treatment years in which to validate this projection.
 
-8. **No ecological outcome**: This study measures income effects only. A PA that causes short-term income decline but prevents long-run ecological collapse (e.g., deforestation-driven soil erosion) may be welfare-improving over a longer horizon. Without coupling income estimates to ecological outcomes, the net welfare implications remain incomplete.
+Finally, this study measures income effects only. A protected area that imposes short-term income costs but prevents longer-run ecological degradation — soil erosion from deforestation, loss of water regulation — may be welfare-improving over a longer horizon. The full welfare comparison requires ecological outcome data that are outside the scope of this analysis.
 
 
 # Next steps: the 2026 survey wave {#sec-next-steps}
@@ -114,12 +105,7 @@ A crucial feature here: *not-yet-exposed units serve as controls.* Alaotra (expo
 
 ## Planned analyses
 
-When the 2026 survey round becomes available, we plan:
-
-1. **Primary specification**: Callaway & Sant'Anna [-@CallawayS2021] staggered DiD at the household level, with doubly-robust estimation, household-level covariates, and clustering at the site level.
-2. **Complementary**: Sun & Abraham [-@SunAbraham2021] interaction-weighted estimator via `fixest::sunab()`, providing transparent event-study syntax.
-3. **Robustness**: the gsynth estimates from Chapters 4--5 serve as a check that relaxes parallel trends to an interactive fixed-effects model. If gsynth and DiD agree, the evidence is strong regardless of which identifying assumption is correct.
-4. **Fénérive distance design**: if the 2026 resurvey covers Fénérive East, the small footprint of Réserve de Tampolo (\~7.3 km²) enables a **within-observatory distance design** --- near-PA vs. far-PA sites --- adding a third independent geographic context alongside Marovoay and Alaotra.
+When the 2026 survey round becomes available, the primary specification will be a Callaway--Sant'Anna [-@CallawayS2021] staggered difference-in-differences estimation at the household level, with doubly-robust estimation, household-level covariates, and clustering at the site level. A complementary Sun--Abraham [-@SunAbraham2021] interaction-weighted estimator via `fixest::sunab()` will provide a transparent event-study summary. The gsynth estimates from Chapters 4 and 5 will serve as a robustness check that relaxes the parallel-trends assumption to interactive fixed effects. If gsynth and DiD agree, the evidence is more credible regardless of which identifying assumption one prefers. If the 2026 wave covers Fénérive East, the small footprint of the Réserve de Tampolo allows a within-observatory distance design contrasting near-PA and far-PA sites, adding a third independent geographic context alongside Marovoay and Alaotra.
 
 This chapter will be updated when the 2026 data arrive. The current gsynth results should be read as a first-pass analysis that will be complemented by household-level estimation exploiting the full depth of the data.
 

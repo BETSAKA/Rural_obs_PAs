@@ -64,7 +64,9 @@ ggplot(att_maro_df, aes(rel_time, att)) +
   theme_minimal(base_size = 12)
 ```
 
-The gsynth estimator finds a persistent negative effect of PA exposure on equivalised household income at the east-bank Marovoay sites. The average post-exposure ATT is approximately {{< var att_maro >}} log points (95% CI: [{{< var att_maro_ci_lo >}}, {{< var att_maro_ci_hi >}}], *p* = {{< var att_maro_p >}}), corresponding to a roughly {{< var att_maro_pct >}} decline in equivalised income relative to the synthetic counterfactual. The effect emerges shortly after the 2002 extension and does not attenuate over the observation period.
+The generalized synthetic control model finds a persistent negative gap between the east-bank Marovoay sites and their synthetic counterfactual. The average post-exposure average treatment effect (ATT) is approximately {{< var att_maro >}} log points (95% CI: [{{< var att_maro_ci_lo >}}, {{< var att_maro_ci_hi >}}], *p* = {{< var att_maro_p >}}), corresponding to a roughly {{< var att_maro_pct >}} difference relative to the projected counterfactual. The gap opens shortly after the 2002 park extension and does not close over the observation period.
+
+How much of this gap is attributable to the park itself — rather than to the broader economic trajectory of the Marovoay region — is a question that the data alone cannot fully resolve. Marovoay was historically Madagascar's most productive irrigated rice zone, often called the *grenier à blé* of the country. From the 1980s onward, the region experienced a well-documented decline driven by the silting of the Betsiboka River, the degradation of colonial-era irrigation infrastructure, and the collapse of state agricultural support. This regional trajectory predates the 2002 park extension and could plausibly account for part of the divergence that gsynth attributes to conservation exposure, if the donor observatories on the highland plateau or in the southern drylands were not similarly affected by the deterioration of irrigated lowland agriculture.
 
 ### Within-Marovoay household RCS check {#sec-maro-rcs}
 
@@ -87,7 +89,11 @@ sec_did$maro$summary |>
   tab_header(title = "Marovoay: household RCS DiD")
 ```
 
-The within-Marovoay point estimate is close to zero with a tight cluster-robust SE — strikingly different in magnitude from the gsynth ATT of {{< var att_maro >}} log points reported above. This is not a contradiction but a clarification: the two estimators identify the treatment effect against different counterfactuals. gsynth weights against five clean outside observatories that share the broad macroeconomic and ecological context of rural Madagascar but were never exposed to a strict-PA framework; the within-Marovoay RCS weights against the west bank, which is geographically adjacent and shares many of the same local shocks (the regional Betsiboka river economy, weather variability, market access) as the east bank. The fact that east-bank and west-bank trajectories track each other so closely is itself substantive: it indicates that the gsynth-identified effect at Marovoay is regional rather than purely local. In other words the whole observatory diverged downward from comparable Madagascar sites, with no detectable east-vs-west gap inside the observatory.
+The within-Marovoay point estimate is close to zero with a tight cluster-robust standard error — strikingly different in magnitude from the gsynth gap of {{< var att_maro >}} log points reported above. This contrast is a key diagnostic, and it cannot simply be dismissed as the two methods answering different questions.
+
+The gsynth compares the east-bank villages against donor observatories located in the highland plateau or the southern drylands — places with different agronomic systems, different exposure to Betsiboka siltation, and different relationships with irrigated rice. If the Marovoay region as a whole has declined relative to those places for reasons unconnected to the park — the collapse of irrigation infrastructure, the retreat of the state from the rice economy, cycles of flooding and soil erosion — then gsynth will attribute that regional divergence to the PA, because the exposure timing coincides with the beginning of the observable panel. The within-Marovoay design controls for this regional shock: because east-bank and west-bank villages share the same river, the same downstream rice economy, and the same local market, a regional shock hits both sides simultaneously and cancels out of the east-west comparison.
+
+The fact that east-bank and west-bank incomes tracked each other so closely throughout the study period is therefore a genuine warning. It suggests that the bulk of the divergence that gsynth identifies is a regional phenomenon — the decline of a once-prosperous agricultural region — rather than an effect that can be confidently attributed to the park boundary. A real park effect may still exist: east-bank communities face the park fence directly, while west-bank communities do not. But the within-observatory evidence places a much tighter bound on the plausible conservation-specific component than the gsynth estimate alone would suggest. The two results should be read together, with neither overruling the other.
 
 ## Unit-specific effects
 
@@ -309,7 +315,7 @@ p_maro_att +
   plot_annotation(title = "ATT Paths: Strict vs Multipurpose Conservation")
 ```
 
-The contrast is striking. Strict enforcement at Ankarafantsika produces a large, persistent negative effect on household income. Participatory conservation at Lac Alaotra produces no detectable aggregate effect. This divergence is consistent with the different institutional arrangements: exclusionary management restricting access to forest resources versus community-based management integrating local livelihoods.
+The contrast between the two estimated ATT paths is sharp on paper: a large persistent negative gap at Ankarafantsika, and a near-zero gap at Alaotra. Before drawing governance conclusions, however, some caution is warranted. At Marovoay, the within-observatory comparison between east and west bank finds no detectable difference, raising the possibility that the gsynth estimate is capturing regional economic decline rather than conservation effects. At Alaotra, the null result may reflect genuinely benign governance or insufficient statistical power. These two caveats temper but do not dissolve the contrast: the evidence is suggestive that strict exclusionary management carries higher livelihood costs than participatory co-management, but the data cannot definitively establish the causal mechanism.
 
 # Long-run assessment: 2025 resurvey {#sec-longrun}
 
@@ -500,12 +506,9 @@ ggplot(
 
 ## Robustness of the 2025 gap {#sec-ext-robust}
 
-The east-west income gap in 2025 is not driven by outliers:
+The east-west income gap in 2025 is not driven by outliers: it is visible at every percentile of the income distribution, IQR-based outlier removal widens rather than narrows the gap, and the west-bank advantage appears across five of seven major income components. In statistical terms, the gap is large enough to pass standard tests (Wilcoxon rank-sum $p = 2.1 \times 10^{-10}$; Welch $t$-test $p = 1.8 \times 10^{-5}$).
 
-- The gap is visible at *every* percentile of the income distribution.
-- IQR-based outlier removal *widens* the gap (outliers disproportionately favour the east bank).
-- The west-bank advantage spans 5 of 7 major income components.
-- Wilcoxon rank-sum $p = 2.1 \times 10^{-10}$; Welch $t$-test $p = 1.8 \times 10^{-5}$.
+What remains unresolved is whether this gap reflects cumulative park exposure or the long-term effects of the same regional decline discussed in @sec-maro-rcs. By 2025, the Marovoay irrigation system has deteriorated further, rural-to-urban migration has reshaped communities, and the region's rice economy has never recovered its former position. The 2025 gap is real and robust; its attribution to conservation policy specifically requires caution.
 
 ## Alaotra long-run assessment {#sec-ext-ala}
 
