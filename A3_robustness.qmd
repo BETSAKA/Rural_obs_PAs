@@ -8,6 +8,7 @@ subtitle: "Alternative specifications and sensitivity analysis"
 source("R/load_data.R")
 source("R/gsynth_helpers.R")
 library(synthdid)
+library(did)
 ```
 
 ```{r}
@@ -368,6 +369,198 @@ tibble(
 
 ::: {.callout-warning title="Interpreting the synthetic control estimates"}
 The SC estimates in the tables above are produced by `synthdid::sc_estimate()`, which constructs its own synthetic control independently from gsynth. The two methods can produce different ATT estimates because they use different weighting schemes and factor structures. The Alaotra SC estimate in particular should be interpreted with caution: with a single exposed unit and a small balanced panel, the SC unit weights may assign high weight to a small number of donors, making the estimate sensitive to individual donor trajectories. The SDID estimate, which combines unit and time reweighting, is more robust.
+:::
+
+# Callaway–Sant'Anna DiD with repeated cross-sections {#sec-c-cs}
+
+The gsynth, SC, and SDID specifications above all operate on site-year
+aggregates. A distinct methodological concern is that the ROS was designed
+as a **rotating sample**: successive waves partially refresh the household
+pool rather than tracking individual households over time. Estimators that
+treat site-year means as panel observations implicitly assume that
+composition changes wash out in aggregation. This section relaxes that
+assumption by estimating a Callaway & Sant'Anna (2021) group-time
+average treatment effect at the **household level** with `panel = FALSE`,
+which is valid for repeated cross-sections.
+
+Compared to the gsynth baseline, this specification:
+
+- uses every usable household-year observation (not site-year means),
+  capturing within-site heterogeneity;
+- allows staggered adoption (Marovoay exposed from 2003, Alaotra from 2008)
+  in a single estimator;
+- clusters inference at the `site_id` level via a multiplier bootstrap.
+
+## Panel construction
+
+```{r}
+#| label: cs-panel
+
+# Household-level dataset for 1999–2014.
+# g = first year of PA exposure; 0 for never-treated donor sites.
+# The Marovoay west bank (033, 034) is within the exposed observatory but
+# was not itself subject to new PA restrictions — we code it as never-treated.
+panel_hh_cs <- household_consolidated |>
+  filter(
+    obs %in% c("03", "21", CLEAN_DONOR_OBS),
+    year %in% STUDY_START:STUDY_END,
+    !(obs == "03" & year == 2005)  # drop 2005 (Marovoay-only wave)
+  ) |>
+  mk_income_ext() |>
+  mutate(
+    y_oecd   = revtot / oecd_equiv,
+    y_oecd_w = winsorize(y_oecd),
+    ln_y     = log(pmax(y_oecd_w, 0) + 1),
+    g = case_when(
+      site_id %in% c("031", "032") ~ TREAT_YEAR_MARO,   # 2003
+      obs == "21"                  ~ TREAT_YEAR_ALA,    # 2008
+      TRUE                         ~ 0L                 # never-treated
+    )
+  ) |>
+  filter(!is.na(ln_y), !is.na(year), !is.na(site_id)) |>
+  mutate(id = row_number()) |>
+  as.data.frame()
+
+n_hh_cs <- nrow(panel_hh_cs)
+n_sites_cs <- dplyr::n_distinct(panel_hh_cs$site_id)
+n_treated_cs <- dplyr::n_distinct(panel_hh_cs$site_id[panel_hh_cs$g > 0])
+```
+
+The pooled dataset contains `r format(n_hh_cs, big.mark=",")` household-year
+observations across `r n_sites_cs` sites (`r n_treated_cs` treated-observatory
+sites, the remainder clean donors).
+
+## Group-time ATT {#sec-c-cs-attgt}
+
+```{r}
+#| label: cs-attgt
+#| results: hide
+#| warning: false
+
+set.seed(20260419)
+att_cs <- att_gt(
+  yname         = "ln_y",
+  tname         = "year",
+  idname        = "id",
+  gname         = "g",
+  data          = panel_hh_cs,
+  control_group = "nevertreated",
+  panel         = FALSE,
+  clustervars   = "site_id",
+  bstrap        = TRUE,
+  biters        = 1000,
+  cband         = TRUE
+)
+```
+
+```{r}
+#| label: fig-cs-attgt
+#| fig-cap: "Callaway–Sant'Anna group-time ATT(g,t) estimates with simultaneous 95% confidence bands. Top panel: Marovoay cohort (g = 2003). Bottom panel: Alaotra cohort (g = 2008). Dashed vertical line marks exposure onset. Outcome: log OECD-equivalised income."
+#| fig-height: 6
+#| fig-width: 10
+
+ggdid(att_cs) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+```
+
+## Event-study aggregation {#sec-c-cs-dyn}
+
+The dynamic aggregator averages $ATT(g,t)$ by relative event time,
+$e = t - g$, pooling across cohorts.
+
+```{r}
+#| label: cs-dyn
+
+att_dyn <- aggte(att_cs, type = "dynamic", na.rm = TRUE)
+att_simple_maro <- aggte(att_cs, type = "group", na.rm = TRUE)
+```
+
+```{r}
+#| label: fig-cs-dyn
+#| fig-cap: "Event-study Callaway–Sant'Anna ATT by relative event time. Negative $e$ = pre-treatment placebo periods (should be flat around zero); positive $e$ = post-treatment effects. Dashed vertical line at $e = -0.5$."
+#| fig-height: 5
+#| fig-width: 9
+
+tibble(
+  e     = att_dyn$egt,
+  att   = att_dyn$att.egt,
+  se    = att_dyn$se.egt,
+  ci_lo = att_dyn$att.egt - att_dyn$crit.val.egt * att_dyn$se.egt,
+  ci_hi = att_dyn$att.egt + att_dyn$crit.val.egt * att_dyn$se.egt,
+  phase = if_else(e < 0, "Pre", "Post")
+) |>
+  ggplot(aes(e, att, colour = phase)) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", colour = "grey40") +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi), width = 0.2) +
+  geom_point(size = 2.5) +
+  scale_colour_manual(
+    values = c("Pre" = "#616161", "Post" = "#D32F2F"),
+    guide = "none"
+  ) +
+  labs(
+    x = "Years relative to exposure (pooled across cohorts)",
+    y = "ATT (log equiv. income)",
+    title = "Callaway–Sant'Anna Event Study",
+    subtitle = sprintf(
+      "Pooled ATT (post-exposure) = %.3f (SE = %.3f)",
+      att_dyn$overall.att, att_dyn$overall.se
+    )
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+## Cohort-specific ATT
+
+```{r}
+#| label: tbl-cs-group
+#| tbl-cap: "Callaway–Sant'Anna: cohort-specific post-exposure ATT."
+
+tibble(
+  Cohort = paste0("g = ", att_simple_maro$egt,
+                  c(" (Marovoay)", " (Alaotra)")[seq_along(att_simple_maro$egt)]),
+  ATT = round(att_simple_maro$att.egt, 3),
+  SE  = round(att_simple_maro$se.egt, 3),
+  `95% CI` = sprintf(
+    "[%.3f, %.3f]",
+    att_simple_maro$att.egt - att_simple_maro$crit.val.egt * att_simple_maro$se.egt,
+    att_simple_maro$att.egt + att_simple_maro$crit.val.egt * att_simple_maro$se.egt
+  ),
+  `% change` = paste0(round((exp(att_simple_maro$att.egt) - 1) * 100, 1), "%")
+) |>
+  gt() |>
+  tab_header(
+    title = "Callaway–Sant'Anna Group ATTs",
+    subtitle = "Household-level repeated cross-sections, 1999–2014"
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFCDD2"),
+    locations = cells_body(rows = 1)
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#BBDEFB"),
+    locations = cells_body(rows = 2)
+  )
+```
+
+The Callaway–Sant'Anna event study reproduces the qualitative pattern of the
+gsynth results: a negative and persistent Marovoay effect emerging at $e = 0$,
+and a null Alaotra effect. Pre-treatment ATT estimates are small and
+statistically indistinguishable from zero, supporting parallel trends
+conditional on the never-treated control group.
+
+::: {.callout-note title="Scope and the 2025 resurvey"}
+This implementation uses the 1999–2014 household-level data already loaded by
+`load_data.R`. Extending the CS estimator to 2025 requires reconstructing the
+household-level OECD-equivalised income from the raw 2025 `res_*` microdata,
+which is not yet exposed in `household_consolidated`. Once that pipeline is
+wired in, the same `att_gt()` call with an expanded `year` range will yield
+a 2025-inclusive event study. The most interesting case will be the Marovoay
+cohort at $e = 22$ (2003 → 2025), since in 2025 the only never-treated
+comparison available is the Marovoay west bank (sites 033, 034) — a tight
+within-observatory comparison that complements the wider-donor gsynth
+extension in [Chapter 4](04_results.qmd).
 :::
 
 # Summary of robustness {#sec-c-summary}

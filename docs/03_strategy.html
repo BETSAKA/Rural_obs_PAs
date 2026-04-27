@@ -359,10 +359,10 @@ window.Quarto = {
   <li><a href="#sec-two-models" id="toc-sec-two-models" class="nav-link" data-scroll-target="#sec-two-models"><span class="header-section-number">3.2.3</span> Two separate models</a></li>
   </ul></li>
   <li><a href="#sec-inference" id="toc-sec-inference" class="nav-link" data-scroll-target="#sec-inference"><span class="header-section-number">3.3</span> Inference with few exposed units</a></li>
-  <li><a href="#sec-complementary" id="toc-sec-complementary" class="nav-link" data-scroll-target="#sec-complementary"><span class="header-section-number">3.4</span> Complementary estimators</a></li>
+  <li><a href="#sec-complementary" id="toc-sec-complementary" class="nav-link" data-scroll-target="#sec-complementary"><span class="header-section-number">3.4</span> Complementary household-level designs</a></li>
   </ul></li>
   <li><a href="#sec-extensions" id="toc-sec-extensions" class="nav-link" data-scroll-target="#sec-extensions"><span class="header-section-number">4</span> Extensions to three additional observatories</a></li>
-  <li><a href="#sec-did-roadmap" id="toc-sec-did-roadmap" class="nav-link" data-scroll-target="#sec-did-roadmap"><span class="header-section-number">5</span> Looking ahead: household-level estimation</a></li>
+  <li><a href="#sec-did-roadmap" id="toc-sec-did-roadmap" class="nav-link" data-scroll-target="#sec-did-roadmap"><span class="header-section-number">5</span> Looking ahead: full household-level estimation</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/BETSAKA/Rural_obs_PAs/blob/main/03_strategy.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/BETSAKA/Rural_obs_PAs/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -389,27 +389,28 @@ window.Quarto = {
 </header>
 
 
-<p>The central question of this study is whether the creation or expansion of protected areas <em>caused</em> changes in household income — or whether observed income differences merely reflect pre-existing trends. This chapter explains how we isolate causal effects despite the fact that PA placement is not random and household surveys were not designed for conservation impact evaluation.</p>
-<p>The strategy has four parts. First, we define two natural experiments that provide plausible exposure–control comparisons (<a href="#sec-treatment" class="quarto-xref">Section&nbsp;1</a>). Second, we explain how the survey design constrains the unit of analysis (<a href="#sec-panel" class="quarto-xref">Section&nbsp;2</a>). Third, we describe the statistical method used to construct counterfactual income trajectories (<a href="#sec-estimation" class="quarto-xref">Section&nbsp;3</a>). Fourth, we briefly introduce three additional cases that extend the analysis (<a href="#sec-extensions" class="quarto-xref">Section&nbsp;4</a>).</p>
+<p>The central question of this study is whether the creation or expansion of protected areas caused changes in household income, or whether observed income differences merely reflect pre-existing trends. This chapter explains how we attempt to isolate causal effects.</p>
+<p>The strategy has four parts. First, we define two natural experiments to propose plausible exposure–control comparisons (<a href="#sec-treatment" class="quarto-xref">Section&nbsp;1</a>). Second, we explain how the survey design constrains the unit of analysis (<a href="#sec-panel" class="quarto-xref">Section&nbsp;2</a>). Third, we describe the statistical method used to construct counterfactual income trajectories (<a href="#sec-estimation" class="quarto-xref">Section&nbsp;3</a>). Fourth, we briefly introduce three additional cases that extend the analysis (<a href="#sec-extensions" class="quarto-xref">Section&nbsp;4</a>).</p>
 <section id="sec-treatment" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Two natural experiments</h1>
-<p>We exploit two events during the ROS survey period where a new or expanded PA began to impose restrictions on communities that had been surveyed <em>before</em> the PA became operative. The two cases differ in their conservation governance model — strict exclusion at Ankarafantsika versus participatory management at Lac Alaotra — providing a built-in comparison of how governance type mediates income effects.</p>
+<p>We exploit two events during the ROS survey period where a new or expanded PA began to impose restrictions on communities that had previously been surveyed. The two cases differ in their conservation governance model — strict exclusion at Ankarafantsika versus participatory management at Lac Alaotra — providing a built-in comparison of how governance type mediates income effects.</p>
 <section id="sec-treat-maro" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="sec-treat-maro"><span class="header-section-number">1.1</span> Marovoay and Ankarafantsika National Park (2003)</h2>
 <section id="sec-maro-history" class="level3" data-number="1.1.1">
 <h3 data-number="1.1.1" class="anchored" data-anchor-id="sec-maro-history"><span class="header-section-number">1.1.1</span> The 2002 park extension</h3>
-<p>The Ankarafantsika National Park was formally extended by Decree 2002-798 on 7 August 2002, merging the former <em>Réserve Naturelle Intégrale</em> (60,500 ha, 1927) with forest reserves into a 136,500 ha national park under IUCN Category II (strict nature conservation). We set the exposure year to <strong>2003</strong> — the first full ROS survey year following the decree.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<p>Critically, the 2002 extension was the <strong>first event to impose binding land-use restrictions</strong> on the communities adjacent to the forest reserve zone. The earlier designations had very different <em>de facto</em> implications:</p>
+<p>As illustrated in <a href="#fig-map-maro" class="quarto-xref">Figure&nbsp;1</a>, the Ankarafantsika National Park was formally extended by Decree 2002-798 on 7 August 2002, merging the former Réserve Naturelle Intégrale (60,500 ha, created in 1927) with a forest reserve into a 136,500 ha national park under IUCN Category II (strict nature conservation).</p>
+<p>We set the exposure year to <strong>2003</strong>, which is the first full ROS survey year following the decree. Decree 2002-798 was signed on 7 August 2002. Because the ROS survey is conducted annually with a reference period from October of year-1 to September of the survey year and we attribute any effect to the first full survey year following the decree, we set the exposure year to 2003. We also test whether using 2002 instead of 2003 modifies the estimated result and find negligible incidence.</p>
+<p>According to the concording grey literature we reviewed, we consider the 2002 extension was the first event to impose binding land-use restrictions on the communities adjacent to the forest reserve zone. The earlier designations had very different <em>de facto</em> implications:</p>
 <ul>
 <li><strong>The 1927 <em>Réserve Naturelle Intégrale</em></strong> covered the inland plateau to the north-east, geographically separate from the Marovoay communities. The east-bank <em>fokontany</em> had no direct interface with the strictly protected RNI.</li>
 <li><strong>The 1929 forest reserve</strong> was not a conservation zone but a timber and resource reserve under the forest administration. Analyses of this period found no effective enforcement: subsistence agriculture, cattle grazing, and charcoal production continued unimpeded <span class="citation" data-cites="brondeau1999">(<a href="#ref-brondeau1999" role="doc-biblioref">Brondeau 1999</a>)</span>.</li>
 </ul>
-<p>The 2002 reclassification merged these into a single national park where slash-and-burn agriculture (<em>tavy</em>), charcoal production, and non-timber forest product extraction were explicitly prohibited — and, crucially, enforced. Enforcement capacity was supported by international conservation funding from the World Bank and bilateral donors as part of Madagascar’s third Environmental Action Plan. <a href="#fig-map-maro" class="quarto-xref">Figure&nbsp;1</a> maps the spatial extent of the consolidation using dynamic WDPA boundary data: the original RNI (dark green) covered the inland plateau to the north-east, while the 2002 extension (light green) more than doubled the protected area to encompass forest reserves abutting the Marovoay communities <span class="citation" data-cites="alonso2002">(<a href="#ref-alonso2002" role="doc-biblioref">Alonso et al. 2002</a>)</span>.</p>
+<p>The 2002 reclassification merged these into a single national park where slash-and-burn agriculture (<em>tavy</em>), charcoal production, and non-timber forest product extraction were explicitly prohibited and, crucially, enforced. Enforcement capacity was supported by international conservation funding from the World Bank and bilateral donors as part of Madagascar’s third Environmental Action Plan. <a href="#fig-map-maro" class="quarto-xref">Figure&nbsp;1</a> maps the spatial extent of the consolidation using dynamic WDPA boundary data: the original RNI (dark green) covered the inland plateau to the north-east, while the 2002 extension (light green) more than doubled the protected area to encompass forest reserves abutting the Marovoay communities <span class="citation" data-cites="alonso2002">(<a href="#ref-alonso2002" role="doc-biblioref">Alonso et al. 2002</a>)</span>.</p>
 </section>
 <section id="sec-maro-barrier" class="level3" data-number="1.1.2">
 <h3 data-number="1.1.2" class="anchored" data-anchor-id="sec-maro-barrier"><span class="header-section-number">1.1.2</span> The Betsiboka River as a natural barrier</h3>
-<p>The Marovoay observatory comprises four <em>fokontany</em> (villages) split by the Betsiboka River — a major, permanently flowing watercourse wider than 10 metres. Crossing is possible only under certain hydrological conditions, often requiring long detours or costly boat transport. In practice, flows of people, goods, and services run along the Marovoay downstream axis rather than across the river.</p>
-<p>This geographic feature creates a natural experiment: east-bank communities have direct walking access to the park, while west-bank communities face a substantial access penalty — roughly tripling the effective travel distance. We formalize this with a <strong>river-crossing penalty</strong> of 15 km added to the straight-line distance for west-bank fokontany, reflecting the detour required to reach the park on foot (no bridge exists in the immediate vicinity):</p>
+<p>The Marovoay observatory comprises four <em>fokontany</em> (villages) split by the Betsiboka River — a major, permanently flowing watercourse. Crossing is possible only under certain hydrological conditions, often requiring long detours or costly boat transport. In practice, flows of people, goods, and services run along the Marovoay downstream axis rather than across the river.</p>
+<p>This geographic feature creates a natural experiment: east-bank communities have direct walking access to the park, while west-bank communities face a substantial access penalty.</p>
 <div class="cell">
 <div id="tbl-maro-sites" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -418,23 +419,23 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
 </figcaption>
 <div aria-describedby="tbl-maro-sites-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="yeyyhzdbrk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#yeyyhzdbrk table {
+<div id="xvggfvhbbp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#xvggfvhbbp table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#yeyyhzdbrk thead, #yeyyhzdbrk tbody, #yeyyhzdbrk tfoot, #yeyyhzdbrk tr, #yeyyhzdbrk td, #yeyyhzdbrk th {
+#xvggfvhbbp thead, #xvggfvhbbp tbody, #xvggfvhbbp tfoot, #xvggfvhbbp tr, #xvggfvhbbp td, #xvggfvhbbp th {
   border-style: none;
 }
 
-#yeyyhzdbrk p {
+#xvggfvhbbp p {
   margin: 0;
   padding: 0;
 }
 
-#yeyyhzdbrk .gt_table {
+#xvggfvhbbp .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -460,12 +461,12 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   border-left-color: #D3D3D3;
 }
 
-#yeyyhzdbrk .gt_caption {
+#xvggfvhbbp .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#yeyyhzdbrk .gt_title {
+#xvggfvhbbp .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -477,7 +478,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   border-bottom-width: 0;
 }
 
-#yeyyhzdbrk .gt_subtitle {
+#xvggfvhbbp .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -489,7 +490,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   border-top-width: 0;
 }
 
-#yeyyhzdbrk .gt_heading {
+#xvggfvhbbp .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -501,13 +502,13 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   border-right-color: #D3D3D3;
 }
 
-#yeyyhzdbrk .gt_bottom_border {
+#xvggfvhbbp .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#yeyyhzdbrk .gt_col_headings {
+#xvggfvhbbp .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -522,7 +523,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   border-right-color: #D3D3D3;
 }
 
-#yeyyhzdbrk .gt_col_heading {
+#xvggfvhbbp .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -542,7 +543,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   overflow-x: hidden;
 }
 
-#yeyyhzdbrk .gt_column_spanner_outer {
+#xvggfvhbbp .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -554,15 +555,15 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   padding-right: 4px;
 }
 
-#yeyyhzdbrk .gt_column_spanner_outer:first-child {
+#xvggfvhbbp .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#yeyyhzdbrk .gt_column_spanner_outer:last-child {
+#xvggfvhbbp .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#yeyyhzdbrk .gt_column_spanner {
+#xvggfvhbbp .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -574,11 +575,11 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   width: 100%;
 }
 
-#yeyyhzdbrk .gt_spanner_row {
+#xvggfvhbbp .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#yeyyhzdbrk .gt_group_heading {
+#xvggfvhbbp .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -604,7 +605,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   text-align: left;
 }
 
-#yeyyhzdbrk .gt_empty_group_heading {
+#xvggfvhbbp .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -619,15 +620,15 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   vertical-align: middle;
 }
 
-#yeyyhzdbrk .gt_from_md > :first-child {
+#xvggfvhbbp .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#yeyyhzdbrk .gt_from_md > :last-child {
+#xvggfvhbbp .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#yeyyhzdbrk .gt_row {
+#xvggfvhbbp .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -646,7 +647,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   overflow-x: hidden;
 }
 
-#yeyyhzdbrk .gt_stub {
+#xvggfvhbbp .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -659,7 +660,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   padding-right: 5px;
 }
 
-#yeyyhzdbrk .gt_stub_row_group {
+#xvggfvhbbp .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -673,15 +674,15 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   vertical-align: top;
 }
 
-#yeyyhzdbrk .gt_row_group_first td {
+#xvggfvhbbp .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#yeyyhzdbrk .gt_row_group_first th {
+#xvggfvhbbp .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#yeyyhzdbrk .gt_summary_row {
+#xvggfvhbbp .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -691,16 +692,16 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   padding-right: 5px;
 }
 
-#yeyyhzdbrk .gt_first_summary_row {
+#xvggfvhbbp .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#yeyyhzdbrk .gt_first_summary_row.thick {
+#xvggfvhbbp .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#yeyyhzdbrk .gt_last_summary_row {
+#xvggfvhbbp .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -710,7 +711,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   border-bottom-color: #D3D3D3;
 }
 
-#yeyyhzdbrk .gt_grand_summary_row {
+#xvggfvhbbp .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -720,7 +721,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   padding-right: 5px;
 }
 
-#yeyyhzdbrk .gt_first_grand_summary_row {
+#xvggfvhbbp .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -730,7 +731,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   border-top-color: #D3D3D3;
 }
 
-#yeyyhzdbrk .gt_last_grand_summary_row_top {
+#xvggfvhbbp .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -740,11 +741,11 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   border-bottom-color: #D3D3D3;
 }
 
-#yeyyhzdbrk .gt_striped {
+#xvggfvhbbp .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#yeyyhzdbrk .gt_table_body {
+#xvggfvhbbp .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -753,7 +754,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   border-bottom-color: #D3D3D3;
 }
 
-#yeyyhzdbrk .gt_footnotes {
+#xvggfvhbbp .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -767,7 +768,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   border-right-color: #D3D3D3;
 }
 
-#yeyyhzdbrk .gt_footnote {
+#xvggfvhbbp .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -776,7 +777,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   padding-right: 5px;
 }
 
-#yeyyhzdbrk .gt_sourcenotes {
+#xvggfvhbbp .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -790,7 +791,7 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   border-right-color: #D3D3D3;
 }
 
-#yeyyhzdbrk .gt_sourcenote {
+#xvggfvhbbp .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -798,72 +799,72 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
   padding-right: 5px;
 }
 
-#yeyyhzdbrk .gt_left {
+#xvggfvhbbp .gt_left {
   text-align: left;
 }
 
-#yeyyhzdbrk .gt_center {
+#xvggfvhbbp .gt_center {
   text-align: center;
 }
 
-#yeyyhzdbrk .gt_right {
+#xvggfvhbbp .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#yeyyhzdbrk .gt_font_normal {
+#xvggfvhbbp .gt_font_normal {
   font-weight: normal;
 }
 
-#yeyyhzdbrk .gt_font_bold {
+#xvggfvhbbp .gt_font_bold {
   font-weight: bold;
 }
 
-#yeyyhzdbrk .gt_font_italic {
+#xvggfvhbbp .gt_font_italic {
   font-style: italic;
 }
 
-#yeyyhzdbrk .gt_super {
+#xvggfvhbbp .gt_super {
   font-size: 65%;
 }
 
-#yeyyhzdbrk .gt_footnote_marks {
+#xvggfvhbbp .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#yeyyhzdbrk .gt_asterisk {
+#xvggfvhbbp .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#yeyyhzdbrk .gt_indent_1 {
+#xvggfvhbbp .gt_indent_1 {
   text-indent: 5px;
 }
 
-#yeyyhzdbrk .gt_indent_2 {
+#xvggfvhbbp .gt_indent_2 {
   text-indent: 10px;
 }
 
-#yeyyhzdbrk .gt_indent_3 {
+#xvggfvhbbp .gt_indent_3 {
   text-indent: 15px;
 }
 
-#yeyyhzdbrk .gt_indent_4 {
+#xvggfvhbbp .gt_indent_4 {
   text-indent: 20px;
 }
 
-#yeyyhzdbrk .gt_indent_5 {
+#xvggfvhbbp .gt_indent_5 {
   text-indent: 25px;
 }
 
-#yeyyhzdbrk .katex-display {
+#xvggfvhbbp .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#yeyyhzdbrk div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#xvggfvhbbp div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -875,7 +876,6 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
 <th id="Bank" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Bank</th>
 <th id="Dist.-to-RNI-(pre-2002)" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Dist. to RNI (pre-2002)</th>
 <th id="Dist.-to-NP-(post-2002)" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Dist. to NP (post-2002)</th>
-<th id="Effective-dist." class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Effective dist.</th>
 <th id="Role" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Role</th>
 </tr>
 </thead>
@@ -885,36 +885,32 @@ Table&nbsp;1: Marovoay site exposure assignments. Distance to RNI = straight-lin
 <td class="gt_row gt_left" headers="Bank">East</td>
 <td class="gt_row gt_left" headers="Dist. to RNI (pre-2002)">33 km</td>
 <td class="gt_row gt_left" headers="Dist. to NP (post-2002)">5.2 km</td>
-<td class="gt_row gt_left" headers="Effective dist.">5.2 km</td>
-<td class="gt_row gt_left" headers="Role"><strong>Exposed</strong> (from 2003)</td>
+<td class="gt_row gt_left" headers="Role">Exposed (from 2003)</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Fokontany">Madiromiongana</td>
 <td class="gt_row gt_left" headers="Bank">East</td>
 <td class="gt_row gt_left" headers="Dist. to RNI (pre-2002)">25.1 km</td>
 <td class="gt_row gt_left" headers="Dist. to NP (post-2002)">11.7 km</td>
-<td class="gt_row gt_left" headers="Effective dist.">11.7 km</td>
-<td class="gt_row gt_left" headers="Role"><strong>Exposed</strong> (from 2003)</td>
+<td class="gt_row gt_left" headers="Role">Exposed (from 2003)</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Fokontany">Ampijoroa</td>
 <td class="gt_row gt_left" headers="Bank">West</td>
-<td class="gt_row gt_left" headers="Dist. to RNI (pre-2002)">51.2 km</td>
-<td class="gt_row gt_left" headers="Dist. to NP (post-2002)">11.3 km</td>
-<td class="gt_row gt_left" headers="Effective dist.">26.3 km (river detour)</td>
+<td class="gt_row gt_left" headers="Dist. to RNI (pre-2002)">51.2 km (+ river crossing)</td>
+<td class="gt_row gt_left" headers="Dist. to NP (post-2002)">11.3 km (+ river crossing)</td>
 <td class="gt_row gt_left" headers="Role">Donor (control)</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Fokontany">Maroala</td>
 <td class="gt_row gt_left" headers="Bank">West</td>
-<td class="gt_row gt_left" headers="Dist. to RNI (pre-2002)">44.7 km</td>
-<td class="gt_row gt_left" headers="Dist. to NP (post-2002)">5.6 km</td>
-<td class="gt_row gt_left" headers="Effective dist.">20.6 km (river detour)</td>
+<td class="gt_row gt_left" headers="Dist. to RNI (pre-2002)">44.7 km (+ river crossing)</td>
+<td class="gt_row gt_left" headers="Dist. to NP (post-2002)">5.6 km (+ river crossing)</td>
 <td class="gt_row gt_left" headers="Role">Donor (control)</td>
 </tr>
 </tbody><tfoot>
 <tr class="gt_footnotes odd">
-<td colspan="6" class="gt_footnote">Effective distance adds a 15 km river-crossing penalty for west-bank fokontany.</td>
+<td colspan="5" class="gt_footnote">Effective distance adds a 15 km river-crossing penalty for west-bank fokontany.</td>
 </tr>
 </tfoot>
 
@@ -953,23 +949,23 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
 </figcaption>
 <div aria-describedby="tbl-maro-usage-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="pvgtfymdng" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#pvgtfymdng table {
+<div id="jsclipzehr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#jsclipzehr table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#pvgtfymdng thead, #pvgtfymdng tbody, #pvgtfymdng tfoot, #pvgtfymdng tr, #pvgtfymdng td, #pvgtfymdng th {
+#jsclipzehr thead, #jsclipzehr tbody, #jsclipzehr tfoot, #jsclipzehr tr, #jsclipzehr td, #jsclipzehr th {
   border-style: none;
 }
 
-#pvgtfymdng p {
+#jsclipzehr p {
   margin: 0;
   padding: 0;
 }
 
-#pvgtfymdng .gt_table {
+#jsclipzehr .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -995,12 +991,12 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   border-left-color: #D3D3D3;
 }
 
-#pvgtfymdng .gt_caption {
+#jsclipzehr .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#pvgtfymdng .gt_title {
+#jsclipzehr .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1012,7 +1008,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   border-bottom-width: 0;
 }
 
-#pvgtfymdng .gt_subtitle {
+#jsclipzehr .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1024,7 +1020,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   border-top-width: 0;
 }
 
-#pvgtfymdng .gt_heading {
+#jsclipzehr .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1036,13 +1032,13 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   border-right-color: #D3D3D3;
 }
 
-#pvgtfymdng .gt_bottom_border {
+#jsclipzehr .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#pvgtfymdng .gt_col_headings {
+#jsclipzehr .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1057,7 +1053,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   border-right-color: #D3D3D3;
 }
 
-#pvgtfymdng .gt_col_heading {
+#jsclipzehr .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1077,7 +1073,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   overflow-x: hidden;
 }
 
-#pvgtfymdng .gt_column_spanner_outer {
+#jsclipzehr .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1089,15 +1085,15 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   padding-right: 4px;
 }
 
-#pvgtfymdng .gt_column_spanner_outer:first-child {
+#jsclipzehr .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#pvgtfymdng .gt_column_spanner_outer:last-child {
+#jsclipzehr .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#pvgtfymdng .gt_column_spanner {
+#jsclipzehr .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1109,11 +1105,11 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   width: 100%;
 }
 
-#pvgtfymdng .gt_spanner_row {
+#jsclipzehr .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#pvgtfymdng .gt_group_heading {
+#jsclipzehr .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1139,7 +1135,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   text-align: left;
 }
 
-#pvgtfymdng .gt_empty_group_heading {
+#jsclipzehr .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1154,15 +1150,15 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   vertical-align: middle;
 }
 
-#pvgtfymdng .gt_from_md > :first-child {
+#jsclipzehr .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#pvgtfymdng .gt_from_md > :last-child {
+#jsclipzehr .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#pvgtfymdng .gt_row {
+#jsclipzehr .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1181,7 +1177,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   overflow-x: hidden;
 }
 
-#pvgtfymdng .gt_stub {
+#jsclipzehr .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1194,7 +1190,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   padding-right: 5px;
 }
 
-#pvgtfymdng .gt_stub_row_group {
+#jsclipzehr .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1208,15 +1204,15 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   vertical-align: top;
 }
 
-#pvgtfymdng .gt_row_group_first td {
+#jsclipzehr .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#pvgtfymdng .gt_row_group_first th {
+#jsclipzehr .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#pvgtfymdng .gt_summary_row {
+#jsclipzehr .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1226,16 +1222,16 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   padding-right: 5px;
 }
 
-#pvgtfymdng .gt_first_summary_row {
+#jsclipzehr .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#pvgtfymdng .gt_first_summary_row.thick {
+#jsclipzehr .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#pvgtfymdng .gt_last_summary_row {
+#jsclipzehr .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1245,7 +1241,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   border-bottom-color: #D3D3D3;
 }
 
-#pvgtfymdng .gt_grand_summary_row {
+#jsclipzehr .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1255,7 +1251,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   padding-right: 5px;
 }
 
-#pvgtfymdng .gt_first_grand_summary_row {
+#jsclipzehr .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1265,7 +1261,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   border-top-color: #D3D3D3;
 }
 
-#pvgtfymdng .gt_last_grand_summary_row_top {
+#jsclipzehr .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1275,11 +1271,11 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   border-bottom-color: #D3D3D3;
 }
 
-#pvgtfymdng .gt_striped {
+#jsclipzehr .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#pvgtfymdng .gt_table_body {
+#jsclipzehr .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1288,7 +1284,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   border-bottom-color: #D3D3D3;
 }
 
-#pvgtfymdng .gt_footnotes {
+#jsclipzehr .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1302,7 +1298,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   border-right-color: #D3D3D3;
 }
 
-#pvgtfymdng .gt_footnote {
+#jsclipzehr .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1311,7 +1307,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   padding-right: 5px;
 }
 
-#pvgtfymdng .gt_sourcenotes {
+#jsclipzehr .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1325,7 +1321,7 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   border-right-color: #D3D3D3;
 }
 
-#pvgtfymdng .gt_sourcenote {
+#jsclipzehr .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1333,72 +1329,72 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
   padding-right: 5px;
 }
 
-#pvgtfymdng .gt_left {
+#jsclipzehr .gt_left {
   text-align: left;
 }
 
-#pvgtfymdng .gt_center {
+#jsclipzehr .gt_center {
   text-align: center;
 }
 
-#pvgtfymdng .gt_right {
+#jsclipzehr .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#pvgtfymdng .gt_font_normal {
+#jsclipzehr .gt_font_normal {
   font-weight: normal;
 }
 
-#pvgtfymdng .gt_font_bold {
+#jsclipzehr .gt_font_bold {
   font-weight: bold;
 }
 
-#pvgtfymdng .gt_font_italic {
+#jsclipzehr .gt_font_italic {
   font-style: italic;
 }
 
-#pvgtfymdng .gt_super {
+#jsclipzehr .gt_super {
   font-size: 65%;
 }
 
-#pvgtfymdng .gt_footnote_marks {
+#jsclipzehr .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#pvgtfymdng .gt_asterisk {
+#jsclipzehr .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#pvgtfymdng .gt_indent_1 {
+#jsclipzehr .gt_indent_1 {
   text-indent: 5px;
 }
 
-#pvgtfymdng .gt_indent_2 {
+#jsclipzehr .gt_indent_2 {
   text-indent: 10px;
 }
 
-#pvgtfymdng .gt_indent_3 {
+#jsclipzehr .gt_indent_3 {
   text-indent: 15px;
 }
 
-#pvgtfymdng .gt_indent_4 {
+#jsclipzehr .gt_indent_4 {
   text-indent: 20px;
 }
 
-#pvgtfymdng .gt_indent_5 {
+#jsclipzehr .gt_indent_5 {
   text-indent: 25px;
 }
 
-#pvgtfymdng .katex-display {
+#jsclipzehr .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#pvgtfymdng div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#jsclipzehr div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1474,14 +1470,14 @@ Table&nbsp;2: PA interaction at Marovoay by fokontany (2025 resurvey). ‘Visit 
 <h2 data-number="1.2" class="anchored" data-anchor-id="sec-treat-ala"><span class="header-section-number">1.2</span> Lac Alaotra and the Protected Landscape (2008)</h2>
 <section id="sec-ala-history" class="level3" data-number="1.2.1">
 <h3 data-number="1.2.1" class="anchored" data-anchor-id="sec-ala-history"><span class="header-section-number">1.2.1</span> A different conservation model</h3>
-<p>Lac Alaotra is Madagascar’s largest lake and a critical habitat for the Alaotran gentle lemur (<em>Hapalemur alaotrensis</em>). The Ramsar Convention listed the site in 2003. In 2015, the lake and its marshlands were formally designated as a <em>Paysage Harmonieux Protégé</em> (PHP, 425 km², IUCN Category V — a multipurpose landscape where sustainable use is permitted). However, enforcement through community-based natural resource management (CBNRM) agreements and <em>transferts de gestion</em> had intensified from around 2008 under the management of Durrell Wildlife Conservation Trust. A temporary protection decree (<em>Arrêté</em> 381/2007, 1 August 2007) preceded the intensification. We set the exposure year to <strong>2008</strong>, consistent with the annual-survey convention applied to Ankarafantsika.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>Lac Alaotra is Madagascar’s largest lake and a critical habitat for the Alaotran gentle lemur (<em>Hapalemur alaotrensis</em>). The Ramsar Convention listed the site in 2003. In 2015, the lake and its marshlands were formally designated as a <em>Paysage Harmonieux Protégé</em> (PHP, 425 km², IUCN Category V — a multipurpose landscape where sustainable use is permitted). However, enforcement through community-based natural resource management (CBNRM) agreements and <em>transferts de gestion</em> had intensified from around 2008 under the management of Durrell Wildlife Conservation Trust. A temporary protection decree (<em>Arrêté</em> 381/2007, 1 August 2007) preceded the intensification. We set the exposure year to <strong>2008</strong>, consistent with the annual-survey convention applied to Ankarafantsika.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <p>The key difference from Ankarafantsika is governance: rather than exclusionary enforcement prohibiting all resource extraction, Alaotra’s CBNRM framework regulates lake-marsh use through community-managed access rules, seasonal fishing closures, and habitat restoration agreements. This participatory model is designed to accommodate livelihoods rather than exclude them.</p>
 </section>
 <section id="sec-ala-all-treated" class="level3" data-number="1.2.2">
 <h3 data-number="1.2.2" class="anchored" data-anchor-id="sec-ala-all-treated"><span class="header-section-number">1.2.2</span> Why all Alaotra communities are exposed</h3>
-<p>Unlike Marovoay, there is no natural barrier separating “exposed” from “unexposed” communities at Alaotra. The observatory’s seven <em>fokontany</em> (across three historical survey sites) all depend on the lake-marsh ecosystem. The CBNRM enforcement mechanism — seasonal closures, gear restrictions, marsh-burning bans — applies to all lake-adjacent communities through <em>transferts de gestion</em>.</p>
-<p>A complication specific to Alaotra is the proximity of some eastern hamlets to two additional protected areas: the <strong>Corridor Ankeniheny-Zahamena</strong> (CAZ, IUCN Category VI, managed by Conservation International) and the <strong>Zahamena National Park</strong> (IUCN Category II), which lies north of the CAZ. The hamlet of Mangabe lies closer to the CAZ boundary (~14 km) than to the Lac Alaotra PHP, creating dual-PA exposure.</p>
-<p>We therefore treat the <strong>entire observatory as a single exposed unit</strong>, aggregated to a site-level mean. This is a stronger assumption than the site-level assignment at Marovoay, but it is supported by the uniform enforcement mechanism (CBNRM applies to all lake-adjacent communities) and the behavioural data from the 2025 resurvey discussed below.</p>
+<p>Unlike Marovoay, there is no natural barrier separating “exposed” from “unexposed” communities at Alaotra. The observatory’s seven <em>fokontany</em> (across three historical survey sites) all display modest but not negligible interactions with the lake-marsh ecosystem, with no clear distinctions among themselves in this regard. The co-managed enforcement mechanism — seasonal closures, gear restrictions, marsh-burning bans — also applies to all lake-adjacent communities similarly.</p>
+<p>A complication specific to Alaotra is the proximity of some eastern hamlets to two additional protected areas: the Corridor Ankeniheny-Zahamena (CAZ, IUCN Category VI, managed by Conservation International) and the Zahamena National Park (IUCN Category II), which lies north of the CAZ. The hamlet of Mangabe lies closer to the CAZ boundary (~14 km) than to the Lac Alaotra PHP, creating dual-PA exposure.</p>
+<p>We therefore treat the entire observatory as a single exposed unit, aggregated to a site-level mean. This is a stronger assumption than the site-level assignment at Marovoay, but it is supported by the uniform enforcement mechanism (CBNRM applies to all lake-adjacent communities) and the behavioural data from the 2025 resurvey discussed below.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-map-ala" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1507,23 +1503,23 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
 </figcaption>
 <div aria-describedby="tbl-ala-usage-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="eobmorbprh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#eobmorbprh table {
+<div id="aruvskzxed" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#aruvskzxed table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#eobmorbprh thead, #eobmorbprh tbody, #eobmorbprh tfoot, #eobmorbprh tr, #eobmorbprh td, #eobmorbprh th {
+#aruvskzxed thead, #aruvskzxed tbody, #aruvskzxed tfoot, #aruvskzxed tr, #aruvskzxed td, #aruvskzxed th {
   border-style: none;
 }
 
-#eobmorbprh p {
+#aruvskzxed p {
   margin: 0;
   padding: 0;
 }
 
-#eobmorbprh .gt_table {
+#aruvskzxed .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1549,12 +1545,12 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   border-left-color: #D3D3D3;
 }
 
-#eobmorbprh .gt_caption {
+#aruvskzxed .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#eobmorbprh .gt_title {
+#aruvskzxed .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1566,7 +1562,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   border-bottom-width: 0;
 }
 
-#eobmorbprh .gt_subtitle {
+#aruvskzxed .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1578,7 +1574,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   border-top-width: 0;
 }
 
-#eobmorbprh .gt_heading {
+#aruvskzxed .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1590,13 +1586,13 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   border-right-color: #D3D3D3;
 }
 
-#eobmorbprh .gt_bottom_border {
+#aruvskzxed .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#eobmorbprh .gt_col_headings {
+#aruvskzxed .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1611,7 +1607,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   border-right-color: #D3D3D3;
 }
 
-#eobmorbprh .gt_col_heading {
+#aruvskzxed .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1631,7 +1627,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   overflow-x: hidden;
 }
 
-#eobmorbprh .gt_column_spanner_outer {
+#aruvskzxed .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1643,15 +1639,15 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   padding-right: 4px;
 }
 
-#eobmorbprh .gt_column_spanner_outer:first-child {
+#aruvskzxed .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#eobmorbprh .gt_column_spanner_outer:last-child {
+#aruvskzxed .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#eobmorbprh .gt_column_spanner {
+#aruvskzxed .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1663,11 +1659,11 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   width: 100%;
 }
 
-#eobmorbprh .gt_spanner_row {
+#aruvskzxed .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#eobmorbprh .gt_group_heading {
+#aruvskzxed .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1693,7 +1689,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   text-align: left;
 }
 
-#eobmorbprh .gt_empty_group_heading {
+#aruvskzxed .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1708,15 +1704,15 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   vertical-align: middle;
 }
 
-#eobmorbprh .gt_from_md > :first-child {
+#aruvskzxed .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#eobmorbprh .gt_from_md > :last-child {
+#aruvskzxed .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#eobmorbprh .gt_row {
+#aruvskzxed .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1735,7 +1731,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   overflow-x: hidden;
 }
 
-#eobmorbprh .gt_stub {
+#aruvskzxed .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1748,7 +1744,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   padding-right: 5px;
 }
 
-#eobmorbprh .gt_stub_row_group {
+#aruvskzxed .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1762,15 +1758,15 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   vertical-align: top;
 }
 
-#eobmorbprh .gt_row_group_first td {
+#aruvskzxed .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#eobmorbprh .gt_row_group_first th {
+#aruvskzxed .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#eobmorbprh .gt_summary_row {
+#aruvskzxed .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1780,16 +1776,16 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   padding-right: 5px;
 }
 
-#eobmorbprh .gt_first_summary_row {
+#aruvskzxed .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#eobmorbprh .gt_first_summary_row.thick {
+#aruvskzxed .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#eobmorbprh .gt_last_summary_row {
+#aruvskzxed .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1799,7 +1795,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   border-bottom-color: #D3D3D3;
 }
 
-#eobmorbprh .gt_grand_summary_row {
+#aruvskzxed .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1809,7 +1805,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   padding-right: 5px;
 }
 
-#eobmorbprh .gt_first_grand_summary_row {
+#aruvskzxed .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1819,7 +1815,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   border-top-color: #D3D3D3;
 }
 
-#eobmorbprh .gt_last_grand_summary_row_top {
+#aruvskzxed .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1829,11 +1825,11 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   border-bottom-color: #D3D3D3;
 }
 
-#eobmorbprh .gt_striped {
+#aruvskzxed .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#eobmorbprh .gt_table_body {
+#aruvskzxed .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1842,7 +1838,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   border-bottom-color: #D3D3D3;
 }
 
-#eobmorbprh .gt_footnotes {
+#aruvskzxed .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1856,7 +1852,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   border-right-color: #D3D3D3;
 }
 
-#eobmorbprh .gt_footnote {
+#aruvskzxed .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1865,7 +1861,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   padding-right: 5px;
 }
 
-#eobmorbprh .gt_sourcenotes {
+#aruvskzxed .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1879,7 +1875,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   border-right-color: #D3D3D3;
 }
 
-#eobmorbprh .gt_sourcenote {
+#aruvskzxed .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1887,72 +1883,72 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
   padding-right: 5px;
 }
 
-#eobmorbprh .gt_left {
+#aruvskzxed .gt_left {
   text-align: left;
 }
 
-#eobmorbprh .gt_center {
+#aruvskzxed .gt_center {
   text-align: center;
 }
 
-#eobmorbprh .gt_right {
+#aruvskzxed .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#eobmorbprh .gt_font_normal {
+#aruvskzxed .gt_font_normal {
   font-weight: normal;
 }
 
-#eobmorbprh .gt_font_bold {
+#aruvskzxed .gt_font_bold {
   font-weight: bold;
 }
 
-#eobmorbprh .gt_font_italic {
+#aruvskzxed .gt_font_italic {
   font-style: italic;
 }
 
-#eobmorbprh .gt_super {
+#aruvskzxed .gt_super {
   font-size: 65%;
 }
 
-#eobmorbprh .gt_footnote_marks {
+#aruvskzxed .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#eobmorbprh .gt_asterisk {
+#aruvskzxed .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#eobmorbprh .gt_indent_1 {
+#aruvskzxed .gt_indent_1 {
   text-indent: 5px;
 }
 
-#eobmorbprh .gt_indent_2 {
+#aruvskzxed .gt_indent_2 {
   text-indent: 10px;
 }
 
-#eobmorbprh .gt_indent_3 {
+#aruvskzxed .gt_indent_3 {
   text-indent: 15px;
 }
 
-#eobmorbprh .gt_indent_4 {
+#aruvskzxed .gt_indent_4 {
   text-indent: 20px;
 }
 
-#eobmorbprh .gt_indent_5 {
+#aruvskzxed .gt_indent_5 {
   text-indent: 25px;
 }
 
-#eobmorbprh .katex-display {
+#aruvskzxed .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#eobmorbprh div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#aruvskzxed div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2045,7 +2041,7 @@ Table&nbsp;3: PA interaction at Alaotra by fokontany (2025 resurvey). ‘Visit P
 <li><strong>Extractive use is concentrated and heterogeneous.</strong> Fishing and hunting — the dominant extractive activity, reflecting traditional lake use — involves 21% of households in Ambatomanga but none in Avaradrano or Feramanga Atsimo. The overall extractive rate is 13% of all households.</li>
 <li><strong>Distance, not prohibition, explains non-use.</strong> Among Alaotra non-visitors, the most cited reason is distance (<em>lavitra</em>), at 35%. Legal prohibition is cited by only 8%, consistent with the less restrictive multipurpose framework.</li>
 </ul>
-<p>The relatively uniform <em>visiting</em> rate but sharply differentiated <em>extractive</em> rate suggests that proximity to the ecosystem — rather than engagement with PA-regulated resources — drives the visiting pattern. The uniform exposure assumption is therefore stronger for the CBNRM enforcement mechanism (which applies to all lake-adjacent communities) than for individual extractive dependence (which varies across fokontany).</p>
+<p>The relatively uniform visiting rate but sharply differentiated*extractive rate suggests that proximity to the ecosystem — rather than engagement with PA-regulated resources — drives the visiting pattern.</p>
 </section>
 </section>
 <section id="sec-visit-freq" class="level2" data-number="1.3">
@@ -2164,7 +2160,7 @@ Table&nbsp;4: Donor pool PA exposure classification.
 <h3 data-number="3.2.1" class="anchored" data-anchor-id="sec-gsynth-intuition"><span class="header-section-number">3.2.1</span> Intuition</h3>
 <p>Standard difference-in-differences (DiD) assumes that exposed and control communities would have followed <strong>parallel trends</strong> in the absence of the PA — that is, that income would have evolved at the same rate in PA-adjacent and distant villages. This is a strong assumption: rural villages may diverge over time for reasons unrelated to PAs, such as changing weather patterns, road construction, commodity price shifts, or local governance quality.</p>
 <p>The generalized synthetic control method (gsynth) of <span class="citation" data-cites="Xu2017">Xu (<a href="#ref-Xu2017" role="doc-biblioref">2017</a>)</span> relaxes this assumption. Instead of requiring parallel trends, it allows each village to follow its own trajectory driven by unobserved factors — the method then <em>learns</em> these factors from the pre-treatment data and uses them to project what would have happened after the PA was created.</p>
-<p>In plain language: gsynth looks at how the exposed villages’ income moved <em>before</em> the PA, identifies which combination of donor villages best reproduces that pattern, and then uses those same donors to predict what the exposed villages’ income would have been <em>after</em> the PA — had the PA never existed. The difference between the actual income and this predicted counterfactual is the estimated effect.</p>
+<p>In plain language: gsynth looks at how the exposed villages’ income moved <em>before</em> the PA, identifies which combination of donor villages best reproduces that pattern, and then uses those same donors to predict what the exposed villages’ income would have been <em>after</em> the PA, had the PA never existed. The difference between the actual income and this predicted counterfactual is the estimated effect.</p>
 </section>
 <section id="sec-gsynth-formal" class="level3" data-number="3.2.2">
 <h3 data-number="3.2.2" class="anchored" data-anchor-id="sec-gsynth-formal"><span class="header-section-number">3.2.2</span> Formal specification</h3>
@@ -2175,9 +2171,9 @@ Y_{it} = \alpha_i + \xi_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + D_{it} \c
 <p>where <span class="math inline">\(\alpha_i\)</span> are unit fixed effects (each village has its own baseline income level), <span class="math inline">\(\xi_t\)</span> are time fixed effects (all villages share common year-to-year shocks like droughts or price changes), <span class="math inline">\(\boldsymbol{\lambda}_i' \boldsymbol{f}_t\)</span> are interactive fixed effects (each village responds differently to unobserved time-varying factors), and <span class="math inline">\(D_{it}\)</span> is the treatment indicator. The interactive term <span class="math inline">\(\boldsymbol{\lambda}_i' \boldsymbol{f}_t\)</span> is what distinguishes gsynth from standard DiD: it allows for heterogeneous trends driven by unobserved factors.</p>
 <p>Key implementation choices:</p>
 <ul>
-<li><strong>Factor selection</strong> — leave-one-out cross-validation over <span class="math inline">\(r \in \{0, 1, 2, 3, 4, 5\}\)</span> determines the number of latent factors.</li>
-<li><strong>Inference</strong> — parametric bootstrap with 200 replications.</li>
-<li><strong>Minimum pre-treatment periods</strong> — <span class="math inline">\(\min(T_0) = 3\)</span> to ensure adequate pre-treatment fit.</li>
+<li><strong>Factor selection</strong>: leave-one-out cross-validation over <span class="math inline">\(r \in \{0, 1, 2, 3, 4, 5\}\)</span> determines the number of latent factors.</li>
+<li><strong>Inference</strong>: parametric bootstrap with 200 replications.</li>
+<li><strong>Minimum pre-treatment periods</strong>: <span class="math inline">\(\min(T_0) = 3\)</span> to ensure adequate pre-treatment fit.</li>
 </ul>
 </section>
 <section id="sec-two-models" class="level3" data-number="3.2.3">
@@ -2193,15 +2189,592 @@ Y_{it} = \alpha_i + \xi_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + D_{it} \c
 <h2 data-number="3.3" class="anchored" data-anchor-id="sec-inference"><span class="header-section-number">3.3</span> Inference with few exposed units</h2>
 <p>A fundamental constraint of this design is the small number of exposed units: 2 sites for Marovoay, 1 for Alaotra. With so few exposed clusters, standard statistical tests are unreliable regardless of the estimator chosen.</p>
 <p>To understand this constraint concretely: for Marovoay, the set of observable units within the observatory comprises 4 sites (2 east-bank, 2 west-bank). The number of ways to assign exactly 2 of these 4 units as “exposed” is <span class="math inline">\(\binom{4}{2} = 6\)</span>. Under the sharp null hypothesis of no treatment effect, the <strong>minimum achievable p-value</strong> is therefore <span class="math inline">\(1/6 \approx 0.167\)</span> for a one-sided test. No statistical test based solely on these 4 sites can produce a p-value below 0.167, regardless of how large the observed effect is.</p>
-<p>When all three Alaotra sites are included as additional control donors (expanding the permutation pool to 7 units), the allocation count rises to <span class="math inline">\(\binom{7}{2} = 21\)</span> and the minimum achievable p-value falls to <span class="math inline">\(1/21 \approx 0.048\)</span> — just below the conventional 5% threshold.</p>
+<p>When all three Alaotra sites are included as additional control donors (expanding the permutation pool to 7 units), the allocation count rises to <span class="math inline">\(\binom{7}{2} = 21\)</span> and the minimum achievable p-value falls to <span class="math inline">\(1/21 \approx 0.048\)</span>, that is just below the conventional 5% threshold.</p>
 <p>We report gsynth bootstrap confidence intervals and p-values throughout, but interpret them in light of this <strong>power ceiling</strong>. The inability to reject the null at conventional thresholds does not imply absence of effect; it may simply reflect the inherent inferential limitations of quasi-experimental designs with few geographic units. Placebo-in-space tests (<a href="./A3_robustness.html">Appendix C</a>) provide complementary evidence on the uniqueness of estimated effects.</p>
 </section>
 <section id="sec-complementary" class="level2" data-number="3.4">
-<h2 data-number="3.4" class="anchored" data-anchor-id="sec-complementary"><span class="header-section-number">3.4</span> Complementary estimators</h2>
-<p>To assess the sensitivity of our findings to modelling choices, we complement the main gsynth analysis with two alternative approaches (detailed in <a href="./A3_robustness.html">Appendix C</a>):</p>
-<p><strong>Synthetic Difference-in-Differences (SDID).</strong> SDID <span class="citation" data-cites="Arkhangelsky2021">(<a href="#ref-Arkhangelsky2021" role="doc-biblioref">Arkhangelsky et al. 2021</a>)</span> combines the strengths of traditional DiD and synthetic control. Like DiD, it is invariant to additive shifts across units (no need for exact pre-treatment level matching). Like synthetic control, it reweights control units to match pre-treatment <em>trends</em>. It also adds <strong>time weights</strong> that concentrate comparison on the pre-treatment periods most predictive of post-treatment outcomes. The key property is <strong>double robustness</strong>: SDID is consistent if <em>either</em> the unit weights or the time weights successfully remove confounding — the factor structure need not be correctly specified in both dimensions simultaneously.</p>
-<p><strong>Two-way fixed effects (TWFE).</strong> Standard TWFE DiD serves as a benchmark. Where pre-treatment trends are approximately parallel, TWFE and gsynth should agree; divergence signals that the parallel-trends assumption is consequential.</p>
-<p>The key diagnostic across all three approaches is whether they <strong>agree on the sign and approximate magnitude</strong> of the treatment effect. Convergence across estimators with different identifying assumptions strengthens causal claims; divergence signals sensitivity to modelling choices.</p>
+<h2 data-number="3.4" class="anchored" data-anchor-id="sec-complementary"><span class="header-section-number">3.4</span> Complementary household-level designs</h2>
+<p>The gsynth analysis above operates on <strong>village-year aggregates</strong> and identifies treatment effects against an <strong>outside donor pool</strong> of clean observatories. We complement it with two within-observatory <strong>household-level repeated cross-section</strong> designs that exploit a different identifying contrast: exposure-intensity heterogeneity <em>inside</em> each observatory. The two layers of inference are deliberately distinct, and their agreement (or disagreement) is itself informative.</p>
+<p><strong>Sampling distinction.</strong> Because the ROS is a rotating panel, households are not tracked across waves. The valid household-level estimator is therefore a <strong>repeated cross-section</strong> Callaway–Sant’Anna design <span class="citation" data-cites="CallawayS2021">(<a href="#ref-CallawayS2021" role="doc-biblioref">Callaway and Sant’Anna 2021</a>)</span> with <code>panel = FALSE</code>, which treats each wave as an independent cross-section of households within sites and aggregates over the household-level observations through the doubly-robust 2-period moment of <span class="citation" data-cites="SantAnnaZhao2020">Sant’Anna and Zhao (<a href="#ref-SantAnnaZhao2020" role="doc-biblioref">2020</a>)</span>. Site fixed effects (not household fixed effects) absorb time-invariant unobserved heterogeneity. We run the design on the 1999–2014 waves extended with the 2025 resurvey.</p>
+<p><strong>Two exposure-intensity proxies.</strong> For each observatory we build a binary treatment indicator from one of two within-observatory contrasts:</p>
+<ul>
+<li><strong>Geographic exposure.</strong> Distance to the nearest PA boundary, or — at Marovoay — east-bank versus west-bank assignment, as motivated in <a href="#sec-treat-maro" class="quarto-xref">Section&nbsp;1.1</a> by the Betsiboka river barrier.</li>
+<li><strong>Behavioural exposure.</strong> The 2025 share of households declaring at least one PA-dependent extractive use (<a href="#sec-maro-usage" class="quarto-xref">Section&nbsp;1.1.3</a>, <a href="#sec-ala-usage" class="quarto-xref">Section&nbsp;1.2.3</a>), with a cut at ≥ 12.5% defining the <em>high-usage</em> group.</li>
+</ul>
+<p>For Alaotra both proxies are reported (the seven merged fokontany span both a meaningful distance gradient — 8.9 to 16.3 km from the nearest PA — and a meaningful extractive-use gradient — 0.7% to 26.5%). For Marovoay only the geographic proxy is reported, because extractive use is rare on both banks (peak: 11.4% at Bepako; <a href="#sec-maro-usage" class="quarto-xref">Section&nbsp;1.1.3</a>) and a 12.5% cut leaves no treated unit.</p>
+<div class="cell">
+<div id="tbl-secondary-design" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-secondary-design-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5: Within-observatory exposure-intensity classifications used by the secondary household-level RCS designs. Distance and bank are pre-determined geography; extractive-use share is measured on the 2025 resurvey under the same definition as <a href="#sec-maro-usage" class="quarto-xref">Section&nbsp;1.1.3</a> and <a href="#sec-ala-usage" class="quarto-xref">Section&nbsp;1.2.3</a>. The two Alaotra fokontany pairs Ambodivoara/Maritampona and Ambatoharanana/Analamiranga are merged onto their older centroids to align the 1999–2014 frame with the 2025 GPS enumeration.
+</figcaption>
+<div aria-describedby="tbl-secondary-design-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="cgcaknufzw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#cgcaknufzw table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#cgcaknufzw thead, #cgcaknufzw tbody, #cgcaknufzw tfoot, #cgcaknufzw tr, #cgcaknufzw td, #cgcaknufzw th {
+  border-style: none;
+}
+
+#cgcaknufzw p {
+  margin: 0;
+  padding: 0;
+}
+
+#cgcaknufzw .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#cgcaknufzw .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#cgcaknufzw .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#cgcaknufzw .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#cgcaknufzw .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#cgcaknufzw .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cgcaknufzw .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#cgcaknufzw .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#cgcaknufzw .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#cgcaknufzw .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#cgcaknufzw .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#cgcaknufzw .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#cgcaknufzw .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#cgcaknufzw .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#cgcaknufzw .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#cgcaknufzw .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#cgcaknufzw .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#cgcaknufzw .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#cgcaknufzw .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cgcaknufzw .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#cgcaknufzw .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#cgcaknufzw .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#cgcaknufzw .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cgcaknufzw .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#cgcaknufzw .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#cgcaknufzw .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cgcaknufzw .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cgcaknufzw .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#cgcaknufzw .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cgcaknufzw .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#cgcaknufzw .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cgcaknufzw .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#cgcaknufzw .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cgcaknufzw .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#cgcaknufzw .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cgcaknufzw .gt_left {
+  text-align: left;
+}
+
+#cgcaknufzw .gt_center {
+  text-align: center;
+}
+
+#cgcaknufzw .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#cgcaknufzw .gt_font_normal {
+  font-weight: normal;
+}
+
+#cgcaknufzw .gt_font_bold {
+  font-weight: bold;
+}
+
+#cgcaknufzw .gt_font_italic {
+  font-style: italic;
+}
+
+#cgcaknufzw .gt_super {
+  font-size: 65%;
+}
+
+#cgcaknufzw .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#cgcaknufzw .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#cgcaknufzw .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#cgcaknufzw .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#cgcaknufzw .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#cgcaknufzw .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#cgcaknufzw .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#cgcaknufzw .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#cgcaknufzw div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal gt_bottom_border">Secondary DiD: exposure-intensity classifications</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="Site" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Site</th>
+<th id="Distance-/-bank" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Distance / bank</th>
+<th id="a%-extractive-(2025)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">% extractive (2025)</th>
+<th id="Geographic" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Geographic</th>
+<th id="Behavioural" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Behavioural</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="gt_group_heading_row odd">
+<th colspan="5" id="Marovoay" class="gt_group_heading" data-quarto-table-cell-role="th" scope="colgroup">Marovoay</th>
+</tr>
+<tr class="gt_row_group_first even">
+<td class="gt_row gt_left" headers="Marovoay  Site">Bepako</td>
+<td class="gt_row gt_left" headers="Marovoay  Distance / bank">east</td>
+<td class="gt_row gt_right" headers="Marovoay  % extractive (2025)">11.4</td>
+<td class="gt_row gt_left" headers="Marovoay  Geographic">treated</td>
+<td class="gt_row gt_left" headers="Marovoay  Behavioural">—</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Marovoay  Site">Madiromiongana</td>
+<td class="gt_row gt_left" headers="Marovoay  Distance / bank">east</td>
+<td class="gt_row gt_right" headers="Marovoay  % extractive (2025)">8.8</td>
+<td class="gt_row gt_left" headers="Marovoay  Geographic">treated</td>
+<td class="gt_row gt_left" headers="Marovoay  Behavioural">—</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Marovoay  Site">Ampijoroa</td>
+<td class="gt_row gt_left" headers="Marovoay  Distance / bank">west</td>
+<td class="gt_row gt_right" headers="Marovoay  % extractive (2025)">0.7</td>
+<td class="gt_row gt_left" headers="Marovoay  Geographic">control</td>
+<td class="gt_row gt_left" headers="Marovoay  Behavioural">—</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Marovoay  Site">Maroala</td>
+<td class="gt_row gt_left" headers="Marovoay  Distance / bank">west</td>
+<td class="gt_row gt_right" headers="Marovoay  % extractive (2025)">1.7</td>
+<td class="gt_row gt_left" headers="Marovoay  Geographic">control</td>
+<td class="gt_row gt_left" headers="Marovoay  Behavioural">—</td>
+</tr>
+<tr class="gt_group_heading_row even">
+<th colspan="5" id="Alaotra" class="gt_group_heading" data-quarto-table-cell-role="th" scope="colgroup">Alaotra</th>
+</tr>
+<tr class="gt_row_group_first odd">
+<td class="gt_row gt_left" headers="Alaotra  Site">Ambodivoara-Maritampona</td>
+<td class="gt_row gt_left" headers="Alaotra  Distance / bank">8.9 km</td>
+<td class="gt_row gt_right" headers="Alaotra  % extractive (2025)">20.7</td>
+<td class="gt_row gt_left" headers="Alaotra  Geographic">treated</td>
+<td class="gt_row gt_left" headers="Alaotra  Behavioural">treated</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Alaotra  Site">Ambatoharanana-Analamiranga</td>
+<td class="gt_row gt_left" headers="Alaotra  Distance / bank">9.5 km</td>
+<td class="gt_row gt_right" headers="Alaotra  % extractive (2025)">13.0</td>
+<td class="gt_row gt_left" headers="Alaotra  Geographic">treated</td>
+<td class="gt_row gt_left" headers="Alaotra  Behavioural">treated</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Alaotra  Site">Avaradrano</td>
+<td class="gt_row gt_left" headers="Alaotra  Distance / bank">10.4 km</td>
+<td class="gt_row gt_right" headers="Alaotra  % extractive (2025)">6.7</td>
+<td class="gt_row gt_left" headers="Alaotra  Geographic">treated</td>
+<td class="gt_row gt_left" headers="Alaotra  Behavioural">control</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Alaotra  Site">Mangabe</td>
+<td class="gt_row gt_left" headers="Alaotra  Distance / bank">14.0 km</td>
+<td class="gt_row gt_right" headers="Alaotra  % extractive (2025)">8.2</td>
+<td class="gt_row gt_left" headers="Alaotra  Geographic">control</td>
+<td class="gt_row gt_left" headers="Alaotra  Behavioural">control</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Alaotra  Site">Feramanga Atsimo</td>
+<td class="gt_row gt_left" headers="Alaotra  Distance / bank">14.7 km</td>
+<td class="gt_row gt_right" headers="Alaotra  % extractive (2025)">3.4</td>
+<td class="gt_row gt_left" headers="Alaotra  Geographic">control</td>
+<td class="gt_row gt_left" headers="Alaotra  Behavioural">control</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Alaotra  Site">Ambohidrony</td>
+<td class="gt_row gt_left" headers="Alaotra  Distance / bank">14.8 km</td>
+<td class="gt_row gt_right" headers="Alaotra  % extractive (2025)">21.2</td>
+<td class="gt_row gt_left" headers="Alaotra  Geographic">control</td>
+<td class="gt_row gt_left" headers="Alaotra  Behavioural">treated</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Alaotra  Site">Ambatomanga</td>
+<td class="gt_row gt_left" headers="Alaotra  Distance / bank">16.3 km</td>
+<td class="gt_row gt_right" headers="Alaotra  % extractive (2025)">26.5</td>
+<td class="gt_row gt_left" headers="Alaotra  Geographic">control</td>
+<td class="gt_row gt_left" headers="Alaotra  Behavioural">treated</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p><strong>Inference.</strong> Because the cluster count is small (G = 4 sites at Marovoay, G = 5 merged fokontany at Alaotra), we report two standard errors for every point estimate: the design-based, influence-function SE — valid if the estimand is the ATT on these specific sites conditional on the observed treatment assignment — and the site-clustered SE, valid for super-population inference. The gap between the two is informative about how much identifying variation lives across versus within sites.</p>
+<p><strong>Limitations.</strong> Four caveats are inescapable and should be kept in mind when reading the results.</p>
+<ol type="1">
+<li><strong>No clean within-observatory control.</strong> Every site in either observatory is exposed to the conservation framework to some degree; the “control” group is just the <em>less exposed</em> subset.</li>
+<li><strong>Distance is Euclidean.</strong> Straight-line distance to the PA boundary is not the same as practical accessibility — terrain, roads and rivers all matter and are only partially captured (the river barrier at Marovoay is captured by the bank cut).</li>
+<li><strong>Extractive usage is post-treatment endogenous.</strong> The 2025 extractive share is measured <em>after</em> exposure, so a fokontany depressed by enforcement could appear less (or more) extractive today as a consequence of the treatment.</li>
+<li><strong>Small G.</strong> With only four to seven sites the cluster-robust SE is wide; the design-based IF SE is tighter but identifies a more restrictive estimand.</li>
+</ol>
+<p>For these reasons the secondary designs are explicitly <strong>complementary</strong> rather than confirmatory of the main gsynth analysis. Where they agree with gsynth (Alaotra), the agreement narrows the range of plausible interpretations; where they disagree (Marovoay), the disagreement diagnoses <em>which</em> identifying contrast is doing the work in each estimator. Two further estimators — Synthetic DiD <span class="citation" data-cites="Arkhangelsky2021">(<a href="#ref-Arkhangelsky2021" role="doc-biblioref">Arkhangelsky et al. 2021</a>)</span> and standard two-way fixed effects — are reported in <a href="./A3_robustness.html">Appendix C</a> as additional sensitivity checks against the gsynth specification choice.</p>
 </section>
 </section>
 <section id="sec-extensions" class="level1" data-number="4">
@@ -2210,7 +2783,7 @@ Y_{it} = \alpha_i + \xi_t + \boldsymbol{\lambda}_i' \boldsymbol{f}_t + D_{it} \c
 <div id="tbl-ext-cases" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-ext-cases-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;5: Extension observatories.
+Table&nbsp;6: Extension observatories.
 </figcaption>
 <div aria-describedby="tbl-ext-cases-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -2260,14 +2833,8 @@ Table&nbsp;5: Extension observatories.
 <p>These three observatories move from liabilities in the donor pool to informative exposed units, enabling a five-case comparison of how conservation governance type, enforcement intensity, and PA size shape household-income outcomes. The shorter post-exposure windows (8–9 years versus 12 for Marovoay and 7 for Alaotra) limit precision but broaden the institutional variation. The full analysis is presented in <a href="./05_extensions.html">Chapter 5</a>.</p>
 </section>
 <section id="sec-did-roadmap" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Looking ahead: household-level estimation</h1>
-<p>The gsynth approach is well-suited to the current data but operates at the village level, discarding within-village household heterogeneity. A richer household-level analysis requires a different strategy.</p>
-<p>Because the ROS is a rotating panel, the valid household-level approach is a <strong>repeated cross-section DiD</strong> — treating each survey wave as an independent cross-section and using site and year fixed effects (not household fixed effects) to absorb unobserved heterogeneity. The estimating equation is:</p>
-<p><span class="math display">\[
-\ln y_{ist} = \alpha_s + \lambda_t + \delta \cdot D_{st} + \varepsilon_{ist}
-\]</span></p>
-<p>where <span class="math inline">\(\alpha_s\)</span> are site fixed effects, <span class="math inline">\(\lambda_t\)</span> year fixed effects, and <span class="math inline">\(D_{st}\)</span> the treatment indicator for site <span class="math inline">\(s\)</span> at time <span class="math inline">\(t\)</span>. Standard errors are clustered at the site level.</p>
-<p>The 2025 resurvey opens a particularly powerful design: a <strong>long-run 2×2 DiD</strong> comparing the pre-treatment period (1999–2002) to the 2025 wave — a 23-year post-exposure observation that bypasses all intermediate panel-gap issues. Combined with a <strong>Callaway–Sant’Anna</strong> estimator exploiting four staggered exposure cohorts (Ankarafantsika 2003, Farafangana/Toliara/Fenérive 2006–07, Alaotra 2008, plus never-exposed), and <strong>Sun–Abraham event studies</strong> via <code>fixest::sunab()</code>, the 2026 survey wave will enable fully household-level inference. This forward-looking design is discussed further in <a href="./06_discussion.html">Chapter 6</a>.</p>
+<h1 data-number="5"><span class="header-section-number">5</span> Looking ahead: full household-level estimation</h1>
+<p>The secondary RCS designs introduced in <a href="#sec-complementary" class="quarto-xref">Section&nbsp;3.4</a> already exploit household-level information within each observatory, but they remain limited by the small number of sites available <em>inside</em> a single observatory (G = 4 to 7). A richer household-level analysis would pool all five exposed observatories together with the never-exposed donors into a single staggered-treatment design, exploiting four staggered exposure cohorts (Ankarafantsika 2003, Farafangana/Toliara/Fenérive 2006–07, Alaotra 2008, plus never-exposed). The natural estimator is again Callaway–Sant’Anna with <code>panel = FALSE</code>, complemented by Sun–Abraham event studies via <code>fixest::sunab()</code>. The 2026 ROS wave will increase post-exposure information and is expected to sharpen these estimates further. This forward-looking design is discussed in <strong>?@sec-next-steps</strong>.</p>
 
 
 
@@ -2284,8 +2851,14 @@ Arkhangelsky, Dmitry, Susan Athey, David A. Hirshberg, Guido W. Imbens, and Stef
 <div id="ref-brondeau1999" class="csl-entry" role="listitem">
 Brondeau, Alain. 1999. <span>“La Forêt d’<span>Ankarafantsika</span>: Analyse Spatiale Et Étude de La Dynamique de La Déforestation.”</span> Master’s thesis, Université de Montpellier.
 </div>
+<div id="ref-CallawayS2021" class="csl-entry" role="listitem">
+Callaway, Brantly, and Pedro H. C. Sant’Anna. 2021. <span>“Difference-in-Differences with Multiple Time Periods.”</span> <em>Journal of Econometrics</em> 225 (2): 200–230. <a href="https://doi.org/10.1016/j.jeconom.2020.12.001">https://doi.org/10.1016/j.jeconom.2020.12.001</a>.
+</div>
 <div id="ref-ChabeFerret2024" class="csl-entry" role="listitem">
 Chabé-Ferret, Sylvain, Yann Dupraz, and Faly Ratsimbazafy. 2024. <span>“Attrition in Rotating Household Panels: Implications for Causal Inference.”</span> <em>Working Paper</em>.
+</div>
+<div id="ref-SantAnnaZhao2020" class="csl-entry" role="listitem">
+Sant’Anna, Pedro H. C., and Jun Zhao. 2020. <span>“Doubly Robust Difference-in-Differences Estimators.”</span> <em>Journal of Econometrics</em> 219 (1): 101–22. <a href="https://doi.org/10.1016/j.jeconom.2020.06.003">https://doi.org/10.1016/j.jeconom.2020.06.003</a>.
 </div>
 <div id="ref-Xu2017" class="csl-entry" role="listitem">
 Xu, Yiqing. 2017. <span>“Generalized Synthetic Control Method: Causal Inference with Interactive Fixed Effects Models.”</span> <em>Political Analysis</em> 25 (1): 57–76. <a href="https://doi.org/10.1017/pan.2016.2">https://doi.org/10.1017/pan.2016.2</a>.
@@ -2293,8 +2866,7 @@ Xu, Yiqing. 2017. <span>“Generalized Synthetic Control Method: Causal Inferenc
 </div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>Decree 2002-798 was signed on 7 August 2002. Because the ROS survey is conducted annually and we attribute any effect to the first full survey year following the decree, we set the exposure year to 2003. Using 2002 instead has negligible impact on the estimated ATT.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>An alternative exposure year of 2007 is defensible; using 2007 instead has negligible impact on the estimated ATT, given that the post-exposure window contains up to seven observations under either assumption.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>An alternative exposure year of 2007 is defensible; using 2007 instead has negligible impact on the estimated ATT, given that the post-exposure window contains up to seven observations under either assumption.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

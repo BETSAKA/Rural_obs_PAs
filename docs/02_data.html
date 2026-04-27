@@ -357,7 +357,7 @@ window.Quarto = {
 </header>
 
 
-<p>This chapter summarises the data construction pipeline. The full reproducible workflow — georeferencing, PA overlap analysis, and variable harmonisation — is documented in <a href="./A1_data_pipeline.html">Appendix A</a>. The underlying survey data are described in a companion data paper <span class="citation" data-cites="Andrianjafindrainibe2024">(<a href="#ref-Andrianjafindrainibe2024" role="doc-biblioref">Andrianjafindrainibe et al. 2024</a>)</span>; supplementary materials and replication code are available in the <a href="https://doi.org/10.1038/s41597-024-03879-9">associated repository</a>.</p>
+<p>This chapter summarises the data construction process. The full reproducible workflow — georeferencing, PA overlap analysis, and variable harmonisation — is documented in <a href="./A1_data_pipeline.html">Appendix A</a>. The underlying survey data are described in a companion data paper <span class="citation" data-cites="Andrianjafindrainibe2024">(<a href="#ref-Andrianjafindrainibe2024" role="doc-biblioref">Andrianjafindrainibe et al. 2024</a>)</span>; supplementary materials and replication code are available in the <a href="https://doi.org/10.1038/s41597-024-03879-9">associated repository</a>.</p>
 <section id="sec-survey-data" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Survey data</h1>
 <p>The Rural Observatory System (ROS) surveyed rural households across Madagascar from 1995 to 2015. Many observatories remained active for only a few years. We use 11 observatories that were active by 1999-2000 and had at least 6 years of survey data. This dataset comprises approximately 101,253 household-year observations. Each observatory tracks ~500 households per year in a rotating panel design, with random replacement of attrited households preserving cross-sectional representativeness.</p>
@@ -403,8 +403,8 @@ Figure&nbsp;2: Year-by-year data coverage across observatories and survey sites.
 </section>
 <section id="sec-pa-overlaps" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Protected area overlaps</h1>
-<p>Standard PA databases — including the current WDPA and the Vahatra atlas — record only the <strong>most recent boundary and designation</strong> of each protected area. They do not capture boundary changes (e.g., Ankarafantsika’s 2002 extension roughly doubled the effectively protected area), temporary protection decrees that imposed de facto restrictions years before formal designation, or date errors (many WDPA entries carry incorrect <code>STATUS_YR</code> values).</p>
-<p>We instead use a <strong>dynamic WDPA for Madagascar</strong> — a temporally explicit database that assigns each PA state a precise valid-from / valid-to interval derived from legal texts and the CNLEGIS database. This enables us to determine whether an observatory was adjacent to an <em>active</em> PA at any given point during the study period (see <a href="./A2_donor_validity.html">Appendix B</a> for full construction details).</p>
+<p>Standard PA databases — including the current WDPA and the Vahatra atlas — record only the most recent boundary and designation of each protected area. They do not capture boundary changes (e.g., Ankarafantsika’s 2002 extension roughly doubled the effectively protected area), temporary protection decrees that imposed de facto restrictions years before formal designation, or date errors (many WDPA entries carry incorrect <code>STATUS_YR</code> values).</p>
+<p>We instead use a dynamic WDPA for Madagascar — a temporally explicit database that assigns each PA state a precise valid-from / valid-to interval derived from the Madagascar CNLEGIS legal texts database and historical versions of the SAPM geospatial database [<strong>INCLUDE REFERENCE DATA PAPER</strong>]. This enables us to determine whether an observatory was adjacent to an <em>active</em> PA at any given point during the study period (see <a href="./A2_donor_validity.html">Appendix B</a> for full construction details).</p>
 <p>For each of the 11 study observatories, we compute the minimum distance from commune centroids (projected to UTM 38S) to the nearest PA boundary active during 1999–2014. All (commune, PA) pairs within 20 km are flagged. Three temporal configurations emerge:</p>
 <div id="tbl-pa-timing" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -455,7 +455,7 @@ Figure&nbsp;3: Survey coverage windows and PA exposure events for the 11 study o
 </div>
 </div>
 </div>
-<p><a href="#fig-pa-overlaps" class="quarto-xref">Figure&nbsp;3</a> reveals a stark trade-off between PA proximity and survey design: the ROS was designed for agricultural monitoring, not conservation impact evaluation, so observatories near PAs often lack the panel depth needed for synthetic control estimation. Gsynth requires sufficient pre-treatment years to learn unit-specific factor loadings, and sufficient post-treatment years for the counterfactual to be informative. We apply a minimum threshold of 4 pre-exposure and 3 post-exposure survey years.</p>
+<p><a href="#fig-pa-overlaps" class="quarto-xref">Figure&nbsp;3</a> shows that although the ROS was designed for agricultural monitoring, not conservation impact evaluation, some PAs were created relatively near from observatory sites. Gsynth requires sufficient pre-treatment years to learn unit-specific factor loadings, and sufficient post-treatment years for the counterfactual to be informative. We apply a minimum threshold of 4 pre-exposure and 3 post-exposure survey years.</p>
 <p>The two primary pairs — <strong>Marovoay / Ankarafantsika</strong> (strict, IUCN II, 2003 extension) and <strong>Alaotra / Lac Alaotra</strong> (multipurpose, IUCN V, 2007 temporary decree) — offer the longest pre- and post-exposure windows. Three additional pairs — Farafangana, Toliara North, and Fénérive East — provide shorter but informative extensions (<a href="./05_extensions.html">Chapter 5</a>). Observatories without a nearby PA (shown in blue) serve as the donor pool. A systematic spatial audit of donor pool validity is presented in <a href="./A2_donor_validity.html">Appendix B</a>.</p>
 </section>
 <section id="sec-outcome" class="level1" data-number="4">
@@ -463,11 +463,11 @@ Figure&nbsp;3: Survey coverage windows and PA exposure events for the 11 study o
 <p>The primary outcome is <strong>log equivalised household income</strong>. Construction proceeds as follows:</p>
 <ol type="1">
 <li><p><strong>Total income</strong> (<code>revtot</code>) — the sum of current income components: rice revenue (<code>rev_riz</code>), other crop revenue (<code>rev_cu</code>), livestock revenue (<code>revel</code>), fishing revenue (<code>revpeche</code>), principal activity income (<code>revppal</code>), and secondary activity income (<code>revsec</code>). Missing components are set to zero; the total is imputed from available sub-components when <code>revtot</code> itself is missing.</p></li>
-<li><p><strong>Equivalisation</strong> — using the OECD-modified scale: <span class="math inline">\(1 + 0.5 \times (\text{additional adults}) + 0.3 \times (\text{children under 14})\)</span>, computed from individual-level demographic records.</p></li>
-<li><p><strong>Winsorisation</strong> — at the 1st and 99th percentiles within each year to limit the influence of extreme values.</p></li>
+<li><p><strong>Equivalisation</strong>: using the OECD-modified scale: <span class="math inline">\(1 + 0.5 \times (\text{additional adults}) + 0.3 \times (\text{children under 14})\)</span>, computed from individual-level demographic records <span class="citation" data-cites="karvonen2021">(<a href="#ref-karvonen2021" role="doc-biblioref">Karvonen et al. 2021</a>)</span>.</p></li>
+<li><p><strong>Winsorisation</strong>: at the 1st and 99th percentiles within each year to limit the influence of extreme values.</p></li>
 <li><p><strong>Log transformation</strong> — <span class="math inline">\(y_{it} = \log(\text{equivalised income}_{it} + 1)\)</span>.</p></li>
 </ol>
-<p>Cross-year harmonisation is non-trivial: variable names, questionnaire modules, and income definitions changed across survey waves. The full details of these adjustments are in <a href="./A1_data_pipeline.html">Appendix A</a>.</p>
+<p>Cross-year harmonisation is not trivial: variable names, questionnaire modules, and income definitions changed across survey waves. The full details of these adjustments are in <a href="./A1_data_pipeline.html">Appendix A</a>.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-income-trends" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -493,23 +493,23 @@ Table&nbsp;2: Summary statistics for the analysis sample.
 </figcaption>
 <div aria-describedby="tbl-descriptives-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="vldsnhjjtl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#vldsnhjjtl table {
+<div id="hscsusivkz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#hscsusivkz table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#vldsnhjjtl thead, #vldsnhjjtl tbody, #vldsnhjjtl tfoot, #vldsnhjjtl tr, #vldsnhjjtl td, #vldsnhjjtl th {
+#hscsusivkz thead, #hscsusivkz tbody, #hscsusivkz tfoot, #hscsusivkz tr, #hscsusivkz td, #hscsusivkz th {
   border-style: none;
 }
 
-#vldsnhjjtl p {
+#hscsusivkz p {
   margin: 0;
   padding: 0;
 }
 
-#vldsnhjjtl .gt_table {
+#hscsusivkz .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -535,12 +535,12 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   border-left-color: #D3D3D3;
 }
 
-#vldsnhjjtl .gt_caption {
+#hscsusivkz .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#vldsnhjjtl .gt_title {
+#hscsusivkz .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -552,7 +552,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   border-bottom-width: 0;
 }
 
-#vldsnhjjtl .gt_subtitle {
+#hscsusivkz .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -564,7 +564,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   border-top-width: 0;
 }
 
-#vldsnhjjtl .gt_heading {
+#hscsusivkz .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -576,13 +576,13 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   border-right-color: #D3D3D3;
 }
 
-#vldsnhjjtl .gt_bottom_border {
+#hscsusivkz .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#vldsnhjjtl .gt_col_headings {
+#hscsusivkz .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -597,7 +597,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   border-right-color: #D3D3D3;
 }
 
-#vldsnhjjtl .gt_col_heading {
+#hscsusivkz .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -617,7 +617,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   overflow-x: hidden;
 }
 
-#vldsnhjjtl .gt_column_spanner_outer {
+#hscsusivkz .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -629,15 +629,15 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   padding-right: 4px;
 }
 
-#vldsnhjjtl .gt_column_spanner_outer:first-child {
+#hscsusivkz .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#vldsnhjjtl .gt_column_spanner_outer:last-child {
+#hscsusivkz .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#vldsnhjjtl .gt_column_spanner {
+#hscsusivkz .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -649,11 +649,11 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   width: 100%;
 }
 
-#vldsnhjjtl .gt_spanner_row {
+#hscsusivkz .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#vldsnhjjtl .gt_group_heading {
+#hscsusivkz .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -679,7 +679,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   text-align: left;
 }
 
-#vldsnhjjtl .gt_empty_group_heading {
+#hscsusivkz .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -694,15 +694,15 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   vertical-align: middle;
 }
 
-#vldsnhjjtl .gt_from_md > :first-child {
+#hscsusivkz .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#vldsnhjjtl .gt_from_md > :last-child {
+#hscsusivkz .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#vldsnhjjtl .gt_row {
+#hscsusivkz .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -721,7 +721,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   overflow-x: hidden;
 }
 
-#vldsnhjjtl .gt_stub {
+#hscsusivkz .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -734,7 +734,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   padding-right: 5px;
 }
 
-#vldsnhjjtl .gt_stub_row_group {
+#hscsusivkz .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -748,15 +748,15 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   vertical-align: top;
 }
 
-#vldsnhjjtl .gt_row_group_first td {
+#hscsusivkz .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#vldsnhjjtl .gt_row_group_first th {
+#hscsusivkz .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#vldsnhjjtl .gt_summary_row {
+#hscsusivkz .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -766,16 +766,16 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   padding-right: 5px;
 }
 
-#vldsnhjjtl .gt_first_summary_row {
+#hscsusivkz .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#vldsnhjjtl .gt_first_summary_row.thick {
+#hscsusivkz .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#vldsnhjjtl .gt_last_summary_row {
+#hscsusivkz .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -785,7 +785,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   border-bottom-color: #D3D3D3;
 }
 
-#vldsnhjjtl .gt_grand_summary_row {
+#hscsusivkz .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -795,7 +795,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   padding-right: 5px;
 }
 
-#vldsnhjjtl .gt_first_grand_summary_row {
+#hscsusivkz .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -805,7 +805,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   border-top-color: #D3D3D3;
 }
 
-#vldsnhjjtl .gt_last_grand_summary_row_top {
+#hscsusivkz .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -815,11 +815,11 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   border-bottom-color: #D3D3D3;
 }
 
-#vldsnhjjtl .gt_striped {
+#hscsusivkz .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#vldsnhjjtl .gt_table_body {
+#hscsusivkz .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -828,7 +828,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   border-bottom-color: #D3D3D3;
 }
 
-#vldsnhjjtl .gt_footnotes {
+#hscsusivkz .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -842,7 +842,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   border-right-color: #D3D3D3;
 }
 
-#vldsnhjjtl .gt_footnote {
+#hscsusivkz .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -851,7 +851,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   padding-right: 5px;
 }
 
-#vldsnhjjtl .gt_sourcenotes {
+#hscsusivkz .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -865,7 +865,7 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   border-right-color: #D3D3D3;
 }
 
-#vldsnhjjtl .gt_sourcenote {
+#hscsusivkz .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -873,72 +873,72 @@ Table&nbsp;2: Summary statistics for the analysis sample.
   padding-right: 5px;
 }
 
-#vldsnhjjtl .gt_left {
+#hscsusivkz .gt_left {
   text-align: left;
 }
 
-#vldsnhjjtl .gt_center {
+#hscsusivkz .gt_center {
   text-align: center;
 }
 
-#vldsnhjjtl .gt_right {
+#hscsusivkz .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#vldsnhjjtl .gt_font_normal {
+#hscsusivkz .gt_font_normal {
   font-weight: normal;
 }
 
-#vldsnhjjtl .gt_font_bold {
+#hscsusivkz .gt_font_bold {
   font-weight: bold;
 }
 
-#vldsnhjjtl .gt_font_italic {
+#hscsusivkz .gt_font_italic {
   font-style: italic;
 }
 
-#vldsnhjjtl .gt_super {
+#hscsusivkz .gt_super {
   font-size: 65%;
 }
 
-#vldsnhjjtl .gt_footnote_marks {
+#hscsusivkz .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#vldsnhjjtl .gt_asterisk {
+#hscsusivkz .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#vldsnhjjtl .gt_indent_1 {
+#hscsusivkz .gt_indent_1 {
   text-indent: 5px;
 }
 
-#vldsnhjjtl .gt_indent_2 {
+#hscsusivkz .gt_indent_2 {
   text-indent: 10px;
 }
 
-#vldsnhjjtl .gt_indent_3 {
+#hscsusivkz .gt_indent_3 {
   text-indent: 15px;
 }
 
-#vldsnhjjtl .gt_indent_4 {
+#hscsusivkz .gt_indent_4 {
   text-indent: 20px;
 }
 
-#vldsnhjjtl .gt_indent_5 {
+#hscsusivkz .gt_indent_5 {
   text-indent: 25px;
 }
 
-#vldsnhjjtl .katex-display {
+#hscsusivkz .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#vldsnhjjtl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#hscsusivkz div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1015,6 +1015,9 @@ Table&nbsp;2: Summary statistics for the analysis sample.
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-Andrianjafindrainibe2024" class="csl-entry" role="listitem">
 Andrianjafindrainibe, Velomalala Solo, Nicole Andrianirina, Florent Bédécarrats, Isabelle Droy, Jean-Luc Dubois, Jeanne de Montalembert, Bako Nirina Rabevohitra, et al. 2024. <span>“Madagascar Rural Observatory Surveys, a Longitudinal Dataset on Household Living Conditions 1995–2015.”</span> <em>Scientific Data</em> 11 (1): 1061. <a href="https://doi.org/10.1038/s41597-024-03879-9">https://doi.org/10.1038/s41597-024-03879-9</a>.
+</div>
+<div id="ref-karvonen2021" class="csl-entry" role="listitem">
+Karvonen, Sakari, Pasi Moisio, Kristian Vepsäläinen, and Joonas Ollonqvist. 2021. <span>“Assessing Health Gradient with Different Equivalence Scales for Household Income–a Sensitivity Analysis.”</span> <em>SSM-Population Health</em> 15: 100892.
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

@@ -309,20 +309,27 @@ window.Quarto = {
   <li><a href="#sec-maro" id="toc-sec-maro" class="nav-link active" data-scroll-target="#sec-maro"><span class="header-section-number">1</span> Ankarafantsika: strict conservation (IUCN II)</a>
   <ul class="collapse">
   <li><a href="#panel-construction" id="toc-panel-construction" class="nav-link" data-scroll-target="#panel-construction"><span class="header-section-number">1.1</span> Panel construction</a></li>
-  <li><a href="#sec-maro-att" id="toc-sec-maro-att" class="nav-link" data-scroll-target="#sec-maro-att"><span class="header-section-number">1.2</span> gsynth ATT path</a></li>
+  <li><a href="#sec-maro-att" id="toc-sec-maro-att" class="nav-link" data-scroll-target="#sec-maro-att"><span class="header-section-number">1.2</span> gsynth ATT path</a>
+  <ul class="collapse">
+  <li><a href="#sec-maro-rcs" id="toc-sec-maro-rcs" class="nav-link" data-scroll-target="#sec-maro-rcs"><span class="header-section-number">1.2.1</span> Within-Marovoay household RCS check</a></li>
+  </ul></li>
   <li><a href="#unit-specific-effects" id="toc-unit-specific-effects" class="nav-link" data-scroll-target="#unit-specific-effects"><span class="header-section-number">1.3</span> Unit-specific effects</a></li>
   </ul></li>
   <li><a href="#sec-ala" id="toc-sec-ala" class="nav-link" data-scroll-target="#sec-ala"><span class="header-section-number">2</span> Lac Alaotra: multipurpose conservation (IUCN VI)</a>
   <ul class="collapse">
   <li><a href="#panel-construction-1" id="toc-panel-construction-1" class="nav-link" data-scroll-target="#panel-construction-1"><span class="header-section-number">2.1</span> Panel construction</a></li>
-  <li><a href="#sec-ala-att" id="toc-sec-ala-att" class="nav-link" data-scroll-target="#sec-ala-att"><span class="header-section-number">2.2</span> gsynth ATT path</a></li>
+  <li><a href="#sec-ala-att" id="toc-sec-ala-att" class="nav-link" data-scroll-target="#sec-ala-att"><span class="header-section-number">2.2</span> gsynth ATT path</a>
+  <ul class="collapse">
+  <li><a href="#sec-ala-rcs" id="toc-sec-ala-rcs" class="nav-link" data-scroll-target="#sec-ala-rcs"><span class="header-section-number">2.2.1</span> Within-Alaotra household RCS check</a></li>
+  </ul></li>
   </ul></li>
   <li><a href="#sec-comparison" id="toc-sec-comparison" class="nav-link" data-scroll-target="#sec-comparison"><span class="header-section-number">3</span> Comparison</a></li>
   <li><a href="#sec-longrun" id="toc-sec-longrun" class="nav-link" data-scroll-target="#sec-longrun"><span class="header-section-number">4</span> Long-run assessment: 2025 resurvey</a>
   <ul class="collapse">
-  <li><a href="#sec-ext-gsynth" id="toc-sec-ext-gsynth" class="nav-link" data-scroll-target="#sec-ext-gsynth"><span class="header-section-number">4.1</span> Extended gsynth</a></li>
-  <li><a href="#sec-ext-robust" id="toc-sec-ext-robust" class="nav-link" data-scroll-target="#sec-ext-robust"><span class="header-section-number">4.2</span> Robustness of the 2025 gap</a></li>
-  <li><a href="#sec-ext-ala" id="toc-sec-ext-ala" class="nav-link" data-scroll-target="#sec-ext-ala"><span class="header-section-number">4.3</span> Alaotra long-run assessment</a></li>
+  <li><a href="#panel-construction-extended-model" id="toc-panel-construction-extended-model" class="nav-link" data-scroll-target="#panel-construction-extended-model"><span class="header-section-number">4.1</span> Panel construction (extended model)</a></li>
+  <li><a href="#sec-ext-gsynth" id="toc-sec-ext-gsynth" class="nav-link" data-scroll-target="#sec-ext-gsynth"><span class="header-section-number">4.2</span> Extended gsynth</a></li>
+  <li><a href="#sec-ext-robust" id="toc-sec-ext-robust" class="nav-link" data-scroll-target="#sec-ext-robust"><span class="header-section-number">4.3</span> Robustness of the 2025 gap</a></li>
+  <li><a href="#sec-ext-ala" id="toc-sec-ext-ala" class="nav-link" data-scroll-target="#sec-ext-ala"><span class="header-section-number">4.4</span> Alaotra long-run assessment</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/BETSAKA/Rural_obs_PAs/blob/main/04_results.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/BETSAKA/Rural_obs_PAs/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -373,6 +380,499 @@ Figure&nbsp;1: Ankarafantsika: gsynth ATT path for east-bank sites relative to e
 </div>
 </div>
 <p>The gsynth estimator finds a persistent negative effect of PA exposure on equivalised household income at the east-bank Marovoay sites. The average post-exposure ATT is approximately -0.312 log points (95% CI: [-0.550, -0.073], <em>p</em> = 0.010), corresponding to a roughly 27% decline in equivalised income relative to the synthetic counterfactual. The effect emerges shortly after the 2002 extension and does not attenuate over the observation period.</p>
+<section id="sec-maro-rcs" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="sec-maro-rcs"><span class="header-section-number">1.2.1</span> Within-Marovoay household RCS check</h3>
+<p>The household-level repeated cross-section design described in <strong>?@sec-complementary</strong> applies the Callaway–Sant’Anna estimator to the 1999–2014 + 2025 Marovoay panel, contrasting east-bank (Bepako and Madiromiongana) against west-bank fokontany (Ampijoroa and Maroala).</p>
+<div class="cell">
+<div id="tbl-maro-rcs" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-maro-rcs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Within-Marovoay household RCS Callaway–Sant’Anna estimate (panel = FALSE), east versus west bank. Two standard errors are reported: design-based (influence function, no clustering) and site-clustered.
+</figcaption>
+<div aria-describedby="tbl-maro-rcs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="kuvkzngosh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#kuvkzngosh table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#kuvkzngosh thead, #kuvkzngosh tbody, #kuvkzngosh tfoot, #kuvkzngosh tr, #kuvkzngosh td, #kuvkzngosh th {
+  border-style: none;
+}
+
+#kuvkzngosh p {
+  margin: 0;
+  padding: 0;
+}
+
+#kuvkzngosh .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#kuvkzngosh .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#kuvkzngosh .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#kuvkzngosh .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#kuvkzngosh .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kuvkzngosh .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kuvkzngosh .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kuvkzngosh .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#kuvkzngosh .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#kuvkzngosh .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#kuvkzngosh .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#kuvkzngosh .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#kuvkzngosh .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#kuvkzngosh .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#kuvkzngosh .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#kuvkzngosh .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#kuvkzngosh .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#kuvkzngosh .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#kuvkzngosh .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kuvkzngosh .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#kuvkzngosh .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#kuvkzngosh .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#kuvkzngosh .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kuvkzngosh .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#kuvkzngosh .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#kuvkzngosh .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kuvkzngosh .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kuvkzngosh .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#kuvkzngosh .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kuvkzngosh .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#kuvkzngosh .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kuvkzngosh .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kuvkzngosh .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kuvkzngosh .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kuvkzngosh .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kuvkzngosh .gt_left {
+  text-align: left;
+}
+
+#kuvkzngosh .gt_center {
+  text-align: center;
+}
+
+#kuvkzngosh .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#kuvkzngosh .gt_font_normal {
+  font-weight: normal;
+}
+
+#kuvkzngosh .gt_font_bold {
+  font-weight: bold;
+}
+
+#kuvkzngosh .gt_font_italic {
+  font-style: italic;
+}
+
+#kuvkzngosh .gt_super {
+  font-size: 65%;
+}
+
+#kuvkzngosh .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#kuvkzngosh .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#kuvkzngosh .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#kuvkzngosh .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#kuvkzngosh .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#kuvkzngosh .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#kuvkzngosh .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#kuvkzngosh .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#kuvkzngosh div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal gt_bottom_border">Marovoay: household RCS DiD</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="Design" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Design</th>
+<th id="Estimate" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Estimate</th>
+<th id="SE-(IF)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">SE (IF)</th>
+<th id="SE-(cluster)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">SE (cluster)</th>
+<th id="a%-income" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">% income</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="Design">East bank vs west bank</td>
+<td class="gt_row gt_right" headers="Estimate">0.000</td>
+<td class="gt_row gt_right" headers="SE (IF)">0.050</td>
+<td class="gt_row gt_right" headers="SE (cluster)">0.046</td>
+<td class="gt_row gt_right" headers="% income">+0.0%</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>The within-Marovoay point estimate is <strong>close to zero</strong> with a tight cluster-robust SE — strikingly different in magnitude from the gsynth ATT of -0.312 log points reported above. This is not a contradiction but a clarification: the two estimators identify the treatment effect against <strong>different counterfactuals</strong>. gsynth weights against five clean outside observatories that share the broad macroeconomic and ecological context of rural Madagascar but were never exposed to a strict-PA framework; the within-Marovoay RCS weights against the west bank, which is geographically adjacent and shares many of the same local shocks (the regional Betsiboka river economy, weather variability, market access) as the east bank. The fact that east-bank and west-bank trajectories track each other so closely is itself substantive: it indicates that the gsynth-identified effect at Marovoay is <strong>regional rather than purely local</strong> — the whole observatory diverged downward from comparable Madagascar sites, with no detectable east-vs-west gap inside the observatory.</p>
+</section>
 </section>
 <section id="unit-specific-effects" class="level2" data-number="1.3">
 <h2 data-number="1.3" class="anchored" data-anchor-id="unit-specific-effects"><span class="header-section-number">1.3</span> Unit-specific effects</h2>
@@ -417,35 +917,34 @@ Figure&nbsp;3: Lac Alaotra: gsynth ATT path for the aggregated observatory relat
 </div>
 <p>The Alaotra gsynth estimates an average post-exposure ATT of approximately +0.014 log points (<em>p</em> = 0.928) — close to zero and not statistically significant. The confidence interval comfortably spans zero. Year-by-year estimates are noisy with no clear trend away from the counterfactual.</p>
 <p>The null result is consistent with several interpretations: participatory conservation under CBNRM may impose lower costs on aggregate income; the 7-year post-exposure window may be insufficient to detect a gradual effect; and the single-unit design limits statistical power.</p>
-</section>
-</section>
-<section id="sec-comparison" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Comparison</h1>
+<section id="sec-ala-rcs" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="sec-ala-rcs"><span class="header-section-number">2.2.1</span> Within-Alaotra household RCS check</h3>
+<p>The household-level repeated cross-section design described in <strong>?@sec-complementary</strong> applies the Callaway–Sant’Anna estimator to the 1999–2014 + 2025 Alaotra panel under two within-observatory exposure proxies: distance to the nearest PA boundary (≤ 10 km) and the 2025 share of households declaring PA-dependent extractive uses (≥ 12.5%).</p>
 <div class="cell">
-<div id="tbl-comparison" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<div id="tbl-ala-rcs" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose (Alaotra) conservation.
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-ala-rcs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Within-Alaotra household RCS Callaway–Sant’Anna estimates (panel = FALSE) on the merged seven-fokontany panel, under two exposure proxies. Two standard errors are reported: design-based (influence function, no clustering) and site-clustered.
 </figcaption>
-<div aria-describedby="tbl-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div aria-describedby="tbl-ala-rcs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="urqmzceuop" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#urqmzceuop table {
+<div id="wjxsrhszoy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#wjxsrhszoy table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#urqmzceuop thead, #urqmzceuop tbody, #urqmzceuop tfoot, #urqmzceuop tr, #urqmzceuop td, #urqmzceuop th {
+#wjxsrhszoy thead, #wjxsrhszoy tbody, #wjxsrhszoy tfoot, #wjxsrhszoy tr, #wjxsrhszoy td, #wjxsrhszoy th {
   border-style: none;
 }
 
-#urqmzceuop p {
+#wjxsrhszoy p {
   margin: 0;
   padding: 0;
 }
 
-#urqmzceuop .gt_table {
+#wjxsrhszoy .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -471,12 +970,12 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   border-left-color: #D3D3D3;
 }
 
-#urqmzceuop .gt_caption {
+#wjxsrhszoy .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#urqmzceuop .gt_title {
+#wjxsrhszoy .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -488,7 +987,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   border-bottom-width: 0;
 }
 
-#urqmzceuop .gt_subtitle {
+#wjxsrhszoy .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -500,7 +999,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   border-top-width: 0;
 }
 
-#urqmzceuop .gt_heading {
+#wjxsrhszoy .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -512,13 +1011,13 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   border-right-color: #D3D3D3;
 }
 
-#urqmzceuop .gt_bottom_border {
+#wjxsrhszoy .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#urqmzceuop .gt_col_headings {
+#wjxsrhszoy .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -533,7 +1032,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   border-right-color: #D3D3D3;
 }
 
-#urqmzceuop .gt_col_heading {
+#wjxsrhszoy .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -553,7 +1052,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   overflow-x: hidden;
 }
 
-#urqmzceuop .gt_column_spanner_outer {
+#wjxsrhszoy .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -565,15 +1064,15 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   padding-right: 4px;
 }
 
-#urqmzceuop .gt_column_spanner_outer:first-child {
+#wjxsrhszoy .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#urqmzceuop .gt_column_spanner_outer:last-child {
+#wjxsrhszoy .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#urqmzceuop .gt_column_spanner {
+#wjxsrhszoy .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -585,11 +1084,11 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   width: 100%;
 }
 
-#urqmzceuop .gt_spanner_row {
+#wjxsrhszoy .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#urqmzceuop .gt_group_heading {
+#wjxsrhszoy .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -615,7 +1114,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   text-align: left;
 }
 
-#urqmzceuop .gt_empty_group_heading {
+#wjxsrhszoy .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -630,15 +1129,15 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   vertical-align: middle;
 }
 
-#urqmzceuop .gt_from_md > :first-child {
+#wjxsrhszoy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#urqmzceuop .gt_from_md > :last-child {
+#wjxsrhszoy .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#urqmzceuop .gt_row {
+#wjxsrhszoy .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -657,7 +1156,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   overflow-x: hidden;
 }
 
-#urqmzceuop .gt_stub {
+#wjxsrhszoy .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -670,7 +1169,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   padding-right: 5px;
 }
 
-#urqmzceuop .gt_stub_row_group {
+#wjxsrhszoy .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -684,15 +1183,15 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   vertical-align: top;
 }
 
-#urqmzceuop .gt_row_group_first td {
+#wjxsrhszoy .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#urqmzceuop .gt_row_group_first th {
+#wjxsrhszoy .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#urqmzceuop .gt_summary_row {
+#wjxsrhszoy .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -702,16 +1201,16 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   padding-right: 5px;
 }
 
-#urqmzceuop .gt_first_summary_row {
+#wjxsrhszoy .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#urqmzceuop .gt_first_summary_row.thick {
+#wjxsrhszoy .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#urqmzceuop .gt_last_summary_row {
+#wjxsrhszoy .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -721,7 +1220,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   border-bottom-color: #D3D3D3;
 }
 
-#urqmzceuop .gt_grand_summary_row {
+#wjxsrhszoy .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -731,7 +1230,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   padding-right: 5px;
 }
 
-#urqmzceuop .gt_first_grand_summary_row {
+#wjxsrhszoy .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -741,7 +1240,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   border-top-color: #D3D3D3;
 }
 
-#urqmzceuop .gt_last_grand_summary_row_top {
+#wjxsrhszoy .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -751,11 +1250,11 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   border-bottom-color: #D3D3D3;
 }
 
-#urqmzceuop .gt_striped {
+#wjxsrhszoy .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#urqmzceuop .gt_table_body {
+#wjxsrhszoy .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -764,7 +1263,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   border-bottom-color: #D3D3D3;
 }
 
-#urqmzceuop .gt_footnotes {
+#wjxsrhszoy .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -778,7 +1277,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   border-right-color: #D3D3D3;
 }
 
-#urqmzceuop .gt_footnote {
+#wjxsrhszoy .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -787,7 +1286,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   padding-right: 5px;
 }
 
-#urqmzceuop .gt_sourcenotes {
+#wjxsrhszoy .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -801,7 +1300,7 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   border-right-color: #D3D3D3;
 }
 
-#urqmzceuop .gt_sourcenote {
+#wjxsrhszoy .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -809,72 +1308,573 @@ Table&nbsp;1: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose
   padding-right: 5px;
 }
 
-#urqmzceuop .gt_left {
+#wjxsrhszoy .gt_left {
   text-align: left;
 }
 
-#urqmzceuop .gt_center {
+#wjxsrhszoy .gt_center {
   text-align: center;
 }
 
-#urqmzceuop .gt_right {
+#wjxsrhszoy .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#urqmzceuop .gt_font_normal {
+#wjxsrhszoy .gt_font_normal {
   font-weight: normal;
 }
 
-#urqmzceuop .gt_font_bold {
+#wjxsrhszoy .gt_font_bold {
   font-weight: bold;
 }
 
-#urqmzceuop .gt_font_italic {
+#wjxsrhszoy .gt_font_italic {
   font-style: italic;
 }
 
-#urqmzceuop .gt_super {
+#wjxsrhszoy .gt_super {
   font-size: 65%;
 }
 
-#urqmzceuop .gt_footnote_marks {
+#wjxsrhszoy .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#urqmzceuop .gt_asterisk {
+#wjxsrhszoy .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#urqmzceuop .gt_indent_1 {
+#wjxsrhszoy .gt_indent_1 {
   text-indent: 5px;
 }
 
-#urqmzceuop .gt_indent_2 {
+#wjxsrhszoy .gt_indent_2 {
   text-indent: 10px;
 }
 
-#urqmzceuop .gt_indent_3 {
+#wjxsrhszoy .gt_indent_3 {
   text-indent: 15px;
 }
 
-#urqmzceuop .gt_indent_4 {
+#wjxsrhszoy .gt_indent_4 {
   text-indent: 20px;
 }
 
-#urqmzceuop .gt_indent_5 {
+#wjxsrhszoy .gt_indent_5 {
   text-indent: 25px;
 }
 
-#urqmzceuop .katex-display {
+#wjxsrhszoy .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#urqmzceuop div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#wjxsrhszoy div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal gt_bottom_border">Alaotra: household RCS DiD</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="Design" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Design</th>
+<th id="Estimate" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Estimate</th>
+<th id="SE-(IF)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">SE (IF)</th>
+<th id="SE-(cluster)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">SE (cluster)</th>
+<th id="a%-income" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">% income</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="Design">Distance ≤ 10 km</td>
+<td class="gt_row gt_right" headers="Estimate">0.015</td>
+<td class="gt_row gt_right" headers="SE (IF)">0.075</td>
+<td class="gt_row gt_right" headers="SE (cluster)">0.113</td>
+<td class="gt_row gt_right" headers="% income">+1.5%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Design">Extractive usage ≥ 12.5%</td>
+<td class="gt_row gt_right" headers="Estimate">−0.042</td>
+<td class="gt_row gt_right" headers="SE (IF)">0.074</td>
+<td class="gt_row gt_right" headers="SE (cluster)">0.152</td>
+<td class="gt_row gt_right" headers="% income">-4.1%</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Both within-Alaotra designs yield small point estimates and wide cluster-robust standard errors that comfortably include zero. Their conclusion <strong>agrees with gsynth</strong> along a different identifying contrast: not against an outside donor pool, but against the less exposed merged fokontany of the same observatory. The convergence narrows the range of plausible interpretations of the Alaotra null: the absence of an aggregate income effect of the <em>Paysage Harmonieux Protégé</em> is robust to whether the counterfactual is built from outside observatories (gsynth) or from within-observatory exposure heterogeneity (RCS DiD).</p>
+</section>
+</section>
+</section>
+<section id="sec-comparison" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Comparison</h1>
+<div class="cell">
+<div id="tbl-comparison" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Summary of gsynth results: strict (Ankarafantsika) vs multipurpose (Alaotra) conservation.
+</figcaption>
+<div aria-describedby="tbl-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="thxwuuiypk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#thxwuuiypk table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#thxwuuiypk thead, #thxwuuiypk tbody, #thxwuuiypk tfoot, #thxwuuiypk tr, #thxwuuiypk td, #thxwuuiypk th {
+  border-style: none;
+}
+
+#thxwuuiypk p {
+  margin: 0;
+  padding: 0;
+}
+
+#thxwuuiypk .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#thxwuuiypk .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#thxwuuiypk .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#thxwuuiypk .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#thxwuuiypk .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#thxwuuiypk .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#thxwuuiypk .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#thxwuuiypk .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#thxwuuiypk .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#thxwuuiypk .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#thxwuuiypk .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#thxwuuiypk .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#thxwuuiypk .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#thxwuuiypk .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#thxwuuiypk .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#thxwuuiypk .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#thxwuuiypk .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#thxwuuiypk .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#thxwuuiypk .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#thxwuuiypk .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#thxwuuiypk .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#thxwuuiypk .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#thxwuuiypk .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#thxwuuiypk .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#thxwuuiypk .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#thxwuuiypk .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#thxwuuiypk .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#thxwuuiypk .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#thxwuuiypk .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#thxwuuiypk .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#thxwuuiypk .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#thxwuuiypk .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#thxwuuiypk .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#thxwuuiypk .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#thxwuuiypk .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#thxwuuiypk .gt_left {
+  text-align: left;
+}
+
+#thxwuuiypk .gt_center {
+  text-align: center;
+}
+
+#thxwuuiypk .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#thxwuuiypk .gt_font_normal {
+  font-weight: normal;
+}
+
+#thxwuuiypk .gt_font_bold {
+  font-weight: bold;
+}
+
+#thxwuuiypk .gt_font_italic {
+  font-style: italic;
+}
+
+#thxwuuiypk .gt_super {
+  font-size: 65%;
+}
+
+#thxwuuiypk .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#thxwuuiypk .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#thxwuuiypk .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#thxwuuiypk .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#thxwuuiypk .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#thxwuuiypk .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#thxwuuiypk .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#thxwuuiypk .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#thxwuuiypk div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -955,9 +1955,20 @@ Figure&nbsp;4: Side-by-side ATT paths. Left: Ankarafantsika (strict, from 2003) 
 </section>
 <section id="sec-longrun" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Long-run assessment: 2025 resurvey</h1>
-<p>A 2025 resurvey of Marovoay (1,026 households across the same fokontany) extends the observation window to 22 years post-exposure.</p>
-<section id="sec-ext-gsynth" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="sec-ext-gsynth"><span class="header-section-number">4.1</span> Extended gsynth</h2>
+<p>A 2025 resurvey of Marovoay (0 households across the four fokontany: Bepako and Madiromiongana on the east bank, Ampijoroa and Maroala on the west bank) extends the observation window to 22 years post-exposure.</p>
+<section id="panel-construction-extended-model" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="panel-construction-extended-model"><span class="header-section-number">4.1</span> Panel construction (extended model)</h2>
+<p>The extended model uses the <strong>full donor pool</strong> (all ROS sites with a complete 1999–2014 income series) rather than the clean 5-donor pool of <a href="#sec-maro" class="quarto-xref">Section&nbsp;1</a>. The exposed units are unchanged — Bepako (site 031) and Madiromiongana (site 032), east of the Betsiboka — but the 62 donor sites span 11 observatories:</p>
+<ul>
+<li>the 5 clean donors used in <a href="#sec-maro" class="quarto-xref">Section&nbsp;1</a> (observatories 02, 13, 16, 25, 41);</li>
+<li>the 5 “also-exposed” observatories flagged in <a href="./A2_donor_validity.html">Appendix B</a> (12, 15, 21, 23, 24);</li>
+<li>the 2 Marovoay west-bank fokontany (Ampijoroa 033 and Maroala 034), which are in the same observatory as the treated units and therefore share local shocks.</li>
+</ul>
+<p>This is a weaker identification setting than the main specification: three of the donor observatories were themselves subject to PA expansions during the period, and two donor sites are one kilometre away from the exposed units. The results below should therefore be read as descriptive corroboration of the <a href="#sec-maro-att" class="quarto-xref">Section&nbsp;1.2</a> estimates rather than an independent test.</p>
+<p>The 2025 resurvey only covered Marovoay (and Alaotra, which is not part of this panel). Accordingly, in the extended panel, 2025 income data exist for exactly 4 sites — the 4 Marovoay fokontany (031, 032, 033, 034) — and are NA for all other donors. The 2025 counterfactual is therefore extrapolated from pre-2015 donor dynamics under the gsynth factor model.</p>
+</section>
+<section id="sec-ext-gsynth" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="sec-ext-gsynth"><span class="header-section-number">4.2</span> Extended gsynth</h2>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-ext-att" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -972,7 +1983,7 @@ Figure&nbsp;5: Extended ATT path for Ankarafantsika east-bank sites (1999–2025
 </div>
 </div>
 </div>
-<p>Including 2025 in the panel, the average post-exposure ATT deepens substantially. The 2025-specific ATT is roughly twice the 1999–2014 average, indicating that income losses compound rather than dissipate over time. The widening gap is visible in raw site-level trajectories:</p>
+<p>Including 2025 in the panel, the average post-exposure ATT deepens substantially: -0.403 log points in the extended model vs -0.312 in the 1999–2014 main specification. The 2025-specific ATT (-0.841 log points) is about 2.7× the 1999–2014 average, indicating that income losses compound rather than dissipate over time. The widening gap is visible in raw site-level trajectories:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-ext-traj" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -988,8 +1999,8 @@ Figure&nbsp;6: Site-level income trajectories for the four Marovoay fokontany (1
 </div>
 </div>
 </section>
-<section id="sec-ext-robust" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="sec-ext-robust"><span class="header-section-number">4.2</span> Robustness of the 2025 gap</h2>
+<section id="sec-ext-robust" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="sec-ext-robust"><span class="header-section-number">4.3</span> Robustness of the 2025 gap</h2>
 <p>The east-west income gap in 2025 is not driven by outliers:</p>
 <ul>
 <li>The gap is visible at <em>every</em> percentile of the income distribution.</li>
@@ -998,8 +2009,8 @@ Figure&nbsp;6: Site-level income trajectories for the four Marovoay fokontany (1
 <li>Wilcoxon rank-sum <span class="math inline">\(p = 2.1 \times 10^{-10}\)</span>; Welch <span class="math inline">\(t\)</span>-test <span class="math inline">\(p = 1.8 \times 10^{-5}\)</span>.</li>
 </ul>
 </section>
-<section id="sec-ext-ala" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="sec-ext-ala"><span class="header-section-number">4.3</span> Alaotra long-run assessment</h2>
+<section id="sec-ext-ala" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="sec-ext-ala"><span class="header-section-number">4.4</span> Alaotra long-run assessment</h2>
 <p>For Alaotra, a 2025 gsynth extension is not feasible: all Alaotra sites are exposed and no other observatory was resurveyed, so there are no 2025 control observations. The Alaotra estimate remains based on the 1999–2014 panel (ATT ≈ +0.014, <span class="math inline">\(p\)</span> = 0.928).</p>
 
 
