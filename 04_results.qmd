@@ -87,7 +87,7 @@ sec_did$maro$summary |>
   tab_header(title = "Marovoay: household RCS DiD")
 ```
 
-The within-Marovoay point estimate is **close to zero** with a tight cluster-robust SE — strikingly different in magnitude from the gsynth ATT of {{< var att_maro >}} log points reported above. This is not a contradiction but a clarification: the two estimators identify the treatment effect against **different counterfactuals**. gsynth weights against five clean outside observatories that share the broad macroeconomic and ecological context of rural Madagascar but were never exposed to a strict-PA framework; the within-Marovoay RCS weights against the west bank, which is geographically adjacent and shares many of the same local shocks (the regional Betsiboka river economy, weather variability, market access) as the east bank. The fact that east-bank and west-bank trajectories track each other so closely is itself substantive: it indicates that the gsynth-identified effect at Marovoay is **regional rather than purely local** — the whole observatory diverged downward from comparable Madagascar sites, with no detectable east-vs-west gap inside the observatory.
+The within-Marovoay point estimate is close to zero with a tight cluster-robust SE — strikingly different in magnitude from the gsynth ATT of {{< var att_maro >}} log points reported above. This is not a contradiction but a clarification: the two estimators identify the treatment effect against different counterfactuals. gsynth weights against five clean outside observatories that share the broad macroeconomic and ecological context of rural Madagascar but were never exposed to a strict-PA framework; the within-Marovoay RCS weights against the west bank, which is geographically adjacent and shares many of the same local shocks (the regional Betsiboka river economy, weather variability, market access) as the east bank. The fact that east-bank and west-bank trajectories track each other so closely is itself substantive: it indicates that the gsynth-identified effect at Marovoay is regional rather than purely local. In other words the whole observatory diverged downward from comparable Madagascar sites, with no detectable east-vs-west gap inside the observatory.
 
 ## Unit-specific effects
 
@@ -192,9 +192,10 @@ The household-level repeated cross-section design described in @sec-complementar
 sec_did_ala <- read_rds("data/secondary_did_results.rds")$ala
 sec_did_ala$summary |>
   transmute(
-    Design = recode(design,
+    Design = recode(
+      design,
       dist = "Distance ≤ 10 km",
-      ext  = "Extractive usage ≥ 12.5%"
+      ext = "Extractive usage ≥ 12.5%"
     ),
     Estimate = estimate,
     `SE (IF)` = se_if,
@@ -206,7 +207,7 @@ sec_did_ala$summary |>
   tab_header(title = "Alaotra: household RCS DiD")
 ```
 
-Both within-Alaotra designs yield small point estimates and wide cluster-robust standard errors that comfortably include zero. Their conclusion **agrees with gsynth** along a different identifying contrast: not against an outside donor pool, but against the less exposed merged fokontany of the same observatory. The convergence narrows the range of plausible interpretations of the Alaotra null: the absence of an aggregate income effect of the *Paysage Harmonieux Protégé* is robust to whether the counterfactual is built from outside observatories (gsynth) or from within-observatory exposure heterogeneity (RCS DiD).
+Both within-Alaotra designs yield small point estimates and wide cluster-robust standard errors that comfortably include zero. Their conclusion agrees with gsynth along a different identifying contrast: not against an outside donor pool, but against the less exposed merged fokontany of the same observatory. The convergence narrows the range of plausible interpretations of the Alaotra null: the absence of an aggregate income effect of the *Paysage Harmonieux Protégé* is robust to whether the counterfactual is built from outside observatories (gsynth) or from within-observatory exposure heterogeneity (RCS DiD).
 
 # Comparison {#sec-comparison}
 
@@ -346,7 +347,7 @@ maro_wbank <- intersect(donor_cols, c("033", "034"))
 years_2025 <- sum(!is.na(gs_maro_ext$eff["2025", ]))
 ```
 
-The extended model uses the **full donor pool** (all ROS sites with a
+The extended model uses the full donor pool (all ROS sites with a
 complete 1999–2014 income series) rather than the clean 5-donor pool
 of @sec-maro. The exposed units are unchanged — Bepako (site 031) and
 Madiromiongana (site 032), east of the Betsiboka — but the
