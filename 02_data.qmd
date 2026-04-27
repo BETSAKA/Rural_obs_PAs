@@ -162,9 +162,9 @@ The original survey data lacked systematic georeferencing. Locality names were r
 
 The matching procedure is hierarchical:
 
-1. **String normalisation** — lowercase, remove diacritics and qualifiers (*centre*, *haut*, *bas*), standardise bilingual toponyms, convert Roman to Arabic numerals.
-2. **Fuzzy matching** — Jaro-Winkler distance against the COD gazetteer, filtered by observatory-level district membership, with a maximum distance threshold of 0.25.
-3. **Cascading spatial levels** — match first at the commune (ADM3) level, then refine to fokontany (ADM4) where possible.
+1. **String normalisation**: lowercase, remove diacritics and qualifiers (*centre*, *haut*, *bas*), standardise bilingual toponyms, convert Roman to Arabic numerals.
+2. **Fuzzy matching**: Jaro-Winkler distance against the COD gazetteer, filtered by observatory-level district membership, with a maximum distance threshold of 0.25.
+3. **Cascading spatial levels**: match first at the commune (ADM3) level, then refine to fokontany (ADM4) where possible.
 
 The result is a geocoded correspondence table linking each ROS household identifier (`j5`) to its P-coded commune and fokontany. This enables spatial overlay with protected area boundaries.
 
@@ -179,8 +179,8 @@ For each of the 11 study observatories, we compute the minimum distance from com
 | Configuration | Observatories | Use |
 |---|---|---|
 | PA predates ROS surveys (no baseline) | e.g., Ranomafana, Andringitra | Excluded |
-| PA created *during* ROS (1999–2014) | Marovoay (2003), Alaotra (2008) | **Primary treatment** |
-| PA created during ROS but later | Farafangana, Toliara, Fénérive (2006–07) | **Extension treatment** ([Ch. 5](05_extensions.qmd)) |
+| PA created *during* ROS (1999–2014) | Marovoay (2003), Alaotra (2008) | Primary treatment |
+| PA created during ROS but later | Farafangana, Toliara, Fénérive (2006–07) | Extension treatment ([Ch. 5](05_extensions.qmd)) |
 
 : Overview of observatory–PA temporal relationships. {#tbl-pa-timing}
 
@@ -357,15 +357,15 @@ The two primary pairs — **Marovoay / Ankarafantsika** (strict, IUCN II, 2003 e
 
 # Outcome variable {#sec-outcome}
 
-The primary outcome is **log equivalised household income**. Construction proceeds as follows:
+The primary outcome is log equivalised household income. Construction proceeds as follows:
 
-1. **Total income** (`revtot`) — the sum of current income components: rice revenue (`rev_riz`), other crop revenue (`rev_cu`), livestock revenue (`revel`), fishing revenue (`revpeche`), principal activity income (`revppal`), and secondary activity income (`revsec`). Missing components are set to zero; the total is imputed from available sub-components when `revtot` itself is missing.
+1. **Total income** (`revtot`): the sum of current income components: rice revenue (`rev_riz`), other crop revenue (`rev_cu`), livestock revenue (`revel`), fishing revenue (`revpeche`), principal activity income (`revppal`), and secondary activity income (`revsec`). Missing components are set to zero; the total is imputed from available sub-components when `revtot` itself is missing.
 
 2. **Equivalisation**: using the OECD-modified scale: $1 + 0.5 \times (\text{additional adults}) + 0.3 \times (\text{children under 14})$, computed from individual-level demographic records [@karvonen2021].
 
 3. **Winsorisation**: at the 1st and 99th percentiles within each year to limit the influence of extreme values.
 
-4. **Log transformation** — $y_{it} = \log(\text{equivalised income}_{it} + 1)$.
+4. **Log transformation**: $y_{it} = \log(\text{equivalised income}_{it} + 1)$.
 
 Cross-year harmonisation is not trivial: variable names, questionnaire modules, and income definitions changed across survey waves. The full details of these adjustments are in [Appendix A](A1_data_pipeline.qmd).
 

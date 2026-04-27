@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Appendix A: Data Pipeline – Conservation Governance and Rural Livelihoods in Madagascar</title>
+<title>8&nbsp; Appendix A: Data Pipeline – Conservation Governance and Rural Livelihoods in Madagascar</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -30,23 +33,24 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./A2_donor_validity.html" rel="next">
+<link href="./06_discussion.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-e31584831b205ffbb2d98406f31c2a5b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-9e3e5b9121e68b3f077afb32f2c64d95.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
-  "location": "navbar",
+  "location": "sidebar",
   "copy-button": false,
   "collapse-after": 3,
-  "panel-placement": "end",
-  "type": "overlay",
+  "panel-placement": "start",
+  "type": "textbox",
   "limit": 50,
   "keyboard-shortcut": [
     "f",
@@ -72,117 +76,47 @@ ul.task-list li input[type="checkbox"] {
 
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar floating quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    </a>
-    <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">Conservation Governance and Rural Livelihoods in Madagascar</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-analysis" role="link" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">Analysis</span>
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-analysis">    
-        <li>
-    <a class="dropdown-item" href="./01_context.html">
- <span class="dropdown-text">1. Context</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./02_data.html">
- <span class="dropdown-text">2. Data</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./03_strategy.html">
- <span class="dropdown-text">3. Identification Strategy</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./04_results.html">
- <span class="dropdown-text">4. Results</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./05_extensions.html">
- <span class="dropdown-text">5. Extensions</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./06_discussion.html">
- <span class="dropdown-text">6. Discussion</span></a>
-  </li>  
-    </ul>
-  </li>
-  <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-appendices" role="link" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">Appendices</span>
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-appendices">    
-        <li>
-    <a class="dropdown-item" href="./A1_data_pipeline.html">
- <span class="dropdown-text">A. Data Pipeline</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./A2_donor_validity.html">
- <span class="dropdown-text">B. Donor Pool Validity</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./A3_robustness.html">
- <span class="dropdown-text">C. Robustness Tests</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./A4_methodology.html">
- <span class="dropdown-text">D. Methodology</span></a>
-  </li>  
-    </ul>
-  </li>
-</ul>
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/BETSAKA/Rural_obs_PAs"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
-</div>
-      </div> <!-- /container-fluid -->
-    </nav>
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./A1_data_pipeline.html">Appendices</a></li><li class="breadcrumb-item"><a href="./A1_data_pipeline.html">Appendix A: Data Pipeline</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./A1_data_pipeline.html">Appendices</a></li><li class="breadcrumb-item"><a href="./A1_data_pipeline.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Appendix A: Data Pipeline</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
     </div>
   </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
-      <a href="./index.html" class="sidebar-logo-link">
-      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Conservation Governance and Rural Livelihoods in Madagascar</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/BETSAKA/Rural_obs_PAs" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
+    </div>
       </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Conservation Governance and Rural Livelihoods in Madagascar</span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -197,37 +131,37 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./01_context.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Conservation in Madagascar</span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Conservation in Madagascar</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./02_data.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data</span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Data</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./03_strategy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Identification Strategy</span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Identification Strategy</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./04_results.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Results</span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Results</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./05_extensions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensions</span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Extensions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./06_discussion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Discussion</span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Discussion</span></span></a>
   </div>
 </li>
       </ul>
@@ -244,25 +178,25 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./A1_data_pipeline.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Appendix A: Data Pipeline</span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Appendix A: Data Pipeline</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./A2_donor_validity.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Appendix B: Donor Pool Validity</span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Appendix B: Donor Pool Validity</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./A3_robustness.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Appendix C: Robustness Tests</span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Appendix C: Robustness Tests</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./A4_methodology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Appendix D: Methodology</span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Appendix D: Methodology</span></span></a>
   </div>
 </li>
       </ul>
@@ -274,34 +208,34 @@ ul.task-list li input[type="checkbox"] {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
+    <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#sec-a-georef" id="toc-sec-a-georef" class="nav-link active" data-scroll-target="#sec-a-georef"><span class="header-section-number">1</span> Georeferencing ROS localities</a>
+  <li><a href="#sec-a-georef" id="toc-sec-a-georef" class="nav-link active" data-scroll-target="#sec-a-georef"><span class="header-section-number">9</span> Georeferencing ROS localities</a>
   <ul class="collapse">
-  <li><a href="#the-problem" id="toc-the-problem" class="nav-link" data-scroll-target="#the-problem"><span class="header-section-number">1.1</span> The problem</a></li>
-  <li><a href="#reference-datasets" id="toc-reference-datasets" class="nav-link" data-scroll-target="#reference-datasets"><span class="header-section-number">1.2</span> Reference datasets</a></li>
-  <li><a href="#string-cleaning" id="toc-string-cleaning" class="nav-link" data-scroll-target="#string-cleaning"><span class="header-section-number">1.3</span> String cleaning</a></li>
-  <li><a href="#hierarchical-fuzzy-matching" id="toc-hierarchical-fuzzy-matching" class="nav-link" data-scroll-target="#hierarchical-fuzzy-matching"><span class="header-section-number">1.4</span> Hierarchical fuzzy matching</a></li>
-  <li><a href="#match-rates" id="toc-match-rates" class="nav-link" data-scroll-target="#match-rates"><span class="header-section-number">1.5</span> Match rates</a></li>
+  <li><a href="#the-problem" id="toc-the-problem" class="nav-link" data-scroll-target="#the-problem"><span class="header-section-number">9.1</span> The problem</a></li>
+  <li><a href="#reference-datasets" id="toc-reference-datasets" class="nav-link" data-scroll-target="#reference-datasets"><span class="header-section-number">9.2</span> Reference datasets</a></li>
+  <li><a href="#string-cleaning" id="toc-string-cleaning" class="nav-link" data-scroll-target="#string-cleaning"><span class="header-section-number">9.3</span> String cleaning</a></li>
+  <li><a href="#hierarchical-fuzzy-matching" id="toc-hierarchical-fuzzy-matching" class="nav-link" data-scroll-target="#hierarchical-fuzzy-matching"><span class="header-section-number">9.4</span> Hierarchical fuzzy matching</a></li>
+  <li><a href="#match-rates" id="toc-match-rates" class="nav-link" data-scroll-target="#match-rates"><span class="header-section-number">9.5</span> Match rates</a></li>
   </ul></li>
-  <li><a href="#sec-a-overlaps" id="toc-sec-a-overlaps" class="nav-link" data-scroll-target="#sec-a-overlaps"><span class="header-section-number">2</span> Protected-area overlap analysis</a>
+  <li><a href="#sec-a-overlaps" id="toc-sec-a-overlaps" class="nav-link" data-scroll-target="#sec-a-overlaps"><span class="header-section-number">10</span> Protected-area overlap analysis</a>
   <ul class="collapse">
-  <li><a href="#spatial-overlaps" id="toc-spatial-overlaps" class="nav-link" data-scroll-target="#spatial-overlaps"><span class="header-section-number">2.1</span> Spatial overlaps</a></li>
-  <li><a href="#ros-survey-inventory" id="toc-ros-survey-inventory" class="nav-link" data-scroll-target="#ros-survey-inventory"><span class="header-section-number">2.2</span> ROS survey inventory</a></li>
-  <li><a href="#temporal-overlap-logic" id="toc-temporal-overlap-logic" class="nav-link" data-scroll-target="#temporal-overlap-logic"><span class="header-section-number">2.3</span> Temporal overlap logic</a></li>
-  <li><a href="#decree-date-revision" id="toc-decree-date-revision" class="nav-link" data-scroll-target="#decree-date-revision"><span class="header-section-number">2.4</span> Decree date revision</a></li>
-  <li><a href="#priority-pairs" id="toc-priority-pairs" class="nav-link" data-scroll-target="#priority-pairs"><span class="header-section-number">2.5</span> Priority pairs</a></li>
+  <li><a href="#spatial-overlaps" id="toc-spatial-overlaps" class="nav-link" data-scroll-target="#spatial-overlaps"><span class="header-section-number">10.1</span> Spatial overlaps</a></li>
+  <li><a href="#ros-survey-inventory" id="toc-ros-survey-inventory" class="nav-link" data-scroll-target="#ros-survey-inventory"><span class="header-section-number">10.2</span> ROS survey inventory</a></li>
+  <li><a href="#temporal-overlap-logic" id="toc-temporal-overlap-logic" class="nav-link" data-scroll-target="#temporal-overlap-logic"><span class="header-section-number">10.3</span> Temporal overlap logic</a></li>
+  <li><a href="#decree-date-revision" id="toc-decree-date-revision" class="nav-link" data-scroll-target="#decree-date-revision"><span class="header-section-number">10.4</span> Decree date revision</a></li>
+  <li><a href="#priority-pairs" id="toc-priority-pairs" class="nav-link" data-scroll-target="#priority-pairs"><span class="header-section-number">10.5</span> Priority pairs</a></li>
   </ul></li>
-  <li><a href="#sec-a-variables" id="toc-sec-a-variables" class="nav-link" data-scroll-target="#sec-a-variables"><span class="header-section-number">3</span> Variable construction</a>
+  <li><a href="#sec-a-variables" id="toc-sec-a-variables" class="nav-link" data-scroll-target="#sec-a-variables"><span class="header-section-number">11</span> Variable construction</a>
   <ul class="collapse">
-  <li><a href="#georeferencing-households" id="toc-georeferencing-households" class="nav-link" data-scroll-target="#georeferencing-households"><span class="header-section-number">3.1</span> Georeferencing households</a></li>
-  <li><a href="#household-composition" id="toc-household-composition" class="nav-link" data-scroll-target="#household-composition"><span class="header-section-number">3.2</span> Household composition</a></li>
-  <li><a href="#education" id="toc-education" class="nav-link" data-scroll-target="#education"><span class="header-section-number">3.3</span> Education</a></li>
-  <li><a href="#agricultural-activities" id="toc-agricultural-activities" class="nav-link" data-scroll-target="#agricultural-activities"><span class="header-section-number">3.4</span> Agricultural activities</a></li>
-  <li><a href="#food-security" id="toc-food-security" class="nav-link" data-scroll-target="#food-security"><span class="header-section-number">3.5</span> Food security</a></li>
-  <li><a href="#income-construction" id="toc-income-construction" class="nav-link" data-scroll-target="#income-construction"><span class="header-section-number">3.6</span> Income construction</a></li>
-  <li><a href="#consolidation" id="toc-consolidation" class="nav-link" data-scroll-target="#consolidation"><span class="header-section-number">3.7</span> Consolidation</a></li>
+  <li><a href="#georeferencing-households" id="toc-georeferencing-households" class="nav-link" data-scroll-target="#georeferencing-households"><span class="header-section-number">11.1</span> Georeferencing households</a></li>
+  <li><a href="#household-composition" id="toc-household-composition" class="nav-link" data-scroll-target="#household-composition"><span class="header-section-number">11.2</span> Household composition</a></li>
+  <li><a href="#education" id="toc-education" class="nav-link" data-scroll-target="#education"><span class="header-section-number">11.3</span> Education</a></li>
+  <li><a href="#agricultural-activities" id="toc-agricultural-activities" class="nav-link" data-scroll-target="#agricultural-activities"><span class="header-section-number">11.4</span> Agricultural activities</a></li>
+  <li><a href="#food-security" id="toc-food-security" class="nav-link" data-scroll-target="#food-security"><span class="header-section-number">11.5</span> Food security</a></li>
+  <li><a href="#income-construction" id="toc-income-construction" class="nav-link" data-scroll-target="#income-construction"><span class="header-section-number">11.6</span> Income construction</a></li>
+  <li><a href="#consolidation" id="toc-consolidation" class="nav-link" data-scroll-target="#consolidation"><span class="header-section-number">11.7</span> Consolidation</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/BETSAKA/Rural_obs_PAs/blob/main/A1_data_pipeline.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/BETSAKA/Rural_obs_PAs/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -309,9 +243,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./A1_data_pipeline.html">Appendices</a></li><li class="breadcrumb-item"><a href="./A1_data_pipeline.html">Appendix A: Data Pipeline</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./A1_data_pipeline.html">Appendices</a></li><li class="breadcrumb-item"><a href="./A1_data_pipeline.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Appendix A: Data Pipeline</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Appendix A: Data Pipeline</h1>
+<h1 class="title"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Appendix A: Data Pipeline</span></h1>
 <p class="subtitle lead">Georeferencing, PA overlaps, and variable harmonisation</p>
 </div>
 
@@ -330,26 +264,26 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>This appendix documents the full reproducible data pipeline from raw ROS survey files to the consolidated household-level panel dataset. The paper chapter (<a href="./02_data.html">Chapter 2</a>) provides a condensed summary; this appendix gives all details needed for reproducibility.</p>
-<section id="sec-a-georef" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Georeferencing ROS localities</h1>
-<section id="the-problem" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="the-problem"><span class="header-section-number">1.1</span> The problem</h2>
+<section id="sec-a-georef" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Georeferencing ROS localities</h1>
+<section id="the-problem" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="the-problem"><span class="header-section-number">9.1</span> The problem</h2>
 <p>The Rural Observatory System collected household panel data in rural Madagascar from 1995 to 2015. Critically, surveys were <strong>not geolocated</strong>: location fields were free-text, not linked to official administrative codes. To enable spatial analysis — particularly overlay with protected-area boundaries — every ROS observation must be aligned with a standardised commune and <em>fokontany</em> using P-codes from the OCHA/BNGRC Common Operational Datasets (CODs).</p>
 </section>
-<section id="reference-datasets" class="level2" data-number="1.2">
-<h2 data-number="1.2" class="anchored" data-anchor-id="reference-datasets"><span class="header-section-number">1.2</span> Reference datasets</h2>
+<section id="reference-datasets" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="reference-datasets"><span class="header-section-number">9.2</span> Reference datasets</h2>
 <p>Two spatial reference datasets anchor the georeferencing:</p>
 <ol type="1">
 <li><strong>Madagascar Subnational Administrative Boundaries</strong> (COD-AB): five administrative levels from country to <em>fokontany</em>, with official P-codes.</li>
 <li><strong>Madagascar Populated Places</strong> (COD-PS): 28,184 populated places with toponyms and P-codes (source: NGA/GIST, distributed by UN OCHA ROSA).</li>
 </ol>
 </section>
-<section id="string-cleaning" class="level2" data-number="1.3">
-<h2 data-number="1.3" class="anchored" data-anchor-id="string-cleaning"><span class="header-section-number">1.3</span> String cleaning</h2>
+<section id="string-cleaning" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="string-cleaning"><span class="header-section-number">9.3</span> String cleaning</h2>
 <p>All location strings are normalised before matching. The <code>clean_string()</code> function lowercases, strips non-alphanumeric characters, removes qualifiers (“centre”, “haut”, “bas”), translates French cardinal directions to Malagasy, standardises alternative city names (e.g.&nbsp;“Fort Dauphin” → “Tolanaro”), and converts Roman numerals I–VI to Arabic.</p>
 </section>
-<section id="hierarchical-fuzzy-matching" class="level2" data-number="1.4">
-<h2 data-number="1.4" class="anchored" data-anchor-id="hierarchical-fuzzy-matching"><span class="header-section-number">1.4</span> Hierarchical fuzzy matching</h2>
+<section id="hierarchical-fuzzy-matching" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="hierarchical-fuzzy-matching"><span class="header-section-number">9.4</span> Hierarchical fuzzy matching</h2>
 <p>Matching uses <strong>Jaro-Winkler distance</strong> (default threshold 0.25), applied observatory-wise to restrict candidate sets. A four-method cascade assigns communes:</p>
 <ol type="1">
 <li><strong>Method 1</strong> — Fuzzy-match the municipality field (<code>j42</code>) against known observatory commune names. Visually verified; false positives removed manually.</li>
@@ -366,22 +300,22 @@ ul.task-list li input[type="checkbox"] {
 <img src="A1_data_pipeline_files/figure-html/fig-map-georef-1.png" class="img-fluid figure-img" width="768">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-map-georef-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: All matched ROS communes and fokontany across Madagascar.
+Figure&nbsp;9.1: All matched ROS communes and fokontany across Madagascar.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="match-rates" class="level2" data-number="1.5">
-<h2 data-number="1.5" class="anchored" data-anchor-id="match-rates"><span class="header-section-number">1.5</span> Match rates</h2>
+<section id="match-rates" class="level2" data-number="9.5">
+<h2 data-number="9.5" class="anchored" data-anchor-id="match-rates"><span class="header-section-number">9.5</span> Match rates</h2>
 <p>Communes were re-identified for <strong>91.8%</strong> of observations; villages for <strong>61.5%</strong> of name variations. The 8.2% commune failures are concentrated in observatories with highly abbreviated or non-standard location strings. 98% of unique commune name variations and 62% of village name variations were resolved.</p>
 </section>
 </section>
-<section id="sec-a-overlaps" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Protected-area overlap analysis</h1>
-<section id="spatial-overlaps" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="spatial-overlaps"><span class="header-section-number">2.1</span> Spatial overlaps</h2>
+<section id="sec-a-overlaps" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Protected-area overlap analysis</h1>
+<section id="spatial-overlaps" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="spatial-overlaps"><span class="header-section-number">10.1</span> Spatial overlaps</h2>
 <p>ROS commune and <em>fokontany</em> polygons are overlaid with the <strong>dynamic WDPA</strong> (<code>dynamic_wdpa.rds</code>), a temporally explicit database of PA boundaries for Madagascar. An interactive map visualises all observatory polygons against PA boundaries.</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -391,21 +325,21 @@ Figure&nbsp;1: All matched ROS communes and fokontany across Madagascar.
 <img src="A1_data_pipeline_files/figure-html/fig-map-overlaps-1.png" class="img-fluid figure-img" width="768">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-map-overlaps-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: ROS survey communes (coloured by observatory) overlaid with PA boundaries (dark green).
+Figure&nbsp;10.1: ROS survey communes (coloured by observatory) overlaid with PA boundaries (dark green).
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="ros-survey-inventory" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="ros-survey-inventory"><span class="header-section-number">2.2</span> ROS survey inventory</h2>
+<section id="ros-survey-inventory" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="ros-survey-inventory"><span class="header-section-number">10.2</span> ROS survey inventory</h2>
 <p>Household-level datasets for 1995–2015 are loaded and tabulated by observatory and year. Survey continuity varies: some observatories have nearly continuous 20-year panels, others cover only 3–8 years.</p>
 <div class="cell">
 <div id="tbl-survey-inventory" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-survey-inventory-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: Number of surveyed households per observatory per year (1995–2015).
+Table&nbsp;10.1: Number of surveyed households per observatory per year (1995–2015).
 </figcaption>
 <div aria-describedby="tbl-survey-inventory-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -859,7 +793,7 @@ Table&nbsp;1: Number of surveyed households per observatory per year (1995–201
 }
 </style>
 
-<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<table class="gt_table cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
 <thead>
 <tr class="gt_heading header">
 <td colspan="22" class="gt_heading gt_title gt_font_normal">ROS Survey Inventory</td>
@@ -1575,8 +1509,8 @@ Table&nbsp;1: Number of surveyed households per observatory per year (1995–201
 </div>
 </div>
 </section>
-<section id="temporal-overlap-logic" class="level2" data-number="2.3">
-<h2 data-number="2.3" class="anchored" data-anchor-id="temporal-overlap-logic"><span class="header-section-number">2.3</span> Temporal overlap logic</h2>
+<section id="temporal-overlap-logic" class="level2" data-number="10.3">
+<h2 data-number="10.3" class="anchored" data-anchor-id="temporal-overlap-logic"><span class="header-section-number">10.3</span> Temporal overlap logic</h2>
 <p>Three scenarios determine usability for impact evaluation:</p>
 <ol type="1">
 <li><strong>PA predates ROS entirely</strong> → no pre-treatment baseline → unusable (e.g.&nbsp;Ranomafana, created 1991).</li>
@@ -1584,13 +1518,13 @@ Table&nbsp;1: Number of surveyed households per observatory per year (1995–201
 <li><strong>PA created after ROS ended</strong> → baseline only; resurvey needed for evaluation.</li>
 </ol>
 </section>
-<section id="decree-date-revision" class="level2" data-number="2.4">
-<h2 data-number="2.4" class="anchored" data-anchor-id="decree-date-revision"><span class="header-section-number">2.4</span> Decree date revision</h2>
+<section id="decree-date-revision" class="level2" data-number="10.4">
+<h2 data-number="10.4" class="anchored" data-anchor-id="decree-date-revision"><span class="header-section-number">10.4</span> Decree date revision</h2>
 <p>Official creation years were cross-checked against the Madagascar legal database (<a href="https://cnlegis.gov.mg">CNLEGIS</a>). Several temporary decree dates were revised:</p>
 <div id="tbl-decree-dates" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-decree-dates-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;2: Revised PA decree dates used in this study
+Table&nbsp;10.2: Revised PA decree dates used in this study
 </figcaption>
 <div aria-describedby="tbl-decree-dates-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -1664,15 +1598,15 @@ Table&nbsp;2: Revised PA decree dates used in this study
 <img src="A1_data_pipeline_files/figure-html/fig-timeline-1.png" class="img-fluid figure-img" width="960">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Timeline of ROS survey years (blue dots) vs.&nbsp;revised PA creation years (red triangles) for priority observatory–PA pairs.
+Figure&nbsp;10.2: Timeline of ROS survey years (blue dots) vs.&nbsp;revised PA creation years (red triangles) for priority observatory–PA pairs.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="priority-pairs" class="level2" data-number="2.5">
-<h2 data-number="2.5" class="anchored" data-anchor-id="priority-pairs"><span class="header-section-number">2.5</span> Priority pairs</h2>
+<section id="priority-pairs" class="level2" data-number="10.5">
+<h2 data-number="10.5" class="anchored" data-anchor-id="priority-pairs"><span class="header-section-number">10.5</span> Priority pairs</h2>
 <p>The spatial and temporal overlay identifies Marovoay–Ankarafantsika and Alaotra–Lac Alaotra as the most promising pairs for causal analysis (long panels, clear exposure dates). Farafangana, Toliara North, and Fénérive East are secondary candidates explored in <a href="./05_extensions.html">Chapter 5</a>. A 10 km buffer (CRS EPSG:29701, Laborde Madagascar) around PAs is used for the proximity screening.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -1689,18 +1623,18 @@ Note
 </div>
 </section>
 </section>
-<section id="sec-a-variables" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Variable construction</h1>
-<section id="georeferencing-households" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="georeferencing-households"><span class="header-section-number">3.1</span> Georeferencing households</h2>
-<p>Household identifiers (<code>j5</code>) are joined to the locality correspondence table from <a href="#sec-a-georef" class="quarto-xref">Section&nbsp;1</a>. A critical correction: <strong>1995 household IDs are re-aligned using the 1996 survey</strong> (which records whether a household was surveyed in 1995 and provides its 1996 identifier).</p>
+<section id="sec-a-variables" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> Variable construction</h1>
+<section id="georeferencing-households" class="level2" data-number="11.1">
+<h2 data-number="11.1" class="anchored" data-anchor-id="georeferencing-households"><span class="header-section-number">11.1</span> Georeferencing households</h2>
+<p>Household identifiers (<code>j5</code>) are joined to the locality correspondence table from <a href="#sec-a-georef" class="quarto-xref"><span>Chapter 9</span></a>. A critical correction: <strong>1995 household IDs are re-aligned using the 1996 survey</strong> (which records whether a household was surveyed in 1995 and provides its 1996 identifier).</p>
 </section>
-<section id="household-composition" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="household-composition"><span class="header-section-number">3.2</span> Household composition</h2>
+<section id="household-composition" class="level2" data-number="11.2">
+<h2 data-number="11.2" class="anchored" data-anchor-id="household-composition"><span class="header-section-number">11.2</span> Household composition</h2>
 <p>Individual-level files (member records) provide sex, age, and headship. Households with multiple heads are resolved by keeping the first member ID. Key variables: <code>household_size</code> (member count) and head’s sex and age.</p>
 </section>
-<section id="education" class="level2" data-number="3.3">
-<h2 data-number="3.3" class="anchored" data-anchor-id="education"><span class="header-section-number">3.3</span> Education</h2>
+<section id="education" class="level2" data-number="11.3">
+<h2 data-number="11.3" class="anchored" data-anchor-id="education"><span class="header-section-number">11.3</span> Education</h2>
 <p>Education variables present several data gaps:</p>
 <ul>
 <li>Literacy (<code>s1a</code>, <code>s1b</code>): missing in 1996 and 1998.</li>
@@ -1709,16 +1643,16 @@ Note
 </ul>
 <p>Household-level indicators are constructed: <code>any_literate_adult</code> (≥1 adult reads), <code>max_years_edu</code>, <code>mean_years_edu_adults</code>, <code>pct_with_schooling</code> (share of members ≥6 with any schooling), and head’s education variables.</p>
 </section>
-<section id="agricultural-activities" class="level2" data-number="3.4">
-<h2 data-number="3.4" class="anchored" data-anchor-id="agricultural-activities"><span class="header-section-number">3.4</span> Agricultural activities</h2>
+<section id="agricultural-activities" class="level2" data-number="11.4">
+<h2 data-number="11.4" class="anchored" data-anchor-id="agricultural-activities"><span class="header-section-number">11.4</span> Agricultural activities</h2>
 <p>Activity codes (<code>a1</code>) are harmonised across the 1996–2015 coding schemes. <strong>1995 is a special case</strong>: no individual <code>a1</code> variable; activities are reconstructed from separate main/secondary activity files (<code>res_apm.dta</code>, <code>res_asm.dta</code>). Two agricultural classifications are used:</p>
 <ul>
 <li><strong>Stricto sensu</strong> (codes 95, 96): farming or livestock only.</li>
 <li><strong>Lato sensu</strong> (19 codes): farming, livestock, fishing, gathering, apiculture, agriculture-related crafts.</li>
 </ul>
 </section>
-<section id="food-security" class="level2" data-number="3.5">
-<h2 data-number="3.5" class="anchored" data-anchor-id="food-security"><span class="header-section-number">3.5</span> Food security</h2>
+<section id="food-security" class="level2" data-number="11.5">
+<h2 data-number="11.5" class="anchored" data-anchor-id="food-security"><span class="header-section-number">11.5</span> Food security</h2>
 <p>The core measure is <strong>months of food self-sufficiency from own production</strong>, harmonised across varying question formats:</p>
 <ul>
 <li>1995: single question (<code>sa3a</code>).</li>
@@ -1727,8 +1661,8 @@ Note
 </ul>
 <p>Summed and capped at 12 months.</p>
 </section>
-<section id="income-construction" class="level2" data-number="3.6">
-<h2 data-number="3.6" class="anchored" data-anchor-id="income-construction"><span class="header-section-number">3.6</span> Income construction</h2>
+<section id="income-construction" class="level2" data-number="11.6">
+<h2 data-number="11.6" class="anchored" data-anchor-id="income-construction"><span class="header-section-number">11.6</span> Income construction</h2>
 <p>Income is reconstructed via dedicated functions for each component:</p>
 <ul>
 <li><strong>Current income</strong> = main activity + secondary activity + net rice + other crops + livestock + fishing.</li>
@@ -1740,7 +1674,7 @@ Note
 <div id="tbl-income-components" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-income-components-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;3: Income component construction and variable sources.
+Table&nbsp;11.1: Income component construction and variable sources.
 </figcaption>
 <div aria-describedby="tbl-income-components-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -2194,7 +2128,7 @@ Table&nbsp;3: Income component construction and variable sources.
 }
 </style>
 
-<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<table class="gt_table cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
 <thead>
 <tr class="gt_heading header">
 <td colspan="4" class="gt_heading gt_title gt_font_normal">Income Component Construction</td>
@@ -2280,8 +2214,8 @@ Table&nbsp;3: Income component construction and variable sources.
 </div>
 </div>
 </section>
-<section id="consolidation" class="level2" data-number="3.7">
-<h2 data-number="3.7" class="anchored" data-anchor-id="consolidation"><span class="header-section-number">3.7</span> Consolidation</h2>
+<section id="consolidation" class="level2" data-number="11.7">
+<h2 data-number="11.7" class="anchored" data-anchor-id="consolidation"><span class="header-section-number">11.7</span> Consolidation</h2>
 <p>All component tables are deduplicated to unique (year, household ID) via mean aggregation, then left-joined into a single dataset: <code>household_consolidated.rds</code> (101,253 household-year observations across 11 observatories). A uniqueness check confirms one row per household per year.</p>
 
 
@@ -2689,6 +2623,18 @@ Table&nbsp;3: Income component construction and variable sources.
     }
   });
   </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./06_discussion.html" class="pagination-link" aria-label="Discussion">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Discussion</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./A2_donor_validity.html" class="pagination-link" aria-label="Appendix B: Donor Pool Validity">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Appendix B: Donor Pool Validity</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 
 

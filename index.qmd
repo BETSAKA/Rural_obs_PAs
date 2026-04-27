@@ -1,13 +1,5 @@
 ---
-title: "Conservation Governance and Rural Livelihoods in Madagascar"
-subtitle: "Long-Run Evidence from Rural Observatory Surveys (1995–2025)"
-author:
-  - name: Florent Bédécarrats
-    affiliations:
-      - UMI SOURCE (IRD / UVSQ)
-  - name: Véromanitra Razafimahenina
-    affiliations:
-      - Université d'Antananarivo
+title: "Overview"
 ---
 
 ::: {.callout-note}

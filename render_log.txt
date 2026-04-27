@@ -1,0 +1,200 @@
+[ 1/11] index.qmd
+[ 2/11] 01_context.qmd
+[ 3/11] 02_data.qmd
+[ 4/11] 03_strategy.qmd
+[ 5/11] 04_results.qmd
+[ 6/11] 05_extensions.qmd
+[ 7/11] 06_discussion.qmd
+[ 8/11] A1_data_pipeline.qmd
+
+
+processing file: A1_data_pipeline.qmd
+1/13                        
+2/13 [setup]                
+3/13                        
+4/13 [fig-map-georef]       
+5/13                        
+6/13 [fig-map-overlaps]     
+7/13                        
+8/13 [tbl-survey-inventory] 
+9/13                        
+10/13 [fig-timeline]         
+11/13                        
+12/13 [tbl-income-components]
+13/13                        
+output file: A1_data_pipeline.knit.md
+
+[ 9/11] A2_donor_validity.qmd
+
+
+processing file: A2_donor_validity.qmd
+1/17                      
+2/17 [setup]              
+3/17                      
+4/17 [compute-proximity]  
+5/17                      
+6/17 [fig-wdpa-timeline]  
+7/17                      
+8/17 [tbl-proximity]      
+9/17                      
+10/17 [tbl-donor-status]   
+11/17                      
+12/17 [fig-map-exposure]   
+13/17                      
+14/17 [fig-exposure-detail]
+15/17                      
+16/17 [fig-clean-donors]   
+17/17                      
+output file: A2_donor_validity.knit.md
+
+[10/11] A3_robustness.qmd
+
+
+processing file: A3_robustness.qmd
+1/35                         
+2/35 [setup]                 
+3/35                         
+4/35 [load-robustness]       
+5/35                         
+6/35 [fig-unadj-att]         
+7/35                         
+8/35 [tbl-income-scale]      
+9/35                         
+10/35 [fig-levels-att]        
+11/35                         
+12/35 [fig-pretreat-fit]      
+13/35                         
+14/35 [sdid-compute]          
+15/35                         
+16/35 [tbl-sdid-maro]         
+17/35                         
+18/35 [fig-sdid-maro]         
+19/35                         
+20/35 [tbl-sdid-ala]          
+21/35                         
+22/35 [cs-panel]              
+23/35                         
+24/35 [cs-attgt]              
+25/35                         
+26/35 [fig-cs-attgt]          
+27/35                         
+28/35 [cs-dyn]                
+29/35                         
+30/35 [fig-cs-dyn]            
+31/35                         
+32/35 [tbl-cs-group]          
+33/35                         
+34/35 [tbl-robustness-summary]
+35/35                         
+output file: A3_robustness.knit.md
+
+
+
+processing file: A3_robustness.qmd
+1/35                         
+2/35 [setup]                 
+3/35                         
+4/35 [load-robustness]       
+5/35                         
+6/35 [fig-unadj-att]         
+7/35                         
+8/35 [tbl-income-scale]      
+9/35                         
+10/35 [fig-levels-att]        
+11/35                         
+12/35 [fig-pretreat-fit]      
+13/35                         
+14/35 [sdid-compute]          
+15/35                         
+16/35 [tbl-sdid-maro]         
+17/35                         
+18/35 [fig-sdid-maro]         
+19/35                         
+20/35 [tbl-sdid-ala]          
+21/35                         
+22/35 [cs-panel]              
+23/35                         
+24/35 [cs-attgt]              
+25/35                         
+26/35 [fig-cs-attgt]          
+27/35                         
+28/35 [cs-dyn]                
+29/35                         
+30/35 [fig-cs-dyn]            
+31/35                         
+32/35 [tbl-cs-group]          
+33/35                         
+34/35 [tbl-robustness-summary]
+35/35                         
+output file: A3_robustness.knit.md
+
+[11/11] A4_methodology.qmd
+
+[WARNING] Duplicate identifier 'sec-outcome' at line 2473 column 1
+[WARNING] Duplicate identifier 'sec-ext-ala' at line 5437 column 1
+pandoc 
+  to: typst
+  output-file: index.typ
+  standalone: true
+  toc: true
+  number-sections: true
+  top-level-division: chapter
+  default-image-extension: svg
+  wrap: none
+  citeproc: false
+  variables: {}
+  
+metadata
+  crossref:
+    chapters: true
+  section-numbering: 1.1.a
+  bibliography:
+    - references.bib
+  engines:
+    - path: C:\Program Files\Quarto\share\extension-subtrees\julia-engine\_extensions\julia-engine\julia-engine.js
+  title: Conservation Governance and Rural Livelihoods in Madagascar
+  subtitle: Long-Run Evidence from Rural Observatory Surveys (1995–2025)
+  author:
+    - name: Florent Bédécarrats
+      affiliations:
+        - UMI SOURCE (IRD / UVSQ)
+    - name: Véromanitra Razafimahenina
+      affiliations:
+        - Université d'Antananarivo
+  date: '2026-04-27T00:00:00+02:00'
+  
+[WARNING] Duplicate identifier 'sec-outcome' at line 2473 column 1
+[WARNING] Duplicate identifier 'sec-ext-ala' at line 5437 column 1
+(W) invalid font weight initial
+(W) invalid font weight initial
+(W) invalid font weight initial
+(W) invalid font weight initial
+(W) invalid font weight initial
+(W) invalid font weight initial
+[typst]: Compiling index.typ to index.pdf...error: file not found (searched at \\?\C:\Users\fbede\Documents\Statistiques\Rural_obs_PAs_Vero\01_context_files\figure-typst\fig-pa-cumarea-1.png)
+    ┌─ \\?\C:\Users\fbede\Documents\Statistiques\Rural_obs_PAs_Vero\index.typ:561:11
+    │
+561 │ #box(image("01_context_files/figure-typst/fig-pa-cumarea-1.png"))
+    │            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ERROR: error: file not found (searched at \\?\C:\Users\fbede\Documents\Statistiques\Rural_obs_PAs_Vero\01_context_files\figure-typst\fig-pa-cumarea-1.png)
+    ┌─ \\?\C:\Users\fbede\Documents\Statistiques\Rural_obs_PAs_Vero\index.typ:561:11
+    │
+561 │ #box(image("01_context_files/figure-typst/fig-pa-cumarea-1.png"))
+    │            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+ERROR: NotFound: Le fichier spécifié est introuvable. (os error 2): rename 'C:\Users\fbede\Documents\Statistiques\Rural_obs_PAs_Vero\index.html' -> 'C:\Users\fbede\Documents\Statistiques\Rural_obs_PAs_Vero\docs\index.html'
+
+Stack trace:
+    at Object.renameSync (ext:deno_fs/30_fs.js:264:3)
+    at safeMoveSync (file:///C:/Program Files/Quarto/bin/quarto.js:3222:10)
+    at renderProject (file:///C:/Program Files/Quarto/bin/quarto.js:137210:9)
+    at eventLoopTick (ext:core/01_core.js:179:7)
+    at async _Command.actionHandler (file:///C:/Program Files/Quarto/bin/quarto.js:142481:24)
+    at async _Command.execute (file:///C:/Program Files/Quarto/bin/quarto.js:102102:7)
+    at async _Command.parseCommand (file:///C:/Program Files/Quarto/bin/quarto.js:101979:14)
+    at async quarto4 (file:///C:/Program Files/Quarto/bin/quarto.js:187653:5)
+    at async file:///C:/Program Files/Quarto/bin/quarto.js:187681:5
+    at async file:///C:/Program Files/Quarto/bin/quarto.js:187536:14
+EXIT:1
