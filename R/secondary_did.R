@@ -12,13 +12,20 @@
 
 # Bridge a numeric/character j4 fokontany label to a stable normalised name.
 # Each observatory provides its own normaliser (see below).
-build_secondary_bridge <- function(j0_code, normalise_fn,
-                                   years = c(1999:2014, 2025)) {
+build_secondary_bridge <- function(
+  j0_code,
+  normalise_fn,
+  years = c(1999:2014, 2025)
+) {
   purrr::map_dfr(years, function(y) {
     f <- file.path("data/ROS_MDG_microdata", y, "res_deb.dta")
-    if (!file.exists(f)) return(NULL)
+    if (!file.exists(f)) {
+      return(NULL)
+    }
     d <- tryCatch(haven::read_dta(f), error = function(e) NULL)
-    if (is.null(d)) return(NULL)
+    if (is.null(d)) {
+      return(NULL)
+    }
     d |>
       dplyr::filter(j0 == j0_code) |>
       dplyr::transmute(
@@ -30,10 +37,15 @@ build_secondary_bridge <- function(j0_code, normalise_fn,
 }
 
 # Build a household-year panel of log equivalent income.
-build_secondary_panel <- function(obs_code, j0_code, treat_year,
-                                  normalise_fn, merge_map = NULL,
-                                  household_consolidated,
-                                  compute_income_year_fn) {
+build_secondary_panel <- function(
+  obs_code,
+  j0_code,
+  treat_year,
+  normalise_fn,
+  merge_map = NULL,
+  household_consolidated,
+  compute_income_year_fn
+) {
   bridge <- build_secondary_bridge(j0_code, normalise_fn)
 
   hist <- household_consolidated |>
@@ -76,8 +88,9 @@ build_secondary_panel <- function(obs_code, j0_code, treat_year,
 
   if (!is.null(merge_map)) {
     raw <- raw |>
-      dplyr::mutate(site = ifelse(site %in% names(merge_map),
-                                  merge_map[site], site))
+      dplyr::mutate(
+        site = ifelse(site %in% names(merge_map), merge_map[site], site)
+      )
   }
   as.data.frame(raw)
 }
@@ -109,8 +122,9 @@ extractive_share_2025 <- function(j0_code, normalise_fn, merge_map = NULL) {
 
   if (!is.null(merge_map)) {
     out <- out |>
-      dplyr::mutate(site = ifelse(site %in% names(merge_map),
-                                  merge_map[site], site)) |>
+      dplyr::mutate(
+        site = ifelse(site %in% names(merge_map), merge_map[site], site)
+      ) |>
       dplyr::group_by(site) |>
       dplyr::summarise(pct = mean(pct), .groups = "drop")
   }
@@ -119,8 +133,13 @@ extractive_share_2025 <- function(j0_code, normalise_fn, merge_map = NULL) {
 
 # Fit Callaway-Sant'Anna with panel = FALSE, returning both clustered and
 # IF-only standard errors. Uses Sant'Anna-Zhao DR moment internally.
-fit_secondary_cs <- function(panel_df, gvar, cluster_var = "site",
-                             biters = 1000L, seed = 20260424L) {
+fit_secondary_cs <- function(
+  panel_df,
+  gvar,
+  cluster_var = "site",
+  biters = 1000L,
+  seed = 20260424L
+) {
   panel_df$g <- panel_df[[gvar]]
   panel_df$id <- seq_len(nrow(panel_df))
   set.seed(seed)
@@ -147,28 +166,42 @@ run_secondary_did <- function(panel_df, designs, biters = 1000L) {
   fits <- list()
   for (nm in names(designs)) {
     g <- designs[[nm]]
-    fits[[paste0(nm, "_clus")]] <- fit_secondary_cs(panel_df, g,
-                                                   cluster_var = "site",
-                                                   biters = biters)
+    fits[[paste0(nm, "_clus")]] <- fit_secondary_cs(
+      panel_df,
+      g,
+      cluster_var = "site",
+      biters = biters
+    )
     # IF-only: did::att_gt requires clustervars; use NULL to drop clustering
     panel_df_loc <- panel_df
     panel_df_loc$g <- panel_df_loc[[g]]
     panel_df_loc$id <- seq_len(nrow(panel_df_loc))
     set.seed(20260424L)
     fits[[paste0(nm, "_nocl")]] <- did::att_gt(
-      yname = "ln_y", tname = "year", idname = "id", gname = "g",
-      data = panel_df_loc, control_group = "nevertreated", panel = FALSE,
-      clustervars = NULL, bstrap = TRUE, biters = biters,
-      cband = TRUE, base_period = "universal"
+      yname = "ln_y",
+      tname = "year",
+      idname = "id",
+      gname = "g",
+      data = panel_df_loc,
+      control_group = "nevertreated",
+      panel = FALSE,
+      clustervars = NULL,
+      bstrap = TRUE,
+      biters = biters,
+      cband = TRUE,
+      base_period = "universal"
     )
   }
   simp <- purrr::map(fits, function(f) {
-    tryCatch(did::aggte(f, type = "simple", na.rm = TRUE),
-             error = function(e) NULL)
+    tryCatch(did::aggte(f, type = "simple", na.rm = TRUE), error = function(e) {
+      NULL
+    })
   })
   dyns <- purrr::map(fits, function(f) {
-    tryCatch(did::aggte(f, type = "dynamic", na.rm = TRUE),
-             error = function(e) NULL)
+    tryCatch(
+      did::aggte(f, type = "dynamic", na.rm = TRUE),
+      error = function(e) NULL
+    )
   })
   list(fits = fits, simp = simp, dyns = dyns)
 }
@@ -178,7 +211,9 @@ secondary_summary <- function(res, designs) {
   purrr::map_dfr(names(designs), function(nm) {
     s_no <- res$simp[[paste0(nm, "_nocl")]]
     s_cl <- res$simp[[paste0(nm, "_clus")]]
-    if (is.null(s_no) || is.null(s_cl)) return(NULL)
+    if (is.null(s_no) || is.null(s_cl)) {
+      return(NULL)
+    }
     tibble::tibble(
       design = nm,
       estimate = s_no$overall.att,
