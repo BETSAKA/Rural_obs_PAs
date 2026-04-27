@@ -35,6 +35,7 @@ website:
             href: A3_robustness.qmd
           - text: "D. Methodology"
             href: A4_methodology.qmd
+
     right:
       - icon: github
         href: https://github.com/BETSAKA/Rural_obs_PAs
@@ -56,6 +57,7 @@ website:
           - A2_donor_validity.qmd
           - A3_robustness.qmd
           - A4_methodology.qmd
+
 
 # -- Bilingual setup (uncomment when .fr.qmd files are ready) -----------------
 # babelquarto:

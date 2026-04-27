@@ -9,56 +9,59 @@ source("R/load_data.R")
 source("R/gsynth_helpers.R")
 ```
 
-The central question of this study is whether the creation or expansion of protected areas *caused* changes in household income — or whether observed income differences merely reflect pre-existing trends. This chapter explains how we isolate causal effects despite the fact that PA placement is not random and household surveys were not designed for conservation impact evaluation.
+The central question of this study is whether the creation or expansion of protected areas caused changes in household income, or whether observed income differences merely reflect pre-existing trends. This chapter explains how we attempt to isolate causal effects.
 
-The strategy has four parts. First, we define two natural experiments that provide plausible exposure–control comparisons (@sec-treatment). Second, we explain how the survey design constrains the unit of analysis (@sec-panel). Third, we describe the statistical method used to construct counterfactual income trajectories (@sec-estimation). Fourth, we briefly introduce three additional cases that extend the analysis (@sec-extensions).
+The strategy has four parts. First, we define two natural experiments to propose plausible exposure–control comparisons (@sec-treatment). Second, we explain how the survey design constrains the unit of analysis (@sec-panel). Third, we describe the statistical method used to construct counterfactual income trajectories (@sec-estimation). Fourth, we briefly introduce three additional cases that extend the analysis (@sec-extensions).
 
 # Two natural experiments {#sec-treatment}
 
-We exploit two events during the ROS survey period where a new or expanded PA began to impose restrictions on communities that had been surveyed *before* the PA became operative. The two cases differ in their conservation governance model — strict exclusion at Ankarafantsika versus participatory management at Lac Alaotra — providing a built-in comparison of how governance type mediates income effects.
+We exploit two events during the ROS survey period where a new or expanded PA began to impose restrictions on communities that had previously been surveyed. The two cases differ in their conservation governance model — strict exclusion at Ankarafantsika versus participatory management at Lac Alaotra — providing a built-in comparison of how governance type mediates income effects.
 
 ## Marovoay and Ankarafantsika National Park (2003) {#sec-treat-maro}
 
 ### The 2002 park extension {#sec-maro-history}
 
-The Ankarafantsika National Park was formally extended by Decree 2002-798 on 7 August 2002, merging the former *Réserve Naturelle Intégrale* (60,500 ha, 1927) with forest reserves into a 136,500 ha national park under IUCN Category II (strict nature conservation). We set the exposure year to **2003** — the first full ROS survey year following the decree.^[Decree 2002-798 was signed on 7 August 2002. Because the ROS survey is conducted annually and we attribute any effect to the first full survey year following the decree, we set the exposure year to 2003. Using 2002 instead has negligible impact on the estimated ATT.]
+As illustrated in @fig-map-maro, the Ankarafantsika National Park was formally extended by Decree 2002-798 on 7 August 2002, merging the former Réserve Naturelle Intégrale (60,500 ha, created in 1927) with a forest reserve into a 136,500 ha national park under IUCN Category II (strict nature conservation). 
 
-Critically, the 2002 extension was the **first event to impose binding land-use restrictions** on the communities adjacent to the forest reserve zone. The earlier designations had very different *de facto* implications:
+We set the exposure year to **2003**, which is the first full ROS survey year following the decree. Decree 2002-798 was signed on 7 August 2002. Because the ROS survey is conducted annually with a reference period from October of year-1 to September of the survey year and we attribute any effect to the first full survey year following the decree, we set the exposure year to 2003. We also test whether using 2002 instead of 2003 modifies the estimated result and find negligible incidence.
+
+According to the concording grey literature we reviewed, we consider the 2002 extension was the first event to impose binding land-use restrictions on the communities adjacent to the forest reserve zone. The earlier designations had very different *de facto* implications:
 
 - **The 1927 *Réserve Naturelle Intégrale*** covered the inland plateau to the north-east, geographically separate from the Marovoay communities. The east-bank *fokontany* had no direct interface with the strictly protected RNI.
 - **The 1929 forest reserve** was not a conservation zone but a timber and resource reserve under the forest administration. Analyses of this period found no effective enforcement: subsistence agriculture, cattle grazing, and charcoal production continued unimpeded [@brondeau1999].
 
-The 2002 reclassification merged these into a single national park where slash-and-burn agriculture (*tavy*), charcoal production, and non-timber forest product extraction were explicitly prohibited — and, crucially, enforced. Enforcement capacity was supported by international conservation funding from the World Bank and bilateral donors as part of Madagascar's third Environmental Action Plan. @fig-map-maro maps the spatial extent of the consolidation using dynamic WDPA boundary data: the original RNI (dark green) covered the inland plateau to the north-east, while the 2002 extension (light green) more than doubled the protected area to encompass forest reserves abutting the Marovoay communities [@alonso2002].
+The 2002 reclassification merged these into a single national park where slash-and-burn agriculture (*tavy*), charcoal production, and non-timber forest product extraction were explicitly prohibited and, crucially, enforced. Enforcement capacity was supported by international conservation funding from the World Bank and bilateral donors as part of Madagascar's third Environmental Action Plan. @fig-map-maro maps the spatial extent of the consolidation using dynamic WDPA boundary data: the original RNI (dark green) covered the inland plateau to the north-east, while the 2002 extension (light green) more than doubled the protected area to encompass forest reserves abutting the Marovoay communities [@alonso2002].
 
 ### The Betsiboka River as a natural barrier {#sec-maro-barrier}
 
-The Marovoay observatory comprises four *fokontany* (villages) split by the Betsiboka River — a major, permanently flowing watercourse wider than 10 metres. Crossing is possible only under certain hydrological conditions, often requiring long detours or costly boat transport. In practice, flows of people, goods, and services run along the Marovoay downstream axis rather than across the river.
+The Marovoay observatory comprises four *fokontany* (villages) split by the Betsiboka River — a major, permanently flowing watercourse. Crossing is possible only under certain hydrological conditions, often requiring long detours or costly boat transport. In practice, flows of people, goods, and services run along the Marovoay downstream axis rather than across the river.
 
-This geographic feature creates a natural experiment: east-bank communities have direct walking access to the park, while west-bank communities face a substantial access penalty — roughly tripling the effective travel distance. We formalize this with a **river-crossing penalty** of 15 km added to the straight-line distance for west-bank fokontany, reflecting the detour required to reach the park on foot (no bridge exists in the immediate vicinity):
+This geographic feature creates a natural experiment: east-bank communities have direct walking access to the park, while west-bank communities face a substantial access penalty. 
 
 ```{r}
 #| label: tbl-maro-sites
 #| tbl-cap: "Marovoay site exposure assignments. Distance to RNI = straight-line distance to the pre-2002 *Réserve Naturelle Intégrale*; Distance to NP = distance to the post-2002 national park boundary. Effective distance adds a 15 km river-crossing penalty for west-bank fokontany."
-
 maro_fkt |>
   st_drop_geometry() |>
   mutate(
+    suffix = if_else(river_side == "west", " (+ river crossing)", ""),
     Bank = str_to_title(river_side),
-    `Dist. to RNI (pre-2002)` = paste0(dist_rni_km, " km"),
-    `Dist. to NP (post-2002)` = paste0(dist_km, " km"),
-    `Effective dist.` = if_else(
-      river_side == "west",
-      paste0(dist_km + 15, " km (river detour)"),
-      paste0(dist_km, " km")
-    ),
-    Role = if_else(treated, "**Exposed** (from 2003)", "Donor (control)")
+    `Dist. to RNI (pre-2002)` = paste0(dist_rni_km, " km", suffix),
+    `Dist. to NP (post-2002)` = paste0(dist_km, " km", suffix),
+    Role = if_else(treated, "Exposed (from 2003)", "Donor (control)")
   ) |>
-  select(Fokontany = fokontany, Bank,
-         `Dist. to RNI (pre-2002)`, `Dist. to NP (post-2002)`,
-         `Effective dist.`, Role) |>
+  select(
+    Fokontany = fokontany,
+    Bank,
+    `Dist. to RNI (pre-2002)`,
+    `Dist. to NP (post-2002)`,
+    Role
+  ) |>
   gt() |>
   fmt_markdown(columns = Role) |>
-  tab_footnote("Effective distance adds a 15 km river-crossing penalty for west-bank fokontany.")
+  tab_footnote(
+    "Effective distance adds a 15 km river-crossing penalty for west-bank fokontany."
+  )
 ```
 
 The 15 km river-crossing penalty is conservative. In rural Madagascar, where most travel is on foot, the actual additional travel time likely exceeds the implied 3-hour walk. An effective distance threshold of 12 km — corresponding to approximately a 2.5-hour daily commuting limit — places both east-bank villages within the PA's zone of influence and both west-bank villages outside it, cleanly separating "exposed" from "donor" communities.
@@ -68,7 +71,6 @@ The 15 km river-crossing penalty is conservative. In rural Madagascar, where mos
 #| fig-cap: "Marovoay observatory and the 2002 Ankarafantsika expansion. Dark green: the original 1927 *Réserve Naturelle Intégrale* (~571 km²). Light green: the 2002 national park extension (~1,351 km²). The Betsiboka River separates west-bank fokontany (donors, grey) from east-bank fokontany (exposed, orange). Labels show distance to NP boundary. Water features from OpenStreetMap."
 #| fig-height: 8
 #| fig-width: 9
-
 # Bounding box: show the whole of Ankarafantsika NP plus the fokontany
 ank_bb <- st_bbox(ankarafantsika_pa)
 fkt_bb <- st_bbox(maro_fkt)
@@ -120,13 +122,17 @@ p <- ggplot() +
   geom_sf(
     data = ankarafantsika_pa,
     aes(fill = "2002 National Park extension"),
-    color = "#388E3C", alpha = 0.35, linewidth = 0.5
+    color = "#388E3C",
+    alpha = 0.35,
+    linewidth = 0.5
   ) +
   # Pre-2002 RNI (dark green, on top)
   geom_sf(
     data = ankarafantsika_rni,
     aes(fill = "1927 Réserve Naturelle Intégrale"),
-    color = "#1B5E20", alpha = 0.55, linewidth = 0.7
+    color = "#1B5E20",
+    alpha = 0.55,
+    linewidth = 0.7
   ) +
   scale_fill_manual(
     values = c(
@@ -141,14 +147,18 @@ if (!is.null(water_polys) && nrow(water_polys) > 0) {
   p <- p +
     geom_sf(
       data = water_polys,
-      fill = WATER_COL, color = WATER_COL, linewidth = 0.1
+      fill = WATER_COL,
+      color = WATER_COL,
+      linewidth = 0.1
     )
 }
 if (!is.null(water_mpolys) && nrow(water_mpolys) > 0) {
   p <- p +
     geom_sf(
       data = water_mpolys,
-      fill = WATER_COL, color = WATER_COL, linewidth = 0.1
+      fill = WATER_COL,
+      color = WATER_COL,
+      linewidth = 0.1
     )
 }
 if (!is.null(water_lines) && nrow(water_lines) > 0) {
@@ -167,36 +177,49 @@ p +
   # RNI label
   annotate(
     "label",
-    x = rni_centroid[1], y = rni_centroid[2],
+    x = rni_centroid[1],
+    y = rni_centroid[2],
     label = "RNI\n(1927\u20132002)",
-    fill = "#2E7D32", color = "white",
-    fontface = "bold.italic", size = 3.5, alpha = 0.85
+    fill = "#2E7D32",
+    color = "white",
+    fontface = "bold.italic",
+    size = 3.5,
+    alpha = 0.85
   ) +
   # NP extension label
   annotate(
     "label",
-    x = ank_bb["xmin"] + 0.12, y = ank_bb["ymin"] + 0.06,
+    x = ank_bb["xmin"] + 0.12,
+    y = ank_bb["ymin"] + 0.06,
     label = "National Park\nextension (2002)",
-    fill = "#A5D6A7", color = "#1B5E20",
-    fontface = "bold.italic", size = 3.5, alpha = 0.85
+    fill = "#A5D6A7",
+    color = "#1B5E20",
+    fontface = "bold.italic",
+    size = 3.5,
+    alpha = 0.85
   ) +
   # Fokontany points
   geom_sf(
     data = maro_fkt,
     aes(color = river_side, shape = river_side),
-    size = 4, stroke = 1.2
+    size = 4,
+    stroke = 1.2
   ) +
   geom_label_repel(
     data = maro_fkt_lab,
     aes(
-      x = lon, y = lat,
+      x = lon,
+      y = lat,
       label = paste0(fokontany, "\n(", dist_km, " km)"),
       color = river_side
     ),
-    size = 3, fontface = "bold", box.padding = 0.8,
+    size = 3,
+    fontface = "bold",
+    box.padding = 0.8,
     nudge_x = maro_fkt_lab$nudge_x,
     nudge_y = maro_fkt_lab$nudge_y,
-    min.segment.length = 0, show.legend = FALSE
+    min.segment.length = 0,
+    show.legend = FALSE
   ) +
   scale_color_manual(
     values = c("east" = "#E65100", "west" = "#616161"),
@@ -225,7 +248,6 @@ The exposure assignment rests on the assumption that the Betsiboka River effecti
 ```{r}
 #| label: tbl-maro-usage
 #| tbl-cap: "PA interaction at Marovoay by fokontany (2025 resurvey). 'Visit PA zone' = any visit, including leisure. 'Extractive use' = food gathering, woodcutting, cultivation, grazing, or craft materials. '% cite forbidden' = share of non-visitors citing legal prohibition."
-
 res_deb_25 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   mutate(
     j5 = as.character(j5),
@@ -304,18 +326,17 @@ The key difference from Ankarafantsika is governance: rather than exclusionary e
 
 ### Why all Alaotra communities are exposed {#sec-ala-all-treated}
 
-Unlike Marovoay, there is no natural barrier separating "exposed" from "unexposed" communities at Alaotra. The observatory's seven *fokontany* (across three historical survey sites) all depend on the lake-marsh ecosystem. The CBNRM enforcement mechanism — seasonal closures, gear restrictions, marsh-burning bans — applies to all lake-adjacent communities through *transferts de gestion*.
+Unlike Marovoay, there is no natural barrier separating "exposed" from "unexposed" communities at Alaotra. The observatory's seven *fokontany* (across three historical survey sites) all display modest but not negligible interactions with the lake-marsh ecosystem, with no clear distinctions among themselves in this regard. The co-managed enforcement mechanism — seasonal closures, gear restrictions, marsh-burning bans — also applies to all lake-adjacent communities similarly.
 
-A complication specific to Alaotra is the proximity of some eastern hamlets to two additional protected areas: the **Corridor Ankeniheny-Zahamena** (CAZ, IUCN Category VI, managed by Conservation International) and the **Zahamena National Park** (IUCN Category II), which lies north of the CAZ. The hamlet of Mangabe lies closer to the CAZ boundary (~14 km) than to the Lac Alaotra PHP, creating dual-PA exposure.
+A complication specific to Alaotra is the proximity of some eastern hamlets to two additional protected areas: the Corridor Ankeniheny-Zahamena (CAZ, IUCN Category VI, managed by Conservation International) and the Zahamena National Park (IUCN Category II), which lies north of the CAZ. The hamlet of Mangabe lies closer to the CAZ boundary (~14 km) than to the Lac Alaotra PHP, creating dual-PA exposure.
 
-We therefore treat the **entire observatory as a single exposed unit**, aggregated to a site-level mean. This is a stronger assumption than the site-level assignment at Marovoay, but it is supported by the uniform enforcement mechanism (CBNRM applies to all lake-adjacent communities) and the behavioural data from the 2025 resurvey discussed below.
+We therefore treat the entire observatory as a single exposed unit, aggregated to a site-level mean. This is a stronger assumption than the site-level assignment at Marovoay, but it is supported by the uniform enforcement mechanism (CBNRM applies to all lake-adjacent communities) and the behavioural data from the 2025 resurvey discussed below.
 
 ```{r}
 #| label: fig-map-ala
 #| fig-cap: "Alaotra observatory and surrounding protected areas. Lac Alaotra PHP (green), Corridor Ankeniheny-Zahamena (CAZ, orange), Zahamena National Park (light orange). Fokontany centroids from 2025 GPS survey; distances to nearest PA boundary."
 #| fig-height: 8
 #| fig-width: 8
-
 ala_bbox <- st_bbox(
   c(xmin = 48.00, ymin = -18.10, xmax = 48.80, ymax = -17.20),
   crs = 4326
@@ -443,7 +464,6 @@ p +
 ```{r}
 #| label: tbl-ala-usage
 #| tbl-cap: "PA interaction at Alaotra by fokontany (2025 resurvey). 'Visit PA zone' includes any visit to the lake-marsh area. 'Extractive use' = food gathering, fishing/hunting, cultivation, grazing, or woodcutting within the zone. Fishing/hunting shown separately as it dominates extractive use."
-
 res_deb_25 |>
   filter(Observatory == "Alaotra") |>
   left_join(um1_25 |> select(j5, um1), by = "j5") |>
@@ -480,7 +500,7 @@ The Alaotra data reveal an important distinction between *visiting* and *dependi
 - **Extractive use is concentrated and heterogeneous.** Fishing and hunting — the dominant extractive activity, reflecting traditional lake use — involves 21% of households in Ambatomanga but none in Avaradrano or Feramanga Atsimo. The overall extractive rate is 13% of all households.
 - **Distance, not prohibition, explains non-use.** Among Alaotra non-visitors, the most cited reason is distance (*lavitra*), at 35%. Legal prohibition is cited by only 8%, consistent with the less restrictive multipurpose framework.
 
-The relatively uniform *visiting* rate but sharply differentiated *extractive* rate suggests that proximity to the ecosystem — rather than engagement with PA-regulated resources — drives the visiting pattern. The uniform exposure assumption is therefore stronger for the CBNRM enforcement mechanism (which applies to all lake-adjacent communities) than for individual extractive dependence (which varies across fokontany).
+The relatively uniform visiting rate but sharply differentiated*extractive rate suggests that proximity to the ecosystem — rather than engagement with PA-regulated resources — drives the visiting pattern. 
 
 ## PA zone usage intensity across both sites {#sec-visit-freq}
 
@@ -491,7 +511,6 @@ The relatively uniform *visiting* rate but sharply differentiated *extractive* r
 #| fig-cap: "PA zone visit frequency by site (2025 resurvey). Each bar represents 100% of households in a site. White = does not visit; grey = few times per year; warm colours = monthly or more. Sites ordered by total share of visitors."
 #| fig-height: 7
 #| fig-width: 9
-
 # --- Site assignment ---
 hh_site_fig <- res_deb_25 |>
   mutate(
@@ -652,7 +671,7 @@ Standard difference-in-differences (DiD) assumes that exposed and control commun
 
 The generalized synthetic control method (gsynth) of @Xu2017 relaxes this assumption. Instead of requiring parallel trends, it allows each village to follow its own trajectory driven by unobserved factors — the method then *learns* these factors from the pre-treatment data and uses them to project what would have happened after the PA was created.
 
-In plain language: gsynth looks at how the exposed villages' income moved *before* the PA, identifies which combination of donor villages best reproduces that pattern, and then uses those same donors to predict what the exposed villages' income would have been *after* the PA — had the PA never existed. The difference between the actual income and this predicted counterfactual is the estimated effect.
+In plain language: gsynth looks at how the exposed villages' income moved *before* the PA, identifies which combination of donor villages best reproduces that pattern, and then uses those same donors to predict what the exposed villages' income would have been *after* the PA, had the PA never existed. The difference between the actual income and this predicted counterfactual is the estimated effect.
 
 ### Formal specification {#sec-gsynth-formal}
 
@@ -666,9 +685,9 @@ where $\alpha_i$ are unit fixed effects (each village has its own baseline incom
 
 Key implementation choices:
 
-- **Factor selection** — leave-one-out cross-validation over $r \in \{0, 1, 2, 3, 4, 5\}$ determines the number of latent factors.
-- **Inference** — parametric bootstrap with 200 replications.
-- **Minimum pre-treatment periods** — $\min(T_0) = 3$ to ensure adequate pre-treatment fit.
+- **Factor selection**: leave-one-out cross-validation over $r \in \{0, 1, 2, 3, 4, 5\}$ determines the number of latent factors.
+- **Inference**: parametric bootstrap with 200 replications.
+- **Minimum pre-treatment periods**: $\min(T_0) = 3$ to ensure adequate pre-treatment fit.
 
 ### Two separate models {#sec-two-models}
 
@@ -684,19 +703,73 @@ A fundamental constraint of this design is the small number of exposed units: 2 
 
 To understand this constraint concretely: for Marovoay, the set of observable units within the observatory comprises 4 sites (2 east-bank, 2 west-bank). The number of ways to assign exactly 2 of these 4 units as "exposed" is $\binom{4}{2} = 6$. Under the sharp null hypothesis of no treatment effect, the **minimum achievable p-value** is therefore $1/6 \approx 0.167$ for a one-sided test. No statistical test based solely on these 4 sites can produce a p-value below 0.167, regardless of how large the observed effect is.
 
-When all three Alaotra sites are included as additional control donors (expanding the permutation pool to 7 units), the allocation count rises to $\binom{7}{2} = 21$ and the minimum achievable p-value falls to $1/21 \approx 0.048$ — just below the conventional 5% threshold.
+When all three Alaotra sites are included as additional control donors (expanding the permutation pool to 7 units), the allocation count rises to $\binom{7}{2} = 21$ and the minimum achievable p-value falls to $1/21 \approx 0.048$, that is just below the conventional 5% threshold.
 
 We report gsynth bootstrap confidence intervals and p-values throughout, but interpret them in light of this **power ceiling**. The inability to reject the null at conventional thresholds does not imply absence of effect; it may simply reflect the inherent inferential limitations of quasi-experimental designs with few geographic units. Placebo-in-space tests ([Appendix C](A3_robustness.qmd)) provide complementary evidence on the uniqueness of estimated effects.
 
-## Complementary estimators {#sec-complementary}
+## Complementary household-level designs {#sec-complementary}
 
-To assess the sensitivity of our findings to modelling choices, we complement the main gsynth analysis with two alternative approaches (detailed in [Appendix C](A3_robustness.qmd)):
+The gsynth analysis above operates on **village-year aggregates** and identifies treatment effects against an **outside donor pool** of clean observatories. We complement it with two within-observatory **household-level repeated cross-section** designs that exploit a different identifying contrast: exposure-intensity heterogeneity *inside* each observatory. The two layers of inference are deliberately distinct, and their agreement (or disagreement) is itself informative.
 
-**Synthetic Difference-in-Differences (SDID).** SDID [@Arkhangelsky2021] combines the strengths of traditional DiD and synthetic control. Like DiD, it is invariant to additive shifts across units (no need for exact pre-treatment level matching). Like synthetic control, it reweights control units to match pre-treatment *trends*. It also adds **time weights** that concentrate comparison on the pre-treatment periods most predictive of post-treatment outcomes. The key property is **double robustness**: SDID is consistent if *either* the unit weights or the time weights successfully remove confounding — the factor structure need not be correctly specified in both dimensions simultaneously.
+**Sampling distinction.** Because the ROS is a rotating panel, households are not tracked across waves. The valid household-level estimator is therefore a **repeated cross-section** Callaway–Sant'Anna design [@CallawayS2021] with `panel = FALSE`, which treats each wave as an independent cross-section of households within sites and aggregates over the household-level observations through the doubly-robust 2-period moment of @SantAnnaZhao2020. Site fixed effects (not household fixed effects) absorb time-invariant unobserved heterogeneity. We run the design on the 1999–2014 waves extended with the 2025 resurvey.
 
-**Two-way fixed effects (TWFE).** Standard TWFE DiD serves as a benchmark. Where pre-treatment trends are approximately parallel, TWFE and gsynth should agree; divergence signals that the parallel-trends assumption is consequential.
+**Two exposure-intensity proxies.** For each observatory we build a binary treatment indicator from one of two within-observatory contrasts:
 
-The key diagnostic across all three approaches is whether they **agree on the sign and approximate magnitude** of the treatment effect. Convergence across estimators with different identifying assumptions strengthens causal claims; divergence signals sensitivity to modelling choices.
+- **Geographic exposure.** Distance to the nearest PA boundary, or — at Marovoay — east-bank versus west-bank assignment, as motivated in @sec-treat-maro by the Betsiboka river barrier.
+- **Behavioural exposure.** The 2025 share of households declaring at least one PA-dependent extractive use (@sec-maro-usage, @sec-ala-usage), with a cut at ≥ 12.5% defining the *high-usage* group.
+
+For Alaotra both proxies are reported (the seven merged fokontany span both a meaningful distance gradient — 8.9 to 16.3 km from the nearest PA — and a meaningful extractive-use gradient — 0.7% to 26.5%). For Marovoay only the geographic proxy is reported, because extractive use is rare on both banks (peak: 11.4% at Bepako; @sec-maro-usage) and a 12.5% cut leaves no treated unit.
+
+```{r}
+#| label: secondary-did-build
+#| include: false
+source("R/secondary_did.R")
+sec_did <- read_rds("data/secondary_did_results.rds")
+```
+
+```{r}
+#| label: tbl-secondary-design
+#| tbl-cap: "Within-observatory exposure-intensity classifications used by the secondary household-level RCS designs. Distance and bank are pre-determined geography; extractive-use share is measured on the 2025 resurvey under the same definition as @sec-maro-usage and @sec-ala-usage. The two Alaotra fokontany pairs Ambodivoara/Maritampona and Ambatoharanana/Analamiranga are merged onto their older centroids to align the 1999–2014 frame with the 2025 GPS enumeration."
+maro_class <- tibble(
+  Observatory = "Marovoay",
+  Site = c("Bepako", "Madiromiongana", "Ampijoroa", "Maroala"),
+  `Distance / bank` = c("east", "east", "west", "west"),
+  `% extractive (2025)` = c(11.4, 8.8, 0.7, 1.7),
+  `Geographic` = c("treated", "treated", "control", "control"),
+  `Behavioural` = c("—", "—", "—", "—")
+)
+ala_summary <- sec_did$ala$panel |>
+  distinct(site, dist, g_dist, g_ext) |>
+  left_join(sec_did$ala$ext_share, by = "site") |>
+  arrange(dist) |>
+  transmute(
+    Observatory = "Alaotra",
+    Site = case_when(
+      site == "Maritampona"  ~ "Ambodivoara-Maritampona",
+      site == "Analamiranga" ~ "Ambatoharanana-Analamiranga",
+      TRUE ~ site
+    ),
+    `Distance / bank` = sprintf("%.1f km", dist),
+    `% extractive (2025)` = round(pct, 1),
+    `Geographic` = if_else(g_dist > 0, "treated", "control"),
+    `Behavioural` = if_else(g_ext > 0, "treated", "control")
+  )
+bind_rows(maro_class, ala_summary) |>
+  gt(groupname_col = "Observatory") |>
+  fmt_number(columns = `% extractive (2025)`, decimals = 1) |>
+  tab_header(title = "Secondary DiD: exposure-intensity classifications")
+```
+
+**Inference.** Because the cluster count is small (G = 4 sites at Marovoay, G = 5 merged fokontany at Alaotra), we report two standard errors for every point estimate: the design-based, influence-function SE — valid if the estimand is the ATT on these specific sites conditional on the observed treatment assignment — and the site-clustered SE, valid for super-population inference. The gap between the two is informative about how much identifying variation lives across versus within sites.
+
+**Limitations.** Four caveats are inescapable and should be kept in mind when reading the results.
+
+1. **No clean within-observatory control.** Every site in either observatory is exposed to the conservation framework to some degree; the "control" group is just the *less exposed* subset.
+2. **Distance is Euclidean.** Straight-line distance to the PA boundary is not the same as practical accessibility — terrain, roads and rivers all matter and are only partially captured (the river barrier at Marovoay is captured by the bank cut).
+3. **Extractive usage is post-treatment endogenous.** The 2025 extractive share is measured *after* exposure, so a fokontany depressed by enforcement could appear less (or more) extractive today as a consequence of the treatment.
+4. **Small G.** With only four to seven sites the cluster-robust SE is wide; the design-based IF SE is tighter but identifies a more restrictive estimand.
+
+For these reasons the secondary designs are explicitly **complementary** rather than confirmatory of the main gsynth analysis. Where they agree with gsynth (Alaotra), the agreement narrows the range of plausible interpretations; where they disagree (Marovoay), the disagreement diagnoses *which* identifying contrast is doing the work in each estimator. Two further estimators — Synthetic DiD [@Arkhangelsky2021] and standard two-way fixed effects — are reported in [Appendix C](A3_robustness.qmd) as additional sensitivity checks against the gsynth specification choice.
 
 
 # Extensions to three additional observatories {#sec-extensions}
@@ -714,16 +787,6 @@ The two-case comparison above — strict enforcement at Ankarafantsika versus pa
 These three observatories move from liabilities in the donor pool to informative exposed units, enabling a five-case comparison of how conservation governance type, enforcement intensity, and PA size shape household-income outcomes. The shorter post-exposure windows (8–9 years versus 12 for Marovoay and 7 for Alaotra) limit precision but broaden the institutional variation. The full analysis is presented in [Chapter 5](05_extensions.qmd).
 
 
-# Looking ahead: household-level estimation {#sec-did-roadmap}
+# Looking ahead: full household-level estimation {#sec-did-roadmap}
 
-The gsynth approach is well-suited to the current data but operates at the village level, discarding within-village household heterogeneity. A richer household-level analysis requires a different strategy.
-
-Because the ROS is a rotating panel, the valid household-level approach is a **repeated cross-section DiD** — treating each survey wave as an independent cross-section and using site and year fixed effects (not household fixed effects) to absorb unobserved heterogeneity. The estimating equation is:
-
-$$
-\ln y_{ist} = \alpha_s + \lambda_t + \delta \cdot D_{st} + \varepsilon_{ist}
-$$
-
-where $\alpha_s$ are site fixed effects, $\lambda_t$ year fixed effects, and $D_{st}$ the treatment indicator for site $s$ at time $t$. Standard errors are clustered at the site level.
-
-The 2025 resurvey opens a particularly powerful design: a **long-run 2×2 DiD** comparing the pre-treatment period (1999–2002) to the 2025 wave — a 23-year post-exposure observation that bypasses all intermediate panel-gap issues. Combined with a **Callaway–Sant’Anna** estimator exploiting four staggered exposure cohorts (Ankarafantsika 2003, Farafangana/Toliara/Fenérive 2006–07, Alaotra 2008, plus never-exposed), and **Sun–Abraham event studies** via `fixest::sunab()`, the 2026 survey wave will enable fully household-level inference. This forward-looking design is discussed further in [Chapter 6](06_discussion.qmd).
+The secondary RCS designs introduced in @sec-complementary already exploit household-level information within each observatory, but they remain limited by the small number of sites available *inside* a single observatory (G = 4 to 7). A richer household-level analysis would pool all five exposed observatories together with the never-exposed donors into a single staggered-treatment design, exploiting four staggered exposure cohorts (Ankarafantsika 2003, Farafangana/Toliara/Fenérive 2006–07, Alaotra 2008, plus never-exposed). The natural estimator is again Callaway–Sant'Anna with `panel = FALSE`, complemented by Sun–Abraham event studies via `fixest::sunab()`. The 2026 ROS wave will increase post-exposure information and is expected to sharpen these estimates further. This forward-looking design is discussed in @sec-next-steps.

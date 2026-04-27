@@ -333,7 +333,14 @@ window.Quarto = {
   <li><a href="#ankarafantsika-sdid" id="toc-ankarafantsika-sdid" class="nav-link" data-scroll-target="#ankarafantsika-sdid"><span class="header-section-number">3.1</span> Ankarafantsika (SDID)</a></li>
   <li><a href="#alaotra-sdid" id="toc-alaotra-sdid" class="nav-link" data-scroll-target="#alaotra-sdid"><span class="header-section-number">3.2</span> Alaotra (SDID)</a></li>
   </ul></li>
-  <li><a href="#sec-c-summary" id="toc-sec-c-summary" class="nav-link" data-scroll-target="#sec-c-summary"><span class="header-section-number">4</span> Summary of robustness</a></li>
+  <li><a href="#sec-c-cs" id="toc-sec-c-cs" class="nav-link" data-scroll-target="#sec-c-cs"><span class="header-section-number">4</span> Callaway–Sant’Anna DiD with repeated cross-sections</a>
+  <ul class="collapse">
+  <li><a href="#panel-construction" id="toc-panel-construction" class="nav-link" data-scroll-target="#panel-construction"><span class="header-section-number">4.1</span> Panel construction</a></li>
+  <li><a href="#sec-c-cs-attgt" id="toc-sec-c-cs-attgt" class="nav-link" data-scroll-target="#sec-c-cs-attgt"><span class="header-section-number">4.2</span> Group-time ATT</a></li>
+  <li><a href="#sec-c-cs-dyn" id="toc-sec-c-cs-dyn" class="nav-link" data-scroll-target="#sec-c-cs-dyn"><span class="header-section-number">4.3</span> Event-study aggregation</a></li>
+  <li><a href="#cohort-specific-att" id="toc-cohort-specific-att" class="nav-link" data-scroll-target="#cohort-specific-att"><span class="header-section-number">4.4</span> Cohort-specific ATT</a></li>
+  </ul></li>
+  <li><a href="#sec-c-summary" id="toc-sec-c-summary" class="nav-link" data-scroll-target="#sec-c-summary"><span class="header-section-number">5</span> Summary of robustness</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/BETSAKA/Rural_obs_PAs/blob/main/A3_robustness.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/BETSAKA/Rural_obs_PAs/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -391,23 +398,23 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
 </figcaption>
 <div aria-describedby="tbl-income-scale-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="chcezvspbf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#chcezvspbf table {
+<div id="mdgnyacvtc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#mdgnyacvtc table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#chcezvspbf thead, #chcezvspbf tbody, #chcezvspbf tfoot, #chcezvspbf tr, #chcezvspbf td, #chcezvspbf th {
+#mdgnyacvtc thead, #mdgnyacvtc tbody, #mdgnyacvtc tfoot, #mdgnyacvtc tr, #mdgnyacvtc td, #mdgnyacvtc th {
   border-style: none;
 }
 
-#chcezvspbf p {
+#mdgnyacvtc p {
   margin: 0;
   padding: 0;
 }
 
-#chcezvspbf .gt_table {
+#mdgnyacvtc .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -433,12 +440,12 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   border-left-color: #D3D3D3;
 }
 
-#chcezvspbf .gt_caption {
+#mdgnyacvtc .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#chcezvspbf .gt_title {
+#mdgnyacvtc .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -450,7 +457,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   border-bottom-width: 0;
 }
 
-#chcezvspbf .gt_subtitle {
+#mdgnyacvtc .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -462,7 +469,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   border-top-width: 0;
 }
 
-#chcezvspbf .gt_heading {
+#mdgnyacvtc .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -474,13 +481,13 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   border-right-color: #D3D3D3;
 }
 
-#chcezvspbf .gt_bottom_border {
+#mdgnyacvtc .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#chcezvspbf .gt_col_headings {
+#mdgnyacvtc .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -495,7 +502,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   border-right-color: #D3D3D3;
 }
 
-#chcezvspbf .gt_col_heading {
+#mdgnyacvtc .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -515,7 +522,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   overflow-x: hidden;
 }
 
-#chcezvspbf .gt_column_spanner_outer {
+#mdgnyacvtc .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -527,15 +534,15 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   padding-right: 4px;
 }
 
-#chcezvspbf .gt_column_spanner_outer:first-child {
+#mdgnyacvtc .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#chcezvspbf .gt_column_spanner_outer:last-child {
+#mdgnyacvtc .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#chcezvspbf .gt_column_spanner {
+#mdgnyacvtc .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -547,11 +554,11 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   width: 100%;
 }
 
-#chcezvspbf .gt_spanner_row {
+#mdgnyacvtc .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#chcezvspbf .gt_group_heading {
+#mdgnyacvtc .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -577,7 +584,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   text-align: left;
 }
 
-#chcezvspbf .gt_empty_group_heading {
+#mdgnyacvtc .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -592,15 +599,15 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   vertical-align: middle;
 }
 
-#chcezvspbf .gt_from_md > :first-child {
+#mdgnyacvtc .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#chcezvspbf .gt_from_md > :last-child {
+#mdgnyacvtc .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#chcezvspbf .gt_row {
+#mdgnyacvtc .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -619,7 +626,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   overflow-x: hidden;
 }
 
-#chcezvspbf .gt_stub {
+#mdgnyacvtc .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -632,7 +639,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   padding-right: 5px;
 }
 
-#chcezvspbf .gt_stub_row_group {
+#mdgnyacvtc .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -646,15 +653,15 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   vertical-align: top;
 }
 
-#chcezvspbf .gt_row_group_first td {
+#mdgnyacvtc .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#chcezvspbf .gt_row_group_first th {
+#mdgnyacvtc .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#chcezvspbf .gt_summary_row {
+#mdgnyacvtc .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -664,16 +671,16 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   padding-right: 5px;
 }
 
-#chcezvspbf .gt_first_summary_row {
+#mdgnyacvtc .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#chcezvspbf .gt_first_summary_row.thick {
+#mdgnyacvtc .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#chcezvspbf .gt_last_summary_row {
+#mdgnyacvtc .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -683,7 +690,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   border-bottom-color: #D3D3D3;
 }
 
-#chcezvspbf .gt_grand_summary_row {
+#mdgnyacvtc .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -693,7 +700,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   padding-right: 5px;
 }
 
-#chcezvspbf .gt_first_grand_summary_row {
+#mdgnyacvtc .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -703,7 +710,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   border-top-color: #D3D3D3;
 }
 
-#chcezvspbf .gt_last_grand_summary_row_top {
+#mdgnyacvtc .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -713,11 +720,11 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   border-bottom-color: #D3D3D3;
 }
 
-#chcezvspbf .gt_striped {
+#mdgnyacvtc .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#chcezvspbf .gt_table_body {
+#mdgnyacvtc .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -726,7 +733,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   border-bottom-color: #D3D3D3;
 }
 
-#chcezvspbf .gt_footnotes {
+#mdgnyacvtc .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -740,7 +747,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   border-right-color: #D3D3D3;
 }
 
-#chcezvspbf .gt_footnote {
+#mdgnyacvtc .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -749,7 +756,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   padding-right: 5px;
 }
 
-#chcezvspbf .gt_sourcenotes {
+#mdgnyacvtc .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -763,7 +770,7 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   border-right-color: #D3D3D3;
 }
 
-#chcezvspbf .gt_sourcenote {
+#mdgnyacvtc .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -771,72 +778,72 @@ Table&nbsp;1: Descriptive statistics of winsorised income (thousands of Ariary) 
   padding-right: 5px;
 }
 
-#chcezvspbf .gt_left {
+#mdgnyacvtc .gt_left {
   text-align: left;
 }
 
-#chcezvspbf .gt_center {
+#mdgnyacvtc .gt_center {
   text-align: center;
 }
 
-#chcezvspbf .gt_right {
+#mdgnyacvtc .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#chcezvspbf .gt_font_normal {
+#mdgnyacvtc .gt_font_normal {
   font-weight: normal;
 }
 
-#chcezvspbf .gt_font_bold {
+#mdgnyacvtc .gt_font_bold {
   font-weight: bold;
 }
 
-#chcezvspbf .gt_font_italic {
+#mdgnyacvtc .gt_font_italic {
   font-style: italic;
 }
 
-#chcezvspbf .gt_super {
+#mdgnyacvtc .gt_super {
   font-size: 65%;
 }
 
-#chcezvspbf .gt_footnote_marks {
+#mdgnyacvtc .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#chcezvspbf .gt_asterisk {
+#mdgnyacvtc .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#chcezvspbf .gt_indent_1 {
+#mdgnyacvtc .gt_indent_1 {
   text-indent: 5px;
 }
 
-#chcezvspbf .gt_indent_2 {
+#mdgnyacvtc .gt_indent_2 {
   text-indent: 10px;
 }
 
-#chcezvspbf .gt_indent_3 {
+#mdgnyacvtc .gt_indent_3 {
   text-indent: 15px;
 }
 
-#chcezvspbf .gt_indent_4 {
+#mdgnyacvtc .gt_indent_4 {
   text-indent: 20px;
 }
 
-#chcezvspbf .gt_indent_5 {
+#mdgnyacvtc .gt_indent_5 {
   text-indent: 25px;
 }
 
-#chcezvspbf .katex-display {
+#mdgnyacvtc .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#chcezvspbf div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#mdgnyacvtc div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -938,23 +945,23 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
 </figcaption>
 <div aria-describedby="tbl-sdid-maro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="duqbyjnwkq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#duqbyjnwkq table {
+<div id="ftjtwrpscm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ftjtwrpscm table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#duqbyjnwkq thead, #duqbyjnwkq tbody, #duqbyjnwkq tfoot, #duqbyjnwkq tr, #duqbyjnwkq td, #duqbyjnwkq th {
+#ftjtwrpscm thead, #ftjtwrpscm tbody, #ftjtwrpscm tfoot, #ftjtwrpscm tr, #ftjtwrpscm td, #ftjtwrpscm th {
   border-style: none;
 }
 
-#duqbyjnwkq p {
+#ftjtwrpscm p {
   margin: 0;
   padding: 0;
 }
 
-#duqbyjnwkq .gt_table {
+#ftjtwrpscm .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -980,12 +987,12 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   border-left-color: #D3D3D3;
 }
 
-#duqbyjnwkq .gt_caption {
+#ftjtwrpscm .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#duqbyjnwkq .gt_title {
+#ftjtwrpscm .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -997,7 +1004,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   border-bottom-width: 0;
 }
 
-#duqbyjnwkq .gt_subtitle {
+#ftjtwrpscm .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1009,7 +1016,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   border-top-width: 0;
 }
 
-#duqbyjnwkq .gt_heading {
+#ftjtwrpscm .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1021,13 +1028,13 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   border-right-color: #D3D3D3;
 }
 
-#duqbyjnwkq .gt_bottom_border {
+#ftjtwrpscm .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#duqbyjnwkq .gt_col_headings {
+#ftjtwrpscm .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1042,7 +1049,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   border-right-color: #D3D3D3;
 }
 
-#duqbyjnwkq .gt_col_heading {
+#ftjtwrpscm .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1062,7 +1069,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   overflow-x: hidden;
 }
 
-#duqbyjnwkq .gt_column_spanner_outer {
+#ftjtwrpscm .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1074,15 +1081,15 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   padding-right: 4px;
 }
 
-#duqbyjnwkq .gt_column_spanner_outer:first-child {
+#ftjtwrpscm .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#duqbyjnwkq .gt_column_spanner_outer:last-child {
+#ftjtwrpscm .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#duqbyjnwkq .gt_column_spanner {
+#ftjtwrpscm .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1094,11 +1101,11 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   width: 100%;
 }
 
-#duqbyjnwkq .gt_spanner_row {
+#ftjtwrpscm .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#duqbyjnwkq .gt_group_heading {
+#ftjtwrpscm .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1124,7 +1131,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   text-align: left;
 }
 
-#duqbyjnwkq .gt_empty_group_heading {
+#ftjtwrpscm .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1139,15 +1146,15 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   vertical-align: middle;
 }
 
-#duqbyjnwkq .gt_from_md > :first-child {
+#ftjtwrpscm .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#duqbyjnwkq .gt_from_md > :last-child {
+#ftjtwrpscm .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#duqbyjnwkq .gt_row {
+#ftjtwrpscm .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1166,7 +1173,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   overflow-x: hidden;
 }
 
-#duqbyjnwkq .gt_stub {
+#ftjtwrpscm .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1179,7 +1186,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   padding-right: 5px;
 }
 
-#duqbyjnwkq .gt_stub_row_group {
+#ftjtwrpscm .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1193,15 +1200,15 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   vertical-align: top;
 }
 
-#duqbyjnwkq .gt_row_group_first td {
+#ftjtwrpscm .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#duqbyjnwkq .gt_row_group_first th {
+#ftjtwrpscm .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#duqbyjnwkq .gt_summary_row {
+#ftjtwrpscm .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1211,16 +1218,16 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   padding-right: 5px;
 }
 
-#duqbyjnwkq .gt_first_summary_row {
+#ftjtwrpscm .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#duqbyjnwkq .gt_first_summary_row.thick {
+#ftjtwrpscm .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#duqbyjnwkq .gt_last_summary_row {
+#ftjtwrpscm .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1230,7 +1237,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   border-bottom-color: #D3D3D3;
 }
 
-#duqbyjnwkq .gt_grand_summary_row {
+#ftjtwrpscm .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1240,7 +1247,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   padding-right: 5px;
 }
 
-#duqbyjnwkq .gt_first_grand_summary_row {
+#ftjtwrpscm .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1250,7 +1257,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   border-top-color: #D3D3D3;
 }
 
-#duqbyjnwkq .gt_last_grand_summary_row_top {
+#ftjtwrpscm .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1260,11 +1267,11 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   border-bottom-color: #D3D3D3;
 }
 
-#duqbyjnwkq .gt_striped {
+#ftjtwrpscm .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#duqbyjnwkq .gt_table_body {
+#ftjtwrpscm .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1273,7 +1280,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   border-bottom-color: #D3D3D3;
 }
 
-#duqbyjnwkq .gt_footnotes {
+#ftjtwrpscm .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1287,7 +1294,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   border-right-color: #D3D3D3;
 }
 
-#duqbyjnwkq .gt_footnote {
+#ftjtwrpscm .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1296,7 +1303,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   padding-right: 5px;
 }
 
-#duqbyjnwkq .gt_sourcenotes {
+#ftjtwrpscm .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1310,7 +1317,7 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   border-right-color: #D3D3D3;
 }
 
-#duqbyjnwkq .gt_sourcenote {
+#ftjtwrpscm .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1318,72 +1325,72 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
   padding-right: 5px;
 }
 
-#duqbyjnwkq .gt_left {
+#ftjtwrpscm .gt_left {
   text-align: left;
 }
 
-#duqbyjnwkq .gt_center {
+#ftjtwrpscm .gt_center {
   text-align: center;
 }
 
-#duqbyjnwkq .gt_right {
+#ftjtwrpscm .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#duqbyjnwkq .gt_font_normal {
+#ftjtwrpscm .gt_font_normal {
   font-weight: normal;
 }
 
-#duqbyjnwkq .gt_font_bold {
+#ftjtwrpscm .gt_font_bold {
   font-weight: bold;
 }
 
-#duqbyjnwkq .gt_font_italic {
+#ftjtwrpscm .gt_font_italic {
   font-style: italic;
 }
 
-#duqbyjnwkq .gt_super {
+#ftjtwrpscm .gt_super {
   font-size: 65%;
 }
 
-#duqbyjnwkq .gt_footnote_marks {
+#ftjtwrpscm .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#duqbyjnwkq .gt_asterisk {
+#ftjtwrpscm .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#duqbyjnwkq .gt_indent_1 {
+#ftjtwrpscm .gt_indent_1 {
   text-indent: 5px;
 }
 
-#duqbyjnwkq .gt_indent_2 {
+#ftjtwrpscm .gt_indent_2 {
   text-indent: 10px;
 }
 
-#duqbyjnwkq .gt_indent_3 {
+#ftjtwrpscm .gt_indent_3 {
   text-indent: 15px;
 }
 
-#duqbyjnwkq .gt_indent_4 {
+#ftjtwrpscm .gt_indent_4 {
   text-indent: 20px;
 }
 
-#duqbyjnwkq .gt_indent_5 {
+#ftjtwrpscm .gt_indent_5 {
   text-indent: 25px;
 }
 
-#duqbyjnwkq .katex-display {
+#ftjtwrpscm .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#duqbyjnwkq div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#ftjtwrpscm div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1407,19 +1414,19 @@ Table&nbsp;2: SDID, SC, and DID estimates for Ankarafantsika (exposure onset 200
 <tr class="odd">
 <td class="gt_row gt_left" headers="Method">SDID</td>
 <td class="gt_row gt_right" headers="ATT">-0.098</td>
-<td class="gt_row gt_right" headers="SE (placebo)">0.200</td>
+<td class="gt_row gt_right" headers="SE (placebo)">0.178</td>
 <td class="gt_row gt_right" headers="% change">-9.3%</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Method">Synthetic Control</td>
 <td class="gt_row gt_right" headers="ATT">0.020</td>
-<td class="gt_row gt_right" headers="SE (placebo)">0.105</td>
+<td class="gt_row gt_right" headers="SE (placebo)">0.095</td>
 <td class="gt_row gt_right" headers="% change">2%</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Method">DID</td>
 <td class="gt_row gt_right" headers="ATT">-0.246</td>
-<td class="gt_row gt_right" headers="SE (placebo)">0.212</td>
+<td class="gt_row gt_right" headers="SE (placebo)">0.203</td>
 <td class="gt_row gt_right" headers="% change">-21.8%</td>
 </tr>
 </tbody>
@@ -1469,23 +1476,23 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
 </figcaption>
 <div aria-describedby="tbl-sdid-ala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="rxvhvuotzu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#rxvhvuotzu table {
+<div id="joshnanjau" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#joshnanjau table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#rxvhvuotzu thead, #rxvhvuotzu tbody, #rxvhvuotzu tfoot, #rxvhvuotzu tr, #rxvhvuotzu td, #rxvhvuotzu th {
+#joshnanjau thead, #joshnanjau tbody, #joshnanjau tfoot, #joshnanjau tr, #joshnanjau td, #joshnanjau th {
   border-style: none;
 }
 
-#rxvhvuotzu p {
+#joshnanjau p {
   margin: 0;
   padding: 0;
 }
 
-#rxvhvuotzu .gt_table {
+#joshnanjau .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1511,12 +1518,12 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   border-left-color: #D3D3D3;
 }
 
-#rxvhvuotzu .gt_caption {
+#joshnanjau .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#rxvhvuotzu .gt_title {
+#joshnanjau .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1528,7 +1535,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   border-bottom-width: 0;
 }
 
-#rxvhvuotzu .gt_subtitle {
+#joshnanjau .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1540,7 +1547,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   border-top-width: 0;
 }
 
-#rxvhvuotzu .gt_heading {
+#joshnanjau .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1552,13 +1559,13 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   border-right-color: #D3D3D3;
 }
 
-#rxvhvuotzu .gt_bottom_border {
+#joshnanjau .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#rxvhvuotzu .gt_col_headings {
+#joshnanjau .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1573,7 +1580,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   border-right-color: #D3D3D3;
 }
 
-#rxvhvuotzu .gt_col_heading {
+#joshnanjau .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1593,7 +1600,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   overflow-x: hidden;
 }
 
-#rxvhvuotzu .gt_column_spanner_outer {
+#joshnanjau .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1605,15 +1612,15 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   padding-right: 4px;
 }
 
-#rxvhvuotzu .gt_column_spanner_outer:first-child {
+#joshnanjau .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#rxvhvuotzu .gt_column_spanner_outer:last-child {
+#joshnanjau .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#rxvhvuotzu .gt_column_spanner {
+#joshnanjau .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1625,11 +1632,11 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   width: 100%;
 }
 
-#rxvhvuotzu .gt_spanner_row {
+#joshnanjau .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#rxvhvuotzu .gt_group_heading {
+#joshnanjau .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1655,7 +1662,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   text-align: left;
 }
 
-#rxvhvuotzu .gt_empty_group_heading {
+#joshnanjau .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1670,15 +1677,15 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   vertical-align: middle;
 }
 
-#rxvhvuotzu .gt_from_md > :first-child {
+#joshnanjau .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#rxvhvuotzu .gt_from_md > :last-child {
+#joshnanjau .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#rxvhvuotzu .gt_row {
+#joshnanjau .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1697,7 +1704,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   overflow-x: hidden;
 }
 
-#rxvhvuotzu .gt_stub {
+#joshnanjau .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1710,7 +1717,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   padding-right: 5px;
 }
 
-#rxvhvuotzu .gt_stub_row_group {
+#joshnanjau .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1724,15 +1731,15 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   vertical-align: top;
 }
 
-#rxvhvuotzu .gt_row_group_first td {
+#joshnanjau .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#rxvhvuotzu .gt_row_group_first th {
+#joshnanjau .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#rxvhvuotzu .gt_summary_row {
+#joshnanjau .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1742,16 +1749,16 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   padding-right: 5px;
 }
 
-#rxvhvuotzu .gt_first_summary_row {
+#joshnanjau .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#rxvhvuotzu .gt_first_summary_row.thick {
+#joshnanjau .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#rxvhvuotzu .gt_last_summary_row {
+#joshnanjau .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1761,7 +1768,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   border-bottom-color: #D3D3D3;
 }
 
-#rxvhvuotzu .gt_grand_summary_row {
+#joshnanjau .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1771,7 +1778,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   padding-right: 5px;
 }
 
-#rxvhvuotzu .gt_first_grand_summary_row {
+#joshnanjau .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1781,7 +1788,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   border-top-color: #D3D3D3;
 }
 
-#rxvhvuotzu .gt_last_grand_summary_row_top {
+#joshnanjau .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1791,11 +1798,11 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   border-bottom-color: #D3D3D3;
 }
 
-#rxvhvuotzu .gt_striped {
+#joshnanjau .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#rxvhvuotzu .gt_table_body {
+#joshnanjau .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1804,7 +1811,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   border-bottom-color: #D3D3D3;
 }
 
-#rxvhvuotzu .gt_footnotes {
+#joshnanjau .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1818,7 +1825,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   border-right-color: #D3D3D3;
 }
 
-#rxvhvuotzu .gt_footnote {
+#joshnanjau .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1827,7 +1834,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   padding-right: 5px;
 }
 
-#rxvhvuotzu .gt_sourcenotes {
+#joshnanjau .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1841,7 +1848,7 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   border-right-color: #D3D3D3;
 }
 
-#rxvhvuotzu .gt_sourcenote {
+#joshnanjau .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1849,72 +1856,72 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
   padding-right: 5px;
 }
 
-#rxvhvuotzu .gt_left {
+#joshnanjau .gt_left {
   text-align: left;
 }
 
-#rxvhvuotzu .gt_center {
+#joshnanjau .gt_center {
   text-align: center;
 }
 
-#rxvhvuotzu .gt_right {
+#joshnanjau .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#rxvhvuotzu .gt_font_normal {
+#joshnanjau .gt_font_normal {
   font-weight: normal;
 }
 
-#rxvhvuotzu .gt_font_bold {
+#joshnanjau .gt_font_bold {
   font-weight: bold;
 }
 
-#rxvhvuotzu .gt_font_italic {
+#joshnanjau .gt_font_italic {
   font-style: italic;
 }
 
-#rxvhvuotzu .gt_super {
+#joshnanjau .gt_super {
   font-size: 65%;
 }
 
-#rxvhvuotzu .gt_footnote_marks {
+#joshnanjau .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#rxvhvuotzu .gt_asterisk {
+#joshnanjau .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#rxvhvuotzu .gt_indent_1 {
+#joshnanjau .gt_indent_1 {
   text-indent: 5px;
 }
 
-#rxvhvuotzu .gt_indent_2 {
+#joshnanjau .gt_indent_2 {
   text-indent: 10px;
 }
 
-#rxvhvuotzu .gt_indent_3 {
+#joshnanjau .gt_indent_3 {
   text-indent: 15px;
 }
 
-#rxvhvuotzu .gt_indent_4 {
+#joshnanjau .gt_indent_4 {
   text-indent: 20px;
 }
 
-#rxvhvuotzu .gt_indent_5 {
+#joshnanjau .gt_indent_5 {
   text-indent: 25px;
 }
 
-#rxvhvuotzu .katex-display {
+#joshnanjau .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#rxvhvuotzu div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#joshnanjau div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1944,13 +1951,13 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
 <tr class="even">
 <td class="gt_row gt_left" headers="Method">Synthetic Control</td>
 <td class="gt_row gt_right" headers="ATT">-0.053</td>
-<td class="gt_row gt_right" headers="SE (placebo)">0.073</td>
+<td class="gt_row gt_right" headers="SE (placebo)">0.072</td>
 <td class="gt_row gt_right" headers="% change">-5.2%</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Method">DID</td>
 <td class="gt_row gt_right" headers="ATT">0.374</td>
-<td class="gt_row gt_right" headers="SE (placebo)">0.097</td>
+<td class="gt_row gt_right" headers="SE (placebo)">0.089</td>
 <td class="gt_row gt_right" headers="% change">45.4%</td>
 </tr>
 </tbody>
@@ -1977,33 +1984,81 @@ Table&nbsp;3: SDID, SC, and DID estimates for Alaotra (exposure onset 2008).
 </div>
 </section>
 </section>
-<section id="sec-c-summary" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Summary of robustness</h1>
+<section id="sec-c-cs" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Callaway–Sant’Anna DiD with repeated cross-sections</h1>
+<p>The gsynth, SC, and SDID specifications above all operate on site-year aggregates. A distinct methodological concern is that the ROS was designed as a <strong>rotating sample</strong>: successive waves partially refresh the household pool rather than tracking individual households over time. Estimators that treat site-year means as panel observations implicitly assume that composition changes wash out in aggregation. This section relaxes that assumption by estimating a Callaway &amp; Sant’Anna (2021) group-time average treatment effect at the <strong>household level</strong> with <code>panel = FALSE</code>, which is valid for repeated cross-sections.</p>
+<p>Compared to the gsynth baseline, this specification:</p>
+<ul>
+<li>uses every usable household-year observation (not site-year means), capturing within-site heterogeneity;</li>
+<li>allows staggered adoption (Marovoay exposed from 2003, Alaotra from 2008) in a single estimator;</li>
+<li>clusters inference at the <code>site_id</code> level via a multiplier bootstrap.</li>
+</ul>
+<section id="panel-construction" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="panel-construction"><span class="header-section-number">4.1</span> Panel construction</h2>
+<p>The pooled dataset contains 40,072 household-year observations across 43 sites (5 treated-observatory sites, the remainder clean donors).</p>
+</section>
+<section id="sec-c-cs-attgt" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="sec-c-cs-attgt"><span class="header-section-number">4.2</span> Group-time ATT</h2>
 <div class="cell">
-<div id="tbl-robustness-summary" class="cell quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-robustness-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4: Robustness summary: ATT estimates across all specifications for both PAs.
-</figcaption>
-<div aria-describedby="tbl-robustness-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="wwyakofzab" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#wwyakofzab table {
+<div id="fig-cs-attgt" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cs-attgt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="A3_robustness_files/figure-html/fig-cs-attgt-1.png" class="img-fluid figure-img" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cs-attgt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Callaway–Sant’Anna group-time ATT(g,t) estimates with simultaneous 95% confidence bands. Top panel: Marovoay cohort (g = 2003). Bottom panel: Alaotra cohort (g = 2008). Dashed vertical line marks exposure onset. Outcome: log OECD-equivalised income.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-c-cs-dyn" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="sec-c-cs-dyn"><span class="header-section-number">4.3</span> Event-study aggregation</h2>
+<p>The dynamic aggregator averages <span class="math inline">\(ATT(g,t)\)</span> by relative event time, <span class="math inline">\(e = t - g\)</span>, pooling across cohorts.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-cs-dyn" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cs-dyn-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="A3_robustness_files/figure-html/fig-cs-dyn-1.png" class="img-fluid figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cs-dyn-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Event-study Callaway–Sant’Anna ATT by relative event time. Negative <span class="math inline">\(e\)</span> = pre-treatment placebo periods (should be flat around zero); positive <span class="math inline">\(e\)</span> = post-treatment effects. Dashed vertical line at <span class="math inline">\(e = -0.5\)</span>.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="cohort-specific-att" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="cohort-specific-att"><span class="header-section-number">4.4</span> Cohort-specific ATT</h2>
+<div class="cell">
+<div id="tbl-cs-group" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-cs-group-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Callaway–Sant’Anna: cohort-specific post-exposure ATT.
+</figcaption>
+<div aria-describedby="tbl-cs-group-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="sctylbxllr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#sctylbxllr table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#wwyakofzab thead, #wwyakofzab tbody, #wwyakofzab tfoot, #wwyakofzab tr, #wwyakofzab td, #wwyakofzab th {
+#sctylbxllr thead, #sctylbxllr tbody, #sctylbxllr tfoot, #sctylbxllr tr, #sctylbxllr td, #sctylbxllr th {
   border-style: none;
 }
 
-#wwyakofzab p {
+#sctylbxllr p {
   margin: 0;
   padding: 0;
 }
 
-#wwyakofzab .gt_table {
+#sctylbxllr .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2029,12 +2084,12 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   border-left-color: #D3D3D3;
 }
 
-#wwyakofzab .gt_caption {
+#sctylbxllr .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#wwyakofzab .gt_title {
+#sctylbxllr .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2046,7 +2101,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   border-bottom-width: 0;
 }
 
-#wwyakofzab .gt_subtitle {
+#sctylbxllr .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2058,7 +2113,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   border-top-width: 0;
 }
 
-#wwyakofzab .gt_heading {
+#sctylbxllr .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2070,13 +2125,13 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   border-right-color: #D3D3D3;
 }
 
-#wwyakofzab .gt_bottom_border {
+#sctylbxllr .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#wwyakofzab .gt_col_headings {
+#sctylbxllr .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2091,7 +2146,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   border-right-color: #D3D3D3;
 }
 
-#wwyakofzab .gt_col_heading {
+#sctylbxllr .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2111,7 +2166,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   overflow-x: hidden;
 }
 
-#wwyakofzab .gt_column_spanner_outer {
+#sctylbxllr .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2123,15 +2178,15 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   padding-right: 4px;
 }
 
-#wwyakofzab .gt_column_spanner_outer:first-child {
+#sctylbxllr .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#wwyakofzab .gt_column_spanner_outer:last-child {
+#sctylbxllr .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#wwyakofzab .gt_column_spanner {
+#sctylbxllr .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2143,11 +2198,11 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   width: 100%;
 }
 
-#wwyakofzab .gt_spanner_row {
+#sctylbxllr .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#wwyakofzab .gt_group_heading {
+#sctylbxllr .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2173,7 +2228,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   text-align: left;
 }
 
-#wwyakofzab .gt_empty_group_heading {
+#sctylbxllr .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2188,15 +2243,15 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   vertical-align: middle;
 }
 
-#wwyakofzab .gt_from_md > :first-child {
+#sctylbxllr .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#wwyakofzab .gt_from_md > :last-child {
+#sctylbxllr .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#wwyakofzab .gt_row {
+#sctylbxllr .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2215,7 +2270,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   overflow-x: hidden;
 }
 
-#wwyakofzab .gt_stub {
+#sctylbxllr .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2228,7 +2283,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   padding-right: 5px;
 }
 
-#wwyakofzab .gt_stub_row_group {
+#sctylbxllr .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2242,15 +2297,15 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   vertical-align: top;
 }
 
-#wwyakofzab .gt_row_group_first td {
+#sctylbxllr .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#wwyakofzab .gt_row_group_first th {
+#sctylbxllr .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#wwyakofzab .gt_summary_row {
+#sctylbxllr .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2260,16 +2315,16 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   padding-right: 5px;
 }
 
-#wwyakofzab .gt_first_summary_row {
+#sctylbxllr .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#wwyakofzab .gt_first_summary_row.thick {
+#sctylbxllr .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#wwyakofzab .gt_last_summary_row {
+#sctylbxllr .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2279,7 +2334,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   border-bottom-color: #D3D3D3;
 }
 
-#wwyakofzab .gt_grand_summary_row {
+#sctylbxllr .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2289,7 +2344,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   padding-right: 5px;
 }
 
-#wwyakofzab .gt_first_grand_summary_row {
+#sctylbxllr .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2299,7 +2354,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   border-top-color: #D3D3D3;
 }
 
-#wwyakofzab .gt_last_grand_summary_row_top {
+#sctylbxllr .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2309,11 +2364,11 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   border-bottom-color: #D3D3D3;
 }
 
-#wwyakofzab .gt_striped {
+#sctylbxllr .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#wwyakofzab .gt_table_body {
+#sctylbxllr .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2322,7 +2377,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   border-bottom-color: #D3D3D3;
 }
 
-#wwyakofzab .gt_footnotes {
+#sctylbxllr .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2336,7 +2391,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   border-right-color: #D3D3D3;
 }
 
-#wwyakofzab .gt_footnote {
+#sctylbxllr .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2345,7 +2400,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   padding-right: 5px;
 }
 
-#wwyakofzab .gt_sourcenotes {
+#sctylbxllr .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2359,7 +2414,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   border-right-color: #D3D3D3;
 }
 
-#wwyakofzab .gt_sourcenote {
+#sctylbxllr .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2367,72 +2422,588 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
   padding-right: 5px;
 }
 
-#wwyakofzab .gt_left {
+#sctylbxllr .gt_left {
   text-align: left;
 }
 
-#wwyakofzab .gt_center {
+#sctylbxllr .gt_center {
   text-align: center;
 }
 
-#wwyakofzab .gt_right {
+#sctylbxllr .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#wwyakofzab .gt_font_normal {
+#sctylbxllr .gt_font_normal {
   font-weight: normal;
 }
 
-#wwyakofzab .gt_font_bold {
+#sctylbxllr .gt_font_bold {
   font-weight: bold;
 }
 
-#wwyakofzab .gt_font_italic {
+#sctylbxllr .gt_font_italic {
   font-style: italic;
 }
 
-#wwyakofzab .gt_super {
+#sctylbxllr .gt_super {
   font-size: 65%;
 }
 
-#wwyakofzab .gt_footnote_marks {
+#sctylbxllr .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#wwyakofzab .gt_asterisk {
+#sctylbxllr .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#wwyakofzab .gt_indent_1 {
+#sctylbxllr .gt_indent_1 {
   text-indent: 5px;
 }
 
-#wwyakofzab .gt_indent_2 {
+#sctylbxllr .gt_indent_2 {
   text-indent: 10px;
 }
 
-#wwyakofzab .gt_indent_3 {
+#sctylbxllr .gt_indent_3 {
   text-indent: 15px;
 }
 
-#wwyakofzab .gt_indent_4 {
+#sctylbxllr .gt_indent_4 {
   text-indent: 20px;
 }
 
-#wwyakofzab .gt_indent_5 {
+#sctylbxllr .gt_indent_5 {
   text-indent: 25px;
 }
 
-#wwyakofzab .katex-display {
+#sctylbxllr .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#wwyakofzab div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#sctylbxllr div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal">Callaway–Sant'Anna Group ATTs</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="5" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Household-level repeated cross-sections, 1999–2014</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Cohort" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Cohort</th>
+<th id="ATT" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">ATT</th>
+<th id="SE" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">SE</th>
+<th id="a95%-CI" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">95% CI</th>
+<th id="a%-change" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">% change</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="Cohort" style="background-color: #FFCDD2">g = 2003 (Marovoay)</td>
+<td class="gt_row gt_right" headers="ATT" style="background-color: #FFCDD2">-0.570</td>
+<td class="gt_row gt_right" headers="SE" style="background-color: #FFCDD2">0.099</td>
+<td class="gt_row gt_left" headers="95% CI" style="background-color: #FFCDD2">[-0.781, -0.359]</td>
+<td class="gt_row gt_right" headers="% change" style="background-color: #FFCDD2">-43.4%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Cohort" style="background-color: #BBDEFB">g = 2008 (Alaotra)</td>
+<td class="gt_row gt_right" headers="ATT" style="background-color: #BBDEFB">-0.254</td>
+<td class="gt_row gt_right" headers="SE" style="background-color: #BBDEFB">0.067</td>
+<td class="gt_row gt_left" headers="95% CI" style="background-color: #BBDEFB">[-0.397, -0.111]</td>
+<td class="gt_row gt_right" headers="% change" style="background-color: #BBDEFB">-22.5%</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>The Callaway–Sant’Anna event study reproduces the qualitative pattern of the gsynth results: a negative and persistent Marovoay effect emerging at <span class="math inline">\(e = 0\)</span>, and a null Alaotra effect. Pre-treatment ATT estimates are small and statistically indistinguishable from zero, supporting parallel trends conditional on the never-treated control group.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Scope and the 2025 resurvey">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Scope and the 2025 resurvey
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This implementation uses the 1999–2014 household-level data already loaded by <code>load_data.R</code>. Extending the CS estimator to 2025 requires reconstructing the household-level OECD-equivalised income from the raw 2025 <code>res_*</code> microdata, which is not yet exposed in <code>household_consolidated</code>. Once that pipeline is wired in, the same <code>att_gt()</code> call with an expanded <code>year</code> range will yield a 2025-inclusive event study. The most interesting case will be the Marovoay cohort at <span class="math inline">\(e = 22\)</span> (2003 → 2025), since in 2025 the only never-treated comparison available is the Marovoay west bank (sites 033, 034) — a tight within-observatory comparison that complements the wider-donor gsynth extension in <a href="./04_results.html">Chapter 4</a>.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-c-summary" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Summary of robustness</h1>
+<div class="cell">
+<div id="tbl-robustness-summary" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-robustness-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5: Robustness summary: ATT estimates across all specifications for both PAs.
+</figcaption>
+<div aria-describedby="tbl-robustness-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="sjrxocyayw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#sjrxocyayw table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#sjrxocyayw thead, #sjrxocyayw tbody, #sjrxocyayw tfoot, #sjrxocyayw tr, #sjrxocyayw td, #sjrxocyayw th {
+  border-style: none;
+}
+
+#sjrxocyayw p {
+  margin: 0;
+  padding: 0;
+}
+
+#sjrxocyayw .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#sjrxocyayw .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#sjrxocyayw .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#sjrxocyayw .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#sjrxocyayw .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#sjrxocyayw .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#sjrxocyayw .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#sjrxocyayw .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#sjrxocyayw .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#sjrxocyayw .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#sjrxocyayw .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#sjrxocyayw .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#sjrxocyayw .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#sjrxocyayw .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#sjrxocyayw .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#sjrxocyayw .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#sjrxocyayw .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#sjrxocyayw .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#sjrxocyayw .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sjrxocyayw .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#sjrxocyayw .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#sjrxocyayw .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#sjrxocyayw .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sjrxocyayw .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#sjrxocyayw .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#sjrxocyayw .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#sjrxocyayw .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sjrxocyayw .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#sjrxocyayw .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#sjrxocyayw .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#sjrxocyayw .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#sjrxocyayw .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#sjrxocyayw .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sjrxocyayw .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#sjrxocyayw .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sjrxocyayw .gt_left {
+  text-align: left;
+}
+
+#sjrxocyayw .gt_center {
+  text-align: center;
+}
+
+#sjrxocyayw .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#sjrxocyayw .gt_font_normal {
+  font-weight: normal;
+}
+
+#sjrxocyayw .gt_font_bold {
+  font-weight: bold;
+}
+
+#sjrxocyayw .gt_font_italic {
+  font-style: italic;
+}
+
+#sjrxocyayw .gt_super {
+  font-size: 65%;
+}
+
+#sjrxocyayw .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#sjrxocyayw .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#sjrxocyayw .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#sjrxocyayw .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#sjrxocyayw .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#sjrxocyayw .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#sjrxocyayw .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#sjrxocyayw .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#sjrxocyayw div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2519,7 +3090,7 @@ Table&nbsp;4: Robustness summary: ATT estimates across all specifications for bo
 <td class="gt_row gt_left" headers="Robustness 3: SDID  PA" style="background-color: #FFCDD2">Ankarafantsika</td>
 <td class="gt_row gt_left" headers="Robustness 3: SDID  Specification" style="background-color: #FFCDD2">Robustness 3: SDID (log OECD-equivalised)</td>
 <td class="gt_row gt_right" headers="Robustness 3: SDID  ATT" style="background-color: #FFCDD2">-0.098</td>
-<td class="gt_row gt_right" headers="Robustness 3: SDID  SE" style="background-color: #FFCDD2">0.200</td>
+<td class="gt_row gt_right" headers="Robustness 3: SDID  SE" style="background-color: #FFCDD2">0.178</td>
 <td class="gt_row gt_right" headers="Robustness 3: SDID  p-value" style="background-color: #FFCDD2">NA</td>
 <td class="gt_row gt_left" headers="Robustness 3: SDID  Unit" style="background-color: #FFCDD2">log pts</td>
 </tr>

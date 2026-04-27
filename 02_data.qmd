@@ -10,7 +10,7 @@ source("R/plot_themes.R")
 source("R/gsynth_helpers.R")
 ```
 
-This chapter summarises the data construction pipeline. The full reproducible workflow — georeferencing, PA overlap analysis, and variable harmonisation — is documented in [Appendix A](A1_data_pipeline.qmd). The underlying survey data are described in a companion data paper [@Andrianjafindrainibe2024]; supplementary materials and replication code are available in the [associated repository](https://doi.org/10.1038/s41597-024-03879-9).
+This chapter summarises the data construction process. The full reproducible workflow — georeferencing, PA overlap analysis, and variable harmonisation — is documented in [Appendix A](A1_data_pipeline.qmd). The underlying survey data are described in a companion data paper [@Andrianjafindrainibe2024]; supplementary materials and replication code are available in the [associated repository](https://doi.org/10.1038/s41597-024-03879-9).
 
 # Survey data {#sec-survey-data}
 
@@ -21,7 +21,6 @@ The Rural Observatory System (ROS) surveyed rural households across Madagascar f
 #| fig-cap: "Location of the 11 rural observatories used in this study."
 #| fig-height: 7
 #| fig-width: 6
-
 ggplot() +
   geom_sf(
     data = madagascar,
@@ -72,7 +71,6 @@ ggplot() +
 #| fig-cap: "Year-by-year data coverage across observatories and survey sites."
 #| fig-height: 7
 #| fig-width: 10
-
 obs_names_df <- obs_locations |> st_drop_geometry() |> select(code, name)
 # obs 12 (Antsohihy) is in ALL_DONOR_OBS but not in obs_locations
 obs_names_df <- bind_rows(obs_names_df, tibble(code = "12", name = "Antsohihy"))
@@ -172,9 +170,9 @@ The result is a geocoded correspondence table linking each ROS household identif
 
 # Protected area overlaps {#sec-pa-overlaps}
 
-Standard PA databases — including the current WDPA and the Vahatra atlas — record only the **most recent boundary and designation** of each protected area. They do not capture boundary changes (e.g., Ankarafantsika's 2002 extension roughly doubled the effectively protected area), temporary protection decrees that imposed de facto restrictions years before formal designation, or date errors (many WDPA entries carry incorrect `STATUS_YR` values).
+Standard PA databases — including the current WDPA and the Vahatra atlas — record only the most recent boundary and designation of each protected area. They do not capture boundary changes (e.g., Ankarafantsika's 2002 extension roughly doubled the effectively protected area), temporary protection decrees that imposed de facto restrictions years before formal designation, or date errors (many WDPA entries carry incorrect `STATUS_YR` values).
 
-We instead use a **dynamic WDPA for Madagascar** — a temporally explicit database that assigns each PA state a precise valid-from / valid-to interval derived from legal texts and the CNLEGIS database. This enables us to determine whether an observatory was adjacent to an *active* PA at any given point during the study period (see [Appendix B](A2_donor_validity.qmd) for full construction details).
+We instead use a dynamic WDPA for Madagascar — a temporally explicit database that assigns each PA state a precise valid-from / valid-to interval derived from the Madagascar CNLEGIS  legal texts database and historical versions of the SAPM geospatial database [**INCLUDE REFERENCE DATA PAPER**]. This enables us to determine whether an observatory was adjacent to an *active* PA at any given point during the study period (see [Appendix B](A2_donor_validity.qmd) for full construction details).
 
 For each of the 11 study observatories, we compute the minimum distance from commune centroids (projected to UTM 38S) to the nearest PA boundary active during 1999–2014. All (commune, PA) pairs within 20 km are flagged. Three temporal configurations emerge:
 
@@ -191,7 +189,6 @@ For each of the 11 study observatories, we compute the minimum distance from com
 #| fig-cap: "Survey coverage windows and PA exposure events for the 11 study observatories. Bars show the survey span; triangles mark the nearest new PA decree date. Green bars indicate observatories with sufficient pre/post data for gsynth; red bars indicate insufficient coverage relative to the PA event."
 #| fig-height: 7
 #| fig-width: 11
-
 # --- Proximity computation (self-contained) ---
 study_obs_codes <- as.integer(c(
   "02",
@@ -354,7 +351,7 @@ ggplot(gantt_data, aes(y = obs_label)) +
   theme(legend.position = "bottom", panel.grid.minor = element_blank())
 ```
 
-@fig-pa-overlaps reveals a stark trade-off between PA proximity and survey design: the ROS was designed for agricultural monitoring, not conservation impact evaluation, so observatories near PAs often lack the panel depth needed for synthetic control estimation. Gsynth requires sufficient pre-treatment years to learn unit-specific factor loadings, and sufficient post-treatment years for the counterfactual to be informative. We apply a minimum threshold of 4 pre-exposure and 3 post-exposure survey years.
+@fig-pa-overlaps shows that although the ROS was designed for agricultural monitoring, not conservation impact evaluation, some PAs were created relatively near from observatory sites. Gsynth requires sufficient pre-treatment years to learn unit-specific factor loadings, and sufficient post-treatment years for the counterfactual to be informative. We apply a minimum threshold of 4 pre-exposure and 3 post-exposure survey years.
 
 The two primary pairs — **Marovoay / Ankarafantsika** (strict, IUCN II, 2003 extension) and **Alaotra / Lac Alaotra** (multipurpose, IUCN V, 2007 temporary decree) — offer the longest pre- and post-exposure windows. Three additional pairs — Farafangana, Toliara North, and Fénérive East — provide shorter but informative extensions ([Chapter 5](05_extensions.qmd)). Observatories without a nearby PA (shown in blue) serve as the donor pool. A systematic spatial audit of donor pool validity is presented in [Appendix B](A2_donor_validity.qmd).
 
@@ -364,20 +361,19 @@ The primary outcome is **log equivalised household income**. Construction procee
 
 1. **Total income** (`revtot`) — the sum of current income components: rice revenue (`rev_riz`), other crop revenue (`rev_cu`), livestock revenue (`revel`), fishing revenue (`revpeche`), principal activity income (`revppal`), and secondary activity income (`revsec`). Missing components are set to zero; the total is imputed from available sub-components when `revtot` itself is missing.
 
-2. **Equivalisation** — using the OECD-modified scale: $1 + 0.5 \times (\text{additional adults}) + 0.3 \times (\text{children under 14})$, computed from individual-level demographic records.
+2. **Equivalisation**: using the OECD-modified scale: $1 + 0.5 \times (\text{additional adults}) + 0.3 \times (\text{children under 14})$, computed from individual-level demographic records [@karvonen2021].
 
-3. **Winsorisation** — at the 1st and 99th percentiles within each year to limit the influence of extreme values.
+3. **Winsorisation**: at the 1st and 99th percentiles within each year to limit the influence of extreme values.
 
 4. **Log transformation** — $y_{it} = \log(\text{equivalised income}_{it} + 1)$.
 
-Cross-year harmonisation is non-trivial: variable names, questionnaire modules, and income definitions changed across survey waves. The full details of these adjustments are in [Appendix A](A1_data_pipeline.qmd).
+Cross-year harmonisation is not trivial: variable names, questionnaire modules, and income definitions changed across survey waves. The full details of these adjustments are in [Appendix A](A1_data_pipeline.qmd).
 
 ```{r}
 #| label: fig-income-trends
 #| fig-cap: "Mean log equivalised household income over time, by observatory."
 #| fig-height: 5
 #| fig-width: 12
-
 maro_panel <- household_consolidated |>
   filter(obs == "03") |>
   mutate(
@@ -493,7 +489,6 @@ p1 +
 ```{r}
 #| label: tbl-descriptives
 #| tbl-cap: "Summary statistics for the analysis sample."
-
 analysis_sample <- household_consolidated |>
   filter(
     obs %in% c("03", "21", ALL_DONOR_OBS),
