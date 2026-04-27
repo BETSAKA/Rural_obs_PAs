@@ -26,6 +26,7 @@ book:
         - 04_results.qmd
         - 05_extensions.qmd
         - 06_discussion.qmd
+    - references.qmd
   appendices:
     - A1_data_pipeline.qmd
     - A2_donor_validity.qmd

@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>Appendix D — Methodology – Conservation Governance and Rural Livelihoods in Madagascar</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -24,7 +27,6 @@ ul.task-list li input[type="checkbox"] {
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -53,15 +55,14 @@ div.csl-indent {
 <link href="./A3_robustness.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-70a47bd5681a7291082a5b9f83d58762.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-9e3e5b9121e68b3f077afb32f2c64d95.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -91,7 +92,7 @@ div.csl-indent {
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -144,9 +145,7 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
-      <a href="./index.html" class="sidebar-logo-link">
-      </a>
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Conservation Governance and Rural Livelihoods in Madagascar</a> 
         <div class="sidebar-tools-main">
@@ -214,6 +213,12 @@ window.Quarto = {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
@@ -317,7 +322,7 @@ window.Quarto = {
 <h1 data-number="E"><span class="header-section-number">E</span> Generalised synthetic control</h1>
 <section id="interactive-fixed-effects-model" class="level2" data-number="E.1">
 <h2 data-number="E.1" class="anchored" data-anchor-id="interactive-fixed-effects-model"><span class="header-section-number">E.1</span> Interactive fixed-effects model</h2>
-<p>The generalised synthetic control method <span class="citation" data-cites="Xu2017">(<a href="#ref-Xu2017" role="doc-biblioref">Xu 2017</a>)</span> extends the standard synthetic control framework to accommodate multiple treated units and allows for estimation of treatment effects in the presence of unobserved time-varying confounders. The data-generating process is:</p>
+<p>The generalised synthetic control method <span class="citation" data-cites="Xu2017">(<a href="references.html#ref-Xu2017" role="doc-biblioref">Xu 2017</a>)</span> extends the standard synthetic control framework to accommodate multiple treated units and allows for estimation of treatment effects in the presence of unobserved time-varying confounders. The data-generating process is:</p>
 <p><span class="math display">\[
 Y_{it} = \delta_{it} D_{it} + \mathbf{x}_{it}'\boldsymbol{\beta} + \boldsymbol{\lambda}_i' \mathbf{f}_t + \varepsilon_{it}
 \]</span></p>
@@ -343,14 +348,14 @@ Y_{it} = \delta_{it} D_{it} + \mathbf{x}_{it}'\boldsymbol{\beta} + \boldsymbol{\
 </section>
 <section id="relationship-to-standard-synthetic-control" class="level2" data-number="E.5">
 <h2 data-number="E.5" class="anchored" data-anchor-id="relationship-to-standard-synthetic-control"><span class="header-section-number">E.5</span> Relationship to standard synthetic control</h2>
-<p>When there is a single treated unit and <span class="math inline">\(r\)</span> is chosen to minimise pre-treatment fit, gsynth nests the Abadie, Diamond &amp; Hainmueller <span class="citation" data-cites="Abadie2010">(<a href="#ref-Abadie2010" role="doc-biblioref">2010</a>)</span> synthetic control estimator. The advantage of gsynth is that it (i) selects <span class="math inline">\(r\)</span> via cross-validation rather than exact pre-treatment matching, (ii) accommodates multiple treated units, and (iii) provides valid frequentist inference via the bootstrap rather than relying on permutation <span class="math inline">\(p\)</span>-values.</p>
+<p>When there is a single treated unit and <span class="math inline">\(r\)</span> is chosen to minimise pre-treatment fit, gsynth nests the Abadie, Diamond &amp; Hainmueller <span class="citation" data-cites="Abadie2010">(<a href="references.html#ref-Abadie2010" role="doc-biblioref">2010</a>)</span> synthetic control estimator. The advantage of gsynth is that it (i) selects <span class="math inline">\(r\)</span> via cross-validation rather than exact pre-treatment matching, (ii) accommodates multiple treated units, and (iii) provides valid frequentist inference via the bootstrap rather than relying on permutation <span class="math inline">\(p\)</span>-values.</p>
 </section>
 </section>
 <section id="sec-d-csdid" class="level1" data-number="F">
 <h1 data-number="F"><span class="header-section-number">F</span> Callaway–Sant’Anna staggered DiD</h1>
 <section id="group-time-att-framework" class="level2" data-number="F.1">
 <h2 data-number="F.1" class="anchored" data-anchor-id="group-time-att-framework"><span class="header-section-number">F.1</span> Group-time ATT framework</h2>
-<p>The Callaway &amp; Sant’Anna <span class="citation" data-cites="CallawayS2021">(<a href="#ref-CallawayS2021" role="doc-biblioref">2021</a>)</span> estimator is designed for settings with staggered treatment adoption. Define <span class="math inline">\(G_i\)</span> as the first period in which unit <span class="math inline">\(i\)</span> is treated (<span class="math inline">\(G_i = \infty\)</span> for never-treated units). The target parameter is the <strong>group-time ATT</strong>:</p>
+<p>The Callaway &amp; Sant’Anna <span class="citation" data-cites="CallawayS2021">(<a href="references.html#ref-CallawayS2021" role="doc-biblioref">2021</a>)</span> estimator is designed for settings with staggered treatment adoption. Define <span class="math inline">\(G_i\)</span> as the first period in which unit <span class="math inline">\(i\)</span> is treated (<span class="math inline">\(G_i = \infty\)</span> for never-treated units). The target parameter is the <strong>group-time ATT</strong>:</p>
 <p><span class="math display">\[
 ATT(g, t) = \mathbb{E}[Y_t(g) - Y_t(\infty) \mid G = g]
 \]</span></p>
@@ -382,7 +387,7 @@ ATT(g, t) = \mathbb{E}[Y_t(g) - Y_t(\infty) \mid G = g]
 <h1 data-number="G"><span class="header-section-number">G</span> Synthetic Difference-in-Differences</h1>
 <section id="framework" class="level2" data-number="G.1">
 <h2 data-number="G.1" class="anchored" data-anchor-id="framework"><span class="header-section-number">G.1</span> Framework</h2>
-<p>SDID <span class="citation" data-cites="Arkhangelsky2021">(<a href="#ref-Arkhangelsky2021" role="doc-biblioref">Arkhangelsky et al. 2021</a>)</span> combines unit reweighting (synthetic control) with time reweighting (DiD):</p>
+<p>SDID <span class="citation" data-cites="Arkhangelsky2021">(<a href="references.html#ref-Arkhangelsky2021" role="doc-biblioref">Arkhangelsky et al. 2021</a>)</span> combines unit reweighting (synthetic control) with time reweighting (DiD):</p>
 <p><span class="math display">\[
 \hat{\tau}^{sdid} = \sum_{i: D_i = 1} \sum_{t: \text{post}} \left( Y_{it} - \hat{\omega}_0' Y_{\text{co},t} - \hat{\lambda}_0 - \hat{\lambda}_t' \mathbf{1} \right)
 \]</span></p>
@@ -394,7 +399,7 @@ ATT(g, t) = \mathbb{E}[Y_t(g) - Y_t(\infty) \mid G = g]
 </section>
 <section id="inference-1" class="level2" data-number="G.3">
 <h2 data-number="G.3" class="anchored" data-anchor-id="inference-1"><span class="header-section-number">G.3</span> Inference</h2>
-<p>We use the placebo method (Algorithm 4 of <span class="citation" data-cites="Arkhangelsky2021">Arkhangelsky et al. (<a href="#ref-Arkhangelsky2021" role="doc-biblioref">2021</a>)</span>): for each control unit, the SDID estimator is re-computed treating that unit as if it were treated. The distribution of placebo effects yields a standard error estimate. This is valid even when <span class="math inline">\(N_{tr} = 1\)</span>, as in our observatory-level models.</p>
+<p>We use the placebo method (Algorithm 4 of <span class="citation" data-cites="Arkhangelsky2021">Arkhangelsky et al. (<a href="references.html#ref-Arkhangelsky2021" role="doc-biblioref">2021</a>)</span>): for each control unit, the SDID estimator is re-computed treating that unit as if it were treated. The distribution of placebo effects yields a standard error estimate. This is valid even when <span class="math inline">\(N_{tr} = 1\)</span>, as in our observatory-level models.</p>
 </section>
 </section>
 <section id="sec-d-inference" class="level1" data-number="H">
@@ -405,7 +410,7 @@ ATT(g, t) = \mathbb{E}[Y_t(g) - Y_t(\infty) \mid G = g]
 <ol type="1">
 <li><p><strong>Parametric bootstrap</strong> (gsynth): resampling residuals from the estimated factor model. This is valid under the factor model assumptions but does not account for treatment-effect heterogeneity across treated units.</p></li>
 <li><p><strong>Permutation inference</strong>: for each control unit, re-estimate gsynth treating that unit as if it were treated. The <span class="math inline">\(p\)</span>-value is the fraction of placebo ATTs exceeding the true ATT. With <span class="math inline">\(N\)</span> donor units, the minimum achievable <span class="math inline">\(p\)</span>-value is <span class="math inline">\(1/N\)</span>. With ~50–60 donor sites, this gives a floor of <span class="math inline">\(\approx 0.017\)</span> — sufficient to detect large effects but limiting for moderate ones.</p></li>
-<li><p><strong>Wild cluster bootstrap</strong> (planned for DiD): the Cameron, Gelbach &amp; Miller <span class="citation" data-cites="Cameron2008">(<a href="#ref-Cameron2008" role="doc-biblioref">2008</a>)</span> wild bootstrap applies to the few-cluster problem in DiD estimation. With 43 site-level clusters (5 exposed observatories + 38 control sites), inference is feasible though conservative.</p></li>
+<li><p><strong>Wild cluster bootstrap</strong> (planned for DiD): the Cameron, Gelbach &amp; Miller <span class="citation" data-cites="Cameron2008">(<a href="references.html#ref-Cameron2008" role="doc-biblioref">2008</a>)</span> wild bootstrap applies to the few-cluster problem in DiD estimation. With 43 site-level clusters (5 exposed observatories + 38 control sites), inference is feasible though conservative.</p></li>
 </ol>
 </section>
 <section id="practical-implications" class="level2" data-number="H.2">
@@ -422,7 +427,7 @@ ATT(g, t) = \mathbb{E}[Y_t(g) - Y_t(\infty) \mid G = g]
 <h1 class="unnumbered">References</h1>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-Abadie2010" class="csl-entry" role="listitem">
 Abadie, Alberto, Alexis Diamond, and Jens Hainmueller. 2010. <span>“Synthetic Control Methods for Comparative Case Studies: Estimating the Effect of <span>California</span>’s Tobacco Control Program.”</span> <em>Journal of the American Statistical Association</em> 105 (490): 493–505. <a href="https://doi.org/10.1198/jasa.2009.ap08746">https://doi.org/10.1198/jasa.2009.ap08746</a>.
 </div>
