@@ -1,0 +1,117 @@
+````quarto
+---
+title: "Méthodologie"
+subtitle: "Détails techniques sur les méthodes d'estimation"
+---
+
+Cette annexe fournit les descriptions formelles des méthodes d'estimation utilisées dans cet article. Le texte principal ([Chapitre 3](03_strategy.qmd), [Chapitre 4](04_results.qmd)) décrit les méthodes au niveau nécessaire pour suivre l'argumentation ; cette annexe donne les détails techniques nécessaires à la réplication et à l'évaluation méthodologique.
+
+
+# Contrôle synthétique généralisé {#sec-d-gsynth}
+
+## Modèle à effets fixes interactifs
+
+La méthode du contrôle synthétique généralisé [@Xu2017] étend le cadre du contrôle synthétique standard pour accueillir plusieurs unités traitées et permet l'estimation des effets traitement en présence de facteurs de confusion inobservés variant dans le temps. Le processus générateur de données est :
+
+$$Y_{it} = \delta_{it} D_{it} + \mathbf{x}_{it}'\boldsymbol{\beta} + \boldsymbol{\lambda}_i' \mathbf{f}_t + \varepsilon_{it}$$
+
+où $Y_{it}$ est le résultat pour l'unité $i$ à la période $t$ ; $D_{it}$ est l'indicateur de traitement ; $\mathbf{x}_{it}$ est un vecteur de covariables observées (non utilisées dans nos spécifications au niveau site) ; $\boldsymbol{\lambda}_i$ est un vecteur $r \times 1$ de chargements factoriels spécifiques à l'unité ; $\mathbf{f}_t$ est un vecteur $r \times 1$ de facteurs communs variant dans le temps ; et $\varepsilon_{it}$ est une erreur idiosyncrasique.
+
+L'hypothèse d'identification clé est que la structure factorielle $\boldsymbol{\lambda}_i' \mathbf{f}_t$ est partagée entre les unités traitées et témoins. Cela généralise l'hypothèse de tendances parallèles : plutôt que de requérir que les unités traitées et témoins suivent la même tendance, cela permet des **tendances différentes** tant que ces tendances sont engendrées par le même ensemble de facteurs latents.
+
+## Estimation
+
+L'algorithme procède en trois étapes :
+
+1. **Estimer les facteurs à partir des unités témoins** : en utilisant la matrice $N_0 \times T$ des résultats témoin, estimer $\hat{\mathbf{f}}_t$ et $\hat{\boldsymbol{\lambda}}_i$ par analyse en composantes principales (ou minimisation de la norme nucléaire). Le nombre de facteurs $r$ est sélectionné par validation croisée leave-one-out sur $r = 0, 1, \ldots, r_{\max}$.
+
+2. **Estimer les chargements factoriels traités** : pour chaque unité traitée $i$, régresser les résultats pré-traitement $Y_{i1}, \ldots, Y_{i,T_0}$ sur les facteurs estimés $\hat{\mathbf{f}}_1, \ldots, \hat{\mathbf{f}}_{T_0}$ pour obtenir $\hat{\boldsymbol{\lambda}}_i$.
+
+3. **Construire le contrefactuel** : le résultat contrefactuel estimé pour l'unité traitée $i$ en période post-traitement $t > T_0$ est $\hat{Y}_{it}(0) = \hat{\boldsymbol{\lambda}}_i' \hat{\mathbf{f}}_t$. L'ATT à la période $t$ est $\hat{\delta}_{it} = Y_{it} - \hat{Y}_{it}(0)$.
+
+## Validation croisée pour la sélection des facteurs
+
+Dans notre implémentation, $r$ est sélectionné par validation croisée leave-one-out (LOOCV) sur $r \in \{0, 1, 2, 3, 4, 5\}$. Pour chaque candidat $r$, chaque unité témoin est temporairement supprimée, le modèle factoriel est ré-estimé, et l'erreur de prédiction pour les résultats pré-traitement de l'unité exclue est calculée. Le $r$ minimisant l'erreur quadratique moyenne de prédiction est sélectionné. Lorsque $r^* = 0$, le modèle se réduit à une spécification à effets fixes bi-directionnels.
+
+## Inférence
+
+Nous utilisons le bootstrap paramétrique avec 200 réplications, tel qu'implémenté dans le package R `gsynth`. Le bootstrap rééchantillonne les résidus du modèle factoriel estimé, ré-estime la trajectoire ATT, et construit des intervalles de confiance à 95 % point par point. Pour l'ATT moyen post-traitement, nous rapportons l'erreur standard du bootstrap et une $p$-valeur de type Wald.
+
+## Relation avec le contrôle synthétique standard
+
+Lorsqu'il existe une seule unité traitée et que $r$ est choisi pour minimiser l'ajustement pré-traitement, gsynth emboîte l'estimateur de contrôle synthétique d'Abadie, Diamond & Hainmueller [-@Abadie2010]. L'avantage de gsynth est qu'il (i) sélectionne $r$ par validation croisée plutôt que par appariement exact pré-traitement, (ii) accommode plusieurs unités traitées, et (iii) fournit une inférence fréquentiste valide via le bootstrap plutôt que de recourir aux $p$-valeurs de permutation.
+
+
+# DiD Callaway–Sant'Anna à adoption échelonnée {#sec-d-csdid}
+
+## Cadre ATT groupe-temps
+
+L'estimateur Callaway & Sant'Anna [-@CallawayS2021] est conçu pour des contextes d'adoption échelonnée du traitement. Définissons $G_i$ comme la première période au cours de laquelle l'unité $i$ est traitée ($G_i = \infty$ pour les unités jamais-traitées). Le paramètre cible est l'**ATT groupe-temps** :
+
+$$ATT(g, t) = \mathbb{E}[Y_t(g) - Y_t(\infty) \mid G = g]$$
+
+où $Y_t(g)$ est le résultat potentiel sous adoption du traitement au temps $g$, et $Y_t(\infty)$ est le résultat potentiel jamais-traité. $ATT(g, t)$ est identifié sous deux hypothèses :
+
+1. **Non-anticipation** : $Y_t(g) = Y_t(\infty)$ pour tout $t < g$.
+2. **Tendances parallèles conditionnelles** : $\mathbb{E}[Y_t(\infty) - Y_{t-1}(\infty) \mid X, G = g] = \mathbb{E}[Y_t(\infty) - Y_{t-1}(\infty) \mid X, G = \infty]$ (ou en utilisant les groupes pas-encore-traités comme comparaison).
+
+## Coupes transversales répétées
+
+Les données SOR sont des coupes transversales répétées au niveau du ménage (de nouveaux ménages sont échantillonnés chaque année au sein des mêmes sites). L'estimateur CS utilise la variante pour coupes transversales répétées, où l'identification repose sur la comparaison de la distribution des résultats entre cohortes et périodes temporelles, plutôt que sur le suivi d'unités individuelles.
+
+## Agrégation
+
+Les ATT groupe-temps peuvent être agrégés en :
+
+- **Effets dynamiques** $\theta_e = \sum_g w_g \cdot ATT(g, g + e)$ : ATT moyen au temps relatif $e$, produisant un graphique d'étude d'événements avec des tests de pré-tendance explicites.
+- **Effets spécifiques au groupe** : $\bar{ATT}(g) = \sum_{t \geq g} w_t \cdot ATT(g, t)$.
+- **ATT global** : moyenne pondérée sur toutes les cellules $(g, t)$.
+
+## Implémentation (prévue pour les données 2026)
+
+Nous utiliserons le package R `did` avec l'estimation doublement robuste (pondération par l'inverse des probabilités combinée à la régression des résultats), des covariables au niveau du ménage (taille du ménage, éducation du chef, activité agricole) et le regroupement au niveau du site.
+
+
+# Différences-en-différences synthétiques {#sec-d-sdid}
+
+## Cadre
+
+Le SDID [@Arkhangelsky2021] combine la repondération des unités (contrôle synthétique) avec la repondération temporelle (DiD) :
+
+$$\hat{\tau}^{sdid} = \sum_{i: D_i = 1} \sum_{t: \text{post}} \left( Y_{it} - \hat{\omega}_0' Y_{\text{co},t} - \hat{\lambda}_0 - \hat{\lambda}_t' \mathbf{1} \right)$$
+
+où $\hat{\omega}_0$ sont les poids unitaires qui équilibrent les trajectoires de résultats pré-traitement et $\hat{\lambda}_t$ sont les poids temporels qui augmentent le poids des périodes pré-traitement les plus prédictives des résultats post-traitement.
+
+## Comparaison avec gsynth
+
+Le SDID et gsynth généralisent tous deux l'hypothèse de tendances parallèles via des facteurs latents. La différence clé est que le SDID utilise une repondération explicite tandis que gsynth utilise l'estimation de facteurs. Le SDID est doublement robuste : il est convergent si les poids unitaires ou les poids temporels spécifient correctement le contrefactuel. gsynth est convergent sous le modèle à effets fixes interactifs indépendamment de la repondération, mais nécessite la spécification correcte du nombre de facteurs.
+
+## Inférence
+
+Nous utilisons la méthode placebo (Algorithme 4 de @Arkhangelsky2021) : pour chaque unité témoin, l'estimateur SDID est recalculé en traitant cette unité comme si elle était traitée. La distribution des effets placebo fournit une estimation de l'erreur standard. Ceci est valide même lorsque $N_{tr} = 1$, comme dans nos modèles au niveau de l'observatoire.
+
+
+# Inférence avec peu de clusters {#sec-d-inference}
+
+## Le problème de puissance
+
+Chaque modèle gsynth au niveau de l'observatoire a exactement une unité traitée. L'inférence asymptotique standard (qui requiert $N_{tr} \to \infty$) n'est pas applicable. Nous y remédions via :
+
+1. **Bootstrap paramétrique** (gsynth) : rééchantillonnage des résidus du modèle factoriel estimé. Valide sous les hypothèses du modèle factoriel mais ne prend pas en compte l'hétérogénéité des effets de traitement entre les unités traitées.
+
+2. **Inférence par permutation** : pour chaque unité témoin, ré-estimer gsynth en traitant cette unité comme si elle était traitée. La $p$-valeur est la fraction d'ATT placebo dépassant l'ATT réel. Avec $N$ unités donneuses, la $p$-valeur minimale atteignable est $1/N$. Avec ~50–60 sites donneurs, cela donne un plancher de $\approx 0,017$ — suffisant pour détecter des effets importants mais limitant pour des effets modérés.
+
+3. **Bootstrap cluster sauvage** (prévu pour le DiD) : le bootstrap sauvage de Cameron, Gelbach & Miller [-@Cameron2008] s'applique au problème des peu de clusters dans l'estimation DiD. Avec 43 clusters au niveau site (5 observatoires exposés + 38 sites témoins), l'inférence est faisable bien que conservatrice.
+
+## Implications pratiques
+
+Les contraintes de puissance impliquent que :
+
+- L'**effet négatif d'Ankarafantsika** (important, ~27 % du revenu) est détectable même avec une seule unité traitée et une inférence basée sur la permutation.
+- Le **résultat nul d'Alaotra** peut refléter une puissance insuffisante plutôt qu'un vrai zéro. Des effets inférieurs à ~15–20 % seraient non détectables avec l'échantillon disponible.
+- Les **trois sites d'extension** ([Chapitre 5](05_extensions.qmd)) font face au même plancher de puissance. Les estimations ponctuelles proches de zéro ne doivent pas être interprétées comme des preuves d'« absence d'effet » — elles sont compatibles à la fois avec un vrai nul et un effet modéré sous le seuil de détection.
+
+
+# Références {.unnumbered}
+
+````

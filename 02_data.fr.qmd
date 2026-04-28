@@ -1,0 +1,413 @@
+---
+title: "Données"
+subtitle: "Enquêtes des Observatoires Ruraux, géoréférencement et construction des variables"
+---
+
+```{r}
+#| label: setup
+source("R/load_data.R")
+source("R/plot_themes.R")
+source("R/gsynth_helpers.R")
+```
+
+Ce chapitre résume le processus de construction des données. Le flux de travail reproductible complet — géoréférencement, analyse des chevauchements avec les aires protégées et harmonisation des variables — est documenté dans l'[Annexe A](A1_data_pipeline.qmd). Les données d'enquête sous-jacentes sont décrites dans un article de données connexe [@Andrianjafindrainibe2024].
+
+# Données d'enquête {#sec-survey-data}
+
+Le Système des Observatoires Ruraux (SOR) a enquêté des ménages ruraux à travers Madagascar de 1995 à 2015. De nombreux observatoires n'ont été actifs que quelques années. Nous utilisons {{< var n_observatories >}} observatoires actifs dès 1999–2000 et disposant d'au moins 6 années de données d'enquête. Ce jeu de données comprend environ {{< var n_household_years >}} observations ménage-année. Chaque observatoire suit environ 500 ménages par an selon un dispositif de panel rotatif, avec remplacement aléatoire des ménages sortants préservant la représentativité transversale.
+
+```{r}
+#| label: fig-obs-map
+#| fig-cap: "Localisation des 11 observatoires ruraux utilisés dans cette étude."
+#| fig-height: 7
+#| fig-width: 6
+ggplot() +
+  geom_sf(
+    data = madagascar,
+    fill = "grey95",
+    color = "grey60",
+    linewidth = 0.3
+  ) +
+  geom_point(
+    data = obs_locations,
+    aes(x = longitude, y = latitude, color = role, shape = role),
+    size = 3.5,
+    stroke = 1
+  ) +
+  geom_label_repel(
+    data = obs_locations,
+    aes(x = longitude, y = latitude, label = paste0(name, " (", code, ")")),
+    size = 2.5,
+    fontface = "bold",
+    box.padding = 0.5,
+    min.segment.length = 0,
+    max.overlaps = 20
+  ) +
+  scale_color_manual(
+    values = c(
+      "Marovoay (strict, 2003)" = "#D32F2F",
+      "Alaotra (multipurpose, 2008)" = "#1565C0",
+      "New treated (2006\u20132007)" = "#FF8F00",
+      "Clean donor pool" = "#4CAF50"
+    ),
+    name = NULL
+  ) +
+  scale_shape_manual(
+    values = c(
+      "Marovoay (strict, 2003)" = 17,
+      "Alaotra (multipurpose, 2008)" = 17,
+      "New treated (2006\u20132007)" = 18,
+      "Clean donor pool" = 16
+    ),
+    name = NULL
+  ) +
+  labs(title = "Observatoires Ruraux dans l'analyse") +
+  theme_void(base_size = 11) +
+  theme(legend.position = "bottom")
+```
+
+```{r}
+#| label: fig-time-grid
+#| fig-cap: "Couverture des données par observatoire et par année d'enquête."
+#| fig-height: 7
+#| fig-width: 10
+obs_names_df <- obs_locations |> st_drop_geometry() |> select(code, name)
+obs_names_df <- bind_rows(obs_names_df, tibble(code = "12", name = "Antsohihy"))
+
+coverage <- household_consolidated |>
+  filter(obs %in% c("03", "21", ALL_DONOR_OBS)) |>
+  mutate(
+    unit_label = case_when(
+      site_id == "031" ~ "Marovoay: Bepako",
+      site_id == "032" ~ "Marovoay: Madiromiongana",
+      site_id == "033" ~ "Marovoay: Ampijoroa",
+      site_id == "034" ~ "Marovoay: Maroala",
+      obs == "21" & site_id == "211" ~ "Alaotra: Avaradrano / Feramanga A.",
+      obs == "21" & site_id == "212" ~ "Alaotra: Mangabe",
+      obs == "21" & site_id == "213" ~ "Alaotra: Analamiranga area",
+      obs == "21" ~ paste0("Alaotra: site ", site_id),
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(unit_label) | obs %in% ALL_DONOR_OBS)
+
+treated_cov <- coverage |>
+  filter(!is.na(unit_label)) |>
+  distinct(unit_label, year, obs) |>
+  mutate(
+    status = case_when(
+      obs == "03" &
+        grepl("Bepako|Madiromiongana", unit_label) &
+        year >= TREAT_YEAR_MARO ~ "Exposé (post)",
+      obs == "03" &
+        grepl("Bepako|Madiromiongana", unit_label) ~ "Exposé (pré)",
+      obs == "03" ~ "Contrôle Maro.",
+      obs == "21" & year >= TREAT_YEAR_ALA ~ "Exposé (post)",
+      obs == "21" ~ "Exposé (pré)"
+    ),
+    group = if_else(obs == "03", "Marovoay", "Alaotra")
+  )
+
+donor_cov <- coverage |>
+  filter(obs %in% ALL_DONOR_OBS) |>
+  distinct(obs, year) |>
+  left_join(obs_names_df, by = c("obs" = "code")) |>
+  mutate(
+    unit_label = name,
+    status = "Pool de donneurs",
+    group = "Pool de donneurs"
+  )
+
+all_cov <- bind_rows(treated_cov, donor_cov)
+
+level_order <- c(
+  donor_cov |> distinct(unit_label) |> arrange(unit_label) |> pull(unit_label),
+  "Alaotra: Analamiranga area",
+  "Alaotra: Mangabe",
+  "Alaotra: Avaradrano / Feramanga A.",
+  "Marovoay: Maroala",
+  "Marovoay: Ampijoroa",
+  "Marovoay: Bepako",
+  "Marovoay: Madiromiongana"
+)
+
+all_cov <- all_cov |>
+  mutate(unit_label = factor(unit_label, levels = level_order))
+
+ggplot(all_cov, aes(x = factor(year), y = unit_label, fill = status)) +
+  geom_tile(color = "white", linewidth = 0.3) +
+  scale_fill_manual(
+    values = c(
+      "Exposé (post)" = "#EF9A9A",
+      "Exposé (pré)" = "#A5D6A7",
+      "Contrôle Maro." = "#90CAF9",
+      "Pool de donneurs" = "#E0E0E0"
+    ),
+    name = NULL
+  ) +
+  labs(x = NULL, y = NULL, title = "Couverture du panel : Sites × Années") +
+  theme_minimal(base_size = 10) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+    axis.text.y = element_text(size = 8),
+    legend.position = "bottom",
+    panel.grid = element_blank()
+  )
+```
+
+# Géoréférencement {#sec-georef}
+
+Les données d'enquête originales ne comportaient pas de géoréférencement systématique. Les noms de localités étaient enregistrés en texte libre, avec des orthographes incohérentes selon les années et les langues (malgache et français). Nous avons lié chaque observation aux limites administratives officielles à l'aide des Ensembles de Données Opérationnelles Communes (COD), gérés par OCHA et le BNGRC malgache. La procédure complète de géoréférencement est décrite dans la [documentation des données connexe](https://betsaka.github.io/Rural_obs_Madagascar/03-ros-data-georeferencing.html).
+
+La procédure de correspondance est hiérarchique :
+
+1. Normalisation des chaînes de caractères : minuscules, suppression des diacritiques et des qualificatifs (*centre*, *haut*, *bas*), standardisation des toponymes bilingues, conversion des chiffres romains en arabes.
+2. Correspondance approximative : distance de Jaro-Winkler par rapport au gazettier COD, filtrée par l'appartenance au district de l'observatoire, avec un seuil de distance maximale de 0,25.
+3. Niveaux spatiaux en cascade : correspondance d'abord au niveau de la commune (ADM3), puis affinée au fokontany (ADM4) lorsque possible.
+
+Le résultat est un tableau de correspondance géocodé reliant chaque identifiant de ménage ROS (`j5`) à sa commune et son fokontany codés P.
+
+# Chevauchements avec les aires protégées {#sec-pa-overlaps}
+
+Les bases de données standard d'aires protégées — dont la WDPA actuelle et l'atlas Vahatra — n'enregistrent que la frontière et le classement les plus récents de chaque aire protégée. Nous utilisons à la place une WDPA dynamique pour Madagascar — une base de données temporellement explicite qui attribue à chaque état d'une AP un intervalle précis valide-de / valide-à dérivé des textes juridiques CNLEGIS malgaches et des versions historiques de la base de données géospatiale SAPM.
+
+Pour chacun des 11 observatoires d'étude, nous calculons la distance minimale entre les centroïdes de communes (projetés en UTM 38S) et la limite d'AP la plus proche active durant 1999–2014. Toutes les paires (commune, AP) situées à moins de 20 km sont signalées.
+
+```{r}
+#| label: fig-pa-overlaps
+#| fig-cap: "Fenêtres de couverture des enquêtes et événements d'exposition aux AP pour les 11 observatoires d'étude. Les barres montrent la durée d'enquête ; les triangles indiquent la date du décret de classement AP le plus proche."
+#| fig-height: 7
+#| fig-width: 11
+study_obs_codes <- as.integer(c(
+  "02", "03", "12", "13", "15", "16", "21", "23", "24", "25", "41"
+))
+study_communes <- obs_communes |>
+  filter(OBS_CODE %in% study_obs_codes) |>
+  st_make_valid()
+
+obs_proj <- study_communes |> st_transform(32738)
+dyn_proj <- dyn_study |> st_transform(32738)
+obs_cents <- st_centroid(obs_proj)
+
+dist_mat <- st_distance(obs_cents, dyn_proj) |>
+  units::set_units("km") |>
+  units::drop_units()
+
+obs_attr <- study_communes |>
+  st_drop_geometry() |>
+  select(OBS_CODE, OBS_NAME) |>
+  mutate(row_idx = row_number())
+
+pa_attr <- dyn_study |>
+  st_drop_geometry() |>
+  select(WDPAID, pa_name = NAME, valid_from) |>
+  mutate(col_idx = row_number())
+
+proximity_ch2 <- which(dist_mat <= THRESHOLD_KM, arr.ind = TRUE) |>
+  as_tibble() |>
+  rename(row_idx = row, col_idx = col) |>
+  mutate(dist_km = dist_mat[cbind(row_idx, col_idx)]) |>
+  left_join(obs_attr, by = "row_idx") |>
+  left_join(pa_attr, by = "col_idx") |>
+  mutate(
+    within_study = valid_from >= STUDY_START_DT & valid_from <= STUDY_END_DT
+  )
+
+new_pa_by_obs <- proximity_ch2 |>
+  filter(within_study) |>
+  slice_min(dist_km, by = c(OBS_CODE, WDPAID)) |>
+  summarise(
+    nearest_pa = pa_name[which.min(dist_km)],
+    pa_year = as.integer(format(valid_from[which.min(dist_km)], "%Y")),
+    closest_km = min(dist_km),
+    .by = OBS_CODE
+  )
+
+obs_names_full <- bind_rows(
+  obs_locations |> mutate(obs = code) |> select(obs, name),
+  tibble(obs = "12", name = "Antsohihy")
+)
+
+hh_coverage <- household_consolidated |>
+  summarise(
+    first_year = min(year),
+    last_year = max(year),
+    .by = obs
+  ) |>
+  filter(obs %in% sprintf("%02d", study_obs_codes))
+
+gantt_data <- hh_coverage |>
+  mutate(OBS_CODE = as.integer(obs)) |>
+  left_join(new_pa_by_obs, by = "OBS_CODE") |>
+  left_join(obs_names_full, by = "obs") |>
+  mutate(
+    role = case_when(
+      obs == "03" ~ "Marovoay (strict, 2003)",
+      obs == "21" ~ "Alaotra (multifonctionnel, 2008)",
+      obs %in% c("15", "23", "24") ~ "Aussi exposé (2006\u20132007)",
+      TRUE ~ "Pool de donneurs propre"
+    ),
+    has_pa = !is.na(pa_year),
+    pre_yrs = if_else(has_pa, pa_year - first_year, NA_integer_),
+    post_yrs = if_else(
+      has_pa,
+      pmin(last_year, 2014L) - pa_year + 1L,
+      NA_integer_
+    ),
+    feasible = case_when(
+      !has_pa ~ "Pas d'AP à proximité",
+      pre_yrs >= 4 & post_yrs >= 3 ~ "Faisable",
+      TRUE ~ "Couverture insuffisante"
+    ),
+    last_year_cap = pmin(last_year, 2014L),
+    obs_label = paste0(name, " (", obs, ")")
+  ) |>
+  arrange(feasible != "Faisable", desc(pa_year), obs_label) |>
+  mutate(obs_label = factor(obs_label, levels = obs_label))
+
+feasibility_cols <- c(
+  "Faisable" = "#388E3C",
+  "Couverture insuffisante" = "#EF9A9A",
+  "Pas d'AP à proximité" = "#90CAF9"
+)
+
+ggplot(gantt_data, aes(y = obs_label)) +
+  annotate(
+    "rect",
+    xmin = STUDY_START, xmax = STUDY_END,
+    ymin = -Inf, ymax = Inf,
+    fill = "#E3F2FD", alpha = 0.5
+  ) +
+  geom_segment(
+    aes(x = first_year, xend = last_year_cap, yend = obs_label, colour = feasible),
+    linewidth = 5, alpha = 0.6, lineend = "round"
+  ) +
+  geom_point(
+    data = gantt_data |> filter(has_pa),
+    aes(x = pa_year), colour = "#D32F2F", size = 3.5, shape = 17
+  ) +
+  geom_label_repel(
+    data = gantt_data |> filter(has_pa),
+    aes(x = pa_year, label = nearest_pa),
+    size = 2.2, nudge_y = 0.35, max.overlaps = 15,
+    box.padding = 0.2, colour = "grey20", fill = "white", label.size = 0.1
+  ) +
+  scale_colour_manual(values = feasibility_cols, name = "Faisabilité gsynth") +
+  scale_x_continuous(breaks = seq(1995, 2015, 5)) +
+  labs(
+    x = "Année", y = NULL,
+    title = "Couverture des enquêtes et exposition aux AP",
+    subtitle = "Barres = durée d'enquête · Triangles = décret AP le plus proche · Bande bleue = période d'étude (1999\u20132014)"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom", panel.grid.minor = element_blank())
+```
+
+Les deux paires principales — Marovoay / Ankarafantsika (stricte, catégorie II UICN, extension 2003) et Alaotra / Lac Alaotra (multifonctionnelle, catégorie V UICN, décret temporaire 2007) — offrent les fenêtres pré- et post-exposition les plus longues. Trois paires supplémentaires — Farafangana, Toliara Nord et Fénérive Est — fournissent des extensions plus courtes mais informatives ([Chapitre 5](05_extensions.qmd)).
+
+# Variable de résultat {#sec-outcome}
+
+La variable de résultat principale est le logarithme du revenu équivalisé des ménages. La construction se déroule comme suit :
+
+1. Revenu total (`revtot`) : somme des composantes de revenus courants.
+2. Équivalisation : à l'aide de l'échelle OCDE modifiée : $1 + 0{,}5 \times (\text{adultes supplémentaires}) + 0{,}3 \times (\text{enfants de moins de 14 ans})$.
+3. Winsorisation : aux 1er et 99e percentiles par année.
+4. Transformation logarithmique : $y_{it} = \log(\text{revenu équivalisé}_{it} + 1)$.
+
+```{r}
+#| label: fig-income-trends
+#| fig-cap: "Revenu moyen logarithmique équivalisé dans le temps, par observatoire."
+#| fig-height: 5
+#| fig-width: 12
+maro_panel <- household_consolidated |>
+  filter(obs == "03") |>
+  mutate(
+    treated = site_id %in% c("031", "032"),
+    revtot_eq = revtot / oecd_equiv,
+    revtot_w = winsorize(revtot_eq),
+    ln_rev = log(pmax(revtot_w, 1)),
+    .by = year
+  )
+
+maro_trends <- maro_panel |>
+  summarize(
+    mean_ln = mean(ln_rev, na.rm = TRUE),
+    se_ln = sd(ln_rev, na.rm = TRUE) / sqrt(n()),
+    .by = c(year, treated)
+  ) |>
+  mutate(group = if_else(treated, "Rive est (exposée)", "Rive ouest (donneur)"))
+
+p1 <- ggplot(maro_trends, aes(year, mean_ln, color = group, shape = group)) +
+  annotate("rect", xmin = TREAT_YEAR_MARO, xmax = 2015, ymin = -Inf, ymax = Inf,
+           fill = "#FFCDD2", alpha = 0.3) +
+  geom_vline(xintercept = TREAT_YEAR_MARO - 0.5, linetype = "dashed", color = "grey40") +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2.5) +
+  geom_errorbar(aes(ymin = mean_ln - 1.96 * se_ln, ymax = mean_ln + 1.96 * se_ln),
+                width = 0.3, alpha = 0.5) +
+  scale_color_manual(values = c("Rive est (exposée)" = "#D32F2F", "Rive ouest (donneur)" = "#1565C0")) +
+  labs(title = "Ankarafantsika (strict, 2003)", x = "Année",
+       y = "Revenu log moyen (équivalisé)", color = NULL, shape = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+
+ala_panel <- household_consolidated |>
+  filter(obs == "21") |>
+  mutate(
+    revtot_eq = revtot / oecd_equiv,
+    revtot_w = winsorize(revtot_eq),
+    ln_rev = log(pmax(revtot_w, 1)),
+    .by = year
+  )
+
+ala_trends <- ala_panel |>
+  summarize(mean_ln = mean(ln_rev, na.rm = TRUE), se_ln = sd(ln_rev, na.rm = TRUE) / sqrt(n()), .by = year)
+
+p2 <- ggplot(ala_trends, aes(year, mean_ln)) +
+  annotate("rect", xmin = TREAT_YEAR_ALA, xmax = 2015, ymin = -Inf, ymax = Inf,
+           fill = "#BBDEFB", alpha = 0.3) +
+  geom_vline(xintercept = TREAT_YEAR_ALA - 0.5, linetype = "dashed", color = "grey40") +
+  geom_line(linewidth = 0.8, color = "#1565C0") +
+  geom_point(size = 2.5, color = "#1565C0") +
+  geom_errorbar(aes(ymin = mean_ln - 1.96 * se_ln, ymax = mean_ln + 1.96 * se_ln),
+                width = 0.3, alpha = 0.5, color = "#1565C0") +
+  labs(title = "Lac Alaotra (multifonctionnel, 2008)", x = "Année", y = "Revenu log moyen (équivalisé)") +
+  theme_minimal(base_size = 11)
+
+p1 + p2 + plot_annotation(title = "Tendances de revenu par observatoire", subtitle = "Zones ombrées = post-exposition")
+```
+
+# Statistiques descriptives {#sec-descriptives}
+
+```{r}
+#| label: tbl-descriptives
+#| tbl-cap: "Statistiques descriptives pour l'échantillon d'analyse."
+analysis_sample <- household_consolidated |>
+  filter(obs %in% c("03", "21", ALL_DONOR_OBS), year >= STUDY_START & year <= STUDY_END) |>
+  mutate(
+    group = case_when(
+      obs == "03" & site_id %in% c("031", "032") ~ "Marovoay exposé (est)",
+      obs == "03" ~ "Marovoay contrôle (ouest)",
+      obs == "21" ~ "Alaotra (exposé)",
+      TRUE ~ "Pool de donneurs"
+    ),
+    revtot_eq = revtot / oecd_equiv
+  )
+
+analysis_sample |>
+  summarize(
+    `N ménage-années` = n(),
+    `Revenu moyen (Ar)` = round(mean(revtot, na.rm = TRUE)),
+    `Revenu équivalisé moyen` = round(mean(revtot_eq, na.rm = TRUE)),
+    `Taille moy. ménage` = round(mean(n_membres, na.rm = TRUE), 1),
+    `Années d'éduc. moy. (adultes)` = round(mean(mean_years_edu_adults, na.rm = TRUE), 1),
+    `% adulte alphabétisé` = round(mean(any_literate_adult, na.rm = TRUE) * 100, 1),
+    .by = group
+  ) |>
+  arrange(match(group, c("Marovoay exposé (est)", "Marovoay contrôle (ouest)", "Alaotra (exposé)", "Pool de donneurs"))) |>
+  gt() |>
+  tab_header(title = "Statistiques descriptives de l'échantillon",
+             subtitle = paste0("Période d'analyse : ", STUDY_START, "\u2013", STUDY_END)) |>
+  fmt_number(columns = c(`Revenu moyen (Ar)`, `Revenu équivalisé moyen`), use_seps = TRUE, decimals = 0)
+```
+

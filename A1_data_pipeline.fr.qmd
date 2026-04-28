@@ -1,0 +1,302 @@
+````quarto
+---
+title: "Pipeline de données"
+subtitle: "Géoréférencement, chevauchements avec les AP et harmonisation des variables"
+---
+
+```{r}
+#| label: setup
+source("R/load_data.R")
+```
+
+Cette annexe documente le pipeline de données reproductible complet, des fichiers d'enquête SOR bruts au jeu de données de panel consolidé au niveau des ménages. Le chapitre principal ([Chapitre 2](02_data.qmd)) en donne un résumé condensé ; cette annexe fournit tous les détails nécessaires à la reproductibilité.
+
+
+# Géoréférencement des localités SOR {#sec-a-georef}
+
+## Le problème
+
+Le Système des Observatoires Ruraux a collecté des données de panel auprès de ménages ruraux à Madagascar de 1995 à 2015. De manière cruciale, les enquêtes n'étaient **pas géolocalisées** : les champs de localisation étaient en texte libre, non liés à des codes administratifs officiels. Pour permettre l'analyse spatiale — notamment le croisement avec les limites des aires protégées — chaque observation SOR doit être alignée avec une commune et un *fokontany* standardisés à l'aide des P-codes des Ensembles de Données Opérationnelles Communes (COD) OCHA/BNGRC.
+
+## Jeux de données de référence
+
+Deux jeux de données de référence spatiaux ancrent le géoréférencement :
+
+1. **Limites administratives infranationales de Madagascar** (COD-AB) : cinq niveaux administratifs du pays au *fokontany*, avec des P-codes officiels.
+2. **Lieux peuplés de Madagascar** (COD-PS) : 28 184 lieux peuplés avec des toponymes et des P-codes (source : NGA/GIST, distribué par UN OCHA ROSA).
+
+## Nettoyage des chaînes
+
+Toutes les chaînes de localisation sont normalisées avant la correspondance. La fonction `clean_string()` met en minuscules, supprime les caractères non alphanumériques, retire les qualificatifs (« centre », « haut », « bas »), traduit les points cardinaux français en malgache, standardise les noms de villes alternatifs (ex. « Fort Dauphin » → « Tolanaro »), et convertit les chiffres romains I–VI en chiffres arabes.
+
+## Correspondance floue hiérarchique
+
+La correspondance utilise la **distance de Jaro-Winkler** (seuil par défaut de 0,25), appliquée par observatoire pour restreindre les ensembles de candidats. Une cascade à quatre méthodes attribue les communes :
+
+1. **Méthode 1** — Correspondance floue du champ commune (`j42`) avec les noms de communes connues de l'observatoire. Vérifiée visuellement ; les faux positifs sont supprimés manuellement.
+2. **Méthode 2** — Pour les enregistrements sans commune, extraction du premier mot du nom de village et correspondance floue avec les noms de communes.
+3. **Méthode 3** — Correspondance floue du nom de village complet avec les lieux peuplés COD (seuil resserré à 0,22).
+4. **Méthode 4** — Correspondance floue des noms de villages restants avec les noms déjà appariés aux étapes précédentes (seuil 0,28).
+
+Après l'attribution des communes, une fonction dédiée `fuzzy_match_village()` fait correspondre les noms de villages aux noms ADM4 (*fokontany*) dans la commune appariée (seuil Jaro-Winkler 0,2). Une **Méthode 6** finale ajoute 13 entrées codées manuellement pour l'observatoire 52 (Menabe).
+
+```{r}
+#| label: fig-map-georef
+#| fig-cap: "Toutes les communes et fokontany SOR appariés à Madagascar."
+#| fig-height: 10
+#| fig-width: 8
+
+# Aggregate communes per observatory for labelling
+obs_union <- obs_communes |>
+  group_by(OBS_CODE) |>
+  summarise(.groups = "drop") |>
+  st_centroid() |>
+  left_join(
+    obs_communes |> st_drop_geometry() |> distinct(OBS_CODE, OBS_NAME),
+    by = "OBS_CODE"
+  )
+
+obs_pts <- bind_cols(
+  obs_union |> st_drop_geometry(),
+  as_tibble(st_coordinates(obs_union))
+)
+
+ggplot() +
+  geom_sf(data = madagascar, fill = "grey97", colour = "grey80", linewidth = 0.2) +
+  geom_sf(data = obs_communes, aes(fill = factor(OBS_CODE)),
+          colour = "grey50", linewidth = 0.2, alpha = 0.6) +
+  geom_sf(data = sel_fokontany,
+          fill = NA, colour = "grey30", linewidth = 0.1, linetype = "dotted") +
+  geom_label_repel(
+    data = obs_pts, aes(x = X, y = Y, label = OBS_NAME),
+    size = 2.2, fontface = "bold",
+    fill = alpha("white", 0.85), label.size = 0.15,
+    box.padding = 0.4, max.overlaps = 20
+  ) +
+  scale_fill_brewer(palette = "Paired", guide = "none") +
+  labs(title = "Localités SOR géoréférencées",
+       subtitle = "Polygones communaux (remplis) avec limites de fokontany appariées (pointillés)") +
+  theme_void(base_size = 10) +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+## Taux de correspondance
+
+Les communes ont été réidentifiées pour **91,8 %** des observations ; les villages pour **61,5 %** des variations de noms. Les 8,2 % d'échecs communaux se concentrent dans les observatoires avec des chaînes de localisation très abrégées ou non standard. 98 % des variations uniques de noms de communes et 62 % des variations de noms de villages ont été résolus.
+
+
+# Analyse des chevauchements avec les AP {#sec-a-overlaps}
+
+## Chevauchements spatiaux
+
+Les polygones de communes et *fokontany* SOR sont croisés avec le **WDPA dynamique** (`dynamic_wdpa.rds`), une base de données temporellement explicite des limites des AP pour Madagascar. Une carte interactive visualise tous les polygones d'observatoires par rapport aux limites des AP.
+
+```{r}
+#| label: fig-map-overlaps
+#| fig-cap: "Communes d'enquête SOR (colorées par observatoire) superposées aux limites des AP (vert foncé)."
+#| fig-height: 10
+#| fig-width: 8
+
+ggplot() +
+  geom_sf(data = madagascar, fill = "grey97", colour = "grey80", linewidth = 0.2) +
+  geom_sf(data = dyn_study, fill = "#2E7D32", colour = "#2E7D32",
+          alpha = 0.25, linewidth = 0.3) +
+  geom_sf(data = obs_communes, aes(fill = factor(OBS_CODE)),
+          colour = "grey40", linewidth = 0.25, alpha = 0.6) +
+  geom_label_repel(
+    data = obs_pts, aes(x = X, y = Y, label = OBS_NAME),
+    size = 2.2, fontface = "bold",
+    fill = alpha("white", 0.85), label.size = 0.15,
+    box.padding = 0.4, max.overlaps = 20
+  ) +
+  scale_fill_brewer(palette = "Paired", guide = "none") +
+  labs(title = "Communes d'enquête SOR et limites des aires protégées",
+       subtitle = "Vert : limites des AP (WDPA dynamique) · Coloré : communes d'enquête") +
+  theme_void(base_size = 10) +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+## Inventaire des enquêtes SOR
+
+Les ensembles de données au niveau des ménages pour 1995–2015 sont chargés et tabulés par observatoire et par année. La continuité des enquêtes varie : certains observatoires disposent de panels quasi-continus sur 20 ans, d'autres ne couvrent que 3 à 8 ans.
+
+```{r}
+#| label: tbl-survey-inventory
+#| tbl-cap: "Nombre de ménages enquêtés par observatoire et par année (1995–2015)."
+
+obs_names_full <- bind_rows(
+  obs_locations |> mutate(obs = code) |> select(obs, name),
+  tibble(obs = "12", name = "Antsohihy")
+)
+
+household_consolidated |>
+  count(obs, year, name = "n_hh") |>
+  left_join(obs_names_full, by = "obs") |>
+  mutate(name = coalesce(name, paste0("Obs ", obs))) |>
+  select(Observatoire = name, Année = year, `N ménages` = n_hh) |>
+  pivot_wider(names_from = Année, values_from = `N ménages`) |>
+  gt() |>
+  tab_header(
+    title = "Inventaire des enquêtes SOR",
+    subtitle = "Nombre de ménages par observatoire et par année (blanc = pas d'enquête)"
+  ) |>
+  sub_missing(missing_text = "—")
+```
+
+## Logique de chevauchement temporel
+
+Trois scénarios déterminent l'utilisabilité pour l'évaluation d'impact :
+
+1. **L'AP précède entièrement le SOR** → pas de référence pré-traitement → inutilisable (ex. Ranomafana, créé en 1991).
+2. **AP créée pendant les enquêtes SOR** → analyse d'impact possible → *ce sont nos cas d'exposition*.
+3. **AP créée après la fin du SOR** → référence uniquement ; une nouvelle enquête est nécessaire pour l'évaluation.
+
+## Révision des dates de décrets
+
+Les années de création officielles ont été vérifiées par rapport à la base de données juridique malgache ([CNLEGIS](https://cnlegis.gov.mg)). Plusieurs dates de décrets provisoires ont été révisées :
+
+| AP | Année originale | Année révisée | Source |
+|:---|:---:|:---:|:---|
+| Parc National d'Ankarafantsika | 1927 | **2002** | Décret 2002-798 (extension) |
+| PHP du Lac Alaotra | 2003 | **2007** | Décret provisoire |
+| Corridor Ankeniheny–Zahamena | 2002 | **2005** | Décret provisoire |
+| Menabe Antimena | 2003 | **2006** | Décret provisoire |
+| Corridor Ambositra-Vondrozo | 2003 | **2006** | WDPA / CNLEGIS |
+| Parc National des Mikea | 2003 | **2007** | Décret provisoire |
+| Ranobe PK 32 | 2003 | **2008** | Décret provisoire |
+| Amoron'i Onilahy | 2003 | **2007** | Décret provisoire |
+
+: Dates de décrets des AP révisées utilisées dans cette étude {#tbl-decree-dates}
+
+```{r}
+#| label: fig-timeline
+#| fig-cap: "Chronologie des années d'enquête SOR (points bleus) et des années de création des AP révisées (triangles rouges) pour les paires observatoire–AP prioritaires."
+#| fig-height: 7
+#| fig-width: 10
+
+survey_coverage <- household_consolidated |>
+  distinct(obs, year) |>
+  left_join(obs_names_full, by = "obs") |>
+  mutate(name = coalesce(name, paste0("Obs ", obs)))
+
+pa_events <- tribble(
+  ~name, ~pa_name, ~pa_year,
+  "Marovoay", "Ankarafantsika NP", TREAT_YEAR_MARO,
+  "Alaotra", "Lac Alaotra PHP", TREAT_YEAR_ALA,
+  "Farafangana", "Corridor Ambositra-Vondrozo", TREAT_YEAR_FARA,
+  "Toliara Nord", "Amoron'i Onilahy", TREAT_YEAR_TOL,
+  "Fénérive Est", "Réserve de Tampolo", TREAT_YEAR_FEN
+)
+
+ggplot() +
+  geom_point(data = survey_coverage,
+             aes(x = year, y = name), colour = "#1565C0",
+             size = 2.5, alpha = 0.7) +
+  geom_point(data = pa_events,
+             aes(x = pa_year, y = name), colour = "#D32F2F",
+             shape = 17, size = 4) +
+  geom_text_repel(
+    data = pa_events,
+    aes(x = pa_year, y = name, label = pa_name),
+    colour = "#D32F2F", size = 2.5, nudge_y = 0.3,
+    fontface = "italic", max.overlaps = 10
+  ) +
+  scale_x_continuous(breaks = seq(1995, 2015, 2)) +
+  labs(x = "Année", y = NULL,
+       title = "Couverture des enquêtes SOR et dates d'exposition aux AP",
+       subtitle = "Points bleus : années d'enquête · Triangles rouges : création/extension des AP") +
+  theme_minimal(base_size = 11) +
+  theme(panel.grid.minor = element_blank())
+```
+
+## Paires prioritaires
+
+Le croisement spatial et temporel identifie Marovoay–Ankarafantsika et Alaotra–Lac Alaotra comme les paires les plus prometteuses pour l'analyse causale (longs panels, dates d'exposition claires). Farafangana, Toliara Nord et Fénérive Est sont des candidats secondaires explorés au [Chapitre 5](05_extensions.qmd). Un buffer de 10 km (SCR EPSG:29701, Laborde Madagascar) autour des AP est utilisé pour le filtrage de proximité.
+
+::: {.callout-note}
+Les observatoires SOR ont été sélectionnés pour le suivi agricole et socio-économique, non pour leur proximité aux AP. Les chevauchements sont en partie fortuits et nécessitent une interprétation prudente.
+:::
+
+
+# Construction des variables {#sec-a-variables}
+
+## Géoréférencement des ménages
+
+Les identifiants de ménages (`j5`) sont joints à la table de correspondance des localités de @sec-a-georef. Une correction critique : **les identifiants de ménages de 1995 sont réalignés à l'aide de l'enquête de 1996** (qui indique si un ménage a été enquêté en 1995 et fournit son identifiant 1996).
+
+## Composition des ménages
+
+Les fichiers individuels (enregistrements de membres) fournissent le sexe, l'âge et le statut de chef de ménage. Les ménages avec plusieurs chefs sont résolus en conservant l'identifiant du premier membre. Variables clés : `household_size` (nombre de membres) et le sexe et l'âge du chef.
+
+## Éducation
+
+Les variables d'éducation présentent plusieurs lacunes de données :
+
+- Alphabétisation (`s1a`, `s1b`) : manquante en 1996 et 1998.
+- Fréquentation de l'école primaire (`s2`) : manquante en 1996.
+- Années de scolarité (`s3a`) : manquante en 1996.
+
+Des indicateurs au niveau du ménage sont construits : `any_literate_adult` (≥ 1 adulte lit), `max_years_edu`, `mean_years_edu_adults`, `pct_with_schooling` (part des membres ≥ 6 ans ayant une scolarité), et les variables d'éducation du chef.
+
+## Activités agricoles
+
+Les codes d'activité (`a1`) sont harmonisés entre les schémas de codage 1996–2015. **1995 est un cas particulier** : pas de variable `a1` individuelle ; les activités sont reconstruites à partir de fichiers d'activité principale/secondaire séparés (`res_apm.dta`, `res_asm.dta`). Deux classifications agricoles sont utilisées :
+
+- **Stricto sensu** (codes 95, 96) : agriculture ou élevage uniquement.
+- **Lato sensu** (19 codes) : agriculture, élevage, pêche, cueillette, apiculture, artisanat lié à l'agriculture.
+
+## Sécurité alimentaire
+
+La mesure centrale est le nombre de **mois d'autosuffisance alimentaire à partir de la production propre**, harmonisée selon des formats de questions variables :
+
+- 1995 : question unique (`sa3a`).
+- 1996–1997 : question unique (`sa2`).
+- 1998–2015 : trois composantes (`sa2a` + `sa2b` + `sa2c` pour riz saison 1 + riz saison 2 + maïs).
+
+Somme plafonnée à 12 mois.
+
+## Construction du revenu
+
+Le revenu est reconstruit via des fonctions dédiées pour chaque composante :
+
+- **Revenu courant** = activité principale + activité secondaire + riz net + autres cultures + élevage + pêche.
+- **Revenu exceptionnel** = rentes foncières + divers + HIMO (travaux publics) + ventes d'actifs + transferts monétaires et non monétaires.
+- **Revenu total** (`revtot`) = courant + exceptionnel.
+
+L'échelle d'équivalence OCDE modifiée assigne un poids de 1,0 au premier adulte, 0,5 à chaque adulte supplémentaire (≥ 14 ans), et 0,3 à chaque enfant (< 14 ans). Le revenu équivalisé OCDE = `revtot / oecd_scale`. Le revenu total et équivalisé est transformé en logarithme et winsorisé aux 1er–99e percentiles pour l'analyse principale.
+
+```{r}
+#| label: tbl-income-components
+#| tbl-cap: "Construction des composantes du revenu et sources des variables."
+
+tribble(
+  ~Composante, ~Variables, ~Couverture, ~Notes,
+  "Revenu riz (net)", "rev_riz", "1995–2015", "Recettes moins coûts de production",
+  "Autres cultures", "rev_cu", "1995–2015", "Cultures de rente, fruits, légumes",
+  "Élevage", "revel", "1995–2015", "Bovins, volailles, autres animaux",
+  "Pêche", "revpeche", "1995–2015", "Eau douce et côtière",
+  "Activité principale", "revppal", "1995–2015", "Activité non agricole principale",
+  "Activité secondaire", "revsec", "1995–2015", "Activité non agricole secondaire",
+  "Revenu courant", "revcou", "Dérivé", "Somme des 6 composantes ci-dessus",
+  "Revenu exceptionnel", "revext", "1995–2015", "Rentes, transferts, HIMO, ventes d'actifs",
+  "Revenu total", "revtot", "Dérivé", "Courant + exceptionnel",
+  "Revenu équivalisé OCDE", "revtot / oecd_equiv", "Dérivé", "Échelle : 1,0 + 0,5×(adultes−1) + 0,3×enfants"
+) |>
+  gt() |>
+  tab_header(
+    title = "Construction des composantes du revenu",
+    subtitle = "Des enquêtes SOR aux variables de revenu prêtes pour l'analyse"
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      rows = Composante %in% c("Revenu courant", "Revenu total", "Revenu équivalisé OCDE")
+    )
+  )
+```
+
+## Consolidation
+
+Toutes les tables de composantes sont dédupliquées à des identifiants (année, ménage) uniques via agrégation par moyenne, puis jointes à gauche en un seul jeu de données : `household_consolidated.rds` ({{< var n_hh_obs >}} observations ménage-année dans {{< var n_obs >}} observatoires). Une vérification d'unicité confirme une ligne par ménage et par année.
+
+````

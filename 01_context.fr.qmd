@@ -1,0 +1,190 @@
+---
+title: "La conservation à Madagascar"
+subtitle: "Aires protégées, modèles de gouvernance et conditions de vie rurales"
+---
+
+# L'expansion du système des aires protégées {#sec-pa-system}
+
+La communauté internationale s'est engagée à protéger 30 % des terres et des mers mondiales d'ici 2030 dans le cadre du Cadre mondial pour la biodiversité de Kunming-Montréal. Pour des pays riches en biodiversité comme Madagascar, cet objectif se traduit par une impulsion soutenue d'expansion et de renforcement des réseaux d'aires protégées. Madagascar a répondu précocement : lors du Congrès mondial des parcs de Durban en 2003, le président Ravalomanana a annoncé la *Vision Durban* — un engagement à tripler la superficie des aires protégées du pays, de 1,7 million à 6 millions d'hectares [@Kremen2006], soit de 3 % à environ 10 % du territoire national. D'ici 2015, le *Système des Aires Protégées de Madagascar* (SAPM) était passé de 47 à plus de 160 aires protégées, couvrant près de 12 % du territoire national.
+
+Cette expansion n'a pas été monolithique. Le SAPM a introduit une diversité de modèles de gouvernance, allant des parcs nationaux strictement protégés sous la gestion de Madagascar National Parks (MNP) à des paysages multifonctionnels co-gérés par des ONG internationales et des communautés locales via des transferts de gestion. Le système de classification de l'UICN capture ce spectre : les parcs de catégorie II privilégient l'intégrité des écosystèmes avec une utilisation humaine limitée, tandis que les catégories V et VI permettent l'extraction durable des ressources et la participation communautaire.
+
+Les conséquences en termes de bien-être de cette expansion pour les communautés rurales adjacentes restent contestées. Une littérature quasi-expérimentale croissante constate des effets hétérogènes des aires protégées dans le monde : certaines études documentent des impacts négatifs sur les revenus et la consommation locaux [@Andam2010; @Sims2010], tandis que d'autres trouvent des effets neutres ou positifs, notamment lorsque les aires protégées génèrent des revenus touristiques ou des services écosystémiques [@Naidoo2019]. Il y a lieu de supposer que les modestes effets positifs observés ailleurs pourraient ne pas se matérialiser à Madagascar, car la prévalence extrême de la pauvreté intensifie la dépendance de la population locale aux ressources naturelles, le tourisme reste d'un ordre de grandeur inférieur à celui d'autres points chauds de biodiversité, et la faiblesse de la gouvernance pourrait compromettre l'engagement des parties prenantes et les mécanismes de partage des bénéfices. À Madagascar spécifiquement, les données restent limitées et principalement transversales [@Ferraro2011]. Les rares études causales se concentrent sur les résultats en matière de déforestation plutôt que sur les moyens de subsistance des ménages.
+
+Une question centrale dans ce débat est de savoir si le modèle de gouvernance d'une aire protégée importe pour les populations qui y vivent. La conservation strictement exclusive et la gestion participative communautaire représentent des dispositifs fondamentalement différents avec les populations locales. Pourtant, la plupart des études empiriques traitent les aires protégées comme des interventions homogènes, comparant « protégé » et « non protégé » plutôt qu'en examinant comment différents dispositifs institutionnels médiatisent les effets sur les moyens de subsistance.
+
+```{r}
+#| label: fig-pa-cumarea
+#| fig-cap: "Superficie totale cumulée des aires protégées à Madagascar par catégorie UICN. Données de la couche WDPA dynamique ; chaque aire protégée entre à sa date de création légale la plus ancienne. La vague post-Durban (après 2003) est dominée par les catégories V et VI (multifonctionnelles)."
+#| fig-height: 5
+#| fig-width: 8
+library(tidyverse)
+library(sf)
+
+dyn_wdpa <- read_rds("data/dynamic_wdpa.rds")
+
+# Filter to terrestrial designated PAs (exclude marine, Ramsar, MAB, WHS)
+pa_summary <- dyn_wdpa |>
+  st_drop_geometry() |>
+  filter(
+    STATUS == "Designated",
+    MARINE == "0",
+    !DESIG %in%
+      c(
+        "UNESCO-MAB Biosphere Reserve",
+        "Ramsar Site, Wetland of International Importance",
+        "World Heritage Site (natural or mixed)"
+      )
+  ) |>
+  mutate(rep_area = as.numeric(REP_AREA)) |>
+  filter(!is.na(rep_area), rep_area > 0) |>
+  summarise(
+    creation_year = min(year(valid_from)),
+    iucn_cat = last(IUCN_CAT),
+    area_km2 = max(rep_area),
+    .by = NAME
+  ) |>
+  filter(creation_year > 0)
+
+iucn_levels <- c("Ia","Ib","II","III","IV","V","VI","Not Reported","Not Applicable")
+iucn_colours <- c("Ia"="#1B5E20","Ib"="#2E7D32","II"="#388E3C","III"="#43A047",
+                  "IV"="#66BB6A","V"="#A5D6A7","VI"="#C8E6C9",
+                  "Not Reported"="#BDBDBD","Not Applicable"="#E0E0E0")
+
+pa_summary <- pa_summary |> mutate(iucn_cat = factor(iucn_cat, levels = iucn_levels))
+year_range <- seq(min(pa_summary$creation_year), max(pa_summary$creation_year))
+cum_area <- pa_summary |>
+  expand_grid(year = year_range) |>
+  filter(year >= creation_year) |>
+  summarise(area_km2 = sum(area_km2), .by = c(year, iucn_cat)) |>
+  complete(year, iucn_cat, fill = list(area_km2 = 0))
+
+ggplot(cum_area, aes(x = year, y = area_km2, fill = iucn_cat)) +
+  geom_area(alpha = 0.85) +
+  geom_vline(xintercept = 2003, linetype = "dashed", colour = "grey30") +
+  annotate("text", x = 2003.5, y = max(cumsum(pa_summary$area_km2)) * 0.95,
+           label = "Vision Durban\n(2003)", hjust = 0, size = 3,
+           colour = "grey30", fontface = "italic") +
+  scale_fill_manual(values = iucn_colours, name = "Catégorie UICN", drop = FALSE) +
+  scale_x_continuous(breaks = seq(1930, 2020, 10)) +
+  scale_y_continuous(labels = scales::label_comma()) +
+  labs(x = NULL, y = expression("Superficie cumulée (km"^2*")")) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom", legend.key.size = unit(0.4, "cm"))
+```
+
+# Les enquêtes des Observatoires Ruraux {#sec-ros}
+
+Cette étude exploite un jeu de données longitudinal rare : le Système des Observatoires Ruraux (SOR), un réseau d'observatoires ruraux menés à travers Madagascar entre 1995 et 2015. Coordonné par l'INSTAT puis le ministère de l'Agriculture, avec le soutien technique de l'IRD et le financement de bailleurs internationaux, le SOR a enquêté environ 500 ménages par observatoire et par an dans jusqu'à 28 sites, couvrant les diverses zones agroécologiques du pays — des basses terres humides de l'est aux zones semi-arides du sud [@Razafindrakoto2015].
+
+```{r}
+#| label: fig-hist-ros
+#| fig-cap: "Localisation approximative des observatoires ruraux et années d'enquête"
+# Load required libraries
+library(tidyverse)
+library(haven)
+library(labelled)
+library(sf)
+library(tmap)
+library(readxl)
+library(cowplot)
+
+data_path <- "data/ROS_MDG_microdata/"
+
+load_and_count <- function(year, factorize = FALSE) {
+  file_path <- paste0(data_path, year, "/res_deb.dta")
+  data <- read_dta(file_path)
+  if (factorize) {
+    data <- data %>%
+      mutate(across(everything(), as.character),
+             across(where(is.labelled), ~ as.character(as_factor(.))))
+  }
+  count_data <- data %>%
+    group_by(j0) %>%
+    summarise(survey_count = n()) %>%
+    ungroup() %>%
+    mutate(year = year)
+  return(count_data)
+}
+
+years <- c(1995:2015, 2025)
+obs_count <- map_df(years, load_and_count) %>%
+  filter(j0 != 7 & !is.na(j0) & survey_count > 1) %>%
+  rename(observatory = j0)
+
+observatory_names <- readxl::read_xlsx("data/georeferencing/observatory_names.xlsx") %>%
+  select(code, observatory_name = name)
+
+obs_count <- obs_count %>%
+  left_join(observatory_names, by = c("observatory" = "code")) %>%
+  group_by(observatory_name, year) %>%
+  summarise(survey_count = sum(survey_count))
+
+obs_count_wide <- obs_count %>%
+  pivot_wider(names_from = year, values_from = survey_count)
+
+locations <- tibble(
+  code = c(1,2,3,4,12,13,15,16,21,22,23,24,31,25,41,42,43,51,44,45,61,17,18,19,71,52),
+  name = c("Antalaha","Antsirabe","Marovoay","Toliara coastal","Antsohihy",
+           "Tsiroanomandidy","Farafangana","Ambovombe","Alaotra","Manjakandriana",
+           "Toliara North","Fenerive East","Bekily","Mahanoro","Itasy","Menabe-Belo",
+           "Fianarantsoa","Tsivory","Morondava","Manandriana","Tanandava","Ihosy",
+           "Ambohimahasoa","Manakara","Tolanaro","Menabe North-East"),
+  latitude = c(-14.8833,-19.8659,-16.1000,-23.7574,-14.8796,-18.7713,-22.8167,-25.1667,
+               -17.8319,-18.9167,-23.2941,-17.3500,-24.6900,-19.9000,-19.1686,-19.6975,
+               -21.4527,-24.4667,-20.2833,-20.2333,-22.5711,-22.4000,-20.7145,-22.1333,
+               -25.0381,-20.5486),
+  longitude = c(50.2833,47.0333,46.6333,43.6770,47.9875,46.0546,47.8333,46.0833,
+                48.4167,47.8000,43.7761,49.4167,45.1700,48.8000,46.7354,44.5419,
+                47.0857,45.4667,44.2833,47.3833,45.0439,46.1167,47.0389,48.0167,
+                46.9562,47.1597)
+)
+
+obs_count <- left_join(obs_count, locations, by = c("observatory_name" = "name"))
+
+madagascar <- st_read(paste0("data/georeferencing/OCHA_BNGRC admin boundaries/",
+                              "mdg_admbnda_adm0_BNGRC_OCHA_20181031.shp"), quiet = TRUE)
+
+locations <- locations %>% arrange(desc(latitude)) %>% mutate(seq_num = 1:n())
+
+map_plot <- ggplot(data = madagascar) +
+  geom_sf(fill = "lightgray", colour = "dimgrey") +
+  geom_point(data = locations, aes(x = longitude, y = latitude, color = name), size = 3) +
+  geom_text(data = locations, aes(x = longitude, y = latitude, label = seq_num),
+            vjust = -1, hjust = 1, size = 3, fontface = "bold") +
+  theme_void() + theme(legend.position = "none")
+
+obs_count <- obs_count %>%
+  left_join(locations %>% select(name, seq_num), by = c("observatory_name" = "name")) %>%
+  mutate(observatory_with_num = paste0(seq_num, ". ", observatory_name))
+
+timeline_plot <- ggplot(obs_count,
+    aes(x = year, y = fct_reorder(observatory_with_num, latitude), color = observatory_name)) +
+  geom_point(aes(size = 1), show.legend = F) +
+  theme_minimal() + labs(y = NULL, x = NULL) +
+  theme(axis.text.y = element_text(size = 8, face = "bold"), legend.position = "none")
+
+combined_plot <- plot_grid(map_plot, timeline_plot, rel_widths = c(1.3, 2))
+print(combined_plot)
+```
+
+Le SOR fonctionne comme un panel rotatif : chaque observatoire suit un ensemble fixe de ménages, mais environ 15 % quittent l'échantillon chaque année par décès, migration ou attrition, avec des remplacements tirés du cadre d'échantillonnage d'origine. Sur une décennie, l'attrition cumulée atteint environ 80 % de la cohorte initiale. Cette conception limite l'analyse de panel au niveau individuel, mais préserve la représentativité transversale à chaque vague : les agrégats village-année estiment de manière cohérente les mêmes quantités de population, ce qui rend les données bien adaptées aux méthodes quasi-expérimentelles au niveau des sites.
+
+De manière cruciale, plusieurs observatoires ruraux sont situés à proximité d'aires protégées qui ont été étendues ou créées pendant la période d'enquête (2002–2008). Ce chevauchement entre vingt ans d'enquêtes ménages et des interventions de conservation échelonnées fournit un laboratoire naturel pour l'évaluation d'impact — qui n'a pas encore été systématiquement exploité.
+
+Une ré-enquête en 2025 de deux sites clés (Marovoay et Alaotra) ajoute une perspective à long terme, permettant d'évaluer si les effets à court terme persistent plus de vingt ans après le début de l'exposition. Une nouvelle vague en 2026 est prévue pour étendre la couverture à des observatoires supplémentaires.
+
+# Question de recherche {#sec-research-question}
+
+Nous posons la question suivante : le modèle de gouvernance d'une aire protégée affecte-t-il le revenu des ménages dans les communautés riveraines ?
+
+Nous comparons deux expériences naturelles incluses dans les données du SOR :
+
+1. Conservation stricte : l'extension de 2002 du parc national d'Ankarafantsika (catégorie II de l'UICN), géré par MNP. L'observatoire de Marovoay chevauche la limite du parc, la rivière Betsiboka créant une frontière naturelle d'exposition-contrôle entre les villages de la rive est (adjacents au parc) et les villages de la rive ouest (effectivement séparés par le fleuve).
+
+2. Conservation multifonctionnelle : la création de la nouvelle aire protégée du Lac Alaotra (catégorie VI de l'UICN), gérée par Durrell Wildlife Conservation Trust par le biais de la gestion communautaire des ressources naturelles, avec une application effective à partir d'environ 2008. L'ensemble de l'observatoire d'Alaotra partage une dépendance à l'écosystème lacustre et marécageux.
+
+En utilisant les méthodes de contrôle synthétique généralisé [@Xu2017] avec un pool de donneurs élargi comprenant jusqu'à neuf observatoires supplémentaires, nous estimons l'effet moyen du traitement sur les traités (ATT) pour le revenu équivalisé des ménages. Nous étendons ensuite l'analyse à trois paires observatoire–aire protégée supplémentaires (Farafangana, Toliara Nord, Fénérive Est) où des aires protégées ont été créées en 2006–2007, exploitant le calendrier échelonné pour renforcer l'identification.
+
+La suite de ce document est structurée comme suit. Le [Chapitre 2](02_data.qmd) décrit les sources de données et la construction des variables. Le [Chapitre 3](03_strategy.qmd) détaille la stratégie d'identification et les méthodes d'estimation. Le [Chapitre 4](04_results.qmd) présente les résultats principaux pour Ankarafantsika et Alaotra. Le [Chapitre 5](05_extensions.qmd) étend l'analyse à trois sites supplémentaires. Le [Chapitre 6](06_discussion.qmd) discute des implications politiques et expose les plans de la vague d'enquête 2026.
+
