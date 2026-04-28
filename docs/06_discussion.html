@@ -266,7 +266,6 @@ window.Quarto = {
   <li><a href="#planned-analyses" id="toc-planned-analyses" class="nav-link" data-scroll-target="#planned-analyses"><span class="header-section-number">11.2</span> Planned analyses</a></li>
   </ul>
 </li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul>
 <li><a href="https://github.com/BETSAKA/Rural_obs_PAs/blob/main/06_discussion.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li>
@@ -407,7 +406,6 @@ Table 11.1: Four staggered exposure cohorts for Callaway &amp; Sant’Anna DiD
 <span class="header-section-number">11.2</span> Planned analyses</h2>
 <p>When the 2026 survey round becomes available, the primary specification will be a Callaway–Sant’Anna <span class="citation" data-cites="CallawayS2021">(<a href="references.html#ref-CallawayS2021" role="doc-biblioref">2021</a>)</span> staggered difference-in-differences estimation at the household level, with doubly-robust estimation, household-level covariates, and clustering at the site level. A complementary Sun–Abraham <span class="citation" data-cites="SunAbraham2021">(<a href="references.html#ref-SunAbraham2021" role="doc-biblioref">2021</a>)</span> interaction-weighted estimator via <code>fixest::sunab()</code> will provide a transparent event-study summary. The gsynth estimates from Chapters 4 and 5 will serve as a robustness check that relaxes the parallel-trends assumption to interactive fixed effects. If gsynth and DiD agree, the evidence is more credible regardless of which identifying assumption one prefers. If the 2026 wave covers Fénérive East, the small footprint of the Réserve de Tampolo allows a within-observatory distance design contrasting near-PA and far-PA sites, adding a third independent geographic context alongside Marovoay and Alaotra.</p>
 <p>This chapter will be updated when the 2026 data arrive. The current gsynth results should be read as a first-pass analysis that will be complemented by household-level estimation exploiting the full depth of the data.</p>
-</section></section><section id="references" class="level1 unnumbered"><h1 class="unnumbered">References</h1>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
@@ -430,7 +428,7 @@ Sun, Liyang, and Sarah Abraham. 2021. <span>“Estimating Dynamic Treatment Effe
 Xu, Yiqing. 2017. <span>“Generalized Synthetic Control Method: Causal Inference with Interactive Fixed Effects Models.”</span> <em>Political Analysis</em> 25 (1): 57–76. <a href="https://doi.org/10.1017/pan.2016.2">https://doi.org/10.1017/pan.2016.2</a>.
 </div>
 </div>
-</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
     const anchorJS = new window.AnchorJS();
@@ -503,7 +501,7 @@ Xu, Yiqing. 2017. <span>“Generalized Synthetic Control Method: Causal Inferenc
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/betsaka\.github\.io\/Rural_obs_PAs");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

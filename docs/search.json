@@ -360,33 +360,11 @@
     ]
   },
   {
-    "objectID": "05_extensions.html#sec-ext-maro",
-    "href": "05_extensions.html#sec-ext-maro",
-    "title": "5  Extensions",
-    "section": "7.1 Ankarafantsika (clean donors)",
-    "text": "7.1 Ankarafantsika (clean donors)\nRe-estimating the Marovoay east-bank model with the restricted donor pool yields an average post-treatment ATT of -0.312 log points (\\(\\approx\\) 27%, \\(p\\) = 0.010), consistent with the full-donor estimate in Chapter 4. The point estimate is slightly attenuated because the smaller donor pool supports fewer latent factors, but the qualitative conclusion is unchanged: strict enforcement is associated with a persistent, statistically significant income decline.\n\n\n\n\n\n\n\n\nFigure 7.1: Ankarafantsika gsynth ATT path (clean donor pool). Exposure onset 2003.",
-    "crumbs": [
-      "Analysis",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Extensions</span>"
-    ]
-  },
-  {
-    "objectID": "05_extensions.html#sec-ext-ala",
-    "href": "05_extensions.html#sec-ext-ala",
-    "title": "5  Extensions",
-    "section": "7.2 Lac Alaotra (clean donors)",
-    "text": "7.2 Lac Alaotra (clean donors)\nThe Alaotra observatory-level ATT with clean donors remains near zero and statistically insignificant: +0.014 log points (\\(p\\) = 0.928). The null result is robust to the donor-pool change, reinforcing the interpretation that participatory conservation under CBNRM did not impose detectable aggregate income costs.\n\n\n\n\n\n\n\n\nFigure 7.2: Lac Alaotra gsynth ATT path (clean donor pool). Exposure onset 2008.",
-    "crumbs": [
-      "Analysis",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Extensions</span>"
-    ]
-  },
-  {
     "objectID": "05_extensions.html#sec-ext-fara",
     "href": "05_extensions.html#sec-ext-fara",
     "title": "5  Extensions",
-    "section": "7.3 Farafangana: Corridor Forestier effect",
-    "text": "7.3 Farafangana: Corridor Forestier effect\n\n\n\n\n\n\nWarning\n\n\n\nFarafangana has only 3 post-treatment survey years (2006–2008). The gsynth estimates are presented for completeness but should be treated with extreme caution. Pre-treatment fit is assessed over 7 years; post-treatment precision is insufficient for firm conclusions.\n\n\nThe point estimate is -0.260 log points (\\(\\approx\\) 23%), but with very wide confidence intervals (\\(p\\) = 0.301) that span both negative and positive values. With only 3 post-treatment observations, this estimate has low reliability and should not be interpreted independently.\n\n\n\n\n\n\n\n\nFigure 7.3: Farafangana gsynth ATT path (1999–2008). Exposure onset 2006. Wide CIs reflect only 3 post-treatment years.",
+    "section": "7.1 Farafangana: Corridor Forestier effect",
+    "text": "7.1 Farafangana: Corridor Forestier effect\n\n\n\n\n\n\nWarning\n\n\n\nFarafangana has only 3 post-treatment survey years (2006–2008). The gsynth estimates are presented for completeness but should be treated with extreme caution. Pre-treatment fit is assessed over 7 years; post-treatment precision is insufficient for firm conclusions.\n\n\nThe point estimate is -0.260 log points (\\(\\approx\\) 23%), but with very wide confidence intervals (\\(p\\) = 0.301) that span both negative and positive values. With only 3 post-treatment observations, this estimate has low reliability and should not be interpreted independently.\n\n\n\n\n\n\n\n\nFigure 7.1: Farafangana gsynth ATT path (1999–2008). Exposure onset 2006. Wide CIs reflect only 3 post-treatment years.",
     "crumbs": [
       "Analysis",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Extensions</span>"
@@ -396,8 +374,8 @@
     "objectID": "05_extensions.html#sec-ext-tol",
     "href": "05_extensions.html#sec-ext-tol",
     "title": "5  Extensions",
-    "section": "7.4 Toliara North: coastal PA cascade",
-    "text": "7.4 Toliara North: coastal PA cascade\nThe Toliara North ATT estimates a composite treatment effect from the 2007–2008 PA cascade. The point estimate is +0.129 log points (\\(p\\) = 0.512), not statistically significant. The December 2008 secondary shock (Ranobe PK 32, the closest PA at &lt;1.5 km) coincides with a visible shift in the ATT path, but it is impossible to separate the 2007 and 2008 effects without additional micro-data. The dominant conservation character of the three PAs is multipurpose (IUCN V), consistent with the near-zero aggregate income effect.\n\n\n\n\n\n\n\n\nFigure 7.4: Toliara North gsynth ATT path. Exposure onset 2007 (Amoron’i Onilahy decree). An annotation marks the December 2008 Ranobe PK 32 secondary decree.",
+    "section": "7.2 Toliara North: coastal PA cascade",
+    "text": "7.2 Toliara North: coastal PA cascade\nThe Toliara North ATT estimates a composite treatment effect from the 2007–2008 PA cascade. The point estimate is +0.129 log points (\\(p\\) = 0.512), not statistically significant. The December 2008 secondary shock (Ranobe PK 32, the closest PA at &lt;1.5 km) coincides with a visible shift in the ATT path, but it is impossible to separate the 2007 and 2008 effects without additional micro-data. The dominant conservation character of the three PAs is multipurpose (IUCN V), consistent with the near-zero aggregate income effect.\n\n\n\n\n\n\n\n\nFigure 7.2: Toliara North gsynth ATT path. Exposure onset 2007 (Amoron’i Onilahy decree). An annotation marks the December 2008 Ranobe PK 32 secondary decree.",
     "crumbs": [
       "Analysis",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Extensions</span>"
@@ -407,8 +385,8 @@
     "objectID": "05_extensions.html#sec-ext-fen",
     "href": "05_extensions.html#sec-ext-fen",
     "title": "5  Extensions",
-    "section": "7.5 Fénérive East: low-intensity reserve",
-    "text": "7.5 Fénérive East: low-intensity reserve\nThe Fénérive East ATT shows a small positive but nonsignificant effect (+0.114 log points, \\(p\\) = 0.619) — perhaps the most interpretively clear result among the three new sites. A 7.3 km² research forest cannot plausibly impose population-level income costs on a multi-commune observatory. The 8/8 pre-/post-treatment symmetry provides the most credible pre-trend assessment of the new sites.\n\n\n\n\n\n\n\n\nFigure 7.5: Fénérive East gsynth ATT path. Exposure onset 2007 (Réserve de Tampolo decree).",
+    "section": "7.3 Fénérive East: low-intensity reserve",
+    "text": "7.3 Fénérive East: low-intensity reserve\nThe Fénérive East ATT shows a small positive but nonsignificant effect (+0.114 log points, \\(p\\) = 0.619) — perhaps the most interpretively clear result among the three new sites. A 7.3 km² research forest cannot plausibly impose population-level income costs on a multi-commune observatory. The 8/8 pre-/post-treatment symmetry provides the most credible pre-trend assessment of the new sites.\n\n\n\n\n\n\n\n\nFigure 7.3: Fénérive East gsynth ATT path. Exposure onset 2007 (Réserve de Tampolo decree).",
     "crumbs": [
       "Analysis",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Extensions</span>"
@@ -540,7 +518,7 @@
     "href": "06_discussion.html#planned-analyses",
     "title": "6  Discussion",
     "section": "11.2 Planned analyses",
-    "text": "11.2 Planned analyses\nWhen the 2026 survey round becomes available, the primary specification will be a Callaway–Sant’Anna (2021) staggered difference-in-differences estimation at the household level, with doubly-robust estimation, household-level covariates, and clustering at the site level. A complementary Sun–Abraham (2021) interaction-weighted estimator via fixest::sunab() will provide a transparent event-study summary. The gsynth estimates from Chapters 4 and 5 will serve as a robustness check that relaxes the parallel-trends assumption to interactive fixed effects. If gsynth and DiD agree, the evidence is more credible regardless of which identifying assumption one prefers. If the 2026 wave covers Fénérive East, the small footprint of the Réserve de Tampolo allows a within-observatory distance design contrasting near-PA and far-PA sites, adding a third independent geographic context alongside Marovoay and Alaotra.\nThis chapter will be updated when the 2026 data arrive. The current gsynth results should be read as a first-pass analysis that will be complemented by household-level estimation exploiting the full depth of the data.",
+    "text": "11.2 Planned analyses\nWhen the 2026 survey round becomes available, the primary specification will be a Callaway–Sant’Anna (2021) staggered difference-in-differences estimation at the household level, with doubly-robust estimation, household-level covariates, and clustering at the site level. A complementary Sun–Abraham (2021) interaction-weighted estimator via fixest::sunab() will provide a transparent event-study summary. The gsynth estimates from Chapters 4 and 5 will serve as a robustness check that relaxes the parallel-trends assumption to interactive fixed effects. If gsynth and DiD agree, the evidence is more credible regardless of which identifying assumption one prefers. If the 2026 wave covers Fénérive East, the small footprint of the Réserve de Tampolo allows a within-observatory distance design contrasting near-PA and far-PA sites, adding a third independent geographic context alongside Marovoay and Alaotra.\nThis chapter will be updated when the 2026 data arrive. The current gsynth results should be read as a first-pass analysis that will be complemented by household-level estimation exploiting the full depth of the data.\n\n\n\n\nCallaway, Brantly, and Pedro H. C. Sant’Anna. 2021. “Difference-in-Differences with Multiple Time Periods.” Journal of Econometrics 225 (2): 200–230. https://doi.org/10.1016/j.jeconom.2020.12.001.\n\n\nFerraro, Paul J., Merlin M. Hanauer, and Katharine R. E. Sims. 2011. “The Effectiveness of Protected Areas in Reducing Deforestation in Madagascar.” Journal of Environmental Economics and Management 62 (2): 261–77. https://doi.org/10.1016/j.jeem.2011.01.012.\n\n\nOldekop, Johan A., George Holmes, William E. Harris, and Karl L. Evans. 2016. “A Global Assessment of the Social and Conservation Outcomes of Protected Areas.” Conservation Biology 30 (1): 133–41. https://doi.org/10.1111/cobi.12568.\n\n\nSims, Katharine R. E. 2010. “Measuring the Effects of Protected Areas on Deforestation in Madagascar.” Journal of Environmental Economics and Management 59 (2): 180–90. https://doi.org/10.1016/j.jeem.2009.10.003.\n\n\nSun, Liyang, and Sarah Abraham. 2021. “Estimating Dynamic Treatment Effects in Event Studies with Heterogeneous Treatment Effects.” Journal of Econometrics 225 (2): 175–99. https://doi.org/10.1016/j.jeconom.2020.09.006.\n\n\nXu, Yiqing. 2017. “Generalized Synthetic Control Method: Causal Inference with Interactive Fixed Effects Models.” Political Analysis 25 (1): 57–76. https://doi.org/10.1017/pan.2016.2.",
     "crumbs": [
       "Analysis",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Discussion</span>"
@@ -1056,7 +1034,7 @@
     "href": "A4_methodology.html#practical-implications",
     "title": "Appendix D — Methodology",
     "section": "H.2 Practical implications",
-    "text": "H.2 Practical implications\nThe power constraints imply that:\n\nThe Ankarafantsika negative effect (large, ~27% of income) is detectable even with one treated unit and permutation-based inference.\nThe Alaotra null result may reflect insufficient power rather than a true zero. Effects smaller than ~15–20% would be undetectable with the available sample.\nThe three extension sites (Chapter 5) face the same power floor. Near-zero point estimates should not be over-interpreted as evidence of “no effect” — they are consistent with both a true null and a moderate effect below the detection threshold.",
+    "text": "H.2 Practical implications\nThe power constraints imply that:\n\nThe Ankarafantsika negative effect (large, ~27% of income) is detectable even with one treated unit and permutation-based inference.\nThe Alaotra null result may reflect insufficient power rather than a true zero. Effects smaller than ~15–20% would be undetectable with the available sample.\nThe three extension sites (Chapter 5) face the same power floor. Near-zero point estimates should not be over-interpreted as evidence of “no effect” — they are consistent with both a true null and a moderate effect below the detection threshold.\n\n\n\n\n\nAbadie, Alberto, Alexis Diamond, and Jens Hainmueller. 2010. “Synthetic Control Methods for Comparative Case Studies: Estimating the Effect of California’s Tobacco Control Program.” Journal of the American Statistical Association 105 (490): 493–505. https://doi.org/10.1198/jasa.2009.ap08746.\n\n\nArkhangelsky, Dmitry, Susan Athey, David A. Hirshberg, Guido W. Imbens, and Stefan Wager. 2021. “Synthetic Difference-in-Differences.” American Economic Review 111 (12): 4088–118. https://doi.org/10.1257/aer.20190159.\n\n\nCallaway, Brantly, and Pedro H. C. Sant’Anna. 2021. “Difference-in-Differences with Multiple Time Periods.” Journal of Econometrics 225 (2): 200–230. https://doi.org/10.1016/j.jeconom.2020.12.001.\n\n\nCameron, A. Colin, Jonah B. Gelbach, and Douglas L. Miller. 2008. “Bootstrap-Based Improvements for Inference with Clustered Errors.” Review of Economics and Statistics 90 (3): 414–27. https://doi.org/10.1162/rest.90.3.414.\n\n\nXu, Yiqing. 2017. “Generalized Synthetic Control Method: Causal Inference with Interactive Fixed Effects Models.” Political Analysis 25 (1): 57–76. https://doi.org/10.1017/pan.2016.2.",
     "crumbs": [
       "Appendices",
       "<span class='chapter-number'>D</span>  <span class='chapter-title'>Methodology</span>"

@@ -240,6 +240,11 @@ gantt_data <- hh_coverage |>
   mutate(OBS_CODE = as.integer(obs)) |>
   left_join(new_pa_by_obs, by = "OBS_CODE") |>
   left_join(obs_names_full, by = "obs") |>
+  # Correction : l'AP la plus proche de Marovoay est l'extension 2002 d'Ankarafantsika NP
+  mutate(
+    nearest_pa = if_else(obs == "03", "Ankarafantsika NP", nearest_pa),
+    pa_year = if_else(obs == "03", 2002L, pa_year)
+  ) |>
   mutate(
     role = case_when(
       obs == "03" ~ "Marovoay (strict, 2003)",

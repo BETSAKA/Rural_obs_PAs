@@ -109,8 +109,12 @@ tol_pas <- dyn_study |>
     str_detect(NAME, "Mikea")   ~ "Mikea NP (II, 2007)"
   ))
 
+tol_bb <- st_bbox(tol_pas)
 tol_bbox <- st_bbox(c(
-  xmin = 43.2, ymin = -24.0, xmax = 44.8, ymax = -22.8
+  xmin = unname(tol_bb["xmin"]) - 0.3,
+  ymin = unname(tol_bb["ymin"]) - 0.3,
+  xmax = unname(tol_bb["xmax"]) + 0.3,
+  ymax = unname(tol_bb["ymax"]) + 0.3
 ), crs = 4326)
 
 tol_mad_c  <- st_crop(madagascar, tol_bbox)
@@ -232,68 +236,23 @@ tribble(
 
 The identification strategy and estimator are identical to [Chapter 4](04_results.qmd). We estimate the gsynth ATT separately for each exposed observatory. Each model specifies $D_{it} = 1$ only for the target observatory's exposed unit(s) from its exposure year onward; all other units carry $D_{it} = 0$ and serve as additional factors for counterfactual construction. This within-model use of other exposed observatories as donors is consistent with the interactive FE framework so long as exposure timing differs across observatories [@Xu2017]. The number of latent factors $r$ is selected by leave-one-out cross-validation; inference is parametric bootstrap with 200 replications.
 
-## Ankarafantsika (clean donors) {#sec-ext-maro}
-
-Re-estimating the Marovoay east-bank model with the restricted donor pool yields an average post-treatment ATT of {{< var att_maro_clean >}} log points ($\approx$ {{< var att_maro_clean_pct >}}, $p$ = {{< var att_maro_clean_p >}}), consistent with the full-donor estimate in [Chapter 4](04_results.qmd). The point estimate is slightly attenuated because the smaller donor pool supports fewer latent factors, but the qualitative conclusion is unchanged: strict enforcement is associated with a persistent, statistically significant income decline.
-
 ```{r}
-#| label: fig-att-maro-clean
-#| fig-cap: "Ankarafantsika gsynth ATT path (clean donor pool). Exposure onset 2003."
-#| fig-height: 4.5
-#| fig-width: 8
-
+#| label: load-maro-ala-ch5
+#| include: false
 gs_maro <- read_rds("data/paper14_gsynth_maro_oecd.rds")
-
+gs_ala  <- read_rds("data/paper14_gsynth_ala_oecd.rds")
 att_maro_df <- tibble(
   rel_time = as.numeric(rownames(gs_maro$est_att)),
   att      = gs_maro$est_att[, "ATT"],
   ci_lo    = gs_maro$est_att[, "CI.lower"],
   ci_hi    = gs_maro$est_att[, "CI.upper"]
 )
-
-ggplot(att_maro_df, aes(rel_time, att)) +
-  geom_hline(yintercept = 0, color = "grey60") +
-  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
-  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
-  geom_line(color = "#D32F2F", linewidth = 0.8) +
-  geom_point(color = "#D32F2F", size = 2.5) +
-  labs(x = "Years relative to exposure (2003)",
-       y = "ATT (log equiv. income)",
-       title = "Ankarafantsika (strict, IUCN II)",
-       subtitle = paste0(gs_maro$N_co, " donor sites; r* = ", gs_maro$r_cv)) +
-  theme_minimal(base_size = 12)
-```
-
-## Lac Alaotra (clean donors) {#sec-ext-ala}
-
-The Alaotra observatory-level ATT with clean donors remains near zero and statistically insignificant: {{< var att_ala_clean >}} log points ($p$ = {{< var att_ala_clean_p >}}). The null result is robust to the donor-pool change, reinforcing the interpretation that participatory conservation under CBNRM did not impose detectable aggregate income costs.
-
-```{r}
-#| label: fig-att-ala-clean
-#| fig-cap: "Lac Alaotra gsynth ATT path (clean donor pool). Exposure onset 2008."
-#| fig-height: 4.5
-#| fig-width: 8
-
-gs_ala <- read_rds("data/paper14_gsynth_ala_oecd.rds")
-
 att_ala_df <- tibble(
   rel_time = as.numeric(rownames(gs_ala$est_att)),
   att      = gs_ala$est_att[, "ATT"],
   ci_lo    = gs_ala$est_att[, "CI.lower"],
   ci_hi    = gs_ala$est_att[, "CI.upper"]
 )
-
-ggplot(att_ala_df, aes(rel_time, att)) +
-  geom_hline(yintercept = 0, color = "grey60") +
-  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
-  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
-  geom_line(color = "#1565C0", linewidth = 0.8) +
-  geom_point(color = "#1565C0", size = 2.5) +
-  labs(x = "Years relative to exposure (2008)",
-       y = "ATT (log equiv. income)",
-       title = "Lac Alaotra (multipurpose, IUCN V)",
-       subtitle = paste0(gs_ala$N_co, " donor sites; r* = ", gs_ala$r_cv)) +
-  theme_minimal(base_size = 12)
 ```
 
 ## Farafangana: Corridor Forestier effect {#sec-ext-fara}

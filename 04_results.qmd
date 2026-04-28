@@ -281,38 +281,36 @@ tibble(
 
 ```{r}
 #| label: fig-comparison
-#| fig-cap: "Side-by-side ATT paths. Left: Ankarafantsika (strict, from 2003) shows a persistent negative effect. Right: Lac Alaotra (multipurpose, from 2008) shows no significant effect."
+#| fig-cap: "Overlaid ATT paths. Ankarafantsika (strict, red) shows a persistent negative effect from 2003; Lac Alaotra (multipurpose, blue) shows no significant effect from 2008. Horizontal scale normalized to each PA's exposure onset."
 #| fig-height: 5
-#| fig-width: 12
-p_maro_att <- ggplot(att_maro_df, aes(rel_time, att)) +
+#| fig-width: 9
+bind_rows(
+  att_maro_df |> mutate(case = "Ankarafantsika (strict)"),
+  att_ala_df  |> mutate(case = "Lac Alaotra (multipurpose)")
+) |>
+  ggplot(aes(rel_time, att, color = case, fill = case)) +
   geom_hline(yintercept = 0, color = "grey60") +
   geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
-  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
-  geom_line(color = "#D32F2F", linewidth = 0.8) +
-  geom_point(color = "#D32F2F", size = 2) +
-  labs(
-    x = "Relative time",
-    y = "ATT (log equiv. income)",
-    title = "Ankarafantsika (strict)"
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), alpha = 0.12, color = NA) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  scale_color_manual(
+    values = c("Ankarafantsika (strict)" = "#D32F2F",
+               "Lac Alaotra (multipurpose)" = "#1565C0"),
+    name = NULL
   ) +
-  theme_minimal(base_size = 11)
-
-p_ala_att <- ggplot(att_ala_df, aes(rel_time, att)) +
-  geom_hline(yintercept = 0, color = "grey60") +
-  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
-  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
-  geom_line(color = "#1565C0", linewidth = 0.8) +
-  geom_point(color = "#1565C0", size = 2) +
-  labs(
-    x = "Relative time",
-    y = "ATT (log equiv. income)",
-    title = "Lac Alaotra (multipurpose)"
+  scale_fill_manual(
+    values = c("Ankarafantsika (strict)" = "#D32F2F",
+               "Lac Alaotra (multipurpose)" = "#1565C0"),
+    name = NULL
   ) +
-  theme_minimal(base_size = 11)
-
-p_maro_att +
-  p_ala_att +
-  plot_annotation(title = "ATT Paths: Strict vs Multipurpose Conservation")
+  labs(
+    x = "Years relative to exposure",
+    y = "ATT (log equiv. income)",
+    title = "ATT Paths: Strict vs Multipurpose Conservation"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom")
 ```
 
 The contrast between the two estimated ATT paths is sharp on paper: a large persistent negative gap at Ankarafantsika, and a near-zero gap at Alaotra. Before drawing governance conclusions, however, some caution is warranted. At Marovoay, the within-observatory comparison between east and west bank finds no detectable difference, raising the possibility that the gsynth estimate is capturing regional economic decline rather than conservation effects. At Alaotra, the null result may reflect genuinely benign governance or insufficient statistical power. These two caveats temper but do not dissolve the contrast: the evidence is suggestive that strict exclusionary management carries higher livelihood costs than participatory co-management, but the data cannot definitively establish the causal mechanism.
@@ -485,6 +483,7 @@ ggplot(
       "Bepako (E)" = "#fb6a4a"
     )
   ) +
+  scale_y_continuous(limits = c(0, NA)) +
   guides(
     color = guide_legend(nrow = 1, byrow = TRUE, order = 1),
     linetype = guide_legend(nrow = 1, order = 2)

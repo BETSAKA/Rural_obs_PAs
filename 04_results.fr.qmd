@@ -192,7 +192,7 @@ sec_did_ala$summary |>
 Les deux dispositifs intra-Alaotra produisent de petites estimations ponctuelles et de larges erreurs types cluster-robustes qui incluent confortablement zéro. Leur conclusion rejoint le gsynth selon un contraste d'identification différent : non pas contre un pool de donneurs extérieur, mais contre les fokontany fusionnés moins exposés du même observatoire. Cette convergence réduit l'éventail des interprétations plausibles du résultat nul d'Alaotra : l'absence d'effet agrégé sur le revenu du *Paysage Harmonieux Protégé* est robuste, que le contrefactuel soit construit à partir d'observatoires extérieurs (gsynth) ou à partir de l'hétérogénéité de l'exposition intra-observatoire (CTR DiD).
 
 
-## Comparaison des deux cas {#sec-comparison}
+# Comparaison des deux cas {#sec-comparison}
 
 ```{r}
 #| label: tbl-comparison
@@ -266,88 +266,6 @@ bind_rows(
 ```
 
 Le contraste entre les deux trajectoires ATT estimées est net : un large écart négatif persistant à Ankarafantsika, et un écart quasi nul à Alaotra. Avant de tirer des conclusions de gouvernance, une certaine prudence s'impose. À Marovoay, la comparaison intra-observatoire entre rive est et rive ouest ne détecte aucune différence, soulevant la possibilité que l'estimation gsynth capte le déclin économique régional plutôt que les effets de la conservation. À Alaotra, le résultat nul peut refléter une gouvernance genuinement bénigne ou une puissance statistique insuffisante. Ces deux mises en garde tempèrent mais ne dissolvent pas le contraste : les éléments suggèrent que la gestion exclusionnaire stricte engendre des coûts sur les moyens de subsistance plus élevés que le co-management participatif, mais les données ne peuvent pas établir définitivement le mécanisme causal.
-
-## Robustesse {#sec-robustness}
-
-```{r}
-#| label: fig-robustness-maro
-#| fig-cap: "Vérification de robustesse pour Marovoay : ATT gsynth sous des spécifications alternatives. 'Niveaux' = revenu sans transformation log ; 'Pool étendu' = inclut les 4 donneurs aussi exposés."
-#| fig-height: 5
-#| fig-width: 9
-gs_maro_lev <- read_rds("data/robustness_gsynth_levels_maro.rds")
-gs_maro_ext2 <- read_rds("data/robustness_gsynth_oecd_maro.rds")
-
-rob_maro <- bind_rows(
-  tibble(rel_time = as.numeric(rownames(gs_maro$est_att)),
-         att = gs_maro$est_att[, "ATT"],
-         ci_lo = gs_maro$est_att[, "CI.lower"],
-         ci_hi = gs_maro$est_att[, "CI.upper"],
-         spec = "Référence (log, pool propre)"),
-  tibble(rel_time = as.numeric(rownames(gs_maro_lev$est_att)),
-         att = gs_maro_lev$est_att[, "ATT"],
-         ci_lo = gs_maro_lev$est_att[, "CI.lower"],
-         ci_hi = gs_maro_lev$est_att[, "CI.upper"],
-         spec = "Niveaux (non-log)"),
-  tibble(rel_time = as.numeric(rownames(gs_maro_ext2$est_att)),
-         att = gs_maro_ext2$est_att[, "ATT"],
-         ci_lo = gs_maro_ext2$est_att[, "CI.lower"],
-         ci_hi = gs_maro_ext2$est_att[, "CI.upper"],
-         spec = "Pool étendu (12 donneurs)")
-)
-
-ggplot(rob_maro, aes(rel_time, att, color = spec, fill = spec)) +
-  geom_hline(yintercept = 0, color = "grey60") +
-  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
-  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), alpha = 0.08, color = NA) +
-  geom_line(linewidth = 0.7) +
-  geom_point(size = 1.8) +
-  scale_color_brewer(palette = "Set1", name = NULL) +
-  scale_fill_brewer(palette = "Set1", name = NULL) +
-  labs(x = "Années relatives à l'exposition", y = "ATT",
-       title = "Robustesse : Marovoay") +
-  theme_minimal(base_size = 11) + theme(legend.position = "bottom")
-```
-
-Les vérifications de robustesse confirment la direction et la persistance de l'écart à Marovoay dans l'ensemble des spécifications. Ce qui reste non résolu, c'est de savoir si cet écart reflète une exposition cumulée au parc ou les effets à long terme du même déclin régional — une question que ces données seules ne peuvent pas trancher.
-
-```{r}
-#| label: fig-robustness-ala
-#| fig-cap: "Vérification de robustesse pour Alaotra : ATT gsynth sous des spécifications alternatives."
-#| fig-height: 5
-#| fig-width: 9
-gs_ala_lev <- read_rds("data/robustness_gsynth_levels_ala.rds")
-gs_ala_ext2 <- read_rds("data/robustness_gsynth_oecd_ala.rds")
-
-rob_ala <- bind_rows(
-  tibble(rel_time = as.numeric(rownames(gs_ala$est_att)),
-         att = gs_ala$est_att[, "ATT"],
-         ci_lo = gs_ala$est_att[, "CI.lower"],
-         ci_hi = gs_ala$est_att[, "CI.upper"],
-         spec = "Référence (log, pool propre)"),
-  tibble(rel_time = as.numeric(rownames(gs_ala_lev$est_att)),
-         att = gs_ala_lev$est_att[, "ATT"],
-         ci_lo = gs_ala_lev$est_att[, "CI.lower"],
-         ci_hi = gs_ala_lev$est_att[, "CI.upper"],
-         spec = "Niveaux (non-log)"),
-  tibble(rel_time = as.numeric(rownames(gs_ala_ext2$est_att)),
-         att = gs_ala_ext2$est_att[, "ATT"],
-         ci_lo = gs_ala_ext2$est_att[, "CI.lower"],
-         ci_hi = gs_ala_ext2$est_att[, "CI.upper"],
-         spec = "Pool étendu (12 donneurs)")
-)
-
-ggplot(rob_ala, aes(rel_time, att, color = spec, fill = spec)) +
-  geom_hline(yintercept = 0, color = "grey60") +
-  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
-  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), alpha = 0.08, color = NA) +
-  geom_line(linewidth = 0.7) +
-  geom_point(size = 1.8) +
-  scale_color_brewer(palette = "Set1", name = NULL) +
-  scale_fill_brewer(palette = "Set1", name = NULL) +
-  labs(x = "Années relatives à l'exposition", y = "ATT", title = "Robustesse : Alaotra") +
-  theme_minimal(base_size = 11) + theme(legend.position = "bottom")
-```
-
 
 # Évaluation à long terme : ré-enquête 2025 {#sec-longrun}
 
@@ -456,6 +374,7 @@ ggplot(traj_data, aes(x = year, y = ln_revtot_w, color = village, linetype = ban
   scale_color_manual(values = c(
     "Ampijoroa (Ouest)" = "#2171b5", "Maroala (Ouest)" = "#6baed6",
     "Madiromiongana (Est)" = "#cb181d", "Bepako (Est)" = "#fb6a4a")) +
+  scale_y_continuous(limits = c(0, NA)) +
   guides(color = guide_legend(nrow = 1, byrow = TRUE, order = 1),
          linetype = guide_legend(nrow = 1, order = 2)) +
   labs(title = "Trajectoires de revenu au niveau des sites : Marovoay 1999–2025",

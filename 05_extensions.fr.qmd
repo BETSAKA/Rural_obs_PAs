@@ -27,7 +27,9 @@ Une note méthodologique : le pool de donneurs dans ce chapitre est restreint au
 
 Le CFAV (~300 km, catégorie V UICN) longe l'escarpement oriental des hautes terres. Un décret de protection temporaire a été émis le 15 septembre 2006 dans le cadre de l'expansion SAPM post-2003. Le statut catégorie V implique une réglementation de l'utilisation des terres à la lisière forestière — principalement des restrictions sur le tavy et la production de charbon de bois dans les zones tampons — plutôt qu'un enforcement d'exclusion.
 
-L'observatoire de Farafangana est situé sur la plaine côtière sud-est ; sa commune la plus proche (Mahatsinjo) borde le CFAV à ~14 km. Avec seulement 3 années post-traitement (2006–2008), les estimations gsynth doivent être considérées comme illustratives.
+L'observatoire de Farafangana est situé sur la plaine côtière sud-est ; sa commune la plus proche (Mahatsinjo) borde le CFAV à ~14 km. Une complication : la Réserve Spéciale de Manombo (catégorie IV UICN, 1962) se trouve à ~12 km d'une deuxième commune. Manombo étant antérieure à la période d'étude avec des limites et une gestion inchangées, elle constitue une condition de fond constante absorbée dans l'effet fixe d'unité. L'ATT pour Farafangana identifie donc l'effet supplémentaire sur le revenu du décret CFAV de 2006.
+
+Tous les sites d'enquête sont exposés au niveau de l'observatoire à partir de 2006 ; aucune division intra-observatoire n'est possible. Avec seulement 3 années post-traitement (2006–2008), les estimations gsynth doivent être considérées comme illustratives.
 
 ```{r}
 #| label: fig-map-fara
@@ -48,10 +50,30 @@ fara_pas_c <- tryCatch(st_crop(fara_pas, fara_bbox), error = function(e) fara_pa
 fara_fkt_c <- fara_fokontany |> mutate(layer = "Fokontany enquêtés")
 tm_shape(fara_mad_c) +
   tm_borders(col = "grey75", lwd = 0.3) +
-  tm_shape(fara_pas_c) + tm_fill(col = "pa_type", palette = c("#EF9A9A", "#FFF9C4"), alpha = 0.5, title = "AP") +
-  tm_borders(col = "pa_type", palette = c("#C62828", "#F9A825"), lwd = 1.2) +
-  tm_shape(fara_fkt_c) + tm_dots(col = "#1B5E20", size = 0.3) +
-  tm_layout(legend.outside = TRUE, frame = FALSE)
+  tm_fill(fill = "grey96") +
+tm_shape(fara_pas_c) +
+  tm_fill(fill = "pa_type",
+          fill.scale = tm_scale_categorical(
+            values = c("AP d'exposition (CFAV, 2006)" = "#EF9A9A",
+                       "AP préexistante (Manombo, 1962)" = "#FFF59D")),
+          fill.legend = tm_legend(title = ""),
+          fill_alpha = 0.5) +
+  tm_borders(col = "pa_type",
+             col.scale = tm_scale_categorical(
+               values = c("AP d'exposition (CFAV, 2006)" = "#D32F2F",
+                          "AP préexistante (Manombo, 1962)" = "#F9A825")),
+             col.legend = tm_legend(show = FALSE),
+             lwd = 0.8) +
+tm_shape(fara_fkt_c) +
+  tm_fill(fill = "layer",
+          fill.scale = tm_scale_categorical(
+            values = c("Fokontany enquêtés" = "#E8F5E9")),
+          fill.legend = tm_legend(title = ""),
+          fill_alpha = 0.7) +
+  tm_borders(col = "grey40", lwd = 0.4) +
+tm_scalebar(position = c("left", "bottom")) +
+tm_title("Farafangana & APs à proximité") +
+tm_layout(legend.position = c("right", "top"))
 ```
 
 ## Résultats : Farafangana {#sec-fara-results}
@@ -108,7 +130,13 @@ tol_pas <- dyn_study |>
     str_detect(NAME, "Amoron")  ~ "Amoron'i Onilahy (V, 2007)",
     str_detect(NAME, "Mikea")   ~ "Mikea NP (II, 2007)"
   ))
-tol_bbox <- st_bbox(c(xmin = 43.2, ymin = -24.0, xmax = 44.8, ymax = -22.8), crs = 4326)
+tol_bb <- st_bbox(tol_pas)
+tol_bbox <- st_bbox(c(
+  xmin = unname(tol_bb["xmin"]) - 0.3,
+  ymin = unname(tol_bb["ymin"]) - 0.3,
+  xmax = unname(tol_bb["xmax"]) + 0.3,
+  ymax = unname(tol_bb["ymax"]) + 0.3
+), crs = 4326)
 tol_mad_c  <- st_crop(madagascar, tol_bbox)
 tol_pas_c  <- tryCatch(st_crop(tol_pas, tol_bbox), error = function(e) tol_pas)
 tol_fkt_c  <- tryCatch(st_crop(tol_fokontany, tol_bbox), error = function(e) tol_fokontany) |>
@@ -242,67 +270,26 @@ tribble(
   tab_style(style = cell_fill(color = "#E8EAF6"), locations = cells_body(rows = grepl("n\u00e9rive", Observatoire)))
 ```
 
-# Résultats par observatoire {#sec-ext-results}
-
-La stratégie d'identification et l'estimateur sont identiques au [Chapitre 4](04_results.qmd). Nous estimons l'ATT gsynth séparément pour chaque observatoire exposé, en utilisant les cinq observatoires propres comme pool de donneurs commun. Les résultats pour Farafangana, Toliara Nord et Fénérive Est sont présentés ci-dessus dans leurs sections respectives. Ici nous présentons les estimations de Marovoay et Alaotra avec ce pool de donneurs restreint, afin de montrer que les résultats principaux du [Chapitre 4](04_results.qmd) restent stables.
-
-## Ankarafantsika (donneurs propres) {#sec-ext-maro}
-
-La ré-estimation du modèle de la rive est de Marovoay avec le pool de donneurs restreint donne un ATT moyen post-traitement de {{< var att_maro_clean >}} points logarithmiques ($\approx$ {{< var att_maro_clean_pct >}}, $p$ = {{< var att_maro_clean_p >}}), cohérent avec l'estimation à pool complet du [Chapitre 4](04_results.qmd). L'estimation ponctuelle est légèrement atténuée car le pool de donneurs plus petit supporte moins de facteurs latents, mais la conclusion qualitative est inchangée : l'enforcement strict est associé à un déclin de revenu persistent et statistiquement significatif.
+# Synthèse à cinq cas {#sec-synthesis}
 
 ```{r}
-#| label: fig-att-maro-clean
-#| fig-cap: "Ankarafantsika : trajectoire ATT gsynth (pool de donneurs propres). Début d'exposition 2003."
-#| fig-height: 4.5
-#| fig-width: 8
+#| label: load-maro-ala-ch5
+#| include: false
 gs_maro <- read_rds("data/paper14_gsynth_maro_oecd.rds")
+gs_ala  <- read_rds("data/paper14_gsynth_ala_oecd.rds")
 att_maro_df <- tibble(
   rel_time = as.numeric(rownames(gs_maro$est_att)),
-  att = gs_maro$est_att[, "ATT"],
-  ci_lo = gs_maro$est_att[, "CI.lower"],
-  ci_hi = gs_maro$est_att[, "CI.upper"]
+  att      = gs_maro$est_att[, "ATT"],
+  ci_lo    = gs_maro$est_att[, "CI.lower"],
+  ci_hi    = gs_maro$est_att[, "CI.upper"]
 )
-ggplot(att_maro_df, aes(rel_time, att)) +
-  geom_hline(yintercept = 0, color = "grey60") +
-  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
-  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
-  geom_line(color = "#D32F2F", linewidth = 0.8) +
-  geom_point(color = "#D32F2F", size = 2.5) +
-  labs(x = "Années relatives à l'exposition (2003)", y = "ATT (revenu log équivalisé)",
-       title = "Ankarafantsika (strict, catégorie II UICN)",
-       subtitle = paste0(gs_maro$N_co, " sites donneurs ; r* = ", gs_maro$r_cv)) +
-  theme_minimal(base_size = 12)
-```
-
-## Lac Alaotra (donneurs propres) {#sec-ext-ala}
-
-L'ATT à l'échelle de l'observatoire d'Alaotra avec les donneurs propres reste proche de zéro et statistiquement non significatif : {{< var att_ala_clean >}} points logarithmiques ($p$ = {{< var att_ala_clean_p >}}). Le résultat nul est robuste au changement de pool de donneurs, renforçant l'interprétation selon laquelle la conservation participative sous CBNRM n'a pas imposé de coûts de revenu agrégés détectables.
-
-```{r}
-#| label: fig-att-ala-clean
-#| fig-cap: "Lac Alaotra : trajectoire ATT gsynth (pool de donneurs propres). Début d'exposition 2008."
-#| fig-height: 4.5
-#| fig-width: 8
-gs_ala <- read_rds("data/paper14_gsynth_ala_oecd.rds")
 att_ala_df <- tibble(
   rel_time = as.numeric(rownames(gs_ala$est_att)),
-  att = gs_ala$est_att[, "ATT"],
-  ci_lo = gs_ala$est_att[, "CI.lower"],
-  ci_hi = gs_ala$est_att[, "CI.upper"]
+  att      = gs_ala$est_att[, "ATT"],
+  ci_lo    = gs_ala$est_att[, "CI.lower"],
+  ci_hi    = gs_ala$est_att[, "CI.upper"]
 )
-ggplot(att_ala_df, aes(rel_time, att)) +
-  geom_hline(yintercept = 0, color = "grey60") +
-  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
-  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
-  geom_line(color = "#1565C0", linewidth = 0.8) +
-  geom_point(color = "#1565C0", size = 2.5) +
-  labs(x = "Années relatives à l'exposition (2008)", y = "ATT (revenu log équivalisé)",
-       title = "Lac Alaotra (multifonctionnel, catégorie V UICN)",
-       subtitle = paste0(gs_ala$N_co, " sites donneurs ; r* = ", gs_ala$r_cv)) +
-  theme_minimal(base_size = 12)
 ```
-
-# Synthèse à cinq cas {#sec-synthesis}
 
 ## Résultats comparatifs
 
