@@ -1,4 +1,3 @@
-```quarto
 ---
 title: "Discussion"
 subtitle: "Implications politiques, limites et perspectives"
@@ -85,4 +84,3 @@ La vague d'enquête 2026 prévue étendra la couverture à des observatoires sup
 La priorité analytique immédiate est de tester empiriquement l'hypothèse de déclin régional pour Marovoay. Deux approches sont envisagées : premièrement, incorporer des données sur les rendements rizicoles régionaux ou la productivité agricole comme covariables dans le modèle gsynth pour contrôler directement la trajectoire économique régionale ; deuxièmement, identifier des sites donneurs comparables sur des plaines irriguées de basse altitude au lieu de sites sur le plateau des hautes terres ou dans les zones sèches.
 
 Les résultats de cette analyse constituent une estimation de première génération qui motive, et sera affinée par, l'analyse au niveau des ménages prévue pour 2026.
-```

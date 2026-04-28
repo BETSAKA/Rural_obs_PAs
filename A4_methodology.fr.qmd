@@ -1,4 +1,3 @@
-```quarto
 ---
 title: "Méthodologie"
 subtitle: "Détails techniques sur les méthodes d'estimation"
@@ -38,4 +37,3 @@ Le dispositif CTR ([Chapitre 3](03_strategy.qmd)) utilise l'estimateur Callaway�
 # Différences-en-différences synthétiques {#sec-d-sdid}
 
 Les tests de robustesse incluent également l'estimateur de différences-en-différences synthétiques de @Arkhangelsky2021, qui pondère à la fois les unités témoins et les périodes pré-traitement pour construire une tendance préliminaire commune entre les unités exposées et le pool de donneurs.
-```

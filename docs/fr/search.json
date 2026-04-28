@@ -298,78 +298,78 @@
   {
     "objectID": "06_discussion.fr.html",
     "href": "06_discussion.fr.html",
-    "title": "6  ```quarto",
+    "title": "6  Discussion",
     "section": "",
-    "text": "7 Résumé des résultats\ntitle: “Discussion” subtitle: “Implications politiques, limites et perspectives” —\nCette analyse estime l’effet de la création d’aires protégées sur le revenu des ménages en milieu rural malgache à l’aide de la méthode du contrôle synthétique généralisé (Xu 2017) sur cinq paires observatoire–AP couvrant la période d’étude 1999–2014, avec une extension à long terme à 2025 pour le cas de Marovoay. Les résultats doivent être lus comme des données suggestives plutôt que comme des estimations causales définitives, compte tenu du faible nombre d’unités traitées et des difficultés d’identification discutées ci-dessous.\nLa principale conclusion des deux sites primaires est une divergence dans les trajectoires de revenus estimées. À Ankarafantsika, l’extension d’une réserve forestière en un parc national strictement patrouillé (catégorie II UICN, 2002) est associée à un écart de -0.312 points logarithmiques dans le revenu équivalisé OCDE par rapport au contrefactuel synthétique (environ 27%), statistiquement significatif et persistant jusqu’en 2025. Cependant, comme discuté à Section 5.2.1, une comparaison entre les villages de la rive est et de la rive ouest au sein du même observatoire ne révèle aucune différence de revenu détectable entre les deux côtés de la rivière. Ce diagnostic soulève une lecture alternative importante : l’estimation gsynth pourrait capturer le déclin économique régional à long terme de la plaine de Marovoay par rapport aux sites donneurs sur le plateau des hautes terres ou dans le sud. Marovoay était historiquement le paysage rizicole irrigué le plus productif de Madagascar, le grenier à blé du pays. À partir des années 1980, la région a connu un déclin documenté alimenté par l’envasement de la Betsiboka, la dégradation des canaux d’irrigation coloniaux et le retrait des soutiens étatiques à la commercialisation du riz. Cette trajectoire est antérieure à l’extension du parc de 2002 et pourrait expliquer une grande partie de la divergence que gsynth enregistre. L’attribution de l’écart de revenu estimé au parc spécifiquement reste donc incertaine ; les résultats à Marovoay doivent être lus comme indicatifs plutôt que conclusifs.\nAu Lac Alaotra, la création d’un paysage protégé participatif sous gestion communautaire des ressources naturelles (catégorie V UICN, 2008) produit un ATT estimé proche de zéro, indiscernable de zéro. Les communautés ont conservé l’accès à l’écosystème lac-marais sous la gestion de Durrell ; aucun coût agrégé de revenu n’est détectable, bien que ce résultat nul puisse également refléter une faible puissance statistique.\nL’extension de l’analyse à Farafangana, Toliara Nord et Fénérive Est donne des ATT proches de zéro, statistiquement non significatifs, dans les trois cas. Ces sites font face à des aires protégées dont la gouvernance est soit multifonctionnelle, soit la superficie est faible, soit les deux. La ré-enquête 2025 à Marovoay confirme que l’écart de revenu est-ouest persiste vingt-deux ans après l’extension du parc, bien que son interprétation reste soumise à la mise en garde sur le déclin régional discutée ci-dessus.",
+    "text": "7 Résumé des résultats\nCette analyse estime l’effet de la création d’aires protégées sur le revenu des ménages en milieu rural malgache à l’aide de la méthode du contrôle synthétique généralisé (Xu 2017) sur cinq paires observatoire–AP couvrant la période d’étude 1999–2014, avec une extension à long terme à 2025 pour le cas de Marovoay. Les résultats doivent être lus comme des données suggestives plutôt que comme des estimations causales définitives, compte tenu du faible nombre d’unités traitées et des difficultés d’identification discutées ci-dessous.\nLa principale conclusion des deux sites primaires est une divergence dans les trajectoires de revenus estimées. À Ankarafantsika, l’extension d’une réserve forestière en un parc national strictement patrouillé (catégorie II UICN, 2002) est associée à un écart de -0.312 points logarithmiques dans le revenu équivalisé OCDE par rapport au contrefactuel synthétique (environ 27%), statistiquement significatif et persistant jusqu’en 2025. Cependant, comme discuté à Section 5.2.1, une comparaison entre les villages de la rive est et de la rive ouest au sein du même observatoire ne révèle aucune différence de revenu détectable entre les deux côtés de la rivière. Ce diagnostic soulève une lecture alternative importante : l’estimation gsynth pourrait capturer le déclin économique régional à long terme de la plaine de Marovoay par rapport aux sites donneurs sur le plateau des hautes terres ou dans le sud. Marovoay était historiquement le paysage rizicole irrigué le plus productif de Madagascar, le grenier à blé du pays. À partir des années 1980, la région a connu un déclin documenté alimenté par l’envasement de la Betsiboka, la dégradation des canaux d’irrigation coloniaux et le retrait des soutiens étatiques à la commercialisation du riz. Cette trajectoire est antérieure à l’extension du parc de 2002 et pourrait expliquer une grande partie de la divergence que gsynth enregistre. L’attribution de l’écart de revenu estimé au parc spécifiquement reste donc incertaine ; les résultats à Marovoay doivent être lus comme indicatifs plutôt que conclusifs.\nAu Lac Alaotra, la création d’un paysage protégé participatif sous gestion communautaire des ressources naturelles (catégorie V UICN, 2008) produit un ATT estimé proche de zéro, indiscernable de zéro. Les communautés ont conservé l’accès à l’écosystème lac-marais sous la gestion de Durrell ; aucun coût agrégé de revenu n’est détectable, bien que ce résultat nul puisse également refléter une faible puissance statistique.\nL’extension de l’analyse à Farafangana, Toliara Nord et Fénérive Est donne des ATT proches de zéro, statistiquement non significatifs, dans les trois cas. Ces sites font face à des aires protégées dont la gouvernance est soit multifonctionnelle, soit la superficie est faible, soit les deux. La ré-enquête 2025 à Marovoay confirme que l’écart de revenu est-ouest persiste vingt-deux ans après l’extension du parc, bien que son interprétation reste soumise à la mise en garde sur le déclin régional discutée ci-dessus.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>```quarto</span>"
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Discussion</span>"
     ]
   },
   {
     "objectID": "06_discussion.fr.html#la-gouvernance-de-la-conservation-est-déterminante",
     "href": "06_discussion.fr.html#la-gouvernance-de-la-conservation-est-déterminante",
-    "title": "6  ```quarto",
+    "title": "6  Discussion",
     "section": "8.1 La gouvernance de la conservation est déterminante",
     "text": "8.1 La gouvernance de la conservation est déterminante\nLes résultats, pris au pied de la lettre, suggèrent que la façon dont une aire protégée est gouvernée peut importer au moins autant que le fait qu’elle existe. Sur l’ensemble des cinq cas, seul le site à gestion strictement exclusive (Ankarafantsika, catégorie II UICN) affiche un grand écart de revenu négatif ; les sites à gouvernance multifonctionnelle ou à faible intensité affichent des effets proches de zéro. Ceci est cohérent avec une littérature croissante montrant que les compromis conservation–revenus dépendent fortement de la conception institutionnelle plutôt que du seul fait de la protection (Ferraro et al. 2011; Sims 2010; Oldekop et al. 2016).\nCela dit, le résultat de Marovoay nécessite la mise en garde exposée à Chapitre 7 : l’écart gsynth peut refléter, au moins en partie, le déclin économique régional de la plaine de Marovoay plutôt qu’un effet spécifique au parc. Pris ensemble, les éléments sont suggestifs plutôt que conclusifs quant au fait que la conservation stricte impose des coûts de revenu aux ménages, et ils soutiennent l’architecture de l’expansion du SAPM malgache post-2003, qui a associé une protection stricte à de vastes approches communautaires et multifonctionnelles.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>```quarto</span>"
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Discussion</span>"
     ]
   },
   {
     "objectID": "06_discussion.fr.html#compensation-et-intégration-des-moyens-de-subsistance",
     "href": "06_discussion.fr.html#compensation-et-intégration-des-moyens-de-subsistance",
-    "title": "6  ```quarto",
+    "title": "6  Discussion",
     "section": "8.2 Compensation et intégration des moyens de subsistance",
     "text": "8.2 Compensation et intégration des moyens de subsistance\nMême sous l’interprétation prudente, deux décennies de données d’enquête montrent que l’écart de revenu entre les villages de la rive est de Marovoay et des sites comparables ne s’est pas refermé. Qu’il soit principalement lié au parc ou au déclin plus large de l’économie d’irrigation, les ménages de cette zone sont sensiblement plus pauvres que les communautés rurales comparables. Si la conservation génère des biens publics nationaux et mondiaux — stockage de carbone, préservation de la biodiversité — les coûts du parc et du désavantage régional ne devraient pas peser de manière disproportionnée sur certains des ménages ruraux les plus pauvres de Madagascar.\nParmi les options politiques qui méritent d’être examinées figurent les transferts directs liés à la proximité du parc et à l’intensité de l’enforcement, les programmes de diversification des moyens de subsistance dans les zones tampons, et, lorsque l’enforcement strict n’est pas écologiquement nécessaire, une reconsidération du bien-fondé d’un classement catégorie II UICN dans certains sites particuliers.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>```quarto</span>"
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Discussion</span>"
     ]
   },
   {
     "objectID": "06_discussion.fr.html#limites-de-linférence-politique",
     "href": "06_discussion.fr.html#limites-de-linférence-politique",
-    "title": "6  ```quarto",
+    "title": "6  Discussion",
     "section": "8.3 Limites de l’inférence politique",
     "text": "8.3 Limites de l’inférence politique\nCes résultats ne disent rien sur l’efficacité de la conservation multifonctionnelle pour atteindre ses objectifs écologiques. L’effet nul sur le revenu au Lac Alaotra peut refléter une gouvernance genuinement bénigne ou un enforcement qui existe sur le papier mais a peu d’effet pratique sur le comportement des communautés. Sans données sur les résultats écologiques — tendances de couverture forestière, qualité de l’eau, abondance des espèces — les implications de bien-être nettes de l’un ou l’autre modèle de gouvernance restent incomplètes.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>```quarto</span>"
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Discussion</span>"
     ]
   },
   {
     "objectID": "06_discussion.fr.html#marovoay-explications-alternatives",
     "href": "06_discussion.fr.html#marovoay-explications-alternatives",
-    "title": "6  ```quarto",
+    "title": "6  Discussion",
     "section": "9.1 Marovoay : explications alternatives",
     "text": "9.1 Marovoay : explications alternatives\nL’estimation Ankarafantsika repose sur la rivière Betsiboka fournissant une division géographique entre les communautés avec et sans accès direct au parc. Plusieurs préoccupations tempèrent l’interprétation causale.\nPremièrement, le diagnostic le plus important : la comparaison intra-observatoire entre les villages de la rive est et de la rive ouest ne révèle aucune différence de revenu détectable sur la période d’étude (Section 5.2.1). C’est la principale raison d’être prudent quant à l’attribution de l’écart gsynth au parc. Le gsynth compare les sites de Marovoay contre des donneurs sur le plateau des hautes terres ou dans les zones sèches du sud. Si la région de Marovoay dans son ensemble a pris du retard par rapport à ces autres endroits — en raison de l’envasement de la Betsiboka, de la dégradation des infrastructures d’irrigation, de la perte de sa position historique de principal fournisseur de riz de Madagascar — alors gsynth attribuera cette divergence régionale à l’exposition au parc simplement parce que le calendrier s’aligne. La comparaison intra-observatoire contrôle automatiquement ce choc régional. Le fait que les revenus de la rive est et de la rive ouest aient évolué ensemble est cohérent avec un driver régional commun plutôt qu’un effet spécifique au parc.\nDeuxièmement, la rive est s’est retrouvée adjacente à la Réserve Naturelle Intégrale d’Ankarafantsika (1927) avant l’extension de 2002. La RNI peut avoir imposé des contraintes partielles avant le début de la période d’étude.\nTroisièmement, les villages de la rive est et de la rive ouest diffèrent en termes de types de sol, d’exposition aux inondations et d’accès à l’irrigation. Si ces différences interagissent avec des tendances post-2002 — à travers un cyclone, une sécheresse ou un investissement d’infrastructure ayant affecté différentiellement une rive — l’écart estimé confondrait des effets de conservation avec d’autres chocs.\nQuatrièmement, la migration sélective hors de la rive est pourrait faire apparaître la population enquêtée restante comme plus pauvre sans aucun vrai déclin de revenu.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>```quarto</span>"
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Discussion</span>"
     ]
   },
   {
     "objectID": "06_discussion.fr.html#alaotra-identification-à-unité-unique",
     "href": "06_discussion.fr.html#alaotra-identification-à-unité-unique",
-    "title": "6  ```quarto",
+    "title": "6  Discussion",
     "section": "9.2 Alaotra : identification à unité unique",
     "text": "9.2 Alaotra : identification à unité unique\nLe modèle Alaotra agrège l’ensemble de l’observatoire en une seule unité exposée. L’ATT proche de zéro pourrait refléter (i) une gouvernance de conservation genuinement bénigne, (ii) un contrefactuel mal construit masquant un effet réel, ou (iii) une puissance statistique insuffisante pour détecter un effet modéré.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>```quarto</span>"
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Discussion</span>"
     ]
   },
   {
     "objectID": "06_discussion.fr.html#implications-pour-linterprétation",
     "href": "06_discussion.fr.html#implications-pour-linterprétation",
-    "title": "6  ```quarto",
+    "title": "6  Discussion",
     "section": "9.3 Implications pour l’interprétation",
     "text": "9.3 Implications pour l’interprétation\nCompte tenu de ces préoccupations, nous caractérisons les résultats comme fortement suggestifs plutôt que définitivement causaux. Trois caractéristiques des données augmentent la confiance que les régularités sont réelles, même sous l’interprétation prudente. Le signe et la persistance de l’écart Ankarafantsika sont robustes à travers les spécifications. Le contraste de gouvernance entre résultats négatifs stricts et nuls multifonctionnels apparaît sur cinq cas indépendants. Et la ré-enquête 2025 à Marovoay confirme directement que les communautés de la rive est font face à des contraintes contraignantes du parc.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>```quarto</span>"
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Discussion</span>"
     ]
   },
   {
@@ -440,34 +440,34 @@
   {
     "objectID": "A4_methodology.fr.html",
     "href": "A4_methodology.fr.html",
-    "title": "Annexe D — ```quarto",
+    "title": "Annexe D — Méthodologie",
     "section": "",
-    "text": "E Contrôle synthétique généralisé\ntitle: “Méthodologie” subtitle: “Détails techniques sur les méthodes d’estimation” —\nCette annexe fournit les descriptions formelles des méthodes d’estimation utilisées dans cet article. Le texte principal (Chapitre 3, Chapitre 4) décrit les méthodes au niveau nécessaire pour suivre l’argumentation ; cette annexe donne les détails techniques nécessaires à la réplication et à l’évaluation méthodologique.",
+    "text": "E Contrôle synthétique généralisé\nCette annexe fournit les descriptions formelles des méthodes d’estimation utilisées dans cet article. Le texte principal (Chapitre 3, Chapitre 4) décrit les méthodes au niveau nécessaire pour suivre l’argumentation ; cette annexe donne les détails techniques nécessaires à la réplication et à l’évaluation méthodologique.",
     "crumbs": [
       "Annexes",
-      "<span class='chapter-number'>D</span>  <span class='chapter-title'>```quarto</span>"
+      "<span class='chapter-number'>D</span>  <span class='chapter-title'>Méthodologie</span>"
     ]
   },
   {
     "objectID": "A4_methodology.fr.html#modèle-à-effets-fixes-interactifs",
     "href": "A4_methodology.fr.html#modèle-à-effets-fixes-interactifs",
-    "title": "Annexe D — ```quarto",
+    "title": "Annexe D — Méthodologie",
     "section": "E.1 Modèle à effets fixes interactifs",
     "text": "E.1 Modèle à effets fixes interactifs\nLa méthode du contrôle synthétique généralisé (Xu 2017) étend le cadre du contrôle synthétique standard pour accueillir plusieurs unités traitées et permet l’estimation des effets traitement en présence de facteurs de confusion inobservés variant dans le temps. Le processus générateur de données est :\n\\[Y_{it} = \\delta_{it} D_{it} + \\mathbf{x}_{it}'\\boldsymbol{\\beta} + \\boldsymbol{\\lambda}_i' \\mathbf{f}_t + \\varepsilon_{it}\\]\noù \\(Y_{it}\\) est le résultat pour l’unité \\(i\\) à la période \\(t\\) ; \\(D_{it}\\) est l’indicateur de traitement ; \\(\\boldsymbol{\\lambda}_i\\) est un vecteur \\(r \\times 1\\) de chargements factoriels spécifiques à l’unité ; \\(\\mathbf{f}_t\\) est un vecteur \\(r \\times 1\\) de facteurs communs variant dans le temps ; et \\(\\varepsilon_{it}\\) est une erreur idiosyncrasique.\nL’hypothèse d’identification clé est que la structure factorielle \\(\\boldsymbol{\\lambda}_i' \\mathbf{f}_t\\) est partagée entre les unités traitées et témoins. Cela généralise l’hypothèse de tendances parallèles : plutôt que de requérir que les unités traitées et témoins suivent la même tendance, cela permet des tendances différentes tant que ces tendances sont engendrées par le même ensemble de facteurs latents.",
     "crumbs": [
       "Annexes",
-      "<span class='chapter-number'>D</span>  <span class='chapter-title'>```quarto</span>"
+      "<span class='chapter-number'>D</span>  <span class='chapter-title'>Méthodologie</span>"
     ]
   },
   {
     "objectID": "A4_methodology.fr.html#estimation",
     "href": "A4_methodology.fr.html#estimation",
-    "title": "Annexe D — ```quarto",
+    "title": "Annexe D — Méthodologie",
     "section": "E.2 Estimation",
     "text": "E.2 Estimation\nL’algorithme procède en trois étapes :\n\nEstimer les facteurs à partir des unités témoins : en utilisant la matrice \\(N_0 \\times T\\) des résultats témoin, estimer \\(\\hat{\\mathbf{f}}_t\\) et \\(\\hat{\\boldsymbol{\\lambda}}_i\\) par analyse en composantes principales. Le nombre de facteurs \\(r\\) est sélectionné par validation croisée leave-one-out sur \\(r = 0, 1, \\ldots, r_{\\max}\\).\nEstimer les chargements factoriels traités : pour chaque unité traitée \\(i\\), régresser les résultats pré-traitement \\(Y_{i1}, \\ldots, Y_{i,T_0}\\) sur les facteurs estimés \\(\\hat{\\mathbf{f}}_1, \\ldots, \\hat{\\mathbf{f}}_{T_0}\\) pour obtenir \\(\\hat{\\boldsymbol{\\lambda}}_i\\).\nConstruire le contrefactuel : le résultat contrefactuel estimé pour l’unité traitée \\(i\\) en période post-traitement \\(t &gt; T_0\\) est \\(\\hat{Y}_{it}(0) = \\hat{\\boldsymbol{\\lambda}}_i' \\hat{\\mathbf{f}}_t\\). L’ATT à la période \\(t\\) est \\(\\hat{\\delta}_{it} = Y_{it} - \\hat{Y}_{it}(0)\\).",
     "crumbs": [
       "Annexes",
-      "<span class='chapter-number'>D</span>  <span class='chapter-title'>```quarto</span>"
+      "<span class='chapter-number'>D</span>  <span class='chapter-title'>Méthodologie</span>"
     ]
   }
 ]
