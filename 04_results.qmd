@@ -16,10 +16,7 @@ source("R/plot_themes.R")
 gs_maro <- read_rds("data/paper14_gsynth_maro_oecd.rds")
 gs_ala <- read_rds("data/paper14_gsynth_ala_oecd.rds")
 
-# Extended panel (1999–2025) — only available with the full donor pool
-gs_maro_ext <- read_rds("data/paper12_gsynth_maro_ext_oecd.rds")
-
-# Pre-computed extended panel for trajectory plot
+# Pre-computed site-year aggregates for trajectory plot (raw data, no gsynth)
 maro_gs_ext <- read_rds("data/maro_gs_ext_panel.rds")
 ```
 
@@ -320,120 +317,28 @@ The contrast between the two estimated ATT paths is sharp on paper: a large pers
 ```{r}
 #| label: longrun-setup
 #| include: false
-# 2025 resurvey: Marovoay-only household count
 res_deb_25 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_deb.dta")
 n_hh_maro_25 <- res_deb_25 |>
-  dplyr::filter(obs == "01") |> # Marovoay observatory
+  dplyr::filter(obs == "01") |>
   nrow()
-
-# Extended gsynth summary numbers (avoid hard-coding)
-att_avg_ext <- gs_maro_ext$att_avg
-att_avg_main <- gs_maro$att_avg
-att_2025_val <- tail(gs_maro_ext$est_att[, "ATT"], 1)
-att_ratio_ext <- att_2025_val / att_avg_main
-n_donors_ext <- gs_maro_ext$N_co
+sec_did_lr <- read_rds("data/secondary_did_results.rds")
 ```
 
 A 2025 resurvey of Marovoay (`r n_hh_maro_25` households across the four
 fokontany: Bepako and Madiromiongana on the east bank, Ampijoroa and Maroala on
 the west bank) extends the observation window to 22 years post-exposure.
+Because the resurvey covered only Marovoay (and Alaotra), no clean
+inter-observatory donor has 2025 data. Extending gsynth to 2025 would require
+importing the Marovoay west-bank fokontany as donors — collapsing the
+inter-observatory comparison into a within-observatory one and making the 2025
+ATT redundant with the within-observatory DiD. The long-run evidence therefore
+relies entirely on the within-observatory DiD design described in
+@sec-complementary, consistent with the framing used throughout this chapter.
 
-## Panel construction (extended model)
+## Site-level income trajectories {#sec-maro-traj}
 
-```{r}
-#| label: longrun-donors
-#| include: false
-donor_cols <- setdiff(colnames(gs_maro_ext$eff), c("031", "032"))
-donor_obs <- sort(unique(substr(donor_cols, 1, 2)))
-also_exp <- intersect(donor_obs, c("15", "21", "23", "24"))
-clean_donor <- intersect(donor_obs, c("02", "12", "13", "16", "25", "41"))
-maro_wbank <- intersect(donor_cols, c("033", "034"))
-years_2025 <- sum(!is.na(gs_maro_ext$eff["2025", ]))
-```
-
-The extended model uses the full donor pool (all ROS sites with a
-complete 1999–2014 income series) rather than the clean 6-donor pool
-of @sec-maro. The exposed units are unchanged — Bepako (site 031) and
-Madiromiongana (site 032), east of the Betsiboka — but the
-`r n_donors_ext` donor sites span `r length(donor_obs)` observatories:
-
-- the `r length(clean_donor)` clean donors used in @sec-maro
-  (observatories `r paste(clean_donor, collapse = ", ")`);
-- the `r length(also_exp)` "also-exposed" observatories flagged in
-  [Appendix B](A2_donor_validity.qmd) (`r paste(also_exp, collapse = ", ")`);
-- the `r length(maro_wbank)` Marovoay west-bank fokontany (Ampijoroa 033 and
-  Maroala 034), which are in the same observatory as the treated units and
-  therefore share local shocks.
-
-This is a weaker identification setting than the main specification: three of
-the donor observatories were themselves subject to PA expansions during the
-period, and two donor sites are one kilometre away from the exposed units. The
-results below should therefore be read as descriptive corroboration of the
-@sec-maro-att estimates rather than an independent test.
-
-The 2025 resurvey only covered Marovoay (and Alaotra, which is not part of
-this panel). Accordingly, in the extended panel, 2025 income data exist for
-exactly `r years_2025` sites — the 4 Marovoay fokontany (031, 032, 033, 034) —
-and are NA for all other donors. The 2025 counterfactual is therefore
-extrapolated from pre-2015 donor dynamics under the gsynth factor model.
-
-## Extended gsynth {#sec-ext-gsynth}
-
-```{r}
-#| label: fig-ext-att
-#| fig-cap: "Extended ATT path for Ankarafantsika east-bank sites (1999–2025). The 2025 point, 22 years after the park extension, shows the largest single-period effect."
-#| fig-height: 5.5
-#| fig-width: 10
-att_ext_df <- tibble(
-  rel_time = as.numeric(rownames(gs_maro_ext$est_att)),
-  att = gs_maro_ext$est_att[, "ATT"],
-  ci_lo = gs_maro_ext$est_att[, "CI.lower"],
-  ci_hi = gs_maro_ext$est_att[, "CI.upper"]
-)
-
-att_2025 <- tail(att_ext_df, 1)
-
-ggplot(att_ext_df, aes(rel_time, att)) +
-  geom_hline(yintercept = 0, color = "grey60") +
-  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
-  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.12) +
-  geom_line(color = "#D32F2F", linewidth = 0.8) +
-  geom_point(color = "#D32F2F", size = 2.5) +
-  geom_point(data = att_2025, color = "#D32F2F", size = 4, shape = 18) +
-  annotate(
-    "text",
-    x = att_2025$rel_time - 0.3,
-    y = att_2025$att + 0.12,
-    label = "2025",
-    fontface = "bold",
-    color = "#D32F2F",
-    hjust = 1,
-    size = 3.5
-  ) +
-  labs(
-    x = "Periods relative to exposure (2003 = 0)",
-    y = "ATT (log equiv. income)",
-    title = "Ankarafantsika: Extended ATT Path (1999–2025)",
-    subtitle = paste0(
-      "Average post-exposure ATT = ",
-      round(gs_maro_ext$att_avg, 3),
-      " (p = ",
-      format.pval(gs_maro_ext$est_avg[1, "p.value"], digits = 3),
-      ")",
-      ". 2025 ATT = ",
-      round(att_2025$att, 3)
-    )
-  ) +
-  theme_minimal(base_size = 12)
-```
-
-Including 2025 in the panel, the average post-exposure ATT deepens
-substantially: `r round(att_avg_ext, 3)` log points in the extended model vs
-`r round(att_avg_main, 3)` in the 1999–2014 main specification. The
-2025-specific ATT (`r round(att_2025_val, 3)` log points) is about
-`r sprintf("%.1f", att_ratio_ext)`× the 1999–2014 average, indicating that
-income losses compound rather than dissipate over time. The widening gap is
-visible in raw site-level trajectories:
+The raw site-level trajectories below show the full 26-year income record for
+all four Marovoay fokontany.
 
 ```{r}
 #| label: fig-ext-traj
@@ -503,6 +408,70 @@ ggplot(
   )
 ```
 
+The four fokontany tracked closely through 2002. From 2003 onward, east-bank
+sites diverge downward relative to the west bank; by 2025 the gap has widened
+rather than closed.
+
+## Marovoay DiD event study (1999–2025) {#sec-maro-dyn}
+
+The event study from the within-observatory Callaway–Sant'Anna estimator shows
+the year-by-year ATT relative to the pre-treatment baseline. Relative times
+−4 to +11 (1999–2014) are estimated on the main panel; the 2025 point (+22
+years) is the long-run observation from the same estimator. Pre-treatment
+estimates near zero confirm parallel trends between east- and west-bank sites
+before the park extension. Standard errors are influence-function based; with
+only two treated sites, site-level cluster-robust period SEs are unreliable
+(the pooled ATT in @tbl-maro-rcs reports both).
+
+```{r}
+#| label: fig-maro-dyn
+#| fig-cap: "Marovoay within-observatory DiD event study (1999–2025). East-bank vs west-bank households, Callaway–Sant'Anna (panel = FALSE). Year 2003 is the exposure onset; the rightmost diamond (2025) is the long-run resurvey point. Error bars: 95% pointwise CI (influence-function SE)."
+#| fig-height: 5
+#| fig-width: 10
+dyn_maro <- sec_did_lr$maro$res$dyns[["bank_nocl"]]
+event_df <- tibble(
+  rel_time = dyn_maro$egt,
+  att      = dyn_maro$att.egt,
+  se       = dyn_maro$se.egt
+) |>
+  mutate(
+    year    = rel_time + TREAT_YEAR_MARO,
+    ci_lo   = att - 1.96 * se,
+    ci_hi   = att + 1.96 * se,
+    is_2025 = rel_time == 22
+  )
+
+ggplot(event_df, aes(x = year, y = att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = TREAT_YEAR_MARO - 0.5,
+             linetype = "dashed", color = "grey40") +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
+                width = 0.4, color = "#D32F2F", alpha = 0.6) +
+  geom_point(aes(size = is_2025, shape = is_2025),
+             color = "#D32F2F", show.legend = FALSE) +
+  scale_size_manual(values = c("FALSE" = 2.5, "TRUE" = 4.5)) +
+  scale_shape_manual(values = c("FALSE" = 16, "TRUE" = 18)) +
+  annotate(
+    "text", x = 2025, y = min(event_df$ci_lo, na.rm = TRUE) - 0.04,
+    label = "2025\n(+22 yrs)", color = "#D32F2F", size = 3, vjust = 1
+  ) +
+  labs(
+    x = "Year",
+    y = "ATT (log equiv. income)",
+    title = "Marovoay: Within-Observatory DiD Event Study (1999–2025)",
+    subtitle = "East-bank vs west-bank households. SE: influence function (no site clustering)."
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+Pre-treatment coefficients fluctuate near zero, supporting the parallel-trends
+assumption. Post-2003 estimates turn negative and deepen progressively.
+The 2025 point — 22 years post-exposure — shows the largest negative estimate
+of the series, confirming that the east-to-west income gap has widened rather
+than closed over the long run. This persistence is identified entirely from the
+within-observatory east-versus-west contrast, independent of any
+inter-observatory comparison.
+
 ## Robustness of the 2025 gap {#sec-ext-robust}
 
 The east-west income gap in 2025 is not driven by outliers: it is visible at every percentile of the income distribution, IQR-based outlier removal widens rather than narrows the gap, and the west-bank advantage appears across five of seven major income components. In statistical terms, the gap is large enough to pass standard tests (Wilcoxon rank-sum $p = 2.1 \times 10^{-10}$; Welch $t$-test $p = 1.8 \times 10^{-5}$).
@@ -511,4 +480,10 @@ What remains unresolved is whether this gap reflects cumulative park exposure or
 
 ## Alaotra long-run assessment {#sec-ala-longrun}
 
-For Alaotra, a 2025 gsynth extension is not feasible: all Alaotra sites are exposed and no other observatory was resurveyed, so there are no 2025 control observations. The Alaotra estimate remains based on the 1999–2014 panel (ATT ≈ {{< var att_ala >}}, $p$ = {{< var att_ala_p >}}).
+The within-observatory DiD for Alaotra also covers the 2025 resurvey wave.
+Both exposure proxies — distance to the PA boundary and extractive-use share —
+continue to yield near-zero estimates with wide confidence intervals, consistent
+with the pooled result over the 1999–2014 panel (ATT ≈ {{< var att_ala >}},
+$p$ = {{< var att_ala_p >}}). The absence of a detectable income effect under
+participatory conservation management is therefore stable across the full
+1999–2025 observation window.

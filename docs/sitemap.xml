@@ -1,80 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://betsaka.github.io/Rural_obs_PAs/fr/index.fr.html</loc>
-    <lastmod>2026-04-28T07:35:15.844Z</lastmod>
-  </url>
-  <url>
-    <loc>https://betsaka.github.io/Rural_obs_PAs/fr/01_context.fr.html</loc>
-    <lastmod>2026-04-28T07:35:15.633Z</lastmod>
-  </url>
-  <url>
-    <loc>https://betsaka.github.io/Rural_obs_PAs/fr/02_data.fr.html</loc>
-    <lastmod>2026-04-28T20:44:36.861Z</lastmod>
-  </url>
-  <url>
-    <loc>https://betsaka.github.io/Rural_obs_PAs/fr/03_strategy.fr.html</loc>
-    <lastmod>2026-04-28T07:35:15.637Z</lastmod>
-  </url>
-  <url>
-    <loc>https://betsaka.github.io/Rural_obs_PAs/fr/04_results.fr.html</loc>
-    <lastmod>2026-04-28T20:44:36.862Z</lastmod>
-  </url>
-  <url>
-    <loc>https://betsaka.github.io/Rural_obs_PAs/fr/05_extensions.fr.html</loc>
-    <lastmod>2026-04-28T20:44:36.862Z</lastmod>
-  </url>
-  <url>
-    <loc>https://betsaka.github.io/Rural_obs_PAs/fr/06_discussion.fr.html</loc>
-    <lastmod>2026-04-28T19:32:59.855Z</lastmod>
-  </url>
-  <url>
-    <loc>https://betsaka.github.io/Rural_obs_PAs/fr/references.fr.html</loc>
-    <lastmod>2026-04-28T19:32:59.866Z</lastmod>
-  </url>
-  <url>
-    <loc>https://betsaka.github.io/Rural_obs_PAs/fr/A1_data_pipeline.fr.html</loc>
-    <lastmod>2026-04-28T19:32:41.690Z</lastmod>
-  </url>
-  <url>
-    <loc>https://betsaka.github.io/Rural_obs_PAs/fr/A2_donor_validity.fr.html</loc>
-    <lastmod>2026-04-28T19:32:59.866Z</lastmod>
-  </url>
-  <url>
-    <loc>https://betsaka.github.io/Rural_obs_PAs/fr/A3_robustness.fr.html</loc>
-    <lastmod>2026-04-28T19:32:59.872Z</lastmod>
-  </url>
-  <url>
-    <loc>https://betsaka.github.io/Rural_obs_PAs/fr/A4_methodology.fr.html</loc>
-    <lastmod>2026-04-28T19:32:59.872Z</lastmod>
-  </url>
-  <url>
     <loc>https://betsaka.github.io/Rural_obs_PAs/index.html</loc>
-    <lastmod>2026-04-28T07:35:15.845Z</lastmod>
+    <lastmod>2026-04-28T21:54:32.518Z</lastmod>
   </url>
   <url>
     <loc>https://betsaka.github.io/Rural_obs_PAs/01_context.html</loc>
-    <lastmod>2026-04-28T07:35:15.634Z</lastmod>
+    <lastmod>2026-04-28T21:54:32.518Z</lastmod>
   </url>
   <url>
     <loc>https://betsaka.github.io/Rural_obs_PAs/02_data.html</loc>
-    <lastmod>2026-04-28T20:44:36.862Z</lastmod>
+    <lastmod>2026-04-28T21:54:32.518Z</lastmod>
   </url>
   <url>
     <loc>https://betsaka.github.io/Rural_obs_PAs/03_strategy.html</loc>
-    <lastmod>2026-04-28T07:35:15.639Z</lastmod>
+    <lastmod>2026-04-28T21:54:32.517Z</lastmod>
   </url>
   <url>
     <loc>https://betsaka.github.io/Rural_obs_PAs/04_results.html</loc>
-    <lastmod>2026-04-28T20:44:36.857Z</lastmod>
+    <lastmod>2026-04-28T22:14:56.128Z</lastmod>
   </url>
   <url>
     <loc>https://betsaka.github.io/Rural_obs_PAs/05_extensions.html</loc>
-    <lastmod>2026-04-28T20:44:36.857Z</lastmod>
+    <lastmod>2026-04-28T22:09:43.988Z</lastmod>
   </url>
   <url>
     <loc>https://betsaka.github.io/Rural_obs_PAs/06_discussion.html</loc>
-    <lastmod>2026-04-28T20:22:31.599Z</lastmod>
+    <lastmod>2026-04-28T22:07:39.979Z</lastmod>
   </url>
   <url>
     <loc>https://betsaka.github.io/Rural_obs_PAs/references.html</loc>
@@ -82,15 +34,15 @@
   </url>
   <url>
     <loc>https://betsaka.github.io/Rural_obs_PAs/A1_data_pipeline.html</loc>
-    <lastmod>2026-04-28T19:32:35.083Z</lastmod>
+    <lastmod>2026-04-28T21:54:32.518Z</lastmod>
   </url>
   <url>
     <loc>https://betsaka.github.io/Rural_obs_PAs/A2_donor_validity.html</loc>
-    <lastmod>2026-04-27T22:40:38.314Z</lastmod>
+    <lastmod>2026-04-28T21:54:32.504Z</lastmod>
   </url>
   <url>
     <loc>https://betsaka.github.io/Rural_obs_PAs/A3_robustness.html</loc>
-    <lastmod>2026-04-27T22:40:38.315Z</lastmod>
+    <lastmod>2026-04-28T21:54:32.518Z</lastmod>
   </url>
   <url>
     <loc>https://betsaka.github.io/Rural_obs_PAs/A4_methodology.html</loc>
