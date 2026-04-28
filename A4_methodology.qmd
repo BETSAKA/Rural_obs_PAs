@@ -116,5 +116,3 @@ The power constraints imply that:
 - The **Alaotra null result** may reflect insufficient power rather than a true zero. Effects smaller than \~15--20% would be undetectable with the available sample.
 - The **three extension sites** ([Chapter 5](05_extensions.qmd)) face the same power floor. Near-zero point estimates should not be over-interpreted as evidence of "no effect" --- they are consistent with both a true null and a moderate effect below the detection threshold.
 
-
-# References {.unnumbered}

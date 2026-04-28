@@ -1,4 +1,3 @@
-````quarto
 ---
 title: "Validité du pool de donneurs"
 subtitle: "Audit spatial des observatoires de contrôle"
@@ -13,20 +12,28 @@ library(ggrepel)
 # Observatory code-name lookup (including Antsohihy which is not in obs_locations)
 obs_code_names <- tibble(
   OBS_CODE = c(2L, 3L, 12L, 13L, 15L, 16L, 21L, 23L, 24L, 25L, 41L),
-  obs_label = c("Antsirabe (02)", "Marovoay (03)", "Antsohihy (12)",
-                "Tsiroanomandidy (13)", "Farafangana (15)", "Ambovombe (16)",
-                "Alaotra (21)", "Toliara Nord (23)", "Fénérive Est (24)",
-                "Mahanoro (25)", "Itasy (41)")
+  obs_label = c(
+    "Antsirabe (02)",
+    "Marovoay (03)",
+    "Antsohihy (12)",
+    "Tsiroanomandidy (13)",
+    "Farafangana (15)",
+    "Ambovombe (16)",
+    "Alaotra (21)",
+    "Toliara Nord (23)",
+    "Fénérive Est (24)",
+    "Mahanoro (25)",
+    "Itasy (41)"
+  )
 )
 
 DONOR_OBS_CODES <- as.integer(ALL_DONOR_OBS)
-TREATED_CODES   <- c(3L, 21L)
+TREATED_CODES <- c(3L, 21L)
 ALL_STUDY_CODES <- c(TREATED_CODES, DONOR_OBS_CODES)
 ```
 
 ```{r}
 #| label: compute-proximity
-
 # --- Proximity computation chain ---
 # Project to metric CRS (UTM 38S) for distance computation
 study_communes <- obs_communes |>
@@ -62,13 +69,13 @@ proximity <- which(dist_mat <= THRESHOLD_KM, arr.ind = TRUE) |>
   left_join(pa_attr, by = "col_idx") |>
   arrange(OBS_CODE, dist_km) |>
   mutate(
-    pre_study    = valid_from < STUDY_START_DT,
+    pre_study = valid_from < STUDY_START_DT,
     within_study = valid_from >= STUDY_START_DT & valid_from <= STUDY_END_DT,
-    post_study   = valid_from > STUDY_END_DT,
+    post_study = valid_from > STUDY_END_DT,
     exposure_type = case_when(
-      pre_study    ~ "Préexistante (avant 1999)",
+      pre_study ~ "Préexistante (avant 1999)",
       within_study ~ "Nouvelle pendant l'étude (1999–2014)",
-      post_study   ~ "Post-étude (après 2014)"
+      post_study ~ "Post-étude (après 2014)"
     ),
     role = if_else(OBS_CODE %in% DONOR_OBS_CODES, "Pool de donneurs", "Exposé")
   )
@@ -84,25 +91,25 @@ all_donors_base <- study_communes |>
 contam_summary <- proximity |>
   filter(role == "Pool de donneurs") |>
   summarise(
-    any_new_during    = any(within_study),
-    any_pre_existing  = any(pre_study),
-    n_pas_within      = n_distinct(WDPAID),
-    closest_km        = min(dist_km),
-    nearest_pa        = pa_name[which.min(dist_km)],
-    nearest_pa_from   = valid_from[which.min(dist_km)],
+    any_new_during = any(within_study),
+    any_pre_existing = any(pre_study),
+    n_pas_within = n_distinct(WDPAID),
+    closest_km = min(dist_km),
+    nearest_pa = pa_name[which.min(dist_km)],
+    nearest_pa_from = valid_from[which.min(dist_km)],
     .by = OBS_CODE
   )
 
 donor_status <- all_donors_base |>
   left_join(contam_summary, by = "OBS_CODE") |>
   mutate(
-    any_new_during    = replace_na(any_new_during, FALSE),
-    any_pre_existing  = replace_na(any_pre_existing, FALSE),
-    n_pas_within      = replace_na(n_pas_within, 0L),
+    any_new_during = replace_na(any_new_during, FALSE),
+    any_pre_existing = replace_na(any_pre_existing, FALSE),
+    n_pas_within = replace_na(n_pas_within, 0L),
     exposure_status = case_when(
-      any_new_during   ~ "Aussi exposé",
+      any_new_during ~ "Aussi exposé",
       any_pre_existing ~ "Exposition préexistante (constante)",
-      TRUE             ~ "Propre"
+      TRUE ~ "Propre"
     )
   ) |>
   arrange(exposure_status, OBS_CODE)
@@ -129,25 +136,35 @@ Nous utilisons le **WDPA dynamique pour Madagascar** (`dynamic_wdpa.rds`), une b
 #| fig-cap: "Chronologie des dates d'activation des AP par observatoire. Période d'étude (1999–2014) en ombré."
 #| fig-height: 7
 #| fig-width: 11
-
 timeline_data <- proximity |>
   slice_min(dist_km, by = c(OBS_CODE, WDPAID)) |>
   left_join(obs_code_names, by = "OBS_CODE") |>
   mutate(
     panel_role = case_when(
       OBS_CODE %in% TREATED_CODES ~ "Exposé",
-      exposure_type == "Nouvelle pendant l'étude (1999–2014)" ~ "Donneur aussi exposé",
-      exposure_type == "Préexistante (avant 1999)"   ~ "Donneur préexistant",
+      exposure_type ==
+        "Nouvelle pendant l'étude (1999–2014)" ~ "Donneur aussi exposé",
+      exposure_type == "Préexistante (avant 1999)" ~ "Donneur préexistant",
       TRUE ~ "Donneur propre"
     ),
-    panel_role = factor(panel_role,
-                        levels = c("Exposé", "Donneur aussi exposé",
-                                   "Donneur préexistant", "Donneur propre"))
+    panel_role = factor(
+      panel_role,
+      levels = c(
+        "Exposé",
+        "Donneur aussi exposé",
+        "Donneur préexistant",
+        "Donneur propre"
+      )
+    )
   ) |>
   filter(!is.na(valid_from))
 
-role_rank <- c("Exposé" = 1, "Donneur aussi exposé" = 2,
-               "Donneur préexistant" = 3, "Donneur propre" = 4)
+role_rank <- c(
+  "Exposé" = 1,
+  "Donneur aussi exposé" = 2,
+  "Donneur préexistant" = 3,
+  "Donneur propre" = 4
+)
 obs_order <- timeline_data |>
   mutate(rrank = role_rank[as.character(panel_role)]) |>
   slice_min(rrank, n = 1, with_ties = FALSE, by = obs_label) |>
@@ -159,30 +176,44 @@ timeline_data <- timeline_data |>
   mutate(obs_label = factor(obs_label, levels = obs_order))
 
 role_cols <- c(
-  "Exposé"             = "#D32F2F",
-  "Donneur aussi exposé"  = "#E65100",
-  "Donneur préexistant"  = "#F9A825",
-  "Donneur propre"         = "#388E3C"
+  "Exposé" = "#D32F2F",
+  "Donneur aussi exposé" = "#E65100",
+  "Donneur préexistant" = "#F9A825",
+  "Donneur propre" = "#388E3C"
 )
 
-ggplot(timeline_data,
-       aes(x = valid_from, y = obs_label, colour = panel_role)) +
-  annotate("rect",
-           xmin = STUDY_START_DT, xmax = STUDY_END_DT,
-           ymin = -Inf, ymax = Inf,
-           fill = "#E3F2FD", alpha = 0.5) +
-  geom_vline(xintercept = c(STUDY_START_DT, STUDY_END_DT),
-             linetype = "dashed", colour = "grey50", linewidth = 0.4) +
+ggplot(timeline_data, aes(x = valid_from, y = obs_label, colour = panel_role)) +
+  annotate(
+    "rect",
+    xmin = STUDY_START_DT,
+    xmax = STUDY_END_DT,
+    ymin = -Inf,
+    ymax = Inf,
+    fill = "#E3F2FD",
+    alpha = 0.5
+  ) +
+  geom_vline(
+    xintercept = c(STUDY_START_DT, STUDY_END_DT),
+    linetype = "dashed",
+    colour = "grey50",
+    linewidth = 0.4
+  ) +
   geom_point(aes(size = 1 / (dist_km + 0.5)), alpha = 0.85, shape = 16) +
   geom_label_repel(
     aes(label = pa_name),
-    size = 2.3, box.padding = 0.35, max.overlaps = 15,
-    show.legend = FALSE, segment.alpha = 0.5
+    size = 2.3,
+    box.padding = 0.35,
+    max.overlaps = 15,
+    show.legend = FALSE,
+    segment.alpha = 0.5
   ) +
   scale_colour_manual(values = role_cols, name = "Rôle de l'observatoire") +
   scale_size_continuous(guide = "none") +
-  scale_x_date(date_breaks = "5 years", date_labels = "%Y",
-               limits = as.Date(c("1955-01-01", "2016-01-01"))) +
+  scale_x_date(
+    date_breaks = "5 years",
+    date_labels = "%Y",
+    limits = as.Date(c("1955-01-01", "2016-01-01"))
+  ) +
   labs(
     x = "Année d'entrée en vigueur de l'AP (WDPA dynamique)",
     y = NULL,
@@ -190,8 +221,7 @@ ggplot(timeline_data,
     subtitle = "Points taille inversement proportionnelle à la distance ; zone ombrée = période d'étude (1999–2014)"
   ) +
   theme_minimal(base_size = 11) +
-  theme(legend.position = "bottom",
-        panel.grid.minor = element_blank())
+  theme(legend.position = "bottom", panel.grid.minor = element_blank())
 ```
 
 
@@ -210,40 +240,52 @@ Pour chaque paire (centroïde de commune, limite d'AP), nous calculons la distan
 ```{r}
 #| label: tbl-proximity
 #| tbl-cap: "Toutes les paires observatoire–AP dans un rayon de 20 km, colorées par type d'exposition."
-
 proximity |>
   slice_min(dist_km, by = c(OBS_CODE, WDPAID)) |>
   left_join(obs_code_names, by = "OBS_CODE") |>
   mutate(
-    panel_role = if_else(OBS_CODE %in% TREATED_CODES, "Exposé", "Pool de donneurs")
+    panel_role = if_else(
+      OBS_CODE %in% TREATED_CODES,
+      "Exposé",
+      "Pool de donneurs"
+    )
   ) |>
   select(
-    `Observatoire`    = obs_label,
-    `Rôle`           = panel_role,
+    `Observatoire` = obs_label,
+    `Rôle` = panel_role,
     `Commune la plus proche` = ADM3_EN,
-    `Dist. (km)`     = dist_km,
-    `Nom de l'AP`        = pa_name,
-    `Active depuis`    = valid_from,
-    `Type d'exposition`  = exposure_type
+    `Dist. (km)` = dist_km,
+    `Nom de l'AP` = pa_name,
+    `Active depuis` = valid_from,
+    `Type d'exposition` = exposure_type
   ) |>
   mutate(`Dist. (km)` = round(`Dist. (km)`, 1)) |>
   gt() |>
   tab_header(
     title = md("**Proximité observatoire–AP**"),
-    subtitle = md(paste0("Toutes les paires dans **", THRESHOLD_KM,
-                         " km** · WDPA dynamique (fenêtre 1999–2014)"))
+    subtitle = md(paste0(
+      "Toutes les paires dans **",
+      THRESHOLD_KM,
+      " km** · WDPA dynamique (fenêtre 1999–2014)"
+    ))
   ) |>
   tab_style(
     style = cell_fill(color = "#FFCDD2"),
-    locations = cells_body(rows = `Type d'exposition` == "Nouvelle pendant l'étude (1999–2014)")
+    locations = cells_body(
+      rows = `Type d'exposition` == "Nouvelle pendant l'étude (1999–2014)"
+    )
   ) |>
   tab_style(
     style = cell_fill(color = "#FFF9C4"),
-    locations = cells_body(rows = `Type d'exposition` == "Préexistante (avant 1999)")
+    locations = cells_body(
+      rows = `Type d'exposition` == "Préexistante (avant 1999)"
+    )
   ) |>
   tab_style(
     style = cell_fill(color = "#F5F5F5"),
-    locations = cells_body(rows = `Type d'exposition` == "Post-étude (après 2014)")
+    locations = cells_body(
+      rows = `Type d'exposition` == "Post-étude (après 2014)"
+    )
   ) |>
   tab_style(
     style = list(cell_text(weight = "bold")),
@@ -277,15 +319,18 @@ Les neuf observatoires donneurs se répartissent en trois catégories :
 ```{r}
 #| label: tbl-donor-status
 #| tbl-cap: "Résumé du statut d'exposition des AP du pool de donneurs."
-
 donor_status |>
   mutate(
-    `AP la plus proche (km)` = if_else(n_pas_within > 0, round(closest_km, 1), NA_real_),
-    `AP la plus proche`      = if_else(n_pas_within > 0, nearest_pa, "—"),
-    `AP active depuis`  = if_else(n_pas_within > 0, nearest_pa_from, NA_Date_)
+    `AP la plus proche (km)` = if_else(
+      n_pas_within > 0,
+      round(closest_km, 1),
+      NA_real_
+    ),
+    `AP la plus proche` = if_else(n_pas_within > 0, nearest_pa, "—"),
+    `AP active depuis` = if_else(n_pas_within > 0, nearest_pa_from, NA_Date_)
   ) |>
   select(
-    Observatoire          = obs_label,
+    Observatoire = obs_label,
     `Statut d'exposition AP` = exposure_status,
     `# AP dans 20 km` = n_pas_within,
     `AP la plus proche (km)`,
@@ -303,14 +348,19 @@ donor_status |>
   ) |>
   tab_style(
     style = cell_fill(color = "#FFF9C4"),
-    locations = cells_body(rows = `Statut d'exposition AP` == "Exposition préexistante (constante)")
+    locations = cells_body(
+      rows = `Statut d'exposition AP` == "Exposition préexistante (constante)"
+    )
   ) |>
   tab_style(
     style = cell_fill(color = "#E8F5E9"),
     locations = cells_body(rows = `Statut d'exposition AP` == "Propre")
   ) |>
-  fmt_date(columns = `AP active depuis`, date_style = "yMd",
-           rows = !is.na(`AP active depuis`))
+  fmt_date(
+    columns = `AP active depuis`,
+    date_style = "yMd",
+    rows = !is.na(`AP active depuis`)
+  )
 ```
 
 ```{r}
@@ -318,7 +368,6 @@ donor_status |>
 #| fig-cap: "Carte des communes d'observatoires colorées par statut d'exposition. Polygones AP voisins montrés."
 #| fig-height: 10
 #| fig-width: 8
-
 # PA polygons that appear in proximity table
 pa_wdpaid_show <- proximity |> pull(WDPAID) |> unique()
 pa_display <- dyn_study |>
@@ -326,11 +375,18 @@ pa_display <- dyn_study |>
   left_join(
     proximity |>
       distinct(WDPAID, exposure_type) |>
-      slice_min(order_by = match(exposure_type,
-                                 c("Nouvelle pendant l'étude (1999–2014)",
-                                   "Préexistante (avant 1999)",
-                                   "Post-étude (après 2014)")),
-                n = 1, by = WDPAID),
+      slice_min(
+        order_by = match(
+          exposure_type,
+          c(
+            "Nouvelle pendant l'étude (1999–2014)",
+            "Préexistante (avant 1999)",
+            "Post-étude (après 2014)"
+          )
+        ),
+        n = 1,
+        by = WDPAID
+      ),
     by = "WDPAID"
   )
 
@@ -339,30 +395,54 @@ obs_display <- study_communes |>
   left_join(
     proximity |>
       summarise(
-        worst_exposure = if (any(within_study)) "Nouvelle pendant l'étude (1999–2014)"
-                        else if (any(pre_study)) "Préexistante (avant 1999)"
-                        else "Propre (pas d'AP à proximité)",
+        worst_exposure = if (any(within_study)) {
+          "Nouvelle pendant l'étude (1999–2014)"
+        } else if (any(pre_study)) {
+          "Préexistante (avant 1999)"
+        } else {
+          "Propre (pas d'AP à proximité)"
+        },
         .by = OBS_CODE
       ),
     by = "OBS_CODE"
   ) |>
-  mutate(worst_exposure = replace_na(worst_exposure, "Propre (pas d'AP à proximité)"))
+  mutate(
+    worst_exposure = replace_na(worst_exposure, "Propre (pas d'AP à proximité)")
+  )
 
 exp_pal <- c(
   "Nouvelle pendant l'étude (1999–2014)" = "#EF9A9A",
-  "Préexistante (avant 1999)"   = "#FFF59D",
-  "Propre (pas d'AP à proximité)"  = "#C8E6C9",
-  "Post-étude (après 2014)"      = "#F5F5F5"
+  "Préexistante (avant 1999)" = "#FFF59D",
+  "Propre (pas d'AP à proximité)" = "#C8E6C9",
+  "Post-étude (après 2014)" = "#F5F5F5"
 )
 
 ggplot() +
-  geom_sf(data = madagascar, fill = "grey97", colour = "grey80", linewidth = 0.2) +
-  geom_sf(data = pa_display, aes(fill = exposure_type),
-          colour = NA, alpha = 0.35) +
-  geom_sf(data = pa_display, aes(colour = exposure_type),
-          fill = NA, linewidth = 0.5) +
-  geom_sf(data = obs_display, aes(fill = worst_exposure),
-          colour = "grey30", linewidth = 0.25, alpha = 0.8) +
+  geom_sf(
+    data = madagascar,
+    fill = "grey97",
+    colour = "grey80",
+    linewidth = 0.2
+  ) +
+  geom_sf(
+    data = pa_display,
+    aes(fill = exposure_type),
+    colour = NA,
+    alpha = 0.35
+  ) +
+  geom_sf(
+    data = pa_display,
+    aes(colour = exposure_type),
+    fill = NA,
+    linewidth = 0.5
+  ) +
+  geom_sf(
+    data = obs_display,
+    aes(fill = worst_exposure),
+    colour = "grey30",
+    linewidth = 0.25,
+    alpha = 0.8
+  ) +
   geom_sf_label(
     data = obs_display |>
       group_by(OBS_CODE) |>
@@ -370,17 +450,24 @@ ggplot() +
       left_join(obs_code_names, by = "OBS_CODE") |>
       st_centroid(),
     aes(label = obs_label),
-    size = 2.2, label.padding = unit(0.12, "lines"), label.size = 0.15,
-    fill = "white", alpha = 0.85
+    size = 2.2,
+    label.padding = unit(0.12, "lines"),
+    label.size = 0.15,
+    fill = "white",
+    alpha = 0.85
   ) +
-  scale_fill_manual(values = exp_pal, name = "Type d'exposition",
-                    aesthetics = c("fill", "colour")) +
+  scale_fill_manual(
+    values = exp_pal,
+    name = "Type d'exposition",
+    aesthetics = c("fill", "colour")
+  ) +
   guides(colour = "none") +
-  labs(title = "Statut d'exposition des observatoires aux AP",
-       subtitle = "Remplissage commune = exposition la plus sévère pendant 1999–2014") +
+  labs(
+    title = "Statut d'exposition des observatoires aux AP",
+    subtitle = "Remplissage commune = exposition la plus sévère pendant 1999–2014"
+  ) +
   theme_void(base_size = 10) +
-  theme(legend.position = "bottom",
-        plot.title = element_text(face = "bold"))
+  theme(legend.position = "bottom", plot.title = element_text(face = "bold"))
 ```
 
 ## Profils d'exposition détaillés
@@ -390,7 +477,6 @@ ggplot() +
 #| fig-cap: "Distance aux AP pour chaque observatoire donneur aussi exposé."
 #| fig-height: 6
 #| fig-width: 11
-
 exposed_codes <- donor_status |>
   filter(exposure_status == "Aussi exposé") |>
   pull(OBS_CODE)
@@ -399,30 +485,46 @@ detail_data <- proximity |>
   filter(OBS_CODE %in% exposed_codes) |>
   left_join(obs_code_names, by = "OBS_CODE") |>
   mutate(
-    pa_label = paste0(pa_name, "
-(", format(valid_from, "%Y"), ")")
+    pa_label = paste0(
+      pa_name,
+      "
+(",
+      format(valid_from, "%Y"),
+      ")"
+    )
   ) |>
   slice_min(dist_km, by = c(OBS_CODE, WDPAID))
 
 ggplot(detail_data, aes(x = pa_label, y = dist_km, colour = exposure_type)) +
-  geom_hline(yintercept = THRESHOLD_KM, linetype = "dashed",
-             colour = "grey40", linewidth = 0.4) +
+  geom_hline(
+    yintercept = THRESHOLD_KM,
+    linetype = "dashed",
+    colour = "grey40",
+    linewidth = 0.4
+  ) +
   geom_segment(aes(xend = pa_label, yend = 0), linewidth = 0.7, alpha = 0.5) +
   geom_point(size = 3) +
   facet_wrap(~obs_label, scales = "free_x", nrow = 1) +
   scale_colour_manual(
     values = c(
       "Nouvelle pendant l'étude (1999–2014)" = "#D32F2F",
-      "Préexistante (avant 1999)"   = "#F9A825",
-      "Post-étude (après 2014)"      = "grey60"
+      "Préexistante (avant 1999)" = "#F9A825",
+      "Post-étude (après 2014)" = "grey60"
     ),
     name = "Type d'exposition AP"
   ) +
-  annotate("text", x = -Inf, y = THRESHOLD_KM + 0.8,
-           label = paste0(THRESHOLD_KM, " km seuil"),
-           hjust = -0.05, size = 3, colour = "grey40") +
+  annotate(
+    "text",
+    x = -Inf,
+    y = THRESHOLD_KM + 0.8,
+    label = paste0(THRESHOLD_KM, " km seuil"),
+    hjust = -0.05,
+    size = 3,
+    colour = "grey40"
+  ) +
   labs(
-    x = NULL, y = "Distance à la limite de l'AP (km)",
+    x = NULL,
+    y = "Distance à la limite de l'AP (km)",
     title = "Proximité aux AP : observatoires donneurs aussi exposés"
   ) +
   theme_minimal(base_size = 11) +
@@ -457,13 +559,17 @@ Les quatre donneurs aussi exposés deviennent des **unités exposées** dans l'a
 #| fig-cap: "Carte de Madagascar avec les localisations des observatoires colorées par statut : exposé (Ch. 4), nouvellement exposé (Ch. 5), donneur propre, exclu."
 #| fig-height: 7
 #| fig-width: 7
-
 # Include Antsohihy manually (not in obs_locations)
 obs_locs_full <- bind_rows(
-  obs_locations |> st_drop_geometry() |>
-    mutate(OBS_CODE = as.integer(code)),
-  tibble(OBS_CODE = 12L, code = "12", name = "Antsohihy",
-         latitude = -14.8781, longitude = 47.9875, role = NA_character_)
+  obs_locations |> st_drop_geometry() |> mutate(OBS_CODE = as.integer(code)),
+  tibble(
+    OBS_CODE = 12L,
+    code = "12",
+    name = "Antsohihy",
+    latitude = -14.8781,
+    longitude = 47.9875,
+    role = NA_character_
+  )
 ) |>
   mutate(
     status = case_when(
@@ -475,37 +581,47 @@ obs_locs_full <- bind_rows(
   )
 
 status_pal <- c(
-  "Exposé (Ch. 4)"                 = "#D32F2F",
-  "Nouvellement exposé (Ch. 5)"    = "#E65100",
-  "Donneur propre"                  = "#388E3C",
+  "Exposé (Ch. 4)" = "#D32F2F",
+  "Nouvellement exposé (Ch. 5)" = "#E65100",
+  "Donneur propre" = "#388E3C",
   "Exclu (couverture insuffisante)" = "grey60"
 )
 status_shapes <- c(
-  "Exposé (Ch. 4)"                 = 17,
-  "Nouvellement exposé (Ch. 5)"    = 18,
-  "Donneur propre"                  = 16,
+  "Exposé (Ch. 4)" = 17,
+  "Nouvellement exposé (Ch. 5)" = 18,
+  "Donneur propre" = 16,
   "Exclu (couverture insuffisante)" = 4
 )
 
 ggplot() +
-  geom_sf(data = madagascar, fill = "grey95", colour = "grey70", linewidth = 0.3) +
+  geom_sf(
+    data = madagascar,
+    fill = "grey95",
+    colour = "grey70",
+    linewidth = 0.3
+  ) +
   geom_point(
     data = obs_locs_full,
     aes(x = longitude, y = latitude, colour = status, shape = status),
-    size = 3.5, stroke = 1.1
+    size = 3.5,
+    stroke = 1.1
   ) +
   geom_label_repel(
     data = obs_locs_full,
     aes(x = longitude, y = latitude, label = name, colour = status),
-    size = 2.5, fontface = "bold", box.padding = 0.5,
-    min.segment.length = 0, show.legend = FALSE, max.overlaps = 20
+    size = 2.5,
+    fontface = "bold",
+    box.padding = 0.5,
+    min.segment.length = 0,
+    show.legend = FALSE,
+    max.overlaps = 20
   ) +
   scale_colour_manual(values = status_pal, name = NULL) +
   scale_shape_manual(values = status_shapes, name = NULL) +
-  labs(title = "Classification du pool de donneurs",
-       subtitle = "Vert = donneurs propres · Orange = aussi exposés (→ nouvellement exposés au Ch. 5)") +
+  labs(
+    title = "Classification du pool de donneurs",
+    subtitle = "Vert = donneurs propres · Orange = aussi exposés (→ nouvellement exposés au Ch. 5)"
+  ) +
   theme_void(base_size = 11) +
   theme(legend.position = "bottom")
 ```
-
-````

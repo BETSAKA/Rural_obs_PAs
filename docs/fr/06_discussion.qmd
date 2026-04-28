@@ -108,6 +108,3 @@ A crucial feature here: *not-yet-exposed units serve as controls.* Alaotra (expo
 When the 2026 survey round becomes available, the primary specification will be a Callaway--Sant'Anna [-@CallawayS2021] staggered difference-in-differences estimation at the household level, with doubly-robust estimation, household-level covariates, and clustering at the site level. A complementary Sun--Abraham [-@SunAbraham2021] interaction-weighted estimator via `fixest::sunab()` will provide a transparent event-study summary. The gsynth estimates from Chapters 4 and 5 will serve as a robustness check that relaxes the parallel-trends assumption to interactive fixed effects. If gsynth and DiD agree, the evidence is more credible regardless of which identifying assumption one prefers. If the 2026 wave covers Fénérive East, the small footprint of the Réserve de Tampolo allows a within-observatory distance design contrasting near-PA and far-PA sites, adding a third independent geographic context alongside Marovoay and Alaotra.
 
 This chapter will be updated when the 2026 data arrive. The current gsynth results should be read as a first-pass analysis that will be complemented by household-level estimation exploiting the full depth of the data.
-
-
-# References {.unnumbered}

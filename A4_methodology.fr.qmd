@@ -1,4 +1,3 @@
-````quarto
 ---
 title: "Méthodologie"
 subtitle: "Détails techniques sur les méthodes d'estimation"
@@ -112,6 +111,3 @@ Les contraintes de puissance impliquent que :
 - Les **trois sites d'extension** ([Chapitre 5](05_extensions.qmd)) font face au même plancher de puissance. Les estimations ponctuelles proches de zéro ne doivent pas être interprétées comme des preuves d'« absence d'effet » — elles sont compatibles à la fois avec un vrai nul et un effet modéré sous le seuil de détection.
 
 
-# Références {.unnumbered}
-
-````

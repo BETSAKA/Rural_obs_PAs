@@ -1,4 +1,3 @@
-````quarto
 ---
 title: "Robustesse"
 subtitle: "Tests de sensibilité et spécifications alternatives"
@@ -14,32 +13,35 @@ library(did)
 
 ```{r}
 #| label: load-robustness
-
 # Primary specification (cached, clean 5-donor pool)
-gs_main_maro  <- read_rds("data/paper14_gsynth_maro_oecd.rds")
-gs_main_ala   <- read_rds("data/paper14_gsynth_ala_oecd.rds")
+gs_main_maro <- read_rds("data/paper14_gsynth_maro_oecd.rds")
+gs_main_ala <- read_rds("data/paper14_gsynth_ala_oecd.rds")
 
 # Robustness 1: unadjusted log income (no OECD equivalisation)
 gs_unadj_maro <- read_rds("data/paper12_gsynth_maro.rds")
-gs_unadj_ala  <- read_rds("data/paper12_gsynth_ala.rds")
+gs_unadj_ala <- read_rds("data/paper12_gsynth_ala.rds")
 
 # Robustness 2: income in levels (thousands of Ariary)
-gs_lev_maro   <- read_rds("data/robustness_gsynth_levels_maro.rds")
-gs_lev_ala    <- read_rds("data/robustness_gsynth_levels_ala.rds")
+gs_lev_maro <- read_rds("data/robustness_gsynth_levels_maro.rds")
+gs_lev_ala <- read_rds("data/robustness_gsynth_levels_ala.rds")
 
 # Helper: extract period-by-period ATT path from cached gsynth object
 extract_att_path <- function(gs, treat_year) {
   mat <- gs$est_att
   if (is.null(mat)) {
-    return(tibble(rel_time = integer(), att = double(),
-                  ci_lo = double(), ci_hi = double(),
-                  year = integer()))
+    return(tibble(
+      rel_time = integer(),
+      att = double(),
+      ci_lo = double(),
+      ci_hi = double(),
+      year = integer()
+    ))
   }
   tibble(
     rel_time = as.integer(rownames(mat)),
-    att      = mat[, "ATT"],
-    ci_lo    = mat[, "CI.lower"],
-    ci_hi    = mat[, "CI.upper"]
+    att = mat[, "ATT"],
+    ci_lo = mat[, "CI.lower"],
+    ci_hi = mat[, "CI.upper"]
   ) |>
     mutate(year = rel_time + treat_year)
 }
@@ -47,12 +49,15 @@ extract_att_path <- function(gs, treat_year) {
 # Helper: extract a single statistic from cached gsynth est_avg
 gsynth_stat <- function(gs, what = c("se", "ci_lo", "ci_hi", "pval")) {
   what <- match.arg(what)
-  if (is.null(gs$est_avg)) return(NA_real_)
-  col <- switch(what,
-    se    = "S.E.",
+  if (is.null(gs$est_avg)) {
+    return(NA_real_)
+  }
+  col <- switch(
+    what,
+    se = "S.E.",
     ci_lo = "CI.lower",
     ci_hi = "CI.upper",
-    pval  = "p.value"
+    pval = "p.value"
   )
   gs$est_avg[1, col]
 }
@@ -70,7 +75,6 @@ Nous ré-estimons les deux modèles gsynth en utilisant le log du revenu total d
 #| fig-cap: "Trajectoires ATT gsynth utilisant le revenu logarithmique non ajusté (sans équivalisation OCDE). Gauche : Ankarafantsika. Droite : Alaotra."
 #| fig-height: 5
 #| fig-width: 12
-
 att_unadj_m <- extract_att_path(gs_unadj_maro, TREAT_YEAR_MARO)
 att_unadj_a <- extract_att_path(gs_unadj_ala, TREAT_YEAR_ALA)
 
@@ -80,8 +84,11 @@ p_unadj_m <- ggplot(att_unadj_m, aes(rel_time, att)) +
   geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
   geom_line(colour = "#D32F2F", linewidth = 0.8) +
   geom_point(colour = "#D32F2F", size = 2) +
-  labs(x = "Temps relatif", y = "ATT (log revenu)",
-       title = "Ankarafantsika (non ajusté)") +
+  labs(
+    x = "Temps relatif",
+    y = "ATT (log revenu)",
+    title = "Ankarafantsika (non ajusté)"
+  ) +
   theme_minimal(base_size = 11)
 
 p_unadj_a <- ggplot(att_unadj_a, aes(rel_time, att)) +
@@ -90,12 +97,18 @@ p_unadj_a <- ggplot(att_unadj_a, aes(rel_time, att)) +
   geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
   geom_line(colour = "#1565C0", linewidth = 0.8) +
   geom_point(colour = "#1565C0", size = 2) +
-  labs(x = "Temps relatif", y = "ATT (log revenu)",
-       title = "Lac Alaotra (non ajusté)") +
+  labs(
+    x = "Temps relatif",
+    y = "ATT (log revenu)",
+    title = "Lac Alaotra (non ajusté)"
+  ) +
   theme_minimal(base_size = 11)
 
-p_unadj_m + p_unadj_a +
-  plot_annotation(title = "Revenu logarithmique non ajusté : trajectoires ATT gsynth")
+p_unadj_m +
+  p_unadj_a +
+  plot_annotation(
+    title = "Revenu logarithmique non ajusté : trajectoires ATT gsynth"
+  )
 ```
 
 L'ATT non ajusté d'Ankarafantsika est légèrement plus grand en magnitude que l'estimation équivalisée OCDE, ce qui est cohérent avec le fait que les ménages exposés de la rive est sont légèrement plus grands en moyenne (les ménages plus grands reçoivent un ajustement OCDE plus faible, atténuant l'écart per capita). Le résultat nul d'Alaotra est inchangé : l'intervalle de confiance couvre zéro quelle que soit l'équivalisation.
@@ -108,7 +121,6 @@ Nous ré-estimons les deux modèles en utilisant le revenu en niveaux (milliers 
 ```{r}
 #| label: tbl-income-scale
 #| tbl-cap: "Statistiques descriptives du revenu winsorisé (milliers d'Ariary) par groupe."
-
 panel_desc <- household_consolidated |>
   filter(
     obs %in% c("03", "21", ALL_DONOR_OBS),
@@ -135,8 +147,15 @@ panel_desc |>
     `N (mén.-années)` = n(),
     .by = group
   ) |>
-  arrange(match(group, c("Marovoay est (exposé)", "Marovoay ouest (témoin)",
-                         "Lac Alaotra", "Pool de donneurs"))) |>
+  arrange(match(
+    group,
+    c(
+      "Marovoay est (exposé)",
+      "Marovoay ouest (témoin)",
+      "Lac Alaotra",
+      "Pool de donneurs"
+    )
+  )) |>
   gt() |>
   tab_header(
     title = "Revenu en niveaux : statistiques descriptives",
@@ -151,7 +170,6 @@ panel_desc |>
 #| fig-cap: "Trajectoires ATT gsynth utilisant le revenu en niveaux (milliers d'Ariary). Gauche : Ankarafantsika. Droite : Alaotra."
 #| fig-height: 5
 #| fig-width: 12
-
 att_lev_m <- extract_att_path(gs_lev_maro, TREAT_YEAR_MARO)
 att_lev_a <- extract_att_path(gs_lev_ala, TREAT_YEAR_ALA)
 
@@ -161,8 +179,11 @@ p_lev_m <- ggplot(att_lev_m, aes(rel_time, att)) +
   geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
   geom_line(colour = "#D32F2F", linewidth = 0.8) +
   geom_point(colour = "#D32F2F", size = 2) +
-  labs(x = "Temps relatif", y = "ATT (milliers d'Ariary)",
-       title = "Ankarafantsika (niveaux)") +
+  labs(
+    x = "Temps relatif",
+    y = "ATT (milliers d'Ariary)",
+    title = "Ankarafantsika (niveaux)"
+  ) +
   theme_minimal(base_size = 11)
 
 p_lev_a <- ggplot(att_lev_a, aes(rel_time, att)) +
@@ -171,11 +192,15 @@ p_lev_a <- ggplot(att_lev_a, aes(rel_time, att)) +
   geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
   geom_line(colour = "#1565C0", linewidth = 0.8) +
   geom_point(colour = "#1565C0", size = 2) +
-  labs(x = "Temps relatif", y = "ATT (milliers d'Ariary)",
-       title = "Lac Alaotra (niveaux)") +
+  labs(
+    x = "Temps relatif",
+    y = "ATT (milliers d'Ariary)",
+    title = "Lac Alaotra (niveaux)"
+  ) +
   theme_minimal(base_size = 11)
 
-p_lev_m + p_lev_a +
+p_lev_m +
+  p_lev_a +
   plot_annotation(title = "Revenu en niveaux : trajectoires ATT gsynth")
 ```
 
@@ -186,7 +211,6 @@ L'ATT d'Ankarafantsika en niveaux se traduit par un effet négatif en milliers d
 #| fig-cap: "Comparaison de l'ajustement pré-traitement : spécification logarithmique (gauche) vs. niveaux (droite) pour Ankarafantsika."
 #| fig-height: 5
 #| fig-width: 12
-
 att_main_m <- extract_att_path(gs_main_maro, TREAT_YEAR_MARO)
 
 p_log <- ggplot(att_main_m, aes(rel_time, att)) +
@@ -195,8 +219,11 @@ p_log <- ggplot(att_main_m, aes(rel_time, att)) +
   geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
   geom_line(colour = "#D32F2F", linewidth = 0.8) +
   geom_point(colour = "#D32F2F", size = 2) +
-  labs(x = "Temps relatif", y = "ATT (log revenu équiv.)",
-       title = "Spécification logarithmique (principale)") +
+  labs(
+    x = "Temps relatif",
+    y = "ATT (log revenu équiv.)",
+    title = "Spécification logarithmique (principale)"
+  ) +
   theme_minimal(base_size = 11)
 
 p_lev <- ggplot(att_lev_m, aes(rel_time, att)) +
@@ -205,11 +232,15 @@ p_lev <- ggplot(att_lev_m, aes(rel_time, att)) +
   geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
   geom_line(colour = "#D32F2F", linewidth = 0.8) +
   geom_point(colour = "#D32F2F", size = 2) +
-  labs(x = "Temps relatif", y = "ATT (milliers d'Ariary)",
-       title = "Spécification en niveaux") +
+  labs(
+    x = "Temps relatif",
+    y = "ATT (milliers d'Ariary)",
+    title = "Spécification en niveaux"
+  ) +
   theme_minimal(base_size = 11)
 
-p_log + p_lev +
+p_log +
+  p_lev +
   plot_annotation(
     title = "Ankarafantsika : comparaison de l'ajustement pré-traitement",
     subtitle = "Spécification log vs. niveaux"
@@ -223,7 +254,6 @@ Les différences-en-différences synthétiques [SDID ; @Arkhangelsky2021] fourni
 
 ```{r}
 #| label: sdid-compute
-
 # Build OECD-equivalised panel for SDID (clean donors only)
 panel_hh_sdid <- household_consolidated |>
   filter(
@@ -234,8 +264,8 @@ panel_hh_sdid <- household_consolidated |>
   mk_income_ext() |>
   mutate(
     revtot_eq = revtot / oecd_equiv,
-    revtot_w  = pmin(revtot_eq, quantile(revtot_eq, 0.99, na.rm = TRUE)),
-    ln_y      = log(pmax(revtot_w, 0) + 1)
+    revtot_w = pmin(revtot_eq, quantile(revtot_eq, 0.99, na.rm = TRUE)),
+    ln_y = log(pmax(revtot_w, 0) + 1)
   )
 
 panel_site_sdid <- panel_hh_sdid |>
@@ -245,7 +275,9 @@ panel_site_sdid <- panel_hh_sdid |>
 build_sdid_block <- function(treated_ids, treat_year, year_set, panel_data) {
   df <- panel_data |>
     filter(year %in% year_set) |>
-    mutate(treatment = as.integer(site_id %in% treated_ids & year >= treat_year))
+    mutate(
+      treatment = as.integer(site_id %in% treated_ids & year >= treat_year)
+    )
   balanced <- df |>
     count(site_id) |>
     filter(n == length(year_set)) |>
@@ -257,24 +289,32 @@ build_sdid_block <- function(treated_ids, treat_year, year_set, panel_data) {
 maro_years <- c(1999:2004, 2006:2008)
 
 blk_maro <- build_sdid_block(
-  c("031", "032"), TREAT_YEAR_MARO, maro_years, panel_site_sdid
+  c("031", "032"),
+  TREAT_YEAR_MARO,
+  maro_years,
+  panel_site_sdid
 )
 
 sdid_df_maro <- blk_maro |>
   select(unit = site_id, time = year, outcome = ln_y, treatment) |>
   as.data.frame()
 
-s_maro    <- panel.matrices(sdid_df_maro)
+s_maro <- panel.matrices(sdid_df_maro)
 sdid_maro <- synthdid_estimate(s_maro$Y, s_maro$N0, s_maro$T0)
-sc_maro   <- sc_estimate(s_maro$Y, s_maro$N0, s_maro$T0)
-did_maro  <- did_estimate(s_maro$Y, s_maro$N0, s_maro$T0)
+sc_maro <- sc_estimate(s_maro$Y, s_maro$N0, s_maro$T0)
+did_maro <- did_estimate(s_maro$Y, s_maro$N0, s_maro$T0)
 
-se_sdid_maro <- tryCatch(synthdid_se(sdid_maro, method = "placebo"),
-                          error = \(e) NA_real_)
-se_sc_maro   <- tryCatch(synthdid_se(sc_maro, method = "placebo"),
-                          error = \(e) NA_real_)
-se_did_maro  <- tryCatch(synthdid_se(did_maro, method = "placebo"),
-                          error = \(e) NA_real_)
+se_sdid_maro <- tryCatch(
+  synthdid_se(sdid_maro, method = "placebo"),
+  error = \(e) NA_real_
+)
+se_sc_maro <- tryCatch(synthdid_se(sc_maro, method = "placebo"), error = \(e) {
+  NA_real_
+})
+se_did_maro <- tryCatch(
+  synthdid_se(did_maro, method = "placebo"),
+  error = \(e) NA_real_
+)
 
 # --- Block 2: Alaotra (Lac Alaotra, exposed 2008) ---
 panel_sdid_ala <- panel_hh_sdid |>
@@ -284,7 +324,9 @@ panel_sdid_ala <- panel_hh_sdid |>
 ala_years <- c(1999:2004, 2006:2008, 2010:2014)
 
 blk_ala <- build_sdid_block(
-  "ALA", TREAT_YEAR_ALA, ala_years,
+  "ALA",
+  TREAT_YEAR_ALA,
+  ala_years,
   panel_sdid_ala |> rename(site_id = unit_id)
 )
 
@@ -292,17 +334,21 @@ sdid_df_ala <- blk_ala |>
   select(unit = site_id, time = year, outcome = ln_y, treatment) |>
   as.data.frame()
 
-s_ala    <- panel.matrices(sdid_df_ala)
+s_ala <- panel.matrices(sdid_df_ala)
 sdid_ala <- synthdid_estimate(s_ala$Y, s_ala$N0, s_ala$T0)
-sc_ala   <- sc_estimate(s_ala$Y, s_ala$N0, s_ala$T0)
-did_ala  <- did_estimate(s_ala$Y, s_ala$N0, s_ala$T0)
+sc_ala <- sc_estimate(s_ala$Y, s_ala$N0, s_ala$T0)
+did_ala <- did_estimate(s_ala$Y, s_ala$N0, s_ala$T0)
 
-se_sdid_ala <- tryCatch(synthdid_se(sdid_ala, method = "placebo"),
-                         error = \(e) NA_real_)
-se_sc_ala   <- tryCatch(synthdid_se(sc_ala, method = "placebo"),
-                         error = \(e) NA_real_)
-se_did_ala  <- tryCatch(synthdid_se(did_ala, method = "placebo"),
-                         error = \(e) NA_real_)
+se_sdid_ala <- tryCatch(
+  synthdid_se(sdid_ala, method = "placebo"),
+  error = \(e) NA_real_
+)
+se_sc_ala <- tryCatch(synthdid_se(sc_ala, method = "placebo"), error = \(e) {
+  NA_real_
+})
+se_did_ala <- tryCatch(synthdid_se(did_ala, method = "placebo"), error = \(e) {
+  NA_real_
+})
 ```
 
 ## Ankarafantsika (SDID)
@@ -310,20 +356,23 @@ se_did_ala  <- tryCatch(synthdid_se(did_ala, method = "placebo"),
 ```{r}
 #| label: tbl-sdid-maro
 #| tbl-cap: "Estimations SDID, SC et DID pour Ankarafantsika (début d'exposition 2003)."
-
 tibble(
   Méthode = c("SDID", "Contrôle synthétique", "DID"),
-  ATT = round(c(as.numeric(sdid_maro), as.numeric(sc_maro),
-                as.numeric(did_maro)), 3),
+  ATT = round(
+    c(as.numeric(sdid_maro), as.numeric(sc_maro), as.numeric(did_maro)),
+    3
+  ),
   `ET (placebo)` = round(c(se_sdid_maro, se_sc_maro, se_did_maro), 3),
   `% changement` = paste0(round((exp(ATT) - 1) * 100, 1), "%")
 ) |>
   gt() |>
   tab_header(
     title = "Bloc 1 : Marovoay (Ankarafantsika, 2003)",
-    subtitle = sprintf("T₀ = %d, T₁ = %d",
-                       sum(maro_years < TREAT_YEAR_MARO),
-                       sum(maro_years >= TREAT_YEAR_MARO))
+    subtitle = sprintf(
+      "T₀ = %d, T₁ = %d",
+      sum(maro_years < TREAT_YEAR_MARO),
+      sum(maro_years >= TREAT_YEAR_MARO)
+    )
   )
 ```
 
@@ -332,7 +381,6 @@ tibble(
 #| fig-cap: "Graphique de tendance SDID pour Ankarafantsika. Lignes pleines : trajectoires repondérées de l'unité traitée et du contrôle synthétique."
 #| fig-height: 5
 #| fig-width: 8
-
 plot(sdid_maro) +
   labs(title = "SDID : Marovoay vs Contrôle synthétique (2003)") +
   theme_minimal(base_size = 11)
@@ -347,20 +395,23 @@ Les triangles en bas du graphique SDID représentent les **poids temporels** ($\
 ```{r}
 #| label: tbl-sdid-ala
 #| tbl-cap: "Estimations SDID, SC et DID pour Alaotra (début d'exposition 2008)."
-
 tibble(
   Méthode = c("SDID", "Contrôle synthétique", "DID"),
-  ATT = round(c(as.numeric(sdid_ala), as.numeric(sc_ala),
-                as.numeric(did_ala)), 3),
+  ATT = round(
+    c(as.numeric(sdid_ala), as.numeric(sc_ala), as.numeric(did_ala)),
+    3
+  ),
   `ET (placebo)` = round(c(se_sdid_ala, se_sc_ala, se_did_ala), 3),
   `% changement` = paste0(round((exp(ATT) - 1) * 100, 1), "%")
 ) |>
   gt() |>
   tab_header(
     title = "Bloc 2 : Alaotra (PHP du Lac Alaotra, 2008)",
-    subtitle = sprintf("T₀ = %d, T₁ = %d",
-                       sum(ala_years < TREAT_YEAR_ALA),
-                       sum(ala_years >= TREAT_YEAR_ALA))
+    subtitle = sprintf(
+      "T₀ = %d, T₁ = %d",
+      sum(ala_years < TREAT_YEAR_ALA),
+      sum(ala_years >= TREAT_YEAR_ALA)
+    )
   )
 ```
 
@@ -383,7 +434,6 @@ Par rapport au gsynth de base, cette spécification :
 
 ```{r}
 #| label: cs-panel
-
 # Household-level dataset for 1999-2014.
 panel_hh_cs <- household_consolidated |>
   filter(
@@ -393,13 +443,13 @@ panel_hh_cs <- household_consolidated |>
   ) |>
   mk_income_ext() |>
   mutate(
-    y_oecd   = revtot / oecd_equiv,
+    y_oecd = revtot / oecd_equiv,
     y_oecd_w = winsorize(y_oecd),
-    ln_y     = log(pmax(y_oecd_w, 0) + 1),
+    ln_y = log(pmax(y_oecd_w, 0) + 1),
     g = case_when(
       site_id %in% c("031", "032") ~ TREAT_YEAR_MARO,
-      obs == "21"                  ~ TREAT_YEAR_ALA,
-      TRUE                         ~ 0L
+      obs == "21" ~ TREAT_YEAR_ALA,
+      TRUE ~ 0L
     )
   ) |>
   filter(!is.na(ln_y), !is.na(year), !is.na(site_id)) |>
@@ -419,20 +469,19 @@ Le jeu de données combiné contient `r format(n_hh_cs, big.mark=",")` observati
 #| label: cs-attgt
 #| results: hide
 #| warning: false
-
 set.seed(20260419)
 att_cs <- att_gt(
-  yname         = "ln_y",
-  tname         = "year",
-  idname        = "id",
-  gname         = "g",
-  data          = panel_hh_cs,
+  yname = "ln_y",
+  tname = "year",
+  idname = "id",
+  gname = "g",
+  data = panel_hh_cs,
   control_group = "nevertreated",
-  panel         = FALSE,
-  clustervars   = "site_id",
-  bstrap        = TRUE,
-  biters        = 1000,
-  cband         = TRUE
+  panel = FALSE,
+  clustervars = "site_id",
+  bstrap = TRUE,
+  biters = 1000,
+  cband = TRUE
 )
 ```
 
@@ -441,7 +490,6 @@ att_cs <- att_gt(
 #| fig-cap: "Estimations ATT(g,t) groupe-temps de Callaway–Sant'Anna avec bandes de confiance simultanées à 95 %. Panel supérieur : cohorte Marovoay (g = 2003). Panel inférieur : cohorte Alaotra (g = 2008). La ligne verticale en pointillés marque le début de l'exposition. Résultat : log revenu équivalisé OCDE."
 #| fig-height: 6
 #| fig-width: 10
-
 ggdid(att_cs) +
   theme_minimal(base_size = 11) +
   theme(legend.position = "bottom")
@@ -453,7 +501,6 @@ L'agrégateur dynamique fait la moyenne des $ATT(g,t)$ par temps d'événement r
 
 ```{r}
 #| label: cs-dyn
-
 att_dyn <- aggte(att_cs, type = "dynamic", na.rm = TRUE)
 att_simple_maro <- aggte(att_cs, type = "group", na.rm = TRUE)
 ```
@@ -463,11 +510,10 @@ att_simple_maro <- aggte(att_cs, type = "group", na.rm = TRUE)
 #| fig-cap: "Étude d'événements Callaway–Sant'Anna ATT par temps d'événement relatif. $e$ négatif = périodes placebo pré-traitement (devraient être plates autour de zéro) ; $e$ positif = effets post-traitement. Ligne verticale en pointillés à $e = -0,5$."
 #| fig-height: 5
 #| fig-width: 9
-
 tibble(
-  e     = att_dyn$egt,
-  att   = att_dyn$att.egt,
-  se    = att_dyn$se.egt,
+  e = att_dyn$egt,
+  att = att_dyn$att.egt,
+  se = att_dyn$se.egt,
   ci_lo = att_dyn$att.egt - att_dyn$crit.val.egt * att_dyn$se.egt,
   ci_hi = att_dyn$att.egt + att_dyn$crit.val.egt * att_dyn$se.egt,
   phase = if_else(e < 0, "Pré", "Post")
@@ -487,7 +533,8 @@ tibble(
     title = "Étude d'événements Callaway–Sant'Anna",
     subtitle = sprintf(
       "ATT global (post-exposition) = %.3f (ET = %.3f)",
-      att_dyn$overall.att, att_dyn$overall.se
+      att_dyn$overall.att,
+      att_dyn$overall.se
     )
   ) +
   theme_minimal(base_size = 12)
@@ -498,18 +545,25 @@ tibble(
 ```{r}
 #| label: tbl-cs-group
 #| tbl-cap: "Callaway–Sant'Anna : ATT post-exposition spécifiques aux cohortes."
-
 tibble(
-  Cohorte = paste0("g = ", att_simple_maro$egt,
-                  c(" (Marovoay)", " (Alaotra)")[seq_along(att_simple_maro$egt)]),
+  Cohorte = paste0(
+    "g = ",
+    att_simple_maro$egt,
+    c(" (Marovoay)", " (Alaotra)")[seq_along(att_simple_maro$egt)]
+  ),
   ATT = round(att_simple_maro$att.egt, 3),
-  ET  = round(att_simple_maro$se.egt, 3),
+  ET = round(att_simple_maro$se.egt, 3),
   `IC 95 %` = sprintf(
     "[%.3f, %.3f]",
-    att_simple_maro$att.egt - att_simple_maro$crit.val.egt * att_simple_maro$se.egt,
-    att_simple_maro$att.egt + att_simple_maro$crit.val.egt * att_simple_maro$se.egt
+    att_simple_maro$att.egt -
+      att_simple_maro$crit.val.egt * att_simple_maro$se.egt,
+    att_simple_maro$att.egt +
+      att_simple_maro$crit.val.egt * att_simple_maro$se.egt
   ),
-  `% changement` = paste0(round((exp(att_simple_maro$att.egt) - 1) * 100, 1), "%")
+  `% changement` = paste0(
+    round((exp(att_simple_maro$att.egt) - 1) * 100, 1),
+    "%"
+  )
 ) |>
   gt() |>
   tab_header(
@@ -538,7 +592,6 @@ Cette implémentation utilise les données au niveau des ménages 1999–2014 d�
 ```{r}
 #| label: tbl-robustness-summary
 #| tbl-cap: "Synthèse de la robustesse : estimations ATT pour toutes les spécifications et les deux AP."
-
 tibble(
   AP = rep(c("Ankarafantsika", "Lac Alaotra"), 4),
   Spécification = c(
@@ -557,31 +610,41 @@ tibble(
     round(as.numeric(sdid_maro), 3),
     round(as.numeric(sdid_ala), 3)
   ),
-  ET = round(c(
-    gsynth_stat(gs_main_maro, "se"),
-    gsynth_stat(gs_main_ala, "se"),
-    gsynth_stat(gs_unadj_maro, "se"),
-    gsynth_stat(gs_unadj_ala, "se"),
-    gsynth_stat(gs_lev_maro, "se"),
-    gsynth_stat(gs_lev_ala, "se"),
-    se_sdid_maro,
-    se_sdid_ala
-  ), 3),
-  `p-valeur` = round(c(
-    gsynth_stat(gs_main_maro, "pval"),
-    gsynth_stat(gs_main_ala, "pval"),
-    gsynth_stat(gs_unadj_maro, "pval"),
-    gsynth_stat(gs_unadj_ala, "pval"),
-    gsynth_stat(gs_lev_maro, "pval"),
-    gsynth_stat(gs_lev_ala, "pval"),
-    NA_real_,
-    NA_real_
-  ), 3),
+  ET = round(
+    c(
+      gsynth_stat(gs_main_maro, "se"),
+      gsynth_stat(gs_main_ala, "se"),
+      gsynth_stat(gs_unadj_maro, "se"),
+      gsynth_stat(gs_unadj_ala, "se"),
+      gsynth_stat(gs_lev_maro, "se"),
+      gsynth_stat(gs_lev_ala, "se"),
+      se_sdid_maro,
+      se_sdid_ala
+    ),
+    3
+  ),
+  `p-valeur` = round(
+    c(
+      gsynth_stat(gs_main_maro, "pval"),
+      gsynth_stat(gs_main_ala, "pval"),
+      gsynth_stat(gs_unadj_maro, "pval"),
+      gsynth_stat(gs_unadj_ala, "pval"),
+      gsynth_stat(gs_lev_maro, "pval"),
+      gsynth_stat(gs_lev_ala, "pval"),
+      NA_real_,
+      NA_real_
+    ),
+    3
+  ),
   Unité = c(
-    "pts log", "pts log",
-    "pts log", "pts log",
-    "k Ariary", "k Ariary",
-    "pts log", "pts log"
+    "pts log",
+    "pts log",
+    "pts log",
+    "pts log",
+    "k Ariary",
+    "k Ariary",
+    "pts log",
+    "pts log"
   )
 ) |>
   gt() |>
@@ -592,7 +655,10 @@ tibble(
   tab_row_group(label = "Robustesse 3 : SDID", rows = 7:8) |>
   tab_row_group(label = "Robustesse 2 : niveaux (Ariary)", rows = 5:6) |>
   tab_row_group(label = "Robustesse 1 : log revenu non ajusté", rows = 3:4) |>
-  tab_row_group(label = "Principale : log(revenu équivalisé OCDE)", rows = 1:2) |>
+  tab_row_group(
+    label = "Principale : log(revenu équivalisé OCDE)",
+    rows = 1:2
+  ) |>
   tab_style(
     style = cell_fill(color = "#FFCDD2"),
     locations = cells_body(rows = c(1, 3, 5, 7))
@@ -610,5 +676,3 @@ Trois résultats clés :
 3. **Lac Alaotra** : le résultat nul est **robuste à toutes les spécifications**. Ni la spécification non ajustée, ni celle en niveaux, ni le SDID ne produisent un effet statistiquement significatif.
 
 Les estimations SDID pour Ankarafantsika concordent qualitativement avec gsynth, renforçant la confiance dans le résultat principal. La convergence de trois stratégies d'identification distinctes — effets fixes interactifs (gsynth), repondération doublement robuste (SDID) et DiD standard — renforce la conclusion que l'effet d'application stricte n'est pas un artefact de la méthode d'estimation.
-
-````

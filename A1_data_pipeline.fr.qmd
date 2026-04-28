@@ -1,4 +1,3 @@
-````quarto
 ---
 title: "Pipeline de données"
 subtitle: "Géoréférencement, chevauchements avec les AP et harmonisation des variables"
@@ -45,7 +44,6 @@ Après l'attribution des communes, une fonction dédiée `fuzzy_match_village()`
 #| fig-cap: "Toutes les communes et fokontany SOR appariés à Madagascar."
 #| fig-height: 10
 #| fig-width: 8
-
 # Aggregate communes per observatory for labelling
 obs_union <- obs_communes |>
   group_by(OBS_CODE) |>
@@ -62,20 +60,41 @@ obs_pts <- bind_cols(
 )
 
 ggplot() +
-  geom_sf(data = madagascar, fill = "grey97", colour = "grey80", linewidth = 0.2) +
-  geom_sf(data = obs_communes, aes(fill = factor(OBS_CODE)),
-          colour = "grey50", linewidth = 0.2, alpha = 0.6) +
-  geom_sf(data = sel_fokontany,
-          fill = NA, colour = "grey30", linewidth = 0.1, linetype = "dotted") +
+  geom_sf(
+    data = madagascar,
+    fill = "grey97",
+    colour = "grey80",
+    linewidth = 0.2
+  ) +
+  geom_sf(
+    data = obs_communes,
+    aes(fill = factor(OBS_CODE)),
+    colour = "grey50",
+    linewidth = 0.2,
+    alpha = 0.6
+  ) +
+  geom_sf(
+    data = sel_fokontany,
+    fill = NA,
+    colour = "grey30",
+    linewidth = 0.1,
+    linetype = "dotted"
+  ) +
   geom_label_repel(
-    data = obs_pts, aes(x = X, y = Y, label = OBS_NAME),
-    size = 2.2, fontface = "bold",
-    fill = alpha("white", 0.85), label.size = 0.15,
-    box.padding = 0.4, max.overlaps = 20
+    data = obs_pts,
+    aes(x = X, y = Y, label = OBS_NAME),
+    size = 2.2,
+    fontface = "bold",
+    fill = alpha("white", 0.85),
+    label.size = 0.15,
+    box.padding = 0.4,
+    max.overlaps = 20
   ) +
   scale_fill_brewer(palette = "Paired", guide = "none") +
-  labs(title = "Localités SOR géoréférencées",
-       subtitle = "Polygones communaux (remplis) avec limites de fokontany appariées (pointillés)") +
+  labs(
+    title = "Localités SOR géoréférencées",
+    subtitle = "Polygones communaux (remplis) avec limites de fokontany appariées (pointillés)"
+  ) +
   theme_void(base_size = 10) +
   theme(plot.title = element_text(face = "bold"))
 ```
@@ -96,22 +115,42 @@ Les polygones de communes et *fokontany* SOR sont croisés avec le **WDPA dynami
 #| fig-cap: "Communes d'enquête SOR (colorées par observatoire) superposées aux limites des AP (vert foncé)."
 #| fig-height: 10
 #| fig-width: 8
-
 ggplot() +
-  geom_sf(data = madagascar, fill = "grey97", colour = "grey80", linewidth = 0.2) +
-  geom_sf(data = dyn_study, fill = "#2E7D32", colour = "#2E7D32",
-          alpha = 0.25, linewidth = 0.3) +
-  geom_sf(data = obs_communes, aes(fill = factor(OBS_CODE)),
-          colour = "grey40", linewidth = 0.25, alpha = 0.6) +
+  geom_sf(
+    data = madagascar,
+    fill = "grey97",
+    colour = "grey80",
+    linewidth = 0.2
+  ) +
+  geom_sf(
+    data = dyn_study,
+    fill = "#2E7D32",
+    colour = "#2E7D32",
+    alpha = 0.25,
+    linewidth = 0.3
+  ) +
+  geom_sf(
+    data = obs_communes,
+    aes(fill = factor(OBS_CODE)),
+    colour = "grey40",
+    linewidth = 0.25,
+    alpha = 0.6
+  ) +
   geom_label_repel(
-    data = obs_pts, aes(x = X, y = Y, label = OBS_NAME),
-    size = 2.2, fontface = "bold",
-    fill = alpha("white", 0.85), label.size = 0.15,
-    box.padding = 0.4, max.overlaps = 20
+    data = obs_pts,
+    aes(x = X, y = Y, label = OBS_NAME),
+    size = 2.2,
+    fontface = "bold",
+    fill = alpha("white", 0.85),
+    label.size = 0.15,
+    box.padding = 0.4,
+    max.overlaps = 20
   ) +
   scale_fill_brewer(palette = "Paired", guide = "none") +
-  labs(title = "Communes d'enquête SOR et limites des aires protégées",
-       subtitle = "Vert : limites des AP (WDPA dynamique) · Coloré : communes d'enquête") +
+  labs(
+    title = "Communes d'enquête SOR et limites des aires protégées",
+    subtitle = "Vert : limites des AP (WDPA dynamique) · Coloré : communes d'enquête"
+  ) +
   theme_void(base_size = 10) +
   theme(plot.title = element_text(face = "bold"))
 ```
@@ -123,7 +162,6 @@ Les ensembles de données au niveau des ménages pour 1995–2015 sont chargés 
 ```{r}
 #| label: tbl-survey-inventory
 #| tbl-cap: "Nombre de ménages enquêtés par observatoire et par année (1995–2015)."
-
 obs_names_full <- bind_rows(
   obs_locations |> mutate(obs = code) |> select(obs, name),
   tibble(obs = "12", name = "Antsohihy")
@@ -173,38 +211,51 @@ Les années de création officielles ont été vérifiées par rapport à la bas
 #| fig-cap: "Chronologie des années d'enquête SOR (points bleus) et des années de création des AP révisées (triangles rouges) pour les paires observatoire–AP prioritaires."
 #| fig-height: 7
 #| fig-width: 10
-
 survey_coverage <- household_consolidated |>
   distinct(obs, year) |>
   left_join(obs_names_full, by = "obs") |>
   mutate(name = coalesce(name, paste0("Obs ", obs)))
 
 pa_events <- tribble(
-  ~name, ~pa_name, ~pa_year,
-  "Marovoay", "Ankarafantsika NP", TREAT_YEAR_MARO,
-  "Alaotra", "Lac Alaotra PHP", TREAT_YEAR_ALA,
-  "Farafangana", "Corridor Ambositra-Vondrozo", TREAT_YEAR_FARA,
-  "Toliara Nord", "Amoron'i Onilahy", TREAT_YEAR_TOL,
-  "Fénérive Est", "Réserve de Tampolo", TREAT_YEAR_FEN
+  ~name          , ~pa_name                      , ~pa_year        ,
+  "Marovoay"     , "Ankarafantsika NP"           , TREAT_YEAR_MARO ,
+  "Alaotra"      , "Lac Alaotra PHP"             , TREAT_YEAR_ALA  ,
+  "Farafangana"  , "Corridor Ambositra-Vondrozo" , TREAT_YEAR_FARA ,
+  "Toliara Nord" , "Amoron'i Onilahy"            , TREAT_YEAR_TOL  ,
+  "Fénérive Est" , "Réserve de Tampolo"          , TREAT_YEAR_FEN
 )
 
 ggplot() +
-  geom_point(data = survey_coverage,
-             aes(x = year, y = name), colour = "#1565C0",
-             size = 2.5, alpha = 0.7) +
-  geom_point(data = pa_events,
-             aes(x = pa_year, y = name), colour = "#D32F2F",
-             shape = 17, size = 4) +
+  geom_point(
+    data = survey_coverage,
+    aes(x = year, y = name),
+    colour = "#1565C0",
+    size = 2.5,
+    alpha = 0.7
+  ) +
+  geom_point(
+    data = pa_events,
+    aes(x = pa_year, y = name),
+    colour = "#D32F2F",
+    shape = 17,
+    size = 4
+  ) +
   geom_text_repel(
     data = pa_events,
     aes(x = pa_year, y = name, label = pa_name),
-    colour = "#D32F2F", size = 2.5, nudge_y = 0.3,
-    fontface = "italic", max.overlaps = 10
+    colour = "#D32F2F",
+    size = 2.5,
+    nudge_y = 0.3,
+    fontface = "italic",
+    max.overlaps = 10
   ) +
   scale_x_continuous(breaks = seq(1995, 2015, 2)) +
-  labs(x = "Année", y = NULL,
-       title = "Couverture des enquêtes SOR et dates d'exposition aux AP",
-       subtitle = "Points bleus : années d'enquête · Triangles rouges : création/extension des AP") +
+  labs(
+    x = "Année",
+    y = NULL,
+    title = "Couverture des enquêtes SOR et dates d'exposition aux AP",
+    subtitle = "Points bleus : années d'enquête · Triangles rouges : création/extension des AP"
+  ) +
   theme_minimal(base_size = 11) +
   theme(panel.grid.minor = element_blank())
 ```
@@ -268,19 +319,18 @@ L'échelle d'équivalence OCDE modifiée assigne un poids de 1,0 au premier adul
 ```{r}
 #| label: tbl-income-components
 #| tbl-cap: "Construction des composantes du revenu et sources des variables."
-
 tribble(
-  ~Composante, ~Variables, ~Couverture, ~Notes,
-  "Revenu riz (net)", "rev_riz", "1995–2015", "Recettes moins coûts de production",
-  "Autres cultures", "rev_cu", "1995–2015", "Cultures de rente, fruits, légumes",
-  "Élevage", "revel", "1995–2015", "Bovins, volailles, autres animaux",
-  "Pêche", "revpeche", "1995–2015", "Eau douce et côtière",
-  "Activité principale", "revppal", "1995–2015", "Activité non agricole principale",
-  "Activité secondaire", "revsec", "1995–2015", "Activité non agricole secondaire",
-  "Revenu courant", "revcou", "Dérivé", "Somme des 6 composantes ci-dessus",
-  "Revenu exceptionnel", "revext", "1995–2015", "Rentes, transferts, HIMO, ventes d'actifs",
-  "Revenu total", "revtot", "Dérivé", "Courant + exceptionnel",
-  "Revenu équivalisé OCDE", "revtot / oecd_equiv", "Dérivé", "Échelle : 1,0 + 0,5×(adultes−1) + 0,3×enfants"
+  ~Composante              , ~Variables            , ~Couverture , ~Notes                                          ,
+  "Revenu riz (net)"       , "rev_riz"             , "1995–2015" , "Recettes moins coûts de production"            ,
+  "Autres cultures"        , "rev_cu"              , "1995–2015" , "Cultures de rente, fruits, légumes"            ,
+  "Élevage"                , "revel"               , "1995–2015" , "Bovins, volailles, autres animaux"             ,
+  "Pêche"                  , "revpeche"            , "1995–2015" , "Eau douce et côtière"                          ,
+  "Activité principale"    , "revppal"             , "1995–2015" , "Activité non agricole principale"              ,
+  "Activité secondaire"    , "revsec"              , "1995–2015" , "Activité non agricole secondaire"              ,
+  "Revenu courant"         , "revcou"              , "Dérivé"    , "Somme des 6 composantes ci-dessus"             ,
+  "Revenu exceptionnel"    , "revext"              , "1995–2015" , "Rentes, transferts, HIMO, ventes d'actifs"     ,
+  "Revenu total"           , "revtot"              , "Dérivé"    , "Courant + exceptionnel"                        ,
+  "Revenu équivalisé OCDE" , "revtot / oecd_equiv" , "Dérivé"    , "Échelle : 1,0 + 0,5×(adultes−1) + 0,3×enfants"
 ) |>
   gt() |>
   tab_header(
@@ -290,7 +340,8 @@ tribble(
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_body(
-      rows = Composante %in% c("Revenu courant", "Revenu total", "Revenu équivalisé OCDE")
+      rows = Composante %in%
+        c("Revenu courant", "Revenu total", "Revenu équivalisé OCDE")
     )
   )
 ```
@@ -299,4 +350,4 @@ tribble(
 
 Toutes les tables de composantes sont dédupliquées à des identifiants (année, ménage) uniques via agrégation par moyenne, puis jointes à gauche en un seul jeu de données : `household_consolidated.rds` ({{< var n_hh_obs >}} observations ménage-année dans {{< var n_obs >}} observatoires). Une vérification d'unicité confirme une ligne par ménage et par année.
 
-````
+

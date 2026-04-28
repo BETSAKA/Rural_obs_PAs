@@ -103,5 +103,3 @@ Lorsque la vague d'enquête 2026 sera disponible, la spécification principale s
 
 Ce chapitre sera mis à jour lorsque les données 2026 seront disponibles. Les résultats gsynth actuels doivent être lus comme une analyse de première passe qui sera complétée par une estimation au niveau des ménages exploitant toute la profondeur des données.
 
-
-# Références {.unnumbered}
