@@ -1,4 +1,3 @@
-````quarto
 ---
 title: "La conservation à Madagascar"
 subtitle: "Aires protégées, modèles de gouvernance et conditions de vie rurales"
@@ -189,4 +188,3 @@ En utilisant les méthodes de contrôle synthétique généralisé [@Xu2017] ave
 
 La suite de ce document est structurée comme suit. Le [Chapitre 2](02_data.qmd) décrit les sources de données et la construction des variables. Le [Chapitre 3](03_strategy.qmd) détaille la stratégie d'identification et les méthodes d'estimation. Le [Chapitre 4](04_results.qmd) présente les résultats principaux pour Ankarafantsika et Alaotra. Le [Chapitre 5](05_extensions.qmd) étend l'analyse à trois sites supplémentaires. Le [Chapitre 6](06_discussion.qmd) discute des implications politiques et expose les plans de la vague d'enquête 2026.
 
-````

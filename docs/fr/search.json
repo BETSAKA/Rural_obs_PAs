@@ -12,287 +12,287 @@
   {
     "objectID": "01_context.fr.html",
     "href": "01_context.fr.html",
-    "title": "1  ````quarto",
+    "title": "1  La conservation à Madagascar",
     "section": "",
-    "text": "title: “La conservation à Madagascar” subtitle: “Aires protégées, modèles de gouvernance et conditions de vie rurales” —\n\n2 L’expansion du système des aires protégées\nLa communauté internationale s’est engagée à protéger 30 % des terres et des mers mondiales d’ici 2030 dans le cadre du Cadre mondial pour la biodiversité de Kunming-Montréal. Pour des pays riches en biodiversité comme Madagascar, cet objectif se traduit par une impulsion soutenue d’expansion et de renforcement des réseaux d’aires protégées. Madagascar a répondu précocement : lors du Congrès mondial des parcs de Durban en 2003, le président Ravalomanana a annoncé la Vision Durban — un engagement à tripler la superficie des aires protégées du pays, de 1,7 million à 6 millions d’hectares (Kremen et al. 2006), soit de 3 % à environ 10 % du territoire national. D’ici 2015, le Système des Aires Protégées de Madagascar (SAPM) était passé de 47 à plus de 160 aires protégées, couvrant près de 12 % du territoire national.\nCette expansion n’a pas été monolithique. Le SAPM a introduit une diversité de modèles de gouvernance, allant des parcs nationaux strictement protégés sous la gestion de Madagascar National Parks (MNP) à des paysages multifonctionnels co-gérés par des ONG internationales et des communautés locales via des transferts de gestion. Le système de classification de l’UICN capture ce spectre : les parcs de catégorie II privilégient l’intégrité des écosystèmes avec une utilisation humaine limitée, tandis que les catégories V et VI permettent l’extraction durable des ressources et la participation communautaire.\nLes conséquences en termes de bien-être de cette expansion pour les communautés rurales adjacentes restent contestées. Une littérature quasi-expérimentale croissante constate des effets hétérogènes des aires protégées dans le monde : certaines études documentent des impacts négatifs sur les revenus et la consommation locaux (Andam et al. 2010; Sims 2010), tandis que d’autres trouvent des effets neutres ou positifs, notamment lorsque les aires protégées génèrent des revenus touristiques ou des services écosystémiques (Naidoo et al. 2019). Il y a lieu de supposer que les modestes effets positifs observés ailleurs pourraient ne pas se matérialiser à Madagascar, car la prévalence extrême de la pauvreté intensifie la dépendance de la population locale aux ressources naturelles, le tourisme reste d’un ordre de grandeur inférieur à celui d’autres points chauds de biodiversité, et la faiblesse de la gouvernance pourrait compromettre l’engagement des parties prenantes et les mécanismes de partage des bénéfices. À Madagascar spécifiquement, les données restent limitées et principalement transversales (Ferraro et al. 2011). Les rares études causales se concentrent sur les résultats en matière de déforestation plutôt que sur les moyens de subsistance des ménages.\nUne question centrale dans ce débat est de savoir si le modèle de gouvernance d’une aire protégée importe pour les populations qui y vivent. La conservation strictement exclusive et la gestion participative communautaire représentent des dispositifs fondamentalement différents avec les populations locales. Pourtant, la plupart des études empiriques traitent les aires protégées comme des interventions homogènes, comparant « protégé » et « non protégé » plutôt qu’en examinant comment différents dispositifs institutionnels médiatisent les effets sur les moyens de subsistance.\n\n\n\n\n\n\n\n\nFigure 2.1: Superficie totale cumulée des aires protégées à Madagascar par catégorie UICN. Données de la couche WDPA dynamique ; chaque aire protégée entre à sa date de création légale la plus ancienne. La vague post-Durban (après 2003) est dominée par les catégories V et VI (multifonctionnelles).\n\n\n\n\n\n\n\n3 Les enquêtes des Observatoires Ruraux\nCette étude exploite un jeu de données longitudinal rare : le Système des Observatoires Ruraux (SOR), un réseau d’observatoires ruraux menés à travers Madagascar entre 1995 et 2015. Coordonné par l’INSTAT puis le ministère de l’Agriculture, avec le soutien technique de l’IRD et le financement de bailleurs internationaux, le SOR a enquêté environ 500 ménages par observatoire et par an dans jusqu’à 28 sites, couvrant les diverses zones agroécologiques du pays — des basses terres humides de l’est aux zones semi-arides du sud (Razafindrakoto et al. 2015).\n\n\n\n\n\n\n\n\nFigure 3.1: Localisation approximative des observatoires ruraux et années d’enquête\n\n\n\n\n\nLe SOR fonctionne comme un panel rotatif : chaque observatoire suit un ensemble fixe de ménages, mais environ 15 % quittent l’échantillon chaque année par décès, migration ou attrition, avec des remplacements tirés du cadre d’échantillonnage d’origine. Sur une décennie, l’attrition cumulée atteint environ 80 % de la cohorte initiale. Cette conception limite l’analyse de panel au niveau individuel, mais préserve la représentativité transversale à chaque vague : les agrégats village-année estiment de manière cohérente les mêmes quantités de population, ce qui rend les données bien adaptées aux méthodes quasi-expérimentelles au niveau des sites.\nDe manière cruciale, plusieurs observatoires ruraux sont situés à proximité d’aires protégées qui ont été étendues ou créées pendant la période d’enquête (2002–2008). Ce chevauchement entre vingt ans d’enquêtes ménages et des interventions de conservation échelonnées fournit un laboratoire naturel pour l’évaluation d’impact — qui n’a pas encore été systématiquement exploité.\nUne ré-enquête en 2025 de deux sites clés (Marovoay et Alaotra) ajoute une perspective à long terme, permettant d’évaluer si les effets à court terme persistent plus de vingt ans après le début de l’exposition. Une nouvelle vague en 2026 est prévue pour étendre la couverture à des observatoires supplémentaires.\n\n\n4 Question de recherche\nNous posons la question suivante : le modèle de gouvernance d’une aire protégée affecte-t-il le revenu des ménages dans les communautés riveraines ?\nNous comparons deux expériences naturelles incluses dans les données du SOR :\n\nConservation stricte : l’extension de 2002 du parc national d’Ankarafantsika (catégorie II de l’UICN), géré par MNP. L’observatoire de Marovoay chevauche la limite du parc, la rivière Betsiboka créant une frontière naturelle d’exposition-contrôle entre les villages de la rive est (adjacents au parc) et les villages de la rive ouest (effectivement séparés par le fleuve).\nConservation multifonctionnelle : la création de la nouvelle aire protégée du Lac Alaotra (catégorie VI de l’UICN), gérée par Durrell Wildlife Conservation Trust par le biais de la gestion communautaire des ressources naturelles, avec une application effective à partir d’environ 2008. L’ensemble de l’observatoire d’Alaotra partage une dépendance à l’écosystème lacustre et marécageux.\n\nEn utilisant les méthodes de contrôle synthétique généralisé (Xu 2017) avec un pool de donneurs élargi comprenant jusqu’à neuf observatoires supplémentaires, nous estimons l’effet moyen du traitement sur les traités (ATT) pour le revenu équivalisé des ménages. Nous étendons ensuite l’analyse à trois paires observatoire–aire protégée supplémentaires (Farafangana, Toliara Nord, Fénérive Est) où des aires protégées ont été créées en 2006–2007, exploitant le calendrier échelonné pour renforcer l’identification.\nLa suite de ce document est structurée comme suit. Le Chapitre 2 décrit les sources de données et la construction des variables. Le Chapitre 3 détaille la stratégie d’identification et les méthodes d’estimation. Le Chapitre 4 présente les résultats principaux pour Ankarafantsika et Alaotra. Le Chapitre 5 étend l’analyse à trois sites supplémentaires. Le Chapitre 6 discute des implications politiques et expose les plans de la vague d’enquête 2026.\n````\n\n\n\n\nAndam, Kwaw S., Paul J. Ferraro, Katharine R. E. Sims, Andrew Healy, et Margaret B. Holland. 2010. « Protected Areas Reduced Poverty in Costa Rica and Thailand ». Proceedings of the National Academy of Sciences 107 (22): 9996‑10001. https://doi.org/10.1073/pnas.0914177107.\n\n\nFerraro, Paul J., Merlin M. Hanauer, et Katharine R. E. Sims. 2011. « The Effectiveness of Protected Areas in Reducing Deforestation in Madagascar ». Journal of Environmental Economics and Management 62 (2): 261‑77. https://doi.org/10.1016/j.jeem.2011.01.012.\n\n\nKremen, Claire, A. Cameron, et A. Razafimpahanana. 2006. « Terrestrial Biodiversity ». In The Natural History of Madagascar, édité par Steven M. Goodman et Jonathan P. Benstead.\n\n\nNaidoo, Robin, Drew Gerkey, David Hole, et al. 2019. « Evaluating the Impacts of Protected Areas on Human Well-Being across the Developing World ». Science Advances 5 (4): eaav3006. https://doi.org/10.1126/sciadv.aav3006.\n\n\nRazafindrakoto, Mireille, François Roubaud, et Jean-Michel Wachsberger. 2015. « Les observatoires ruraux de Madagascar: une infrastructure de recherche pour le suivi des conditions de vie en milieu rural ». In Madagascar: évaluer les politiques publiques en période de crise. Karthala.\n\n\nSims, Katharine R. E. 2010. « Measuring the Effects of Protected Areas on Deforestation in Madagascar ». Journal of Environmental Economics and Management 59 (2): 180‑90. https://doi.org/10.1016/j.jeem.2009.10.003.\n\n\nXu, Yiqing. 2017. « Generalized Synthetic Control Method: Causal Inference with Interactive Fixed Effects Models ». Political Analysis 25 (1): 57‑76. https://doi.org/10.1017/pan.2016.2.",
+    "text": "2 L’expansion du système des aires protégées\nLa communauté internationale s’est engagée à protéger 30 % des terres et des mers mondiales d’ici 2030 dans le cadre du Cadre mondial pour la biodiversité de Kunming-Montréal. Pour des pays riches en biodiversité comme Madagascar, cet objectif se traduit par une impulsion soutenue d’expansion et de renforcement des réseaux d’aires protégées. Madagascar a répondu précocement : lors du Congrès mondial des parcs de Durban en 2003, le président Ravalomanana a annoncé la Vision Durban — un engagement à tripler la superficie des aires protégées du pays, de 1,7 million à 6 millions d’hectares (Kremen et al. 2006), soit de 3 % à environ 10 % du territoire national. D’ici 2015, le Système des Aires Protégées de Madagascar (SAPM) était passé de 47 à plus de 160 aires protégées, couvrant près de 12 % du territoire national.\nCette expansion n’a pas été monolithique. Le SAPM a introduit une diversité de modèles de gouvernance, allant des parcs nationaux strictement protégés sous la gestion de Madagascar National Parks (MNP) à des paysages multifonctionnels co-gérés par des ONG internationales et des communautés locales via des transferts de gestion. Le système de classification de l’UICN capture ce spectre : les parcs de catégorie II privilégient l’intégrité des écosystèmes avec une utilisation humaine limitée, tandis que les catégories V et VI permettent l’extraction durable des ressources et la participation communautaire.\nLes conséquences en termes de bien-être de cette expansion pour les communautés rurales adjacentes restent contestées. Une littérature quasi-expérimentale croissante constate des effets hétérogènes des aires protégées dans le monde : certaines études documentent des impacts négatifs sur les revenus et la consommation locaux (Andam et al. 2010; Sims 2010), tandis que d’autres trouvent des effets neutres ou positifs, notamment lorsque les aires protégées génèrent des revenus touristiques ou des services écosystémiques (Naidoo et al. 2019). Il y a lieu de supposer que les modestes effets positifs observés ailleurs pourraient ne pas se matérialiser à Madagascar, car la prévalence extrême de la pauvreté intensifie la dépendance de la population locale aux ressources naturelles, le tourisme reste d’un ordre de grandeur inférieur à celui d’autres points chauds de biodiversité, et la faiblesse de la gouvernance pourrait compromettre l’engagement des parties prenantes et les mécanismes de partage des bénéfices. À Madagascar spécifiquement, les données restent limitées et principalement transversales (Ferraro et al. 2011). Les rares études causales se concentrent sur les résultats en matière de déforestation plutôt que sur les moyens de subsistance des ménages.\nUne question centrale dans ce débat est de savoir si le modèle de gouvernance d’une aire protégée importe pour les populations qui y vivent. La conservation strictement exclusive et la gestion participative communautaire représentent des dispositifs fondamentalement différents avec les populations locales. Pourtant, la plupart des études empiriques traitent les aires protégées comme des interventions homogènes, comparant « protégé » et « non protégé » plutôt qu’en examinant comment différents dispositifs institutionnels médiatisent les effets sur les moyens de subsistance.\n\n\n\n\n\n\n\n\nFigure 2.1: Superficie totale cumulée des aires protégées à Madagascar par catégorie UICN. Données de la couche WDPA dynamique ; chaque aire protégée entre à sa date de création légale la plus ancienne. La vague post-Durban (après 2003) est dominée par les catégories V et VI (multifonctionnelles).\n\n\n\n\n\n\n\n3 Les enquêtes des Observatoires Ruraux\nCette étude exploite un jeu de données longitudinal rare : le Système des Observatoires Ruraux (SOR), un réseau d’observatoires ruraux menés à travers Madagascar entre 1995 et 2015. Coordonné par l’INSTAT puis le ministère de l’Agriculture, avec le soutien technique de l’IRD et le financement de bailleurs internationaux, le SOR a enquêté environ 500 ménages par observatoire et par an dans jusqu’à 28 sites, couvrant les diverses zones agroécologiques du pays — des basses terres humides de l’est aux zones semi-arides du sud (Razafindrakoto et al. 2015).\n\n\n\n\n\n\n\n\nFigure 3.1: Localisation approximative des observatoires ruraux et années d’enquête\n\n\n\n\n\nLe SOR fonctionne comme un panel rotatif : chaque observatoire suit un ensemble fixe de ménages, mais environ 15 % quittent l’échantillon chaque année par décès, migration ou attrition, avec des remplacements tirés du cadre d’échantillonnage d’origine. Sur une décennie, l’attrition cumulée atteint environ 80 % de la cohorte initiale. Cette conception limite l’analyse de panel au niveau individuel, mais préserve la représentativité transversale à chaque vague : les agrégats village-année estiment de manière cohérente les mêmes quantités de population, ce qui rend les données bien adaptées aux méthodes quasi-expérimentelles au niveau des sites.\nDe manière cruciale, plusieurs observatoires ruraux sont situés à proximité d’aires protégées qui ont été étendues ou créées pendant la période d’enquête (2002–2008). Ce chevauchement entre vingt ans d’enquêtes ménages et des interventions de conservation échelonnées fournit un laboratoire naturel pour l’évaluation d’impact — qui n’a pas encore été systématiquement exploité.\nUne ré-enquête en 2025 de deux sites clés (Marovoay et Alaotra) ajoute une perspective à long terme, permettant d’évaluer si les effets à court terme persistent plus de vingt ans après le début de l’exposition. Une nouvelle vague en 2026 est prévue pour étendre la couverture à des observatoires supplémentaires.\n\n\n4 Question de recherche\nNous posons la question suivante : le modèle de gouvernance d’une aire protégée affecte-t-il le revenu des ménages dans les communautés riveraines ?\nNous comparons deux expériences naturelles incluses dans les données du SOR :\n\nConservation stricte : l’extension de 2002 du parc national d’Ankarafantsika (catégorie II de l’UICN), géré par MNP. L’observatoire de Marovoay chevauche la limite du parc, la rivière Betsiboka créant une frontière naturelle d’exposition-contrôle entre les villages de la rive est (adjacents au parc) et les villages de la rive ouest (effectivement séparés par le fleuve).\nConservation multifonctionnelle : la création de la nouvelle aire protégée du Lac Alaotra (catégorie VI de l’UICN), gérée par Durrell Wildlife Conservation Trust par le biais de la gestion communautaire des ressources naturelles, avec une application effective à partir d’environ 2008. L’ensemble de l’observatoire d’Alaotra partage une dépendance à l’écosystème lacustre et marécageux.\n\nEn utilisant les méthodes de contrôle synthétique généralisé (Xu 2017) avec un pool de donneurs élargi comprenant jusqu’à neuf observatoires supplémentaires, nous estimons l’effet moyen du traitement sur les traités (ATT) pour le revenu équivalisé des ménages. Nous étendons ensuite l’analyse à trois paires observatoire–aire protégée supplémentaires (Farafangana, Toliara Nord, Fénérive Est) où des aires protégées ont été créées en 2006–2007, exploitant le calendrier échelonné pour renforcer l’identification.\nLa suite de ce document est structurée comme suit. Le Chapitre 2 décrit les sources de données et la construction des variables. Le Chapitre 3 détaille la stratégie d’identification et les méthodes d’estimation. Le Chapitre 4 présente les résultats principaux pour Ankarafantsika et Alaotra. Le Chapitre 5 étend l’analyse à trois sites supplémentaires. Le Chapitre 6 discute des implications politiques et expose les plans de la vague d’enquête 2026.\n\n\n\n\nAndam, Kwaw S., Paul J. Ferraro, Katharine R. E. Sims, Andrew Healy, et Margaret B. Holland. 2010. « Protected Areas Reduced Poverty in Costa Rica and Thailand ». Proceedings of the National Academy of Sciences 107 (22): 9996‑10001. https://doi.org/10.1073/pnas.0914177107.\n\n\nFerraro, Paul J., Merlin M. Hanauer, et Katharine R. E. Sims. 2011. « The Effectiveness of Protected Areas in Reducing Deforestation in Madagascar ». Journal of Environmental Economics and Management 62 (2): 261‑77. https://doi.org/10.1016/j.jeem.2011.01.012.\n\n\nKremen, Claire, A. Cameron, et A. Razafimpahanana. 2006. « Terrestrial Biodiversity ». In The Natural History of Madagascar, édité par Steven M. Goodman et Jonathan P. Benstead.\n\n\nNaidoo, Robin, Drew Gerkey, David Hole, et al. 2019. « Evaluating the Impacts of Protected Areas on Human Well-Being across the Developing World ». Science Advances 5 (4): eaav3006. https://doi.org/10.1126/sciadv.aav3006.\n\n\nRazafindrakoto, Mireille, François Roubaud, et Jean-Michel Wachsberger. 2015. « Les observatoires ruraux de Madagascar: une infrastructure de recherche pour le suivi des conditions de vie en milieu rural ». In Madagascar: évaluer les politiques publiques en période de crise. Karthala.\n\n\nSims, Katharine R. E. 2010. « Measuring the Effects of Protected Areas on Deforestation in Madagascar ». Journal of Environmental Economics and Management 59 (2): 180‑90. https://doi.org/10.1016/j.jeem.2009.10.003.\n\n\nXu, Yiqing. 2017. « Generalized Synthetic Control Method: Causal Inference with Interactive Fixed Effects Models ». Political Analysis 25 (1): 57‑76. https://doi.org/10.1017/pan.2016.2.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>La conservation à Madagascar</span>"
     ]
   },
   {
     "objectID": "02_data.fr.html",
     "href": "02_data.fr.html",
-    "title": "2  ````quarto",
+    "title": "2  Données",
     "section": "",
-    "text": "title: “Données” subtitle: “Enquêtes des Observatoires Ruraux, géoréférencement et construction des variables” —\nCe chapitre résume le processus de construction des données. Le flux de travail reproductible complet — géoréférencement, analyse des chevauchements avec les aires protégées et harmonisation des variables — est documenté dans l’Annexe A. Les données d’enquête sous-jacentes sont décrites dans un article de données connexe (Andrianjafindrainibe et al. 2024).\n\n3 Données d’enquête\nLe Système des Observatoires Ruraux (SOR) a enquêté des ménages ruraux à travers Madagascar de 1995 à 2015. De nombreux observatoires n’ont été actifs que quelques années. Nous utilisons 11 observatoires actifs dès 1999–2000 et disposant d’au moins 6 années de données d’enquête. Ce jeu de données comprend environ 101,253 observations ménage-année. Chaque observatoire suit environ 500 ménages par an selon un dispositif de panel rotatif, avec remplacement aléatoire des ménages sortants préservant la représentativité transversale.\n\n\n\n\n\n\n\n\nFigure 3.1: Localisation des 11 observatoires ruraux utilisés dans cette étude.\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 3.2: Couverture des données par observatoire et par année d’enquête.\n\n\n\n\n\n\n\n4 Géoréférencement\nLes données d’enquête originales ne comportaient pas de géoréférencement systématique. Les noms de localités étaient enregistrés en texte libre, avec des orthographes incohérentes selon les années et les langues (malgache et français). Nous avons lié chaque observation aux limites administratives officielles à l’aide des Ensembles de Données Opérationnelles Communes (COD), gérés par OCHA et le BNGRC malgache. La procédure complète de géoréférencement est décrite dans la documentation des données connexe.\nLa procédure de correspondance est hiérarchique :\n\nNormalisation des chaînes de caractères : minuscules, suppression des diacritiques et des qualificatifs (centre, haut, bas), standardisation des toponymes bilingues, conversion des chiffres romains en arabes.\nCorrespondance approximative : distance de Jaro-Winkler par rapport au gazettier COD, filtrée par l’appartenance au district de l’observatoire, avec un seuil de distance maximale de 0,25.\nNiveaux spatiaux en cascade : correspondance d’abord au niveau de la commune (ADM3), puis affinée au fokontany (ADM4) lorsque possible.\n\nLe résultat est un tableau de correspondance géocodé reliant chaque identifiant de ménage ROS (j5) à sa commune et son fokontany codés P.\n\n\n5 Chevauchements avec les aires protégées\nLes bases de données standard d’aires protégées — dont la WDPA actuelle et l’atlas Vahatra — n’enregistrent que la frontière et le classement les plus récents de chaque aire protégée. Nous utilisons à la place une WDPA dynamique pour Madagascar — une base de données temporellement explicite qui attribue à chaque état d’une AP un intervalle précis valide-de / valide-à dérivé des textes juridiques CNLEGIS malgaches et des versions historiques de la base de données géospatiale SAPM.\nPour chacun des 11 observatoires d’étude, nous calculons la distance minimale entre les centroïdes de communes (projetés en UTM 38S) et la limite d’AP la plus proche active durant 1999–2014. Toutes les paires (commune, AP) situées à moins de 20 km sont signalées.\n\n\n\n\n\n\n\n\nFigure 5.1: Fenêtres de couverture des enquêtes et événements d’exposition aux AP pour les 11 observatoires d’étude. Les barres montrent la durée d’enquête ; les triangles indiquent la date du décret de classement AP le plus proche.\n\n\n\n\n\nLes deux paires principales — Marovoay / Ankarafantsika (stricte, catégorie II UICN, extension 2003) et Alaotra / Lac Alaotra (multifonctionnelle, catégorie V UICN, décret temporaire 2007) — offrent les fenêtres pré- et post-exposition les plus longues. Trois paires supplémentaires — Farafangana, Toliara Nord et Fénérive Est — fournissent des extensions plus courtes mais informatives (Chapitre 5).\n\n\n6 Variable de résultat\nLa variable de résultat principale est le logarithme du revenu équivalisé des ménages. La construction se déroule comme suit :\n\nRevenu total (revtot) : somme des composantes de revenus courants.\nÉquivalisation : à l’aide de l’échelle OCDE modifiée : \\(1 + 0{,}5 \\times (\\text{adultes supplémentaires}) + 0{,}3 \\times (\\text{enfants de moins de 14 ans})\\).\nWinsorisation : aux 1er et 99e percentiles par année.\nTransformation logarithmique : \\(y_{it} = \\log(\\text{revenu équivalisé}_{it} + 1)\\).\n\n\n\n\n\n\n\n\n\nFigure 6.1: Revenu moyen logarithmique équivalisé dans le temps, par observatoire.\n\n\n\n\n\n\n\n7 Statistiques descriptives\n\n\n\n\nTable 7.1: Statistiques descriptives pour l’échantillon d’analyse.\n\n\n\n\n\n\n\n\n\nStatistiques descriptives de l'échantillon\n\n\nPériode d'analyse : 1999–2014\n\n\ngroup\nN ménage-années\nRevenu moyen (Ar)\nRevenu équivalisé moyen\nTaille moy. ménage\nAnnées d'éduc. moy. (adultes)\n% adulte alphabétisé\n\n\n\n\nMarovoay exposé (est)\n3873\n1,736,175\n700,533\n5.0\n4.4\n92.0\n\n\nMarovoay contrôle (ouest)\n3617\n2,135,445\n833,960\n5.4\n4.5\n91.7\n\n\nAlaotra (exposé)\n7613\n1,893,377\n691,554\n5.1\n4.5\n95.6\n\n\nPool de donneurs\n48052\n1,192,493\n453,894\n5.5\n4.3\n80.1\n\n\n\n\n\n\n\n\n\n\n````\n\n\n\n\nAndrianjafindrainibe, Velomalala Solo, Nicole Andrianirina, Florent Bédécarrats, et al. 2024. « Madagascar Rural Observatory Surveys, a Longitudinal Dataset on Household Living Conditions 1995–2015 ». Scientific Data 11 (1): 1061. https://doi.org/10.1038/s41597-024-03879-9.",
+    "text": "Ce chapitre résume le processus de construction des données. Le flux de travail reproductible complet — géoréférencement, analyse des chevauchements avec les aires protégées et harmonisation des variables — est documenté dans l’Annexe A. Les données d’enquête sous-jacentes sont décrites dans un article de données connexe (Andrianjafindrainibe et al. 2024).\n\n3 Données d’enquête\nLe Système des Observatoires Ruraux (SOR) a enquêté des ménages ruraux à travers Madagascar de 1995 à 2015. De nombreux observatoires n’ont été actifs que quelques années. Nous utilisons 11 observatoires actifs dès 1999–2000 et disposant d’au moins 6 années de données d’enquête. Ce jeu de données comprend environ 101,253 observations ménage-année. Chaque observatoire suit environ 500 ménages par an selon un dispositif de panel rotatif, avec remplacement aléatoire des ménages sortants préservant la représentativité transversale.\n\n\n\n\n\n\n\n\nFigure 3.1: Localisation des 11 observatoires ruraux utilisés dans cette étude.\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 3.2: Couverture des données par observatoire et par année d’enquête.\n\n\n\n\n\n\n\n4 Géoréférencement\nLes données d’enquête originales ne comportaient pas de géoréférencement systématique. Les noms de localités étaient enregistrés en texte libre, avec des orthographes incohérentes selon les années et les langues (malgache et français). Nous avons lié chaque observation aux limites administratives officielles à l’aide des Ensembles de Données Opérationnelles Communes (COD), gérés par OCHA et le BNGRC malgache. La procédure complète de géoréférencement est décrite dans la documentation des données connexe.\nLa procédure de correspondance est hiérarchique :\n\nNormalisation des chaînes de caractères : minuscules, suppression des diacritiques et des qualificatifs (centre, haut, bas), standardisation des toponymes bilingues, conversion des chiffres romains en arabes.\nCorrespondance approximative : distance de Jaro-Winkler par rapport au gazettier COD, filtrée par l’appartenance au district de l’observatoire, avec un seuil de distance maximale de 0,25.\nNiveaux spatiaux en cascade : correspondance d’abord au niveau de la commune (ADM3), puis affinée au fokontany (ADM4) lorsque possible.\n\nLe résultat est un tableau de correspondance géocodé reliant chaque identifiant de ménage ROS (j5) à sa commune et son fokontany codés P.\n\n\n5 Chevauchements avec les aires protégées\nLes bases de données standard d’aires protégées — dont la WDPA actuelle et l’atlas Vahatra — n’enregistrent que la frontière et le classement les plus récents de chaque aire protégée. Nous utilisons à la place une WDPA dynamique pour Madagascar — une base de données temporellement explicite qui attribue à chaque état d’une AP un intervalle précis valide-de / valide-à dérivé des textes juridiques CNLEGIS malgaches et des versions historiques de la base de données géospatiale SAPM.\nPour chacun des 11 observatoires d’étude, nous calculons la distance minimale entre les centroïdes de communes (projetés en UTM 38S) et la limite d’AP la plus proche active durant 1999–2014. Toutes les paires (commune, AP) situées à moins de 20 km sont signalées.\n\n\n\n\n\n\n\n\nFigure 5.1: Fenêtres de couverture des enquêtes et événements d’exposition aux AP pour les 11 observatoires d’étude. Les barres montrent la durée d’enquête ; les triangles indiquent la date du décret de classement AP le plus proche.\n\n\n\n\n\nLes deux paires principales — Marovoay / Ankarafantsika (stricte, catégorie II UICN, extension 2003) et Alaotra / Lac Alaotra (multifonctionnelle, catégorie V UICN, décret temporaire 2007) — offrent les fenêtres pré- et post-exposition les plus longues. Trois paires supplémentaires — Farafangana, Toliara Nord et Fénérive Est — fournissent des extensions plus courtes mais informatives (Chapitre 5).\n\n\n6 Variable de résultat\nLa variable de résultat principale est le logarithme du revenu équivalisé des ménages. La construction se déroule comme suit :\n\nRevenu total (revtot) : somme des composantes de revenus courants.\nÉquivalisation : à l’aide de l’échelle OCDE modifiée : \\(1 + 0{,}5 \\times (\\text{adultes supplémentaires}) + 0{,}3 \\times (\\text{enfants de moins de 14 ans})\\).\nWinsorisation : aux 1er et 99e percentiles par année.\nTransformation logarithmique : \\(y_{it} = \\log(\\text{revenu équivalisé}_{it} + 1)\\).\n\n\n\n\n\n\n\n\n\nFigure 6.1: Revenu moyen logarithmique équivalisé dans le temps, par observatoire.\n\n\n\n\n\n\n\n7 Statistiques descriptives\n\n\n\n\nTable 7.1: Statistiques descriptives pour l’échantillon d’analyse.\n\n\n\n\n\n\n\n\n\nStatistiques descriptives de l'échantillon\n\n\nPériode d'analyse : 1999–2014\n\n\ngroup\nN ménage-années\nRevenu moyen (Ar)\nRevenu équivalisé moyen\nTaille moy. ménage\nAnnées d'éduc. moy. (adultes)\n% adulte alphabétisé\n\n\n\n\nMarovoay exposé (est)\n3873\n1,736,175\n700,533\n5.0\n4.4\n92.0\n\n\nMarovoay contrôle (ouest)\n3617\n2,135,445\n833,960\n5.4\n4.5\n91.7\n\n\nAlaotra (exposé)\n7613\n1,893,377\n691,554\n5.1\n4.5\n95.6\n\n\nPool de donneurs\n48052\n1,192,493\n453,894\n5.5\n4.3\n80.1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nAndrianjafindrainibe, Velomalala Solo, Nicole Andrianirina, Florent Bédécarrats, et al. 2024. « Madagascar Rural Observatory Surveys, a Longitudinal Dataset on Household Living Conditions 1995–2015 ». Scientific Data 11 (1): 1061. https://doi.org/10.1038/s41597-024-03879-9.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Données</span>"
     ]
   },
   {
     "objectID": "03_strategy.fr.html",
     "href": "03_strategy.fr.html",
-    "title": "3  ````quarto",
+    "title": "3  Stratégie d’identification",
     "section": "",
-    "text": "4 Deux expériences naturelles\ntitle: “Stratégie d’identification” subtitle: “Comment nous estimons l’effet causal des aires protégées sur le revenu des ménages” —\nLa question centrale de cette étude est de savoir si la création ou l’extension d’aires protégées a causé des changements dans le revenu des ménages, ou si les différences de revenus observées reflètent simplement des tendances préexistantes. Ce chapitre explique comment nous tentons d’isoler les effets causaux.\nLa stratégie comporte quatre parties. Premièrement, nous définissons deux expériences naturelles proposant des comparaisons exposition–contrôle plausibles (Chapitre 4). Deuxièmement, nous expliquons comment le dispositif d’enquête contraint l’unité d’analyse (Chapitre 5). Troisièmement, nous décrivons la méthode statistique utilisée pour construire des trajectoires de revenu contrefactuelles (Chapitre 6). Quatrièmement, nous présentons brièvement trois cas supplémentaires qui étendent l’analyse (Chapitre 7).\nNous exploitons deux événements survenus pendant la période d’enquête SOR où une AP nouvelle ou étendue a commencé à imposer des restrictions à des communautés précédemment enquêtées. Les deux cas diffèrent dans leur modèle de gouvernance de conservation — exclusion stricte à Ankarafantsika versus gestion participative au Lac Alaotra — offrant une comparaison intégrée de la façon dont le type de gouvernance médiatise les effets sur le revenu.",
+    "text": "4 Deux expériences naturelles\nLa question centrale de cette étude est de savoir si la création ou l’extension d’aires protégées a causé des changements dans le revenu des ménages, ou si les différences de revenus observées reflètent simplement des tendances préexistantes. Ce chapitre explique comment nous tentons d’isoler les effets causaux.\nLa stratégie comporte quatre parties. Premièrement, nous définissons deux expériences naturelles proposant des comparaisons exposition–contrôle plausibles (Chapitre 4). Deuxièmement, nous expliquons comment le dispositif d’enquête contraint l’unité d’analyse (Chapitre 5). Troisièmement, nous décrivons la méthode statistique utilisée pour construire des trajectoires de revenu contrefactuelles (Chapitre 6). Quatrièmement, nous présentons brièvement trois cas supplémentaires qui étendent l’analyse (Chapitre 7).\nNous exploitons deux événements survenus pendant la période d’enquête SOR où une AP nouvelle ou étendue a commencé à imposer des restrictions à des communautés précédemment enquêtées. Les deux cas diffèrent dans leur modèle de gouvernance de conservation — exclusion stricte à Ankarafantsika versus gestion participative au Lac Alaotra — offrant une comparaison intégrée de la façon dont le type de gouvernance médiatise les effets sur le revenu.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Stratégie d'identification</span>"
     ]
   },
   {
     "objectID": "03_strategy.fr.html#sec-treat-maro",
     "href": "03_strategy.fr.html#sec-treat-maro",
-    "title": "3  ````quarto",
+    "title": "3  Stratégie d’identification",
     "section": "4.1 Marovoay et le Parc National d’Ankarafantsika (2003)",
     "text": "4.1 Marovoay et le Parc National d’Ankarafantsika (2003)\n\n4.1.1 L’extension du parc en 2002\nComme illustré sur Figure 4.1, le Parc National d’Ankarafantsika a été formellement étendu par le Décret 2002-798 du 7 août 2002, fusionnant l’ancienne Réserve Naturelle Intégrale (60 500 ha, créée en 1927) avec une réserve forestière en un parc national de 136 500 ha sous catégorie II UICN (conservation stricte de la nature).\nNous fixons l’année d’exposition à 2003, qui est la première année complète d’enquête ROS suivant le décret. Nous testons également si l’utilisation de 2002 au lieu de 2003 modifie le résultat estimé et trouvons une incidence négligeable.\nSelon la littérature grise concordante que nous avons examinée, nous considérons que l’extension de 2002 a été le premier événement à imposer des restrictions d’utilisation des terres contraignantes aux communautés adjacentes à la zone de réserve forestière. Les classements antérieurs avaient des implications de facto très différentes :\n\nLa Réserve Naturelle Intégrale de 1927 couvrait le plateau intérieur au nord-est, géographiquement séparé des communautés de Marovoay.\nLa réserve forestière de 1929 n’était pas une zone de conservation mais une réserve de bois et de ressources. Les analyses de cette période n’ont trouvé aucune application effective.\n\nLe reclassement de 2002 a fusionné ces zones en un seul parc national où l’agriculture sur brûlis (tavy), la production de charbon de bois et l’extraction de produits forestiers non ligneux étaient explicitement interdits et, de manière cruciale, mis en vigueur.\n\n\n4.1.2 La rivière Betsiboka comme barrière naturelle\nL’observatoire de Marovoay comprend quatre fokontany (villages) séparés par la rivière Betsiboka — un cours d’eau important à écoulement permanent. La traversée n’est possible que dans certaines conditions hydrologiques, nécessitant souvent de longs détours ou un transport en bateau coûteux. En pratique, les flux de personnes, de biens et de services s’écoulent le long de l’axe aval de Marovoay plutôt que de traverser la rivière.\nCette caractéristique géographique crée une expérience naturelle : les communautés de la rive est ont un accès pédestre direct au parc, tandis que les communautés de la rive ouest font face à une pénalité d’accès substantielle.\n\n\n\n\nTable 4.1: Assignations d’exposition des sites de Marovoay. Distance à la RNI = distance en ligne droite vers la Réserve Naturelle Intégrale pré-2002 ; Distance au PN = distance vers la limite du parc national post-2002. La distance effective ajoute une pénalité de 15 km de traversée de rivière pour les fokontany de la rive ouest.\n\n\n\n\n\n\n\n\n\nFokontany\nRive\nDist. à la RNI (pré-2002)\nDist. au PN (post-2002)\nRôle\n\n\n\n\nBepako\nEast\n33 km\n5.2 km\nExposé (à partir de 2003)\n\n\nMadiromiongana\nEast\n25.1 km\n11.7 km\nExposé (à partir de 2003)\n\n\nAmpijoroa\nWest\n51.2 km (+ traversée de rivière)\n11.3 km (+ traversée de rivière)\nDonneur (contrôle)\n\n\nMaroala\nWest\n44.7 km (+ traversée de rivière)\n5.6 km (+ traversée de rivière)\nDonneur (contrôle)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 4.1: Observatoire de Marovoay et l’extension Ankarafantsika de 2002. Vert foncé : la Réserve Naturelle Intégrale originale de 1927. Vert clair : l’extension du parc national de 2002. La rivière Betsiboka sépare les fokontany de la rive ouest (donneurs, gris) de ceux de la rive est (exposés, orange).\n\n\n\n\n\n\n\n4.1.3 Validation comportementale à partir de la ré-enquête 2025\nL’assignation d’exposition repose sur l’hypothèse que la rivière Betsiboka sépare effectivement les communautés en groupes « exposés » et « non exposés ». La ré-enquête 2025 fournit un test direct de cette hypothèse.\n\n\n\n\nTable 4.2: Interaction avec l’AP à Marovoay par fokontany (ré-enquête 2025).\n\n\n\n\n\n\n\n\n\nInteraction avec l'AP par Fokontany\n\n\nObservatoire de Marovoay, ré-enquête 2025 (N = 519 ménages)\n\n\nSite\nRive\nN\n% visite zone AP\n% usage extractif\n% cite 'interdit'\n\n\n\n\nBepako\nEst\n123\n49\n11\n19\n\n\nMadiromiongana\nEst\n137\n28\n9\n36\n\n\nAmpijoroa\nOuest\n143\n15\n1\n11\n\n\nMaroala\nOuest\n116\n16\n2\n2\n\n\n\n\n\n\n\n\n\n\nTrois résultats soutiennent l’assignation d’exposition : (1) l’asymétrie de visite (38% des ménages de la rive est visitent le parc contre 15% à l’ouest) ; (2) la conscience de l’interdiction (34% des non-visiteurs à Madiromiongana citent l’interdiction légale) ; (3) la distance comme barrière dominante (54% des non-visiteurs sur les deux rives citent la distance).",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Stratégie d'identification</span>"
     ]
   },
   {
     "objectID": "03_strategy.fr.html#sec-treat-ala",
     "href": "03_strategy.fr.html#sec-treat-ala",
-    "title": "3  ````quarto",
+    "title": "3  Stratégie d’identification",
     "section": "4.2 Lac Alaotra et le Paysage Protégé (2008)",
     "text": "4.2 Lac Alaotra et le Paysage Protégé (2008)\n\n4.2.1 Un modèle de conservation différent\nLe Lac Alaotra est le plus grand lac de Madagascar et un habitat critique pour le lémur des marais d’Alaotra (Hapalemur alaotrensis). La Convention de Ramsar a inscrit le site en 2003. En 2015, le lac et ses zones marécageuses ont été officiellement désignés comme Paysage Harmonieux Protégé (PHP, 425 km², catégorie V UICN). L’application via des accords de gestion communautaire des ressources naturelles (CBNRM) et des transferts de gestion s’est intensifiée à partir d’environ 2008 sous la gestion du Durrell Wildlife Conservation Trust. Nous fixons l’année d’exposition à 2008.\nLa différence clé par rapport à Ankarafantsika est la gouvernance : plutôt qu’une application exclusive interdisant toute extraction de ressources, le cadre CBNRM d’Alaotra régule l’utilisation du lac-marais à travers des règles d’accès gérées communautairement, des fermetures saisonnières de pêche et des accords de restauration des habitats.\n\n\n4.2.2 Pourquoi toutes les communautés d’Alaotra sont exposées\nContrairement à Marovoay, il n’y a pas de barrière naturelle séparant les communautés « exposées » des communautés « non exposées » à Alaotra. Les sept fokontany de l’observatoire affichent tous des interactions modestes mais non négligeables avec l’écosystème lac-marais. Nous traitons donc l’ensemble de l’observatoire comme une unité unique exposée, agrégée à une moyenne de site.\n\n\n\n\n\n\n\n\nFigure 4.2: Observatoire d’Alaotra et aires protégées environnantes. PHP du Lac Alaotra (vert), Corridor Ankeniheny-Zahamena (orange), Parc National de Zahamena (orange clair).\n\n\n\n\n\n\n\n4.2.3 Validation comportementale à partir de la ré-enquête 2025\n\n\n\n\nTable 4.3: Interaction avec l’AP à Alaotra par fokontany (ré-enquête 2025).\n\n\n\n\n\n\n\n\n\nInteraction avec l'AP par Fokontany\n\n\nObservatoire d'Alaotra, ré-enquête 2025 (N = 507 ménages)\n\n\nSite\nN\n% visite zone\n% extractif\n% pêche/chasse\n\n\n\n\nAmbatomanga\n68\n51\n26\n21\n\n\nAmbodivoara\n58\n45\n21\n10\n\n\nAmbohidrony\n52\n54\n21\n13\n\n\nAmbatoharanana\n31\n45\n13\n10\n\n\nAnalamiranga\n46\n41\n13\n4\n\n\nMangabe\n73\n47\n8\n5\n\n\nAvaradrano\n90\n38\n7\n0\n\n\nFeramanga Atsimo\n89\n37\n3\n0\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 4.3: Fréquence de visite de la zone AP par site (ré-enquête 2025).",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Stratégie d'identification</span>"
     ]
   },
   {
     "objectID": "03_strategy.fr.html#sec-rotating-panel",
     "href": "03_strategy.fr.html#sec-rotating-panel",
-    "title": "3  ````quarto",
+    "title": "3  Stratégie d’identification",
     "section": "5.1 La contrainte du panel rotatif",
     "text": "5.1 La contrainte du panel rotatif\nLe SOR peut être interprété comme un panel rotatif plutôt qu’un panel de réinterviews strictes. Cette distinction est cruciale pour l’estimation. Sur un horizon de 10 ans, l’attrition cumulée atteint environ 80% de la cohorte initiale. En conséquence, nous ne pouvons pas suivre les mêmes ménages dans le temps.\nLe dispositif rotatif préserve cependant la représentativité transversale à chaque vague d’enquête : le remplacement aléatoire des ménages sortants garantit que les statistiques village-année estiment le même paramètre de population d’une vague à l’autre.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Stratégie d'identification</span>"
     ]
   },
   {
     "objectID": "03_strategy.fr.html#sec-aggregation",
     "href": "03_strategy.fr.html#sec-aggregation",
-    "title": "3  ````quarto",
+    "title": "3  Stratégie d’identification",
     "section": "5.2 Agrégation au niveau du village",
     "text": "5.2 Agrégation au niveau du village\nNous analysons donc les données au niveau du village (fokontany), en agrégeant les revenus des ménages en médianes village-année. La médiane est préférée à la moyenne car les distributions de revenus ruraux sont asymétriques à droite.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Stratégie d'identification</span>"
     ]
   },
   {
     "objectID": "03_strategy.fr.html#sec-outcome",
     "href": "03_strategy.fr.html#sec-outcome",
-    "title": "3  ````quarto",
+    "title": "3  Stratégie d’identification",
     "section": "5.3 Variable de résultat",
     "text": "5.3 Variable de résultat\nLa variable de résultat principale est le logarithme du revenu équivalisé des ménages, construit en quatre étapes :\n\nRevenu total (revtot) : somme des composantes de revenus.\nÉquivalisation selon l’échelle OCDE modifiée : \\(\\text{equiv} = 1 + 0{,}5 \\times (\\text{adultes supplémentaires}) + 0{,}3 \\times (\\text{enfants de moins de 14 ans})\\).\nWinsorisation aux 1er et 99e percentiles intrayear.\nTransformation logarithmique : \\(y_{it} = \\log(\\text{revenu équivalisé}_{it} + 1)\\).",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Stratégie d'identification</span>"
     ]
   },
   {
     "objectID": "03_strategy.fr.html#sec-donor-pool",
     "href": "03_strategy.fr.html#sec-donor-pool",
-    "title": "3  ````quarto",
+    "title": "3  Stratégie d’identification",
     "section": "6.1 Sélection des communautés donneurs",
     "text": "6.1 Sélection des communautés donneurs\nLe contrefactuel est construit à partir de pools de donneurs — des villages d’observatoires ruraux non exposés à aucune AP pendant la période d’étude. Nous commençons avec 9 observatoires donneurs fournissant environ 60 sites donneurs à travers le pays.\nUn audit spatial systématique (Annexe B) vérifie si ces donneurs sont eux-mêmes adjacents à des AP créées durant 1999–2014 :\n\n\n\n\n\n\n\nStatut\nObservatoires\n\n\n\n\n« Propres »\nAntsirabe (02), Tsiroanomandidy (13), Ambovombe (16), Mahanoro (25), Itasy (41)\n\n\nAussi exposés\nAntsohihy (12), Farafangana (15), Toliara Nord (23), Fénérive Est (24)",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Stratégie d'identification</span>"
     ]
   },
   {
     "objectID": "03_strategy.fr.html#sec-gsynth",
     "href": "03_strategy.fr.html#sec-gsynth",
-    "title": "3  ````quarto",
+    "title": "3  Stratégie d’identification",
     "section": "6.2 Contrôle synthétique généralisé",
     "text": "6.2 Contrôle synthétique généralisé\n\n6.2.1 Intuition\nLa méthode standard de différence-en-différences (DiD) suppose que les communautés exposées et de contrôle auraient suivi des tendances parallèles en l’absence de l’AP. Le contrôle synthétique généralisé (gsynth) de Xu (2017) assouplit cette hypothèse. Au lieu d’exiger des tendances parallèles, il permet à chaque village de suivre sa propre trajectoire conduite par des facteurs non observés — la méthode apprend ensuite ces facteurs à partir des données pré-traitement et les utilise pour projeter ce qui se serait passé après la création de l’AP.\n\n\n6.2.2 Spécification formelle\nPour chaque unité exposée \\(i\\) en période post-traitement \\(t\\), gsynth modélise le résultat comme :\n\\[Y_{it} = \\alpha_i + \\xi_t + \\boldsymbol{\\lambda}_i' \\boldsymbol{f}_t + D_{it} \\cdot \\delta_{it} + \\varepsilon_{it}\\]\noù \\(\\alpha_i\\) sont des effets fixes unité, \\(\\xi_t\\) des effets fixes temps, \\(\\boldsymbol{\\lambda}_i' \\boldsymbol{f}_t\\) des effets fixes interactifs, et \\(D_{it}\\) l’indicateur de traitement. La sélection du nombre de facteurs utilise la validation croisée leave-one-out sur \\(r \\in \\{0, 1, 2, 3, 4, 5\\}\\).\n\n\n6.2.3 Deux modèles séparés\nNous estimons deux modèles distincts :\n\nModèle Marovoay : unités exposées = Madiromiongana et Bepako (rive est, à partir de 2003) ; donneurs = tous les autres sites.\nModèle Alaotra : unité exposée = observatoire d’Alaotra agrégé (à partir de 2008) ; donneurs = tous les sites non-Alaotra.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Stratégie d'identification</span>"
     ]
   },
   {
     "objectID": "03_strategy.fr.html#sec-inference",
     "href": "03_strategy.fr.html#sec-inference",
-    "title": "3  ````quarto",
+    "title": "3  Stratégie d’identification",
     "section": "6.3 Inférence avec peu d’unités exposées",
     "text": "6.3 Inférence avec peu d’unités exposées\nUne contrainte fondamentale est le petit nombre d’unités exposées : 2 sites pour Marovoay, 1 pour Alaotra. Pour Marovoay, la p-valeur minimale atteignable est \\(1/6 \\approx 0{,}167\\) (test unilatéral). Nous rapportons les intervalles de confiance bootstrap gsynth et les p-valeurs tout au long, mais les interprétons à la lumière de ce plafond de puissance.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Stratégie d'identification</span>"
     ]
   },
   {
     "objectID": "03_strategy.fr.html#sec-complementary",
     "href": "03_strategy.fr.html#sec-complementary",
-    "title": "3  ````quarto",
+    "title": "3  Stratégie d’identification",
     "section": "6.4 Dispositifs complémentaires au niveau des ménages",
     "text": "6.4 Dispositifs complémentaires au niveau des ménages\nNous complétons l’analyse gsynth par deux dispositifs de coupes transversales répétées (CTR) au niveau des ménages basés sur le cadre Callaway–Sant’Anna (Callaway et Sant’Anna 2021) avec panel = FALSE. Pour chaque observatoire, nous construisons un indicateur de traitement binaire à partir d’un des deux contrastes d’intensité d’exposition intra-observatoire : l’exposition géographique (distance à la limite de l’AP ou assignation rive) et l’exposition comportementale (part de ménages déclarant au moins un usage extractif dépendant de l’AP en 2025).\n\n\n\n\nTable 6.1: Classifications d’intensité d’exposition intra-observatoire utilisées par les dispositifs secondaires CTR.\n\n\n\n\n\n\n\n\n\nCTR secondaire : classifications d'intensité d'exposition\n\n\nSite\nDistance / rive\n% extractif (2025)\nGéographique\nComportemental\n\n\n\n\nMarovoay\n\n\nBepako\nest\n11.4\ntraité\n—\n\n\nMadiromiongana\nest\n8.8\ntraité\n—\n\n\nAmpijoroa\nouest\n0.7\ncontrôle\n—\n\n\nMaroala\nouest\n1.7\ncontrôle\n—\n\n\nAlaotra\n\n\nAmbodivoara-Maritampona\n8.9 km\n20.7\ntraité\ntraité\n\n\nAmbatoharanana-Analamiranga\n9.5 km\n13.0\ntraité\ntraité\n\n\nAvaradrano\n10.4 km\n6.7\ntraité\ncontrôle\n\n\nMangabe\n14.0 km\n8.2\ncontrôle\ncontrôle\n\n\nFeramanga Atsimo\n14.7 km\n3.4\ncontrôle\ncontrôle\n\n\nAmbohidrony\n14.8 km\n21.2\ncontrôle\ntraité\n\n\nAmbatomanga\n16.3 km\n26.5\ncontrôle\ntraité",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Stratégie d'identification</span>"
     ]
   },
   {
     "objectID": "04_results.fr.html",
     "href": "04_results.fr.html",
-    "title": "4  ````quarto",
+    "title": "4  Résultats",
     "section": "",
-    "text": "5 Ankarafantsika : conservation stricte (catégorie II UICN)\ntitle: “Résultats” subtitle: “Impacts de la conservation stricte et multifonctionnelle sur le revenu des ménages” —",
+    "text": "5 Ankarafantsika : conservation stricte (catégorie II UICN)",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Résultats</span>"
     ]
   },
   {
     "objectID": "04_results.fr.html#construction-du-panel",
     "href": "04_results.fr.html#construction-du-panel",
-    "title": "4  ````quarto",
+    "title": "4  Résultats",
     "section": "5.1 Construction du panel",
     "text": "5.1 Construction du panel\nLe modèle Marovoay comprend 2 sites exposés (Bepako et Madiromiongana, rive est) et des sites donneurs issus des 5 observatoires propres identifiés à l’Annexe B (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). La période d’exposition commence en 2003, offrant 4 années de pré-exposition (1999–2002) et jusqu’à 12 années de post-exposition (2003–2014).",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Résultats</span>"
     ]
   },
   {
     "objectID": "04_results.fr.html#sec-maro-att",
     "href": "04_results.fr.html#sec-maro-att",
-    "title": "4  ````quarto",
+    "title": "4  Résultats",
     "section": "5.2 Trajectoire ATT gsynth",
     "text": "5.2 Trajectoire ATT gsynth\n\n\n\n\n\n\n\n\nFigure 5.1: Ankarafantsika : trajectoire ATT gsynth pour les sites de la rive est par rapport au début de l’exposition (2003). Variable de résultat : revenu logarithmique équivalisé OCDE. Bande ombrée : IC bootstrap paramétrique à 95%.\n\n\n\n\n\nLe modèle de contrôle synthétique généralisé trouve un écart négatif persistant entre les sites de la rive est de Marovoay et leur contrefactuel synthétique. L’effet moyen du traitement sur les traités (ATT) post-exposition est d’environ -0.312 points logarithmiques (IC 95% : [-0.550, -0.073], p = 0.010), correspondant à une différence d’environ 27% par rapport au contrefactuel projeté. L’écart s’ouvre peu après l’extension du parc de 2002 et ne se referme pas sur la période d’observation.\nDans quelle mesure cet écart est attribuable au parc lui-même — plutôt qu’à la trajectoire économique plus large de la région de Marovoay — est une question que les données seules ne peuvent pas résoudre de manière définitive. Marovoay était historiquement la zone rizicole irriguée la plus productive de Madagascar, souvent désignée comme le grenier à blé du pays. À partir des années 1980, la région a connu un déclin bien documenté, alimenté par l’envasement de la Betsiboka, la dégradation des infrastructures d’irrigation coloniales et l’effondrement du soutien agricole de l’État. Cette trajectoire régionale est antérieure à l’extension du parc de 2002 et pourrait raisonnablement expliquer une partie de la divergence que gsynth attribue à l’exposition à la conservation, si les observatoires donneurs sur le plateau des hautes terres ou dans les zones sèches du sud n’étaient pas similairement affectés par la détérioration de l’agriculture irriguée des basses terres.\n\n5.2.1 Vérification CTR ménages intra-Marovoay\n\n\n\n\nTable 5.1: Estimation CTR Callaway–Sant’Anna intra-Marovoay (panel=FALSE), rive est contre rive ouest. Deux erreurs standards sont rapportées : basée sur le plan (fonction d’influence, sans clustering) et groupée par site.\n\n\n\n\n\n\n\n\n\nMarovoay : CTR ménages DiD\n\n\nDispositif\nEstimation\nES (FI)\nES (cluster)\n% revenu\n\n\n\n\nRive est vs rive ouest\n0.000\n0.050\n0.046\n+0.0%\n\n\n\n\n\n\n\n\n\n\nL’estimation intra-Marovoay est proche de zéro avec une erreur standard cluster-robuste resserrée — différant de manière frappante par son ordre de grandeur de l’écart gsynth de -0.312 points logarithmiques rapporté ci-dessus. Ce contraste est un diagnostic clé qui ne peut pas simplement être mis de côté comme deux méthodes répondant à des questions différentes.\nLe gsynth compare les villages de la rive est contre des observatoires donneurs situés sur le plateau des hautes terres ou dans les zones sèches du sud — des endroits avec des systèmes agronomiques différents, une exposition différente à l’envasement de la Betsiboka. Si la région de Marovoay dans son ensemble a décliné par rapport à ces observatoires pour des raisons sans lien avec le parc — l’effondrement des infrastructures d’irrigation, le retrait de l’État de l’économie rizicole — alors gsynth attribuera cette divergence régionale à l’AP, car le calendrier de l’exposition coïncide avec le début du panel observable. Le dispositif intra-Marovoay contrôle pour ce choc régional : les villages de la rive est et de la rive ouest partagent la même rivière, la même économie rizicole en aval et le même marché local.\nLe fait que les revenus de la rive est et de la rive ouest aient évolué si étroitement tout au long de la période d’étude constitue donc un avertissement sérieux. Il suggère que la majeure partie de la divergence identifiée par gsynth est un phénomène régional — le déclin d’une région agricole autrefois prospère — plutôt qu’un effet pouvant être attribué avec confiance à la limite du parc. Les deux résultats doivent être lus ensemble, aucun ne l’emportant sur l’autre.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Résultats</span>"
     ]
   },
   {
     "objectID": "04_results.fr.html#effets-spécifiques-aux-unités",
     "href": "04_results.fr.html#effets-spécifiques-aux-unités",
-    "title": "4  ````quarto",
+    "title": "4  Résultats",
     "section": "5.3 Effets spécifiques aux unités",
     "text": "5.3 Effets spécifiques aux unités\n\n\n\n\n\n\n\n\nFigure 5.2: Effets d’exposition spécifiques aux deux fokontany de la rive est.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Résultats</span>"
     ]
   },
   {
     "objectID": "04_results.fr.html#construction-du-panel-1",
     "href": "04_results.fr.html#construction-du-panel-1",
-    "title": "4  ````quarto",
+    "title": "4  Résultats",
     "section": "6.1 Construction du panel",
     "text": "6.1 Construction du panel\nLe modèle Alaotra traite l’ensemble de l’observatoire comme une seule unité exposée, agrégeant les sept fokontany en une médiane annuelle au niveau du site. L’exposition commence en 2008.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Résultats</span>"
     ]
   },
   {
     "objectID": "04_results.fr.html#sec-ala-att",
     "href": "04_results.fr.html#sec-ala-att",
-    "title": "4  ````quarto",
+    "title": "4  Résultats",
     "section": "6.2 Trajectoire ATT gsynth",
     "text": "6.2 Trajectoire ATT gsynth\n\n\n\n\n\n\n\n\nFigure 6.1: Lac Alaotra : trajectoire ATT gsynth. Variable de résultat : revenu logarithmique équivalisé OCDE.\n\n\n\n\n\nLe modèle gsynth pour Alaotra produit un ATT moyen de +0.014 points de log, statistiquement indiscernable de zéro (IC 95% : [?var:att_ala_ci_lo, ?var:att_ala_ci_hi], p = 0.928). L’absence d’impact détectable sur le revenu au Lac Alaotra contraste avec l’écart négatif à Ankarafantsika. L’interprétation la plus parcimonieuse est que le cadre CBNRM de Durrell, qui régule l’accès aux ressources de manière participative plutôt que de les prohiber entièrement, a préservé les moyens de subsistance des ménages tandis que les restrictions d’exclusion à Ankarafantsika les ont érodés.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Résultats</span>"
     ]
   },
   {
     "objectID": "04_results.fr.html#sec-ala-rcs",
     "href": "04_results.fr.html#sec-ala-rcs",
-    "title": "4  ````quarto",
+    "title": "4  Résultats",
     "section": "6.3 Vérification CTR intra-Alaotra",
     "text": "6.3 Vérification CTR intra-Alaotra\n\n\n\n\nTable 6.1: CTR Callaway–Sant’Anna intra-Alaotra (panel=FALSE). Résultats pour les proxys d’exposition géographique (distance) et comportemental (usage extractif).\n\n\n\n\n\n\n\n\n\nAlaotra : CTR ménages DiD\n\n\nDispositif\nEstimation\nES (FI)\nES (cluster)\n% revenu\n\n\n\n\nDistance ≤ 10 km\n0.015\n0.075\n0.113\n+1.5%\n\n\nUsage extractif ≥ 12,5%\n−0.042\n0.074\n0.152\n-4.1%",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Résultats</span>"
     ]
   },
   {
     "objectID": "04_results.fr.html#sec-comparison",
     "href": "04_results.fr.html#sec-comparison",
-    "title": "4  ````quarto",
+    "title": "4  Résultats",
     "section": "6.4 Comparaison des deux cas",
     "text": "6.4 Comparaison des deux cas\n\n\n\n\n\n\n\n\nFigure 6.2: Comparaison des trajectoires ATT gsynth : Ankarafantsika (rouge) vs Lac Alaotra (bleu). L’échelle horizontale est normalisée par rapport au début de l’exposition.\n\n\n\n\n\nLa comparaison entre les deux cas primaires est saisissante mais doit être interprétée avec prudence. À Ankarafantsika, la conservation stricte est associée à un effet négatif persistant, mais sa magnitude et son attribution restent incertaines en raison du déclin régional documenté de la plaine de Marovoay. À Alaotra, la conservation multifonctionnelle est associée à un effet nul, mais cette absence de détection pourrait également refléter une puissance statistique insuffisante. Avant de tirer des conclusions de gouvernance, une certaine prudence s’impose.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Résultats</span>"
     ]
   },
   {
     "objectID": "04_results.fr.html#sec-robustness",
     "href": "04_results.fr.html#sec-robustness",
-    "title": "4  ````quarto",
+    "title": "4  Résultats",
     "section": "6.5 Robustesse",
-    "text": "6.5 Robustesse\n\n\n\n\n\n\n\n\nFigure 6.3: Vérification de robustesse pour Marovoay : ATT gsynth sous des spécifications alternatives. ‘Niveaux’ = revenu sans transformation log ; ‘Pool étendu’ = inclut les 4 donneurs aussi exposés.\n\n\n\n\n\nLes vérifications de robustesse confirment la direction et la persistance de l’écart à Marovoay dans l’ensemble des spécifications. Ce qui reste non résolu, c’est de savoir si cet écart reflète une exposition cumulée au parc ou les effets à long terme du même déclin régional — une question que ces données seules ne peuvent pas trancher.\n\n\n\n\n\n\n\n\nFigure 6.4: Vérification de robustesse pour Alaotra : ATT gsynth sous des spécifications alternatives.\n\n\n\n\n\n````",
+    "text": "6.5 Robustesse\n\n\n\n\n\n\n\n\nFigure 6.3: Vérification de robustesse pour Marovoay : ATT gsynth sous des spécifications alternatives. ‘Niveaux’ = revenu sans transformation log ; ‘Pool étendu’ = inclut les 4 donneurs aussi exposés.\n\n\n\n\n\nLes vérifications de robustesse confirment la direction et la persistance de l’écart à Marovoay dans l’ensemble des spécifications. Ce qui reste non résolu, c’est de savoir si cet écart reflète une exposition cumulée au parc ou les effets à long terme du même déclin régional — une question que ces données seules ne peuvent pas trancher.\n\n\n\n\n\n\n\n\nFigure 6.4: Vérification de robustesse pour Alaotra : ATT gsynth sous des spécifications alternatives.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Résultats</span>"
     ]
   },
   {
     "objectID": "05_extensions.fr.html",
     "href": "05_extensions.fr.html",
-    "title": "5  ````quarto",
+    "title": "5  Extensions",
     "section": "",
-    "text": "6 Sites d’étude\ntitle: “Extensions” subtitle: “Trois paires observatoire–AP supplémentaires” —\nLa comparaison à deux cas du Chapitre 4 — enforcement strict à Ankarafantsika versus conservation participative au Lac Alaotra — limite la validité externe. Ce chapitre étend l’analyse à trois observatoires ruraux supplémentaires que l’audit du pool de donneurs (Annexe B) a identifiés comme eux-mêmes adjacents à des aires protégées créées pendant la période d’étude :\nCes trois observatoires passent de contraintes dans le pool de donneurs à des unités exposées informatives. Ensemble avec Marovoay et Alaotra, ils permettent un examen à cinq cas de la façon dont le type de gouvernance de conservation, l’intensité d’application et la taille de l’AP façonnent les résultats de revenu des ménages. Les résultats de ces trois sites doivent toutefois être interprétés avec prudence, car les fenêtres post-traitement plus courtes limitent la précision des estimateurs.\nUne note méthodologique : le pool de donneurs dans ce chapitre est restreint aux cinq observatoires propres (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). Les quatre donneurs aussi exposés utilisés au Chapitre 4 sont maintenant traités comme unités exposées. Les estimations ATT pour Marovoay et Alaotra différeront donc légèrement de leurs équivalents du Chapitre 4.",
+    "text": "6 Sites d’étude\nLa comparaison à deux cas du Chapitre 4 — enforcement strict à Ankarafantsika versus conservation participative au Lac Alaotra — limite la validité externe. Ce chapitre étend l’analyse à trois observatoires ruraux supplémentaires que l’audit du pool de donneurs (Annexe B) a identifiés comme eux-mêmes adjacents à des aires protégées créées pendant la période d’étude :\nCes trois observatoires passent de contraintes dans le pool de donneurs à des unités exposées informatives. Ensemble avec Marovoay et Alaotra, ils permettent un examen à cinq cas de la façon dont le type de gouvernance de conservation, l’intensité d’application et la taille de l’AP façonnent les résultats de revenu des ménages. Les résultats de ces trois sites doivent toutefois être interprétés avec prudence, car les fenêtres post-traitement plus courtes limitent la précision des estimateurs.\nUne note méthodologique : le pool de donneurs dans ce chapitre est restreint aux cinq observatoires propres (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). Les quatre donneurs aussi exposés utilisés au Chapitre 4 sont maintenant traités comme unités exposées. Les estimations ATT pour Marovoay et Alaotra différeront donc légèrement de leurs équivalents du Chapitre 4.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Extensions</span>"
     ]
   },
   {
     "objectID": "05_extensions.fr.html#sec-fara-site",
     "href": "05_extensions.fr.html#sec-fara-site",
-    "title": "5  ````quarto",
+    "title": "5  Extensions",
     "section": "6.1 Farafangana et le Corridor Forestier Ambositra-Vondrozo",
     "text": "6.1 Farafangana et le Corridor Forestier Ambositra-Vondrozo\nLe CFAV (~300 km, catégorie V UICN) longe l’escarpement oriental des hautes terres. Un décret de protection temporaire a été émis le 15 septembre 2006 dans le cadre de l’expansion SAPM post-2003. Le statut catégorie V implique une réglementation de l’utilisation des terres à la lisière forestière — principalement des restrictions sur le tavy et la production de charbon de bois dans les zones tampons — plutôt qu’un enforcement d’exclusion.\nL’observatoire de Farafangana est situé sur la plaine côtière sud-est ; sa commune la plus proche (Mahatsinjo) borde le CFAV à ~14 km. Avec seulement 3 années post-traitement (2006–2008), les estimations gsynth doivent être considérées comme illustratives.\n\n\n\n\n\n\n\n\nFigure 6.1: Observatoire de Farafangana et aires protégées à proximité.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Extensions</span>"
     ]
   },
   {
     "objectID": "05_extensions.fr.html#sec-fara-results",
     "href": "05_extensions.fr.html#sec-fara-results",
-    "title": "5  ````quarto",
+    "title": "5  Extensions",
     "section": "6.2 Résultats : Farafangana",
     "text": "6.2 Résultats : Farafangana\n\n\n\n\n\n\n\n\nFigure 6.2: Farafangana : trajectoire ATT gsynth (CFAV, catégorie V UICN, 2006). La courte fenêtre post-traitement (3 ans) limite la précision.",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Extensions</span>"
     ]
   },
   {
     "objectID": "05_extensions.fr.html#sec-tol-site",
     "href": "05_extensions.fr.html#sec-tol-site",
-    "title": "5  ````quarto",
+    "title": "5  Extensions",
     "section": "6.3 Toliara Nord et l’AP Amoron’i Onilahy",
     "text": "6.3 Toliara Nord et l’AP Amoron’i Onilahy\nL’observatoire de Toliara Nord (obs. 23) est adjacent à plusieurs aires protégées créées en 2007–2008 dans la région côtière du sud-ouest. Amoron’i Onilahy (catégorie V UICN) est la plus proche, à ~8 km de plusieurs communes de l’observatoire. La multiplicité des AP adjacentes et leurs catégories UICN variables compliquent l’identification d’une exposition nette.\n\n\n\n\n\n\n\n\nFigure 6.3: Toliara Nord : trajectoire ATT gsynth (Amoron’i Onilahy, catégorie V UICN, 2007).",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Extensions</span>"
     ]
   },
   {
     "objectID": "05_extensions.fr.html#sec-fen-site",
     "href": "05_extensions.fr.html#sec-fen-site",
-    "title": "5  ````quarto",
+    "title": "5  Extensions",
     "section": "6.4 Fénérive Est et la Réserve de Tampolo",
     "text": "6.4 Fénérive Est et la Réserve de Tampolo\nL’observatoire de Fénérive Est (obs. 24) est adjacent à la Réserve de Tampolo (catégorie IV UICN), une petite réserve de recherche forestière de ~7,3 km² gérée par ESSA-Forêts. Sa taille est un ordre de grandeur inférieure à celle des autres AP examinées dans cette étude, ce qui rend moins plausible une perturbation substantielle des moyens de subsistance.\n\n\n\n\n\n\n\n\nFigure 6.4: Fénérive Est : trajectoire ATT gsynth (Réserve de Tampolo, catégorie IV UICN, 2007).",
     "crumbs": [
       "Analysis",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Extensions</span>"
     ]
   },
   {
@@ -385,56 +385,56 @@
   {
     "objectID": "A1_data_pipeline.fr.html",
     "href": "A1_data_pipeline.fr.html",
-    "title": "Annexe A — ````quarto",
+    "title": "Annexe A — Pipeline de données",
     "section": "",
-    "text": "B Géoréférencement des localités SOR\ntitle: “Pipeline de données” subtitle: “Géoréférencement, chevauchements avec les AP et harmonisation des variables” —\nCette annexe documente le pipeline de données reproductible complet, des fichiers d’enquête SOR bruts au jeu de données de panel consolidé au niveau des ménages. Le chapitre principal (Chapitre 2) en donne un résumé condensé ; cette annexe fournit tous les détails nécessaires à la reproductibilité.",
+    "text": "B Géoréférencement des localités SOR\nCette annexe documente le pipeline de données reproductible complet, des fichiers d’enquête SOR bruts au jeu de données de panel consolidé au niveau des ménages. Le chapitre principal (Chapitre 2) en donne un résumé condensé ; cette annexe fournit tous les détails nécessaires à la reproductibilité.",
     "crumbs": [
       "Annexes",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Pipeline de données</span>"
     ]
   },
   {
     "objectID": "A1_data_pipeline.fr.html#le-problème",
     "href": "A1_data_pipeline.fr.html#le-problème",
-    "title": "Annexe A — ````quarto",
+    "title": "Annexe A — Pipeline de données",
     "section": "B.1 Le problème",
     "text": "B.1 Le problème\nLe Système des Observatoires Ruraux a collecté des données de panel auprès de ménages ruraux à Madagascar de 1995 à 2015. De manière cruciale, les enquêtes n’étaient pas géolocalisées : les champs de localisation étaient en texte libre, non liés à des codes administratifs officiels. Pour permettre l’analyse spatiale — notamment le croisement avec les limites des aires protégées — chaque observation SOR doit être alignée avec une commune et un fokontany standardisés à l’aide des P-codes des Ensembles de Données Opérationnelles Communes (COD) OCHA/BNGRC.",
     "crumbs": [
       "Annexes",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Pipeline de données</span>"
     ]
   },
   {
     "objectID": "A1_data_pipeline.fr.html#jeux-de-données-de-référence",
     "href": "A1_data_pipeline.fr.html#jeux-de-données-de-référence",
-    "title": "Annexe A — ````quarto",
+    "title": "Annexe A — Pipeline de données",
     "section": "B.2 Jeux de données de référence",
-    "text": "B.2 Jeux de données de référence\n````",
+    "text": "B.2 Jeux de données de référence",
     "crumbs": [
       "Annexes",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Pipeline de données</span>"
     ]
   },
   {
     "objectID": "A2_donor_validity.fr.html",
     "href": "A2_donor_validity.fr.html",
-    "title": "Annexe B — ````quarto",
+    "title": "Annexe B — Validité du pool de donneurs",
     "section": "",
-    "text": "title: “Validité du pool de donneurs” subtitle: “Audit spatial des observatoires de contrôle” —\nCette annexe documente l’audit spatial systématique du pool de donneurs. Pour chaque observatoire utilisé comme donneur dans l’analyse principale, nous vérifions s’il est lui-même adjacent à des aires protégées créées pendant la période d’étude (1999–2014). Un observatoire donneur situé à moins de 20 km d’une AP active est considéré comme potentiellement exposé et retiré du pool de donneurs propre.\n````",
+    "text": "Cette annexe documente l’audit spatial systématique du pool de donneurs. Pour chaque observatoire utilisé comme donneur dans l’analyse principale, nous vérifions s’il est lui-même adjacent à des aires protégées créées pendant la période d’étude (1999–2014). Un observatoire donneur situé à moins de 20 km d’une AP active est considéré comme potentiellement exposé et retiré du pool de donneurs propre.",
     "crumbs": [
       "Annexes",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Validité du pool de donneurs</span>"
     ]
   },
   {
     "objectID": "A3_robustness.fr.html",
     "href": "A3_robustness.fr.html",
-    "title": "Annexe C — ````quarto",
+    "title": "Annexe C — Robustesse",
     "section": "",
-    "text": "title: “Robustesse” subtitle: “Tests de sensibilité et placebo” —\nCette annexe présente des tests de robustesse complémentaires pour les estimations principales des Chapitres 4 et 5. Les vérifications incluent : des tests placebo dans l’espace (permutation des unités exposées et témoins), des spécifications alternatives du résultat (niveaux au lieu du logarithme, revenu brut au lieu de l’équivalence OCDE), l’inclusion des quatre donneurs aussi exposés, et des estimateurs alternatifs (différences-en-différences synthétiques, effets fixes birectionnels).\n````",
+    "text": "Cette annexe présente des tests de robustesse complémentaires pour les estimations principales des Chapitres 4 et 5. Les vérifications incluent : des tests placebo dans l’espace (permutation des unités exposées et témoins), des spécifications alternatives du résultat (niveaux au lieu du logarithme, revenu brut au lieu de l’équivalence OCDE), l’inclusion des quatre donneurs aussi exposés, et des estimateurs alternatifs (différences-en-différences synthétiques, effets fixes birectionnels).",
     "crumbs": [
       "Annexes",
-      "<span class='chapter-number'>C</span>  <span class='chapter-title'>````quarto</span>"
+      "<span class='chapter-number'>C</span>  <span class='chapter-title'>Robustesse</span>"
     ]
   },
   {

@@ -1,4 +1,3 @@
-````quarto
 ---
 title: "Extensions"
 subtitle: "Trois paires observatoire–AP supplémentaires"
@@ -159,4 +158,3 @@ La Réserve de Tampolo à Fénérive Est est si petite (~7,3 km²) que son footp
 
 Enfin, la restriction du pool de donneurs aux cinq observatoires propres dans ce chapitre réduit le nombre de sites donneurs par rapport au Chapitre 4, ce qui peut augmenter la variabilité des estimations pour les cas à pool de donneurs réduit.
 
-````

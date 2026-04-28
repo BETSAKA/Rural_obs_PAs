@@ -1,4 +1,3 @@
-````quarto
 ---
 title: "Résultats"
 subtitle: "Impacts de la conservation stricte et multifonctionnelle sur le revenu des ménages"
@@ -294,4 +293,3 @@ ggplot(rob_ala, aes(rel_time, att, color = spec, fill = spec)) +
   theme_minimal(base_size = 11) + theme(legend.position = "bottom")
 ```
 
-````

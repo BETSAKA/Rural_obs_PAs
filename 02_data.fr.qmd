@@ -1,4 +1,3 @@
-````quarto
 ---
 title: "Données"
 subtitle: "Enquêtes des Observatoires Ruraux, géoréférencement et construction des variables"
@@ -412,4 +411,3 @@ analysis_sample |>
   fmt_number(columns = c(`Revenu moyen (Ar)`, `Revenu équivalisé moyen`), use_seps = TRUE, decimals = 0)
 ```
 
-````

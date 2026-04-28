@@ -1,4 +1,3 @@
-````quarto
 ---
 title: "Stratégie d'identification"
 subtitle: "Comment nous estimons l'effet causal des aires protégées sur le revenu des ménages"
@@ -401,4 +400,3 @@ Trois paires observatoire–AP supplémentaires identifiées lors de l'audit du 
 | Toliara Nord | Amoron'i Onilahy | V | 2007 | Protections côtières et forêt sèche |
 | Fénérive Est | Réserve de Tampolo | IV | 2007 | Petite forêt de recherche (~7,3 km²) |
 
-````

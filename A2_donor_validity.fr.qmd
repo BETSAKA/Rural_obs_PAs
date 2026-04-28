@@ -1,4 +1,3 @@
-````quarto
 ---
 title: "Validité du pool de donneurs"
 subtitle: "Audit spatial des observatoires de contrôle"
@@ -12,4 +11,3 @@ source("R/gsynth_helpers.R")
 
 Cette annexe documente l'audit spatial systématique du pool de donneurs. Pour chaque observatoire utilisé comme donneur dans l'analyse principale, nous vérifions s'il est lui-même adjacent à des aires protégées créées pendant la période d'étude (1999–2014). Un observatoire donneur situé à moins de 20 km d'une AP active est considéré comme potentiellement exposé et retiré du pool de donneurs propre.
 
-````

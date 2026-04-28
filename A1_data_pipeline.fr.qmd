@@ -1,4 +1,3 @@
-````quarto
 ---
 title: "Pipeline de données"
 subtitle: "Géoréférencement, chevauchements avec les AP et harmonisation des variables"
@@ -19,4 +18,3 @@ Le Système des Observatoires Ruraux a collecté des données de panel auprès d
 
 ## Jeux de données de référence
 
-````
