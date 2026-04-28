@@ -6,12 +6,11 @@ book:
   title: "Conservation Governance and Rural Livelihoods in Madagascar"
   subtitle: "Long-Run Analysis of Rural Observatory Surveys (1995–2025)"
   author:
+    - name: Veromanitra Ramizason
+    - name: Bezaka Rivolala
+    - name: Thierry Razanakoto
+    - name: Holimalala Randriamanampisoa
     - name: Florent Bédécarrats
-      affiliations:
-        - UMI SOURCE (IRD / Université Paris Saclay)
-    - name: Véromanitra Razafimahenina
-      affiliations:
-        - IRD, CERED, Université d'Antananarivo
   date: today
   repo-url: https://github.com/BETSAKA/Rural_obs_PAs
   repo-actions: [source, issue]
