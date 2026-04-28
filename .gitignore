@@ -36,6 +36,11 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 
+# Quarto figure/resource folders (intermediate, outside docs/)
+# NOTE: docs/*_files/ must NOT be ignored — those hold rendered images for GitHub Pages
+*_files/
+!docs/*_files/
+
 # R Environment Variables
 .Renviron
 
@@ -46,7 +51,6 @@ po/*~
 rsconnect/
 
 /.quarto/
-*_files/
 *_cache/
 _freeze/
 
