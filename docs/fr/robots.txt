@@ -1,1 +1,1 @@
-Sitemap: /fr/sitemap.xml
+Sitemap: https://betsaka.github.io/Rural_obs_PAs/fr/sitemap.xml

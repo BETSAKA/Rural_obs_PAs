@@ -51,30 +51,30 @@ format:
     number-sections: true
     fig-width: 8
     fig-height: 6
-  typst:
-    toc: true
-    number-sections: true
-    fig-width: 8
-    fig-height: 5
-    fig-format: png
-    include-before-body:
-      - text: |
-          #v(2fr)
-          #align(center)[
-            #image("media/Photo_Marovoay_Veromanitra_Ramizason_01.jpeg", width: 80%)
-            #v(0.5em)
-            #text(size: 9pt, style: "italic")[
-              Marovoay observatory site near Ankarafantsika National Park. \
-              Photo: Véromanitra Ramizason.
-            ]
-          ]
-          #v(1fr)
-          #pagebreak()
-  docx:
-    toc: true
-    number-sections: true
-    fig-width: 8
-    fig-height: 6
+  # typst:                        # Uncomment to re-enable PDF (typst) render
+  #   toc: true
+  #   number-sections: true
+  #   fig-width: 8
+  #   fig-height: 5
+  #   fig-format: png
+  #   include-before-body:
+  #     - text: |
+  #         #v(2fr)
+  #         #align(center)[
+  #           #image("media/Photo_Marovoay_Veromanitra_Ramizason_01.jpeg", width: 80%)
+  #           #v(0.5em)
+  #           #text(size: 9pt, style: "italic")[
+  #             Marovoay observatory site near Ankarafantsika National Park. \
+  #             Photo: Véromanitra Ramizason.
+  #           ]
+  #         ]
+  #         #v(1fr)
+  #         #pagebreak()
+  # docx:                         # Uncomment to re-enable Word (docx) render
+  #   toc: true
+  #   number-sections: true
+  #   fig-width: 8
+  #   fig-height: 6
 
 execute:
   echo: false
