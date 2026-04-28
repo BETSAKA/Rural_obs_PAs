@@ -18,14 +18,12 @@ book:
   output-file: rural-obs-PAs
   chapters:
     - index.qmd
-    - part: "Analysis"
-      chapters:
-        - 01_context.qmd
-        - 02_data.qmd
-        - 03_strategy.qmd
-        - 04_results.qmd
-        - 05_extensions.qmd
-        - 06_discussion.qmd
+    - 01_context.qmd
+    - 02_data.qmd
+    - 03_strategy.qmd
+    - 04_results.qmd
+    - 05_extensions.qmd
+    - 06_discussion.qmd
     - references.qmd
   appendices:
     - A1_data_pipeline.qmd
