@@ -22,7 +22,7 @@ TREAT_YEAR_FARA <- 2006L
 TREAT_YEAR_TOL <- 2007L
 TREAT_YEAR_FEN <- 2007L
 
-CLEAN_DONOR_OBS <- c("02", "13", "16", "25", "41")
+CLEAN_DONOR_OBS <- c("02", "12", "13", "16", "25", "41")
 ALL_DONOR_OBS <- c("02", "12", "13", "15", "16", "23", "24", "25", "41")
 TREATED_OBS <- c("03", "21", "15", "23", "24")
 ALL_OBS_14 <- c(TREATED_OBS, CLEAN_DONOR_OBS)
@@ -226,10 +226,11 @@ ala_fkt$nearest_pa <- if_else(
 
 # -- Observatory locations table -----------------------------------------------
 obs_locations <- tibble(
-  code = c("02", "03", "13", "15", "16", "21", "23", "24", "25", "41"),
+  code = c("02", "03", "12", "13", "15", "16", "21", "23", "24", "25", "41"),
   name = c(
     "Antsirabe",
     "Marovoay",
+    "Antsohihy",      # survey ends 2005; pre-dates Bongolava corridor (Sep 2006) → clean donor
     "Tsiroanomandidy",
     "Farafangana",
     "Ambovombe",
@@ -242,6 +243,7 @@ obs_locations <- tibble(
   latitude = c(
     -19.8667,
     -16.1000,
+    -14.8781,
     -18.7714,
     -22.8167,
     -25.0333,
@@ -254,6 +256,7 @@ obs_locations <- tibble(
   longitude = c(
     47.0333,
     46.6333,
+    47.9875,
     46.0546,
     47.8333,
     46.0833,

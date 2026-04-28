@@ -72,7 +72,6 @@ ggplot() +
 #| fig-height: 7
 #| fig-width: 10
 obs_names_df <- obs_locations |> st_drop_geometry() |> select(code, name)
-obs_names_df <- bind_rows(obs_names_df, tibble(code = "12", name = "Antsohihy"))
 
 coverage <- household_consolidated |>
   filter(obs %in% c("03", "21", ALL_DONOR_OBS)) |>
@@ -175,7 +174,7 @@ Pour chacun des 11 observatoires d'étude, nous calculons la distance minimale e
 
 ```{r}
 #| label: fig-pa-overlaps
-#| fig-cap: "Fenêtres de couverture des enquêtes et événements d'exposition aux AP pour les 11 observatoires d'étude. Les barres montrent la durée d'enquête ; les triangles indiquent la date du décret de classement AP le plus proche."
+#| fig-cap: "Fenêtres de couverture des enquêtes et événements d'exposition aux AP pour les 11 observatoires d'étude. Les barres montrent la durée d'enquête ; les triangles indiquent la date du décret de classement AP le plus proche. Barres vertes : couverture pré/post suffisante pour gsynth. Barres roses : exposition AP mais couverture post-traitement insuffisante. Barres bleues : aucune AP à proximité pendant la période d'enquête (y compris les cas où l'AP a été créée après la fin de l'enquête)."
 #| fig-height: 7
 #| fig-width: 11
 study_obs_codes <- as.integer(c(
@@ -223,10 +222,7 @@ new_pa_by_obs <- proximity_ch2 |>
     .by = OBS_CODE
   )
 
-obs_names_full <- bind_rows(
-  obs_locations |> mutate(obs = code) |> select(obs, name),
-  tibble(obs = "12", name = "Antsohihy")
-)
+obs_names_full <- obs_locations |> mutate(obs = code) |> select(obs, name)
 
 hh_coverage <- household_consolidated |>
   summarise(
@@ -260,7 +256,7 @@ gantt_data <- hh_coverage |>
       NA_integer_
     ),
     feasible = case_when(
-      !has_pa ~ "Pas d'AP à proximité",
+      !has_pa | pa_year > last_year ~ "Pas d'AP à proximité\n(pendant la période d'enquête)",
       pre_yrs >= 4 & post_yrs >= 3 ~ "Faisable",
       TRUE ~ "Couverture insuffisante"
     ),
@@ -273,7 +269,7 @@ gantt_data <- hh_coverage |>
 feasibility_cols <- c(
   "Faisable" = "#388E3C",
   "Couverture insuffisante" = "#EF9A9A",
-  "Pas d'AP à proximité" = "#90CAF9"
+  "Pas d'AP à proximité\n(pendant la période d'enquête)" = "#90CAF9"
 )
 
 ggplot(gantt_data, aes(y = obs_label)) +

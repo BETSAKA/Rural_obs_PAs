@@ -74,7 +74,7 @@ Nous estimons des effets uniquement sur le revenu total. La pression de conserva
 
 La mesure du revenu par enquête dans les économies de subsistance est intrinsèquement approximative. Le biais de rappel et la variation saisonnière sont inévitables.
 
-Les cinq observatoires propres couvrent des zones agro-écologiques très différentes — plateau des hautes terres, sud semi-aride, côte est humide. La question de savoir si une moyenne pondérée de ces économies diverses peut représenter de manière crédible ce que la plaine rizicole irriguée de Marovoay, ou la pêcherie lacustre d'Alaotra, aurait gagné en l'absence de l'AP reste ouverte.
+Les six observatoires propres couvrent des zones agro-écologiques très différentes — plateau des hautes terres, nord côtier, sud semi-aride, côte est humide. La question de savoir si une moyenne pondérée de ces économies diverses peut représenter de manière crédible ce que la plaine rizicole irriguée de Marovoay, ou la pêcherie lacustre d’Alaotra, aurait gagné en l’absence de l’AP reste ouverte.
 
 
 # Prochaines étapes : la vague d'enquête 2026 {#sec-next-steps}
@@ -91,7 +91,7 @@ Les cinq observatoires exposés définissent quatre cohortes d'exposition :
 | 2006 | Farafangana (9 sites) | Multifonctionnel (catégorie V UICN) | Au niveau de l'observatoire |
 | 2007 | Toliara Nord (4) + Fénérive Est (10) | Mixte V/II + Faible intensité (IV) | Au niveau de l'observatoire |
 | 2008 | Alaotra (3 sites) | Multifonctionnel (catégorie V UICN) | Au niveau de l'observatoire |
-| $\infty$ | Marovoay ouest (2) + 5 donneurs propres (36) | Jamais exposés | Contrôles |
+| $\infty$ | Marovoay ouest (2) + 6 donneurs propres | Jamais exposés | Contrôles |
 
 : Quatre cohortes d'exposition échelonnées pour le DiD Callaway & Sant'Anna {#tbl-staggered}
 

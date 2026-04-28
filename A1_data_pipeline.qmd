@@ -162,10 +162,7 @@ Household-level datasets for 1995--2015 are loaded and tabulated by observatory 
 ```{r}
 #| label: tbl-survey-inventory
 #| tbl-cap: "Number of surveyed households per observatory per year (1995--2015)."
-obs_names_full <- bind_rows(
-  obs_locations |> mutate(obs = code) |> select(obs, name),
-  tibble(obs = "12", name = "Antsohihy")
-)
+obs_names_full <- obs_locations |> mutate(obs = code) |> select(obs, name)
 
 household_consolidated |>
   count(obs, year, name = "n_hh") |>

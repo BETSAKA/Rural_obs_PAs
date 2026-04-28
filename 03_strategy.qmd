@@ -655,12 +655,12 @@ A systematic spatial audit ([Appendix B](A2_donor_validity.qmd)) checks whether 
 
 | Status | Observatories | Reason |
 |---|---|---|
-| "Clean" | Antsirabe (02), Tsiroanomandidy (13), Ambovombe (16), Mahanoro (25), Itasy (41) | No active PA within 20 km during 1999–2014 |
-| Also exposed | Antsohihy (12), Farafangana (15), Toliara North (23), Fénérive East (24) | PA created within 20 km during study period |
+| "Clean" | Antsirabe (02), Antsohihy (12), Tsiroanomandidy (13), Ambovombe (16), Mahanoro (25), Itasy (41) | No active PA within 20 km, or survey ends before PA creation |
+| Also exposed | Farafangana (15), Toliara North (23), Fénérive East (24) | PA created within 20 km during study period, with post-treatment data |
 
 : Donor pool PA exposure classification. {#tbl-donor-status}
 
-The main results use the 5 "clean" donor observatories; the [extension analysis](05_extensions.qmd) confirms that including the 4 also-exposed donors does not materially change the estimates. In the extension analysis ([Chapter 5](05_extensions.qmd)), the four also-exposed observatories become *exposed units* with their own PA exposure events.
+The main results use the 6 "clean" donor observatories; the [extension analysis](05_extensions.qmd) confirms that including the 3 also-exposed donors does not materially change the estimates. In the extension analysis ([Chapter 5](05_extensions.qmd)), the three also-exposed observatories become *exposed units* with their own PA exposure events.
 
 ## Generalized synthetic control {#sec-gsynth}
 
@@ -728,7 +728,7 @@ sec_did <- read_rds("data/secondary_did_results.rds")
 
 ```{r}
 #| label: tbl-secondary-design
-#| tbl-cap: "Within-observatory exposure-intensity classifications used by the secondary household-level RCS designs. Distance and bank are pre-determined geography; extractive-use share is measured on the 2025 resurvey under the same definition as @sec-maro-usage and @sec-ala-usage. The two Alaotra fokontany pairs Ambodivoara/Maritampona and Ambatoharanana/Analamiranga are merged onto their older centroids to align the 1999–2014 frame with the 2025 GPS enumeration."
+#| tbl-cap: "Within-observatory exposure-intensity classifications used by the secondary household-level DiD designs. Distance and bank are pre-determined geography; extractive-use share is measured on the 2025 resurvey under the same definition as @sec-maro-usage and @sec-ala-usage. The two Alaotra fokontany pairs Ambodivoara/Maritampona and Ambatoharanana/Analamiranga are merged onto their older centroids to align the 1999–2014 frame with the 2025 GPS enumeration."
 maro_class <- tibble(
   Observatory = "Marovoay",
   Site = c("Bepako", "Madiromiongana", "Ampijoroa", "Maroala"),
@@ -788,4 +788,4 @@ These three observatories move from liabilities in the donor pool to informative
 
 # Looking ahead: full household-level estimation {#sec-did-roadmap}
 
-The secondary RCS designs introduced in @sec-complementary already exploit household-level information within each observatory, but they remain limited by the small number of sites available *inside* a single observatory (G = 4 to 7). A richer household-level analysis would pool all five exposed observatories together with the never-exposed donors into a single staggered-treatment design, exploiting four staggered exposure cohorts (Ankarafantsika 2003, Farafangana/Toliara/Fenérive 2006–07, Alaotra 2008, plus never-exposed). The natural estimator is again Callaway–Sant'Anna with `panel = FALSE`, complemented by Sun–Abraham event studies via `fixest::sunab()`. The 2026 ROS wave will increase post-exposure information and is expected to sharpen these estimates further. This forward-looking design is discussed in @sec-next-steps.
+The secondary within-observatory DiD checks introduced in @sec-complementary already exploit household-level information within each observatory, but they remain limited by the small number of sites available *inside* a single observatory (G = 4 to 7). A richer household-level analysis would pool all five exposed observatories together with the never-exposed donors into a single staggered-treatment design, exploiting four staggered exposure cohorts (Ankarafantsika 2003, Farafangana/Toliara/Fenérive 2006–07, Alaotra 2008, plus never-exposed). The natural estimator is again Callaway–Sant'Anna with `panel = FALSE`, complemented by Sun–Abraham event studies via `fixest::sunab()`. The 2026 ROS wave will increase post-exposure information and is expected to sharpen these estimates further. This forward-looking design is discussed in @sec-next-steps.

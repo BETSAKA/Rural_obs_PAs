@@ -78,7 +78,7 @@ We estimate effects on total income only. Conservation pressure may reshape the 
 
 Survey-based income measurement in subsistence economies is inherently approximate. Recall bias and seasonal variation are unavoidable. The OECD equivalence scale adjusts for household size but assumes consumption patterns that may not hold in rural Madagascar.
 
-The five clean donor observatories span very different agro-ecological zones — highland plateau, semi-arid south, humid east coast. Whether a weighted average of such diverse economies can credibly represent what Marovoay's irrigated rice plain, or Alaotra's lake fishery, would have earned absent the PA is an open question. The Marovoay model has only four pre-treatment years in which to validate this projection.
+The six clean donor observatories span very different agro-ecological zones — highland plateau, semi-arid north, semi-arid south, humid east coast. Whether a weighted average of such diverse economies can credibly represent what Marovoay’s irrigated rice plain, or Alaotra’s lake fishery, would have earned absent the PA is an open question. The Marovoay model has only four pre-treatment years in which to validate this projection.
 
 Finally, this study measures income effects only. A protected area that imposes short-term income costs but prevents longer-run ecological degradation — soil erosion from deforestation, loss of water regulation — may be welfare-improving over a longer horizon. The full welfare comparison requires ecological outcome data that are outside the scope of this analysis.
 
@@ -97,7 +97,7 @@ The five exposed observatories define four exposure cohorts:
 | 2006 | Farafangana (9 sites) | Multipurpose (IUCN V) | Observatory-level |
 | 2007 | Toliara North (4) + Fénérive East (10) | Mixed V/II + Low intensity (IV) | Observatory-level |
 | 2008 | Alaotra (3 sites) | Multipurpose (IUCN V) | Observatory-level |
-| $\infty$ | Marovoay west (2) + 5 clean donors (36) | Never exposed | Controls |
+| $\infty$ | Marovoay west (2) + 6 clean donors | Never exposed | Controls |
 
 : Four staggered exposure cohorts for Callaway & Sant'Anna DiD {#tbl-staggered}
 

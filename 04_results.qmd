@@ -12,7 +12,7 @@ source("R/plot_themes.R")
 
 ```{r}
 #| label: load-results
-# Cached gsynth results (paper14 = clean 5-donor pool)
+# Cached gsynth results (paper14 = clean 6-donor pool)
 gs_maro <- read_rds("data/paper14_gsynth_maro_oecd.rds")
 gs_ala <- read_rds("data/paper14_gsynth_ala_oecd.rds")
 
@@ -27,7 +27,7 @@ maro_gs_ext <- read_rds("data/maro_gs_ext_panel.rds")
 
 ## Panel construction
 
-The Marovoay model comprises 2 exposed sites (Bepako and Madiromiongana, east bank) and donor sites from the 5 clean observatories identified in [Appendix B](A2_donor_validity.qmd) (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). The exposure period begins in 2003, providing 4 pre-exposure years (1999–2002) and up to 12 post-exposure years (2003–2014).
+The Marovoay model comprises 2 exposed sites (Bepako and Madiromiongana, east bank) and donor sites from the 6 clean observatories identified in [Appendix B](A2_donor_validity.qmd) (Antsirabe, Antsohihy, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). The exposure period begins in 2003, providing 4 pre-exposure years (1999–2002) and up to 12 post-exposure years (2003–2014).
 
 ## gsynth ATT path {#sec-maro-att}
 
@@ -68,13 +68,13 @@ The generalized synthetic control model finds a persistent negative gap between 
 
 How much of this gap is attributable to the park itself — rather than to the broader economic trajectory of the Marovoay region — is a question that the data alone cannot fully resolve. Marovoay was historically Madagascar's most productive irrigated rice zone, often called the *grenier à blé* of the country. From the 1980s onward, the region experienced a well-documented decline driven by the silting of the Betsiboka River, the degradation of colonial-era irrigation infrastructure, and the collapse of state agricultural support. This regional trajectory predates the 2002 park extension and could plausibly account for part of the divergence that gsynth attributes to conservation exposure, if the donor observatories on the highland plateau or in the southern drylands were not similarly affected by the deterioration of irrigated lowland agriculture.
 
-### Within-Marovoay household RCS check {#sec-maro-rcs}
+### Within-Marovoay household DiD check {#sec-maro-rcs}
 
 The household-level repeated cross-section design described in @sec-complementary applies the Callaway–Sant'Anna estimator to the 1999–2014 + 2025 Marovoay panel, contrasting east-bank (Bepako and Madiromiongana) against west-bank fokontany (Ampijoroa and Maroala).
 
 ```{r}
 #| label: tbl-maro-rcs
-#| tbl-cap: "Within-Marovoay household RCS Callaway–Sant'Anna estimate (panel = FALSE), east versus west bank. Two standard errors are reported: design-based (influence function, no clustering) and site-clustered."
+#| tbl-cap: "Within-Marovoay household DiD (Callaway–Sant'Anna, panel = FALSE), east versus west bank. Two standard errors are reported: design-based (influence function, no clustering) and site-clustered."
 sec_did <- read_rds("data/secondary_did_results.rds")
 sec_did$maro$summary |>
   transmute(
@@ -86,7 +86,7 @@ sec_did$maro$summary |>
   ) |>
   gt() |>
   fmt_number(columns = c(Estimate, `SE (IF)`, `SE (cluster)`), decimals = 3) |>
-  tab_header(title = "Marovoay: household RCS DiD")
+  tab_header(title = "Marovoay: within-observatory DiD")
 ```
 
 The within-Marovoay point estimate is close to zero with a tight cluster-robust standard error — strikingly different in magnitude from the gsynth gap of {{< var att_maro >}} log points reported above. This contrast is a key diagnostic, and it cannot simply be dismissed as the two methods answering different questions.
@@ -147,7 +147,7 @@ Both exposed fokontany show negative effects, though with different magnitudes. 
 
 ## Panel construction
 
-The Alaotra model has 1 exposed unit (the aggregated observatory) and donor sites from 5 clean observatories. The exposure period begins in 2008, providing 9 pre-exposure years (1999–2007) and 7 post-exposure years (2008–2014).
+The Alaotra model has 1 exposed unit (the aggregated observatory) and donor sites from 6 clean observatories. The exposure period begins in 2008, providing 9 pre-exposure years (1999–2007) and 7 post-exposure years (2008–2014).
 
 ## gsynth ATT path {#sec-ala-att}
 
@@ -188,13 +188,13 @@ The Alaotra gsynth estimates an average post-exposure ATT of approximately {{< v
 
 The null result is consistent with several interpretations: participatory conservation under CBNRM may impose lower costs on aggregate income; the 7-year post-exposure window may be insufficient to detect a gradual effect; and the single-unit design limits statistical power.
 
-### Within-Alaotra household RCS check {#sec-ala-rcs}
+### Within-Alaotra household DiD check {#sec-ala-rcs}
 
 The household-level repeated cross-section design described in @sec-complementary applies the Callaway–Sant'Anna estimator to the 1999–2014 + 2025 Alaotra panel under two within-observatory exposure proxies: distance to the nearest PA boundary (≤ 10 km) and the 2025 share of households declaring PA-dependent extractive uses (≥ 12.5%).
 
 ```{r}
 #| label: tbl-ala-rcs
-#| tbl-cap: "Within-Alaotra household RCS Callaway–Sant'Anna estimates (panel = FALSE) on the merged seven-fokontany panel, under two exposure proxies. Two standard errors are reported: design-based (influence function, no clustering) and site-clustered."
+#| tbl-cap: "Within-Alaotra household DiD (Callaway–Sant'Anna, panel = FALSE) on the merged seven-fokontany panel, under two exposure proxies. Two standard errors are reported: design-based (influence function, no clustering) and site-clustered."
 sec_did_ala <- read_rds("data/secondary_did_results.rds")$ala
 sec_did_ala$summary |>
   transmute(
@@ -210,10 +210,10 @@ sec_did_ala$summary |>
   ) |>
   gt() |>
   fmt_number(columns = c(Estimate, `SE (IF)`, `SE (cluster)`), decimals = 3) |>
-  tab_header(title = "Alaotra: household RCS DiD")
+  tab_header(title = "Alaotra: within-observatory DiD")
 ```
 
-Both within-Alaotra designs yield small point estimates and wide cluster-robust standard errors that comfortably include zero. Their conclusion agrees with gsynth along a different identifying contrast: not against an outside donor pool, but against the less exposed merged fokontany of the same observatory. The convergence narrows the range of plausible interpretations of the Alaotra null: the absence of an aggregate income effect of the *Paysage Harmonieux Protégé* is robust to whether the counterfactual is built from outside observatories (gsynth) or from within-observatory exposure heterogeneity (RCS DiD).
+Both within-Alaotra designs yield small point estimates and wide cluster-robust standard errors that comfortably include zero. Their conclusion agrees with gsynth along a different identifying contrast: not against an outside donor pool, but against the less exposed merged fokontany of the same observatory. The convergence narrows the range of plausible interpretations of the Alaotra null: the absence of an aggregate income effect of the *Paysage Harmonieux Protégé* is robust to whether the counterfactual is built from outside observatories (gsynth) or from within-observatory exposure heterogeneity (within-observatory DiD).
 
 # Comparison {#sec-comparison}
 
@@ -345,14 +345,14 @@ the west bank) extends the observation window to 22 years post-exposure.
 #| include: false
 donor_cols <- setdiff(colnames(gs_maro_ext$eff), c("031", "032"))
 donor_obs <- sort(unique(substr(donor_cols, 1, 2)))
-also_exp <- intersect(donor_obs, c("12", "15", "21", "23", "24"))
-clean_donor <- intersect(donor_obs, c("02", "13", "16", "25", "41"))
+also_exp <- intersect(donor_obs, c("15", "21", "23", "24"))
+clean_donor <- intersect(donor_obs, c("02", "12", "13", "16", "25", "41"))
 maro_wbank <- intersect(donor_cols, c("033", "034"))
 years_2025 <- sum(!is.na(gs_maro_ext$eff["2025", ]))
 ```
 
 The extended model uses the full donor pool (all ROS sites with a
-complete 1999–2014 income series) rather than the clean 5-donor pool
+complete 1999–2014 income series) rather than the clean 6-donor pool
 of @sec-maro. The exposed units are unchanged — Bepako (site 031) and
 Madiromiongana (site 032), east of the Betsiboka — but the
 `r n_donors_ext` donor sites span `r length(donor_obs)` observatories:

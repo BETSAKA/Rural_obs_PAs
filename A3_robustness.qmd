@@ -14,7 +14,7 @@ library(did)
 ```{r}
 #| label: load-robustness
 
-# Primary specification (cached, clean 5-donor pool)
+# Primary specification (cached, clean 6-donor pool)
 gs_main_maro  <- read_rds("data/paper14_gsynth_maro_oecd.rds")
 gs_main_ala   <- read_rds("data/paper14_gsynth_ala_oecd.rds")
 

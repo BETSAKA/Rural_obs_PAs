@@ -17,7 +17,7 @@ treat_year_fen: 2007
 # -- Sample sizes --------------------------------------------------------------
 n_observatories: 11
 n_donor_obs: 9
-n_clean_donor_obs: 5
+n_clean_donor_obs: 6
 n_household_years: "101,253"
 
 # -- PA names ------------------------------------------------------------------
@@ -49,7 +49,7 @@ n_hh_obs: "101,253"
 n_obs: 11
 
 # -- Clean donor observatories -------------------------------------------------
-clean_donors: "Antsirabe (02), Tsiroanomandidy (13), Ambovombe (16), Mahanoro (25), Itasy (41)"
+clean_donors: "Antsirabe (02), Antsohihy (12), Tsiroanomandidy (13), Ambovombe (16), Mahanoro (25), Itasy (41)"
 
 # -- Chapter 5: clean-donor-pool estimates ------------------------------------
 att_maro_clean: "-0.312"

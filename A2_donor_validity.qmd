@@ -257,17 +257,16 @@ proximity |>
 
 The nine donor observatories fall into three categories:
 
-**Clean** (no PA within 20 km during study period):
+**Clean** (no PA within 20 km during study period, or survey ends before PA creation):
 
 - Antsirabe (02)
+- Antsohihy (12) --- within 0.3 km of Corridor forestier Bongolava (IUCN V, 15 September 2006), but the survey runs only 1999--2004 and **ends before the PA was created**. All Antsohihy data is pre-treatment; the contamination concern is moot.
 - Tsiroanomandidy (13)
 - Ambovombe (16)
 - Mahanoro (25)
 - Itasy (41)
 
-**Also exposed** (new PA within 20 km during study period):
-
-- **Antsohihy (12)** --- within 0.3 km of Corridor forestier Bongolava (IUCN V, 15 September 2006). The commune of Tsarahasina borders the corridor directly. However, Antsohihy's survey ends in 2005, providing only 1 post-2006 year. It is excluded from both the donor pool and the exposed sample.
+**Also exposed** (new PA within 20 km during study period, with post-treatment survey data):
 - **Farafangana (15)** --- within 14 km of Corridor Forestier Ambositra-Vondrozo (IUCN V, 15 September 2006), and with pre-existing proximity to Manombo SR (IUCN IV, 1962). Pre-existing exposure is absorbed by the unit fixed effect; the 2006 CFAV decree represents new exposure.
 - **Toliara North (23)** --- within 1.4 km of Ranobe PK 32 (December 2008), 12 km of Amoron'i Onilahy (January 2007), and 16 km of Mikea NP (April 2007). The most problematic case: a cascade of three PAs starting January 2007.
 - **Fénérive East (24)** --- within 6 km of Réserve de Tampolo (IUCN IV, August 2007). Small reserve with low enforcement intensity, but proximity is clear.
@@ -437,13 +436,13 @@ ggplot(detail_data, aes(x = pa_label, y = dist_km, colour = exposure_type)) +
 
 The contamination audit has two consequences:
 
-1. **Restricted donor pool**: removing the four also-exposed observatories leaves five clean donors (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). Gsynth estimates for Marovoay and Alaotra should be re-run with this restricted pool as a robustness check.
+1. **Restricted donor pool**: removing the three also-exposed observatories (Farafangana, Toliara North, Fénérive East) leaves six clean donors (Antsirabe, Antsohihy, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). Antsohihy is included because its survey predates the Bongolava corridor (2006), providing only pre-treatment observations. Gsynth estimates for Marovoay and Alaotra should be re-run with this restricted pool as a robustness check.
 
 2. **Pre-treatment validity preserved for Marovoay**: the exposure onset (2003) predates all secondary PA events (earliest 2006). Pre-treatment balance tests (placebo ATTs before 2003) are unaffected by post-2006 donor exposure.
 
 ## For the extended analysis
 
-The four also-exposed donors become **exposed units** in the extended analysis ([Chapter 5](05_extensions.qmd)). Antsohihy is excluded (insufficient post-treatment coverage). Farafangana, Toliara North, and Fénérive East are viable exposed cases with ≥3 post-treatment years and plausible identification stories. Their redesignation from donors to exposed units simultaneously:
+The three also-exposed donors (Farafangana, Toliara North, Fénérive East) become **exposed units** in the extended analysis ([Chapter 5](05_extensions.qmd)). Antsohihy is reclassified as a **clean donor** rather than an also-exposed unit: its survey runs 1999--2004, ending before the Bongolava corridor was established (September 2006), so it contributes only pre-treatment observations. Like other short-panel clean donors (obs 13 ends 2005, obs 16 ends 2008), gsynth uses whatever years are available. Their redesignation from donors to exposed units simultaneously:
 
 - Purifies the donor pool (removing also-exposed units).
 - Enriches the exposed sample (five observatory--PA pairs instead of two).
@@ -451,22 +450,17 @@ The four also-exposed donors become **exposed units** in the extended analysis (
 
 ```{r}
 #| label: fig-clean-donors
-#| fig-cap: "Map of Madagascar with observatory locations coloured by status: exposed (Ch. 4), newly exposed (Ch. 5), clean donor, excluded."
+#| fig-cap: "Map of Madagascar with observatory locations coloured by status: exposed (Ch. 4), newly exposed (Ch. 5), clean donor."
 #| fig-height: 7
 #| fig-width: 7
 
-# Include Antsohihy manually (not in obs_locations)
-obs_locs_full <- bind_rows(
-  obs_locations |> st_drop_geometry() |>
-    mutate(OBS_CODE = as.integer(code)),
-  tibble(OBS_CODE = 12L, code = "12", name = "Antsohihy",
-         latitude = -14.8781, longitude = 47.9875, role = NA_character_)
-) |>
+# Antsohihy (12) is now in obs_locations (added as clean donor)
+obs_locs_full <- obs_locations |> st_drop_geometry() |>
+  mutate(OBS_CODE = as.integer(code)) |>
   mutate(
     status = case_when(
       OBS_CODE %in% c(3L, 21L) ~ "Exposed (Ch. 4)",
       OBS_CODE %in% c(15L, 23L, 24L) ~ "Newly exposed (Ch. 5)",
-      OBS_CODE == 12L ~ "Excluded (insufficient coverage)",
       OBS_CODE %in% as.integer(CLEAN_DONOR_OBS) ~ "Clean donor"
     )
   )
@@ -474,14 +468,12 @@ obs_locs_full <- bind_rows(
 status_pal <- c(
   "Exposed (Ch. 4)"                 = "#D32F2F",
   "Newly exposed (Ch. 5)"             = "#E65100",
-  "Clean donor"                     = "#388E3C",
-  "Excluded (insufficient coverage)" = "grey60"
+  "Clean donor"                     = "#388E3C"
 )
 status_shapes <- c(
   "Exposed (Ch. 4)"                 = 17,
   "Newly exposed (Ch. 5)"             = 18,
-  "Clean donor"                     = 16,
-  "Excluded (insufficient coverage)" = 4
+  "Clean donor"                     = 16
 )
 
 ggplot() +

@@ -321,8 +321,8 @@ Un audit spatial systématique ([Annexe B](A2_donor_validity.qmd)) vérifie si c
 
 | Statut | Observatoires |
 |---|---|
-| « Propres » | Antsirabe (02), Tsiroanomandidy (13), Ambovombe (16), Mahanoro (25), Itasy (41) |
-| Aussi exposés | Antsohihy (12), Farafangana (15), Toliara Nord (23), Fénérive Est (24) |
+| « Propres » | Antsirabe (02), Antsohihy (12), Tsiroanomandidy (13), Ambovombe (16), Mahanoro (25), Itasy (41) |
+| Aussi exposés | Farafangana (15), Toliara Nord (23), Fénérive Est (24) |
 
 ## Contrôle synthétique généralisé {#sec-gsynth}
 
@@ -362,7 +362,7 @@ sec_did <- read_rds("data/secondary_did_results.rds")
 
 ```{r}
 #| label: tbl-secondary-design
-#| tbl-cap: "Classifications d'intensité d'exposition intra-observatoire utilisées par les dispositifs secondaires CTR."
+#| tbl-cap: "Classifications d'intensité d'exposition intra-observatoire utilisées par les dispositifs DiD secondaires."
 maro_class <- tibble(
   Observatoire = "Marovoay",
   Site = c("Bepako", "Madiromiongana", "Ampijoroa", "Maroala"),
@@ -387,7 +387,7 @@ ala_summary <- sec_did$ala$panel |>
 bind_rows(maro_class, ala_summary) |>
   gt(groupname_col = "Observatoire") |>
   fmt_number(columns = `% extractif (2025)`, decimals = 1) |>
-  tab_header(title = "CTR secondaire : classifications d'intensité d'exposition")
+  tab_header(title = "DiD intra-observatoire : classifications d'intensité d'exposition")
 ```
 
 # Extensions à trois observatoires supplémentaires {#sec-extensions}
@@ -407,4 +407,4 @@ Ces trois observatoires passent de contraintes dans le pool de donneurs à des u
 
 # Perspectives : estimation complète au niveau des ménages {#sec-did-roadmap}
 
-Les dispositifs CTR secondaires présentés à @sec-complementary exploitent déjà les informations au niveau des ménages à l'intérieur de chaque observatoire, mais restent limités par le faible nombre de sites disponibles *au sein* d'un seul observatoire (G = 4 à 7). Une analyse au niveau des ménages plus riche regrouperait l'ensemble des cinq observatoires exposés avec les donneurs jamais exposés dans un dispositif à traitement échelonné unique, exploitant quatre cohortes d'exposition échelonnées (Ankarafantsika 2003, Farafangana/Toliara/Fénérive 2006–07, Alaotra 2008, plus jamais exposés). L'estimateur naturel est à nouveau Callaway–Sant'Anna avec `panel = FALSE`, complété par des études d'événements Sun–Abraham via `fixest::sunab()`. La vague 2026 du SOR augmentera l'information post-exposition et devrait affiner ces estimations. Ce dispositif prospectif est discuté à @sec-next-steps.
+Les vérifications DiD intra-observatoire secondaires présentées à @sec-complementary exploitent déjà les informations au niveau des ménages à l'intérieur de chaque observatoire, mais restent limités par le faible nombre de sites disponibles *au sein* d'un seul observatoire (G = 4 à 7). Une analyse au niveau des ménages plus riche regrouperait l'ensemble des cinq observatoires exposés avec les donneurs jamais exposés dans un dispositif à traitement échelonné unique, exploitant quatre cohortes d'exposition échelonnées (Ankarafantsika 2003, Farafangana/Toliara/Fénérive 2006–07, Alaotra 2008, plus jamais exposés). L'estimateur naturel est à nouveau Callaway–Sant'Anna avec `panel = FALSE`, complété par des études d'événements Sun–Abraham via `fixest::sunab()`. La vague 2026 du SOR augmentera l'information post-exposition et devrait affiner ces estimations. Ce dispositif prospectif est discuté à @sec-next-steps.

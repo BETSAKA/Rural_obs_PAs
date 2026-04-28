@@ -301,17 +301,16 @@ proximity |>
 
 Les neuf observatoires donneurs se répartissent en trois catégories :
 
-**Propres** (pas d'AP dans un rayon de 20 km pendant la période d'étude) :
+**Propres** (aucune AP dans un rayon de 20 km pendant la période d'étude, ou enquête terminée avant la création de l'AP) :
 
 - Antsirabe (02)
+- Antsohihy (12) — à 0,3 km du Corridor forestier Bongolava (UICN V, 15 septembre 2006), mais l'enquête ne couvre que 1999--2004 et **se termine avant la création de l'AP**. Toutes les données d'Antsohihy sont pré-traitement ; le risque de contamination est sans objet.
 - Tsiroanomandidy (13)
 - Ambovombe (16)
 - Mahanoro (25)
 - Itasy (41)
 
-**Aussi exposés** (nouvelle AP dans un rayon de 20 km pendant la période d'étude) :
-
-- **Antsohihy (12)** — à 0,3 km du Corridor forestier Bongolava (UICN V, 15 septembre 2006). La commune de Tsarahasina borde directement le corridor. Cependant, l'enquête d'Antsohihy prend fin en 2005, ne fournissant qu'une seule année post-2006. Il est exclu à la fois du pool de donneurs et de l'échantillon exposé.
+**Aussi exposés** (nouvelle AP dans un rayon de 20 km pendant la période d'étude, avec données post-traitement) :
 - **Farafangana (15)** — à 14 km du Corridor Forestier Ambositra-Vondrozo (UICN V, 15 septembre 2006), et avec une exposition préexistante à Manombo SR (UICN IV, 1962). L'exposition préexistante est absorbée par l'effet fixe d'unité ; le décret CFAV de 2006 représente une nouvelle exposition.
 - **Toliara Nord (23)** — à 1,4 km de Ranobe PK 32 (décembre 2008), 12 km d'Amoron'i Onilahy (janvier 2007) et 16 km du PN des Mikea (avril 2007). Le cas le plus problématique : une cascade de trois AP à partir de janvier 2007.
 - **Fénérive Est (24)** — à 6 km de la Réserve de Tampolo (UICN IV, août 2007). Petite réserve à faible intensité d'application, mais la proximité est claire.
@@ -542,13 +541,13 @@ ggplot(detail_data, aes(x = pa_label, y = dist_km, colour = exposure_type)) +
 
 L'audit de contamination a deux conséquences :
 
-1. **Pool de donneurs restreint** : en retirant les quatre observatoires aussi exposés, il reste cinq donneurs propres (Antsirabe, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). Les estimations gsynth pour Marovoay et Alaotra doivent être ré-estimées avec ce pool restreint comme test de robustesse.
+1. **Pool de donneurs restreint** : en retirant les trois observatoires aussi exposés (Farafangana, Toliara Nord, Fénérive Est), il reste six donneurs propres (Antsirabe, Antsohihy, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). Antsohihy est inclus car son enquête précède le corridor de Bongolava (2006), ne fournissant que des observations pré-traitement. Les estimations gsynth pour Marovoay et Alaotra doivent être ré-estimées avec ce pool restreint comme test de robustesse.
 
 2. **Validité pré-traitement préservée pour Marovoay** : le début de l'exposition (2003) précède tous les événements secondaires d'AP (le plus tôt : 2006). Les tests d'équilibre pré-traitement (ATT placebo avant 2003) ne sont pas affectés par l'exposition post-2006 des donneurs.
 
 ## Pour l'analyse étendue
 
-Les quatre donneurs aussi exposés deviennent des **unités exposées** dans l'analyse étendue ([Chapitre 5](05_extensions.qmd)). Antsohihy est exclu (couverture post-traitement insuffisante). Farafangana, Toliara Nord et Fénérive Est sont des cas exposés viables avec ≥ 3 années post-traitement et des stratégies d'identification plausibles. Leur reclassification de donneurs à unités exposées :
+Les trois donneurs aussi exposés (Farafangana, Toliara Nord et Fénérive Est) deviennent des **unités exposées** dans l'analyse étendue ([Chapitre 5](05_extensions.qmd)). Antsohihy est reclassifié en **donneur propre** plutôt qu'en unité aussi exposée : son enquête couvre 1999--2004 et se termine avant l'établissement du corridor de Bongolava (septembre 2006), de sorte qu'il ne contribue qu'à des observations pré-traitement. Comme les autres donneurs propres à panel court (obs 13 se termine en 2005, obs 16 en 2008), gsynth utilise les années disponibles. La reclassification de ces trois donneurs en unités exposées :
 
 - Purifie le pool de donneurs (en supprimant les unités aussi exposées).
 - Enrichit l'échantillon exposé (cinq paires observatoire–AP au lieu de deux).
@@ -556,26 +555,16 @@ Les quatre donneurs aussi exposés deviennent des **unités exposées** dans l'a
 
 ```{r}
 #| label: fig-clean-donors
-#| fig-cap: "Carte de Madagascar avec les localisations des observatoires colorées par statut : exposé (Ch. 4), nouvellement exposé (Ch. 5), donneur propre, exclu."
+#| fig-cap: "Carte de Madagascar avec les localisations des observatoires colorées par statut : exposé (Ch. 4), nouvellement exposé (Ch. 5), donneur propre."
 #| fig-height: 7
 #| fig-width: 7
-# Include Antsohihy manually (not in obs_locations)
-obs_locs_full <- bind_rows(
-  obs_locations |> st_drop_geometry() |> mutate(OBS_CODE = as.integer(code)),
-  tibble(
-    OBS_CODE = 12L,
-    code = "12",
-    name = "Antsohihy",
-    latitude = -14.8781,
-    longitude = 47.9875,
-    role = NA_character_
-  )
-) |>
+# Antsohihy (12) figure maintenant dans obs_locations (ajouté comme donneur propre)
+obs_locs_full <- obs_locations |> st_drop_geometry() |>
+  mutate(OBS_CODE = as.integer(code)) |>
   mutate(
     status = case_when(
       OBS_CODE %in% c(3L, 21L) ~ "Exposé (Ch. 4)",
       OBS_CODE %in% c(15L, 23L, 24L) ~ "Nouvellement exposé (Ch. 5)",
-      OBS_CODE == 12L ~ "Exclu (couverture insuffisante)",
       OBS_CODE %in% as.integer(CLEAN_DONOR_OBS) ~ "Donneur propre"
     )
   )
@@ -583,14 +572,12 @@ obs_locs_full <- bind_rows(
 status_pal <- c(
   "Exposé (Ch. 4)" = "#D32F2F",
   "Nouvellement exposé (Ch. 5)" = "#E65100",
-  "Donneur propre" = "#388E3C",
-  "Exclu (couverture insuffisante)" = "grey60"
+  "Donneur propre" = "#388E3C"
 )
 status_shapes <- c(
   "Exposé (Ch. 4)" = 17,
   "Nouvellement exposé (Ch. 5)" = 18,
-  "Donneur propre" = 16,
-  "Exclu (couverture insuffisante)" = 4
+  "Donneur propre" = 16
 )
 
 ggplot() +

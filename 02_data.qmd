@@ -72,8 +72,6 @@ ggplot() +
 #| fig-height: 7
 #| fig-width: 10
 obs_names_df <- obs_locations |> st_drop_geometry() |> select(code, name)
-# obs 12 (Antsohihy) is in ALL_DONOR_OBS but not in obs_locations
-obs_names_df <- bind_rows(obs_names_df, tibble(code = "12", name = "Antsohihy"))
 
 coverage <- household_consolidated |>
   filter(obs %in% c("03", "21", ALL_DONOR_OBS)) |>
@@ -186,7 +184,7 @@ For each of the 11 study observatories, we compute the minimum distance from com
 
 ```{r}
 #| label: fig-pa-overlaps
-#| fig-cap: "Survey coverage windows and PA exposure events for the 11 study observatories. Bars show the survey span; triangles mark the nearest new PA decree date. Green bars indicate observatories with sufficient pre/post data for gsynth; red bars indicate insufficient coverage relative to the PA event."
+#| fig-cap: "Survey coverage windows and PA exposure events for the 11 study observatories. Bars show the survey span; triangles mark the nearest new PA decree date. Green bars: sufficient pre/post data for gsynth. Pink bars: PA exposure but insufficient post-treatment coverage. Blue bars: no nearby PA during the survey period (including cases where the PA was created after the survey ended)."
 #| fig-height: 7
 #| fig-width: 11
 # --- Proximity computation (self-contained) ---
@@ -247,10 +245,7 @@ new_pa_by_obs <- proximity_ch2 |>
   )
 
 # --- Survey coverage ---
-obs_names_full <- bind_rows(
-  obs_locations |> mutate(obs = code) |> select(obs, name),
-  tibble(obs = "12", name = "Antsohihy")
-)
+obs_names_full <- obs_locations |> mutate(obs = code) |> select(obs, name)
 
 hh_coverage <- household_consolidated |>
   summarise(
@@ -285,7 +280,7 @@ gantt_data <- hh_coverage |>
       NA_integer_
     ),
     feasible = case_when(
-      !has_pa ~ "No nearby PA",
+      !has_pa | pa_year > last_year ~ "No nearby PA\n(during survey period)",
       pre_yrs >= 4 & post_yrs >= 3 ~ "Feasible",
       TRUE ~ "Insufficient coverage"
     ),
@@ -298,7 +293,7 @@ gantt_data <- hh_coverage |>
 feasibility_cols <- c(
   "Feasible" = "#388E3C",
   "Insufficient coverage" = "#EF9A9A",
-  "No nearby PA" = "#90CAF9"
+  "No nearby PA\n(during survey period)" = "#90CAF9"
 )
 
 ggplot(gantt_data, aes(y = obs_label)) +
