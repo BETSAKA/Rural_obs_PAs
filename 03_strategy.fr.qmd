@@ -302,7 +302,7 @@ Le dispositif rotatif préserve cependant la représentativité transversale à 
 
 Nous analysons donc les données au niveau du village (*fokontany*), en agrégeant les revenus des ménages en médianes village-année. La médiane est préférée à la moyenne car les distributions de revenus ruraux sont asymétriques à droite.
 
-## Variable de résultat {#sec-outcome}
+## Variable de résultat {#sec-outcome-strategy}
 
 La variable de résultat principale est le logarithme du revenu équivalisé des ménages, construit en quatre étapes :
 

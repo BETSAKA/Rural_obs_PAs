@@ -87,8 +87,8 @@
     ]
   },
   {
-    "objectID": "03_strategy.fr.html#sec-outcome",
-    "href": "03_strategy.fr.html#sec-outcome",
+    "objectID": "03_strategy.fr.html#sec-outcome-strategy",
+    "href": "03_strategy.fr.html#sec-outcome-strategy",
     "title": "3  Stratégie d’identification",
     "section": "5.3 Variable de résultat",
     "text": "5.3 Variable de résultat\nLa variable de résultat principale est le logarithme du revenu équivalisé des ménages, construit en quatre étapes :\n\nRevenu total (revtot) : somme des composantes de revenus.\nÉquivalisation selon l’échelle OCDE modifiée : \\(\\text{equiv} = 1 + 0{,}5 \\times (\\text{adultes supplémentaires}) + 0{,}3 \\times (\\text{enfants de moins de 14 ans})\\).\nWinsorisation aux 1er et 99e percentiles intrayear.\nTransformation logarithmique : \\(y_{it} = \\log(\\text{revenu équivalisé}_{it} + 1)\\).",
@@ -201,7 +201,7 @@
     "href": "04_results.fr.html#sec-ala-att",
     "title": "4  Résultats",
     "section": "6.2 Trajectoire ATT gsynth",
-    "text": "6.2 Trajectoire ATT gsynth\n\n\n\n\n\n\n\n\nFigure 6.1: Lac Alaotra : trajectoire ATT gsynth. Variable de résultat : revenu logarithmique équivalisé OCDE.\n\n\n\n\n\nLe modèle gsynth pour Alaotra produit un ATT moyen de +0.014 points de log, statistiquement indiscernable de zéro (IC 95% : [?var:att_ala_ci_lo, ?var:att_ala_ci_hi], p = 0.928). L’absence d’impact détectable sur le revenu au Lac Alaotra contraste avec l’écart négatif à Ankarafantsika. L’interprétation la plus parcimonieuse est que le cadre CBNRM de Durrell, qui régule l’accès aux ressources de manière participative plutôt que de les prohiber entièrement, a préservé les moyens de subsistance des ménages tandis que les restrictions d’exclusion à Ankarafantsika les ont érodés.",
+    "text": "6.2 Trajectoire ATT gsynth\n\n\n\n\n\n\n\n\nFigure 6.1: Lac Alaotra : trajectoire ATT gsynth. Variable de résultat : revenu logarithmique équivalisé OCDE.\n\n\n\n\n\nLe modèle gsynth pour Alaotra produit un ATT moyen de +0.014 points de log, statistiquement indiscernable de zéro (IC 95% : [-0.303, +0.333], p = 0.928). L’absence d’impact détectable sur le revenu au Lac Alaotra contraste avec l’écart négatif à Ankarafantsika. L’interprétation la plus parcimonieuse est que le cadre CBNRM de Durrell, qui régule l’accès aux ressources de manière participative plutôt que de les prohiber entièrement, a préservé les moyens de subsistance des ménages tandis que les restrictions d’exclusion à Ankarafantsika les ont érodés.",
     "crumbs": [
       "Analysis",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Résultats</span>"

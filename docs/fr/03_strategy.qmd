@@ -626,7 +626,7 @@ We therefore analyse the data at the village (*fokontany*) level, aggregating ho
 
 The median is preferred to the mean because rural income distributions are right-skewed with occasional extreme values. Village-level medians are more robust to the specific composition of households surveyed in any given year.
 
-## Outcome variable {#sec-outcome}
+## Outcome variable {#sec-outcome-strategy}
 
 The primary outcome is *log equivalised household income*. Construction proceeds in four steps:
 

@@ -184,7 +184,7 @@ ggplot(att_ala_df, aes(rel_time, att)) +
   theme_minimal(base_size = 12)
 ```
 
-The Alaotra gsynth estimates an average post-exposure ATT of approximately {{< var att_ala >}} log points (*p* = {{< var att_ala_p >}}) — close to zero and not statistically significant. The confidence interval comfortably spans zero. Year-by-year estimates are noisy with no clear trend away from the counterfactual.
+The Alaotra gsynth estimates an average post-exposure ATT of approximately {{< var att_ala >}} log points (95% CI: [{{< var att_ala_ci_lo >}}, {{< var att_ala_ci_hi >}}], *p* = {{< var att_ala_p >}}) — close to zero and not statistically significant. Year-by-year estimates are noisy with no clear trend away from the counterfactual.
 
 The null result is consistent with several interpretations: participatory conservation under CBNRM may impose lower costs on aggregate income; the 7-year post-exposure window may be insufficient to detect a gradual effect; and the single-unit design limits statistical power.
 
@@ -510,6 +510,6 @@ The east-west income gap in 2025 is not driven by outliers: it is visible at eve
 
 What remains unresolved is whether this gap reflects cumulative park exposure or the long-term effects of the same regional decline discussed in @sec-maro-rcs. By 2025, the Marovoay irrigation system has deteriorated further, rural-to-urban migration has reshaped communities, and the region's rice economy has never recovered its former position. The 2025 gap is real and robust; its attribution to conservation policy specifically requires caution.
 
-## Alaotra long-run assessment {#sec-ext-ala}
+## Alaotra long-run assessment {#sec-ala-longrun}
 
 For Alaotra, a 2025 gsynth extension is not feasible: all Alaotra sites are exposed and no other observatory was resurveyed, so there are no 2025 control observations. The Alaotra estimate remains based on the 1999–2014 panel (ATT ≈ {{< var att_ala >}}, $p$ = {{< var att_ala_p >}}).
