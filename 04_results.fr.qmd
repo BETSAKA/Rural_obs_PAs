@@ -126,6 +126,9 @@ ggplot(unit_effects, aes(x = factor(year), y = effect, fill = village)) +
   )
 ```
 
+
+Les deux fokontany exposés affichent des effets négatifs, bien que de magnitudes différentes. Bepako (4,1 km de la limite du parc) présente un effet plus important et plus cohérent que Madiromiongana (11,7 km), ce qui est cohérent avec un gradient de distance dans l'intensité d'enforcement.
+
 # Lac Alaotra : conservation multifonctionnelle (catégorie V UICN) {#sec-ala}
 
 ## Construction du panel
@@ -161,6 +164,8 @@ ggplot(att_ala_df, aes(rel_time, att)) +
 
 Le modèle gsynth pour Alaotra produit un ATT moyen de {{< var att_ala >}} points de log, statistiquement indiscernable de zéro (IC 95% : [{{< var att_ala_ci_lo >}}, {{< var att_ala_ci_hi >}}], *p* = {{< var att_ala_p >}}). L'absence d'impact détectable sur le revenu au Lac Alaotra contraste avec l'écart négatif à Ankarafantsika. L'interprétation la plus parcimonieuse est que le cadre CBNRM de Durrell, qui régule l'accès aux ressources de manière participative plutôt que de les prohiber entièrement, a préservé les moyens de subsistance des ménages tandis que les restrictions d'exclusion à Ankarafantsika les ont érodés.
 
+Le dispositif CTR au niveau des ménages décrit à @sec-complementary applique l'estimateur Callaway–Sant'Anna au panel 1999–2014 + 2025 d'Alaotra sous deux proxys d'exposition intra-observatoire : la distance à la limite de l'AP la plus proche (≤ 10 km) et la part de ménages de 2025 déclarant des usages extractifs dépendants de l'AP (≥ 12,5%).
+
 ## Vérification CTR intra-Alaotra {#sec-ala-rcs}
 
 ```{r}
@@ -184,7 +189,57 @@ sec_did_ala$summary |>
   tab_header(title = "Alaotra : CTR ménages DiD")
 ```
 
+Les deux dispositifs intra-Alaotra produisent de petites estimations ponctuelles et de larges erreurs types cluster-robustes qui incluent confortablement zéro. Leur conclusion rejoint le gsynth selon un contraste d'identification différent : non pas contre un pool de donneurs extérieur, mais contre les fokontany fusionnés moins exposés du même observatoire. Cette convergence réduit l'éventail des interprétations plausibles du résultat nul d'Alaotra : l'absence d'effet agrégé sur le revenu du *Paysage Harmonieux Protégé* est robuste, que le contrefactuel soit construit à partir d'observatoires extérieurs (gsynth) ou à partir de l'hétérogénéité de l'exposition intra-observatoire (CTR DiD).
+
+
 ## Comparaison des deux cas {#sec-comparison}
+
+```{r}
+#| label: tbl-comparison
+#| tbl-cap: "Résumé des résultats gsynth : conservation stricte (Ankarafantsika) vs multifonctionnelle (Alaotra)."
+get_ci <- function(gs, side) {
+  if (!is.null(gs$est_avg)) gs$est_avg[1, side] else NA_real_
+}
+get_se <- function(gs) {
+  if (!is.null(gs$est_avg)) gs$est_avg[1, "S.E."] else NA_real_
+}
+get_pval <- function(gs) {
+  if (!is.null(gs$est_avg)) gs$est_avg[1, "p.value"] else NA_real_
+}
+
+tibble(
+  AP = c("Ankarafantsika PN", "Lac Alaotra PHP"),
+  `Catégorie UICN` = c("II (stricte)", "V (multifonctionnelle)"),
+  `Année d'exposition` = c(TREAT_YEAR_MARO, TREAT_YEAR_ALA),
+  `Unité(s) exposée(s)` = c(
+    "Madiromiongana & Bepako (rive est)",
+    "Observatoire agrégé"
+  ),
+  `ATT (pts log)` = round(c(gs_maro$att_avg, gs_ala$att_avg), 3),
+  `ES` = round(c(get_se(gs_maro), get_se(gs_ala)), 3),
+  `IC 95%` = c(
+    paste0("[", round(get_ci(gs_maro, "CI.lower"), 3), ", ", round(get_ci(gs_maro, "CI.upper"), 3), "]"),
+    paste0("[", round(get_ci(gs_ala, "CI.lower"), 3), ", ", round(get_ci(gs_ala, "CI.upper"), 3), "]")
+  ),
+  `ATT (%)` = paste0(round((exp(c(gs_maro$att_avg, gs_ala$att_avg)) - 1) * 100, 1), "%"),
+  `p-valeur` = round(c(get_pval(gs_maro), get_pval(gs_ala)), 3),
+  `r* (VC)` = c(gs_maro$r_cv, gs_ala$r_cv),
+  `N donneurs` = c(gs_maro$N_co, gs_ala$N_co)
+) |>
+  gt() |>
+  tab_header(
+    title = "Résultats gsynth comparatifs",
+    subtitle = "Estimation séparée pour chaque AP (1999–2014)"
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFCDD2"),
+    locations = cells_body(rows = 1)
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#BBDEFB"),
+    locations = cells_body(rows = 2)
+  )
+```
 
 ```{r}
 #| label: fig-att-comparison
@@ -210,7 +265,7 @@ bind_rows(
   theme_minimal(base_size = 12) + theme(legend.position = "bottom")
 ```
 
-La comparaison entre les deux cas primaires est saisissante mais doit être interprétée avec prudence. À Ankarafantsika, la conservation stricte est associée à un effet négatif persistant, mais sa magnitude et son attribution restent incertaines en raison du déclin régional documenté de la plaine de Marovoay. À Alaotra, la conservation multifonctionnelle est associée à un effet nul, mais cette absence de détection pourrait également refléter une puissance statistique insuffisante. Avant de tirer des conclusions de gouvernance, une certaine prudence s'impose.
+Le contraste entre les deux trajectoires ATT estimées est net : un large écart négatif persistant à Ankarafantsika, et un écart quasi nul à Alaotra. Avant de tirer des conclusions de gouvernance, une certaine prudence s'impose. À Marovoay, la comparaison intra-observatoire entre rive est et rive ouest ne détecte aucune différence, soulevant la possibilité que l'estimation gsynth capte le déclin économique régional plutôt que les effets de la conservation. À Alaotra, le résultat nul peut refléter une gouvernance genuinement bénigne ou une puissance statistique insuffisante. Ces deux mises en garde tempèrent mais ne dissolvent pas le contraste : les éléments suggèrent que la gestion exclusionnaire stricte engendre des coûts sur les moyens de subsistance plus élevés que le co-management participatif, mais les données ne peuvent pas établir définitivement le mécanisme causal.
 
 ## Robustesse {#sec-robustness}
 
@@ -293,3 +348,129 @@ ggplot(rob_ala, aes(rel_time, att, color = spec, fill = spec)) +
   theme_minimal(base_size = 11) + theme(legend.position = "bottom")
 ```
 
+
+# Évaluation à long terme : ré-enquête 2025 {#sec-longrun}
+
+```{r}
+#| label: longrun-setup
+#| include: false
+res_deb_25 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_deb.dta")
+n_hh_maro_25 <- res_deb_25 |>
+  dplyr::filter(obs == "01") |>
+  nrow()
+
+att_avg_ext <- gs_maro_ext$att_avg
+att_avg_main <- gs_maro$att_avg
+att_2025_val <- tail(gs_maro_ext$est_att[, "ATT"], 1)
+att_ratio_ext <- att_2025_val / att_avg_main
+n_donors_ext <- gs_maro_ext$N_co
+```
+
+Une ré-enquête 2025 à Marovoay (`r n_hh_maro_25` ménages répartis entre les quatre fokontany : Bepako et Madiromiongana sur la rive est, Ampijoroa et Maroala sur la rive ouest) étend la fenêtre d'observation à 22 ans post-exposition.
+
+## Construction du panel (modèle étendu)
+
+```{r}
+#| label: longrun-donors
+#| include: false
+donor_cols <- setdiff(colnames(gs_maro_ext$eff), c("031", "032"))
+donor_obs <- sort(unique(substr(donor_cols, 1, 2)))
+also_exp <- intersect(donor_obs, c("12", "15", "21", "23", "24"))
+clean_donor <- intersect(donor_obs, c("02", "13", "16", "25", "41"))
+maro_wbank <- intersect(donor_cols, c("033", "034"))
+years_2025 <- sum(!is.na(gs_maro_ext$eff["2025", ]))
+```
+
+Le modèle étendu utilise le pool de donneurs complet (tous les sites SOR ayant une série de revenus 1999–2014 complète) plutôt que le pool propre à 5 donneurs de @sec-maro. Les unités exposées sont inchangées — Bepako (site 031) et Madiromiongana (site 032), à l'est de la Betsiboka — mais les `r n_donors_ext` sites donneurs couvrent `r length(donor_obs)` observatoires :
+
+- les `r length(clean_donor)` donneurs propres utilisés à @sec-maro (observatoires `r paste(clean_donor, collapse = ", ")`) ;
+- les `r length(also_exp)` observatoires « aussi exposés » signalés à l'[Annexe B](A2_donor_validity.qmd) (`r paste(also_exp, collapse = ", ")`) ;
+- les `r length(maro_wbank)` fokontany de la rive ouest de Marovoay (Ampijoroa 033 et Maroala 034), qui font partie du même observatoire que les unités traitées et partagent donc les chocs locaux.
+
+Ce contexte d'identification est plus faible que la spécification principale : trois des observatoires donneurs étaient eux-mêmes soumis à des expansions d'AP pendant la période, et deux sites donneurs se trouvent à un kilomètre des unités exposées. Les résultats ci-dessous doivent donc être lus comme une corroboration descriptive des estimations de @sec-maro-att plutôt que comme un test indépendant.
+
+## gsynth étendu {#sec-ext-gsynth}
+
+```{r}
+#| label: fig-ext-att
+#| fig-cap: "Trajectoire ATT étendue pour les sites de la rive est d'Ankarafantsika (1999–2025). Le point 2025, 22 ans après l'extension du parc, affiche le plus grand effet pour une seule période."
+#| fig-height: 5.5
+#| fig-width: 10
+att_ext_df <- tibble(
+  rel_time = as.numeric(rownames(gs_maro_ext$est_att)),
+  att = gs_maro_ext$est_att[, "ATT"],
+  ci_lo = gs_maro_ext$est_att[, "CI.lower"],
+  ci_hi = gs_maro_ext$est_att[, "CI.upper"]
+)
+att_2025 <- tail(att_ext_df, 1)
+
+ggplot(att_ext_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.12) +
+  geom_line(color = "#D32F2F", linewidth = 0.8) +
+  geom_point(color = "#D32F2F", size = 2.5) +
+  geom_point(data = att_2025, color = "#D32F2F", size = 4, shape = 18) +
+  annotate("text", x = att_2025$rel_time - 0.3, y = att_2025$att + 0.12,
+           label = "2025", fontface = "bold", color = "#D32F2F", hjust = 1, size = 3.5) +
+  labs(
+    x = "Périodes relatives à l'exposition (2003 = 0)",
+    y = "ATT (revenu log équivalisé)",
+    title = "Ankarafantsika : trajectoire ATT étendue (1999–2025)",
+    subtitle = paste0(
+      "ATT moyen post-exposition = ", round(gs_maro_ext$att_avg, 3),
+      " (p = ", format.pval(gs_maro_ext$est_avg[1, "p.value"], digits = 3), ")",
+      ". ATT 2025 = ", round(att_2025$att, 3))
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+En incluant 2025 dans le panel, l'ATT moyen post-exposition s'approfondit substantiellement : `r round(att_avg_ext, 3)` points logarithmiques dans le modèle étendu contre `r round(att_avg_main, 3)` dans la spécification principale 1999–2014. L'ATT spécifique à 2025 (`r round(att_2025_val, 3)` points logarithmiques) est environ `r sprintf("%.1f", att_ratio_ext)` fois la moyenne 1999–2014, indiquant que les pertes de revenu s'accumulent plutôt qu'elles ne se dissipent dans le temps. L'écart croissant est visible dans les trajectoires brutes au niveau des sites :
+
+```{r}
+#| label: fig-ext-traj
+#| fig-cap: |
+#|   Trajectoires de revenu au niveau des sites pour les quatre fokontany de Marovoay
+#|   (1999–2025). Rive est (exposée, rouge) et rive ouest (contrôle, bleu)
+#|   suivaient une trajectoire commune jusqu'en 2003, puis divergent de manière persistante.
+#| fig-height: 5.5
+#| fig-width: 9
+traj_data <- maro_gs_ext |>
+  filter(site_id %in% c("031", "032", "033", "034")) |>
+  mutate(
+    village = case_when(
+      site_id == "031" ~ "Bepako (Est)",
+      site_id == "032" ~ "Madiromiongana (Est)",
+      site_id == "033" ~ "Ampijoroa (Ouest)",
+      site_id == "034" ~ "Maroala (Ouest)"
+    ),
+    bank = if_else(site_id %in% c("031", "032"), "Exposée (Est)", "Contrôle (Ouest)")
+  )
+
+ggplot(traj_data, aes(x = year, y = ln_revtot_w, color = village, linetype = bank)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  geom_vline(xintercept = 2003, linetype = "dashed", alpha = 0.5) +
+  annotate("text", x = 2003.5, y = min(traj_data$ln_revtot_w, na.rm = TRUE) + 0.3,
+           label = "Extension du parc\n(2003)", hjust = 0, size = 3, color = "grey40") +
+  scale_color_manual(values = c(
+    "Ampijoroa (Ouest)" = "#2171b5", "Maroala (Ouest)" = "#6baed6",
+    "Madiromiongana (Est)" = "#cb181d", "Bepako (Est)" = "#fb6a4a")) +
+  guides(color = guide_legend(nrow = 1, byrow = TRUE, order = 1),
+         linetype = guide_legend(nrow = 1, order = 2)) +
+  labs(title = "Trajectoires de revenu au niveau des sites : Marovoay 1999–2025",
+       x = NULL, y = "Revenu log équivalisé moyen",
+       color = "Village", linetype = "Groupe d'exposition") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom", legend.box = "vertical", legend.spacing.y = unit(2, "pt"))
+```
+
+## Robustesse de l'écart 2025 {#sec-ext-robust}
+
+L'écart de revenu est-ouest en 2025 n'est pas dû à des valeurs aberrantes : il est visible à chaque percentile de la distribution des revenus, la suppression des valeurs aberrantes basée sur l'EIQ élargit plutôt qu'il ne réduit l'écart, et l'avantage de la rive ouest apparaît dans cinq des sept principales composantes du revenu. En termes statistiques, l'écart est suffisamment important pour passer les tests standards (test des rangs de Wilcoxon $p = 2{,}1 \times 10^{-10}$ ; test $t$ de Welch $p = 1{,}8 \times 10^{-5}$).
+
+Ce qui reste non résolu, c'est de savoir si cet écart reflète une exposition cumulative au parc ou les effets à long terme du même déclin régional discuté à @sec-maro-rcs. En 2025, le système d'irrigation de Marovoay s'est encore détérioré, la migration rurale-urbaine a remodelé les communautés et l'économie rizicole de la région n'a jamais retrouvé sa position antérieure. L'écart de 2025 est réel et robuste ; son attribution à la politique de conservation spécifiquement exige de la prudence.
+
+## Évaluation à long terme d'Alaotra {#sec-ala-longrun}
+
+Pour Alaotra, une extension gsynth à 2025 n'est pas réalisable : tous les sites d'Alaotra sont exposés et aucun autre observatoire n'a été ré-enquêté, il n'y a donc pas d'observations de contrôle en 2025. L'estimation d'Alaotra reste basée sur le panel 1999–2014 (ATT ≈ {{< var att_ala >}}, $p$ = {{< var att_ala_p >}}).

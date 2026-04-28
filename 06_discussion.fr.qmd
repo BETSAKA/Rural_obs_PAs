@@ -77,10 +77,31 @@ La mesure du revenu par enquête dans les économies de subsistance est intrins�
 Les cinq observatoires propres couvrent des zones agro-écologiques très différentes — plateau des hautes terres, sud semi-aride, côte est humide. La question de savoir si une moyenne pondérée de ces économies diverses peut représenter de manière crédible ce que la plaine rizicole irriguée de Marovoay, ou la pêcherie lacustre d'Alaotra, aurait gagné en l'absence de l'AP reste ouverte.
 
 
-# Perspectives {#sec-next-steps}
+# Prochaines étapes : la vague d'enquête 2026 {#sec-next-steps}
 
-La vague d'enquête 2026 prévue étendra la couverture à des observatoires supplémentaires et permettra une analyse au niveau des ménages poolant tous les observatoires exposés dans un dispositif à traitement échelonné. L'estimateur naturel est Callaway–Sant'Anna avec `panel = FALSE`, complété par des études d'événements Sun–Abraham via `fixest::sunab()`.
+Les limites ci-dessus — agrégation, exigences de panel équilibré, puissance à unité unique — sont largement des artefacts du cadre gsynth plutôt que des données elles-mêmes. Les données du panel des Observatoires Ruraux, avec ~500 ménages par observatoire par année d'enquête sur des coupes transversales répétées et un traitement échelonné, se prêtent également à une estimation de différences-en-différences au niveau des ménages.
 
-La priorité analytique immédiate est de tester empiriquement l'hypothèse de déclin régional pour Marovoay. Deux approches sont envisagées : premièrement, incorporer des données sur les rendements rizicoles régionaux ou la productivité agricole comme covariables dans le modèle gsynth pour contrôler directement la trajectoire économique régionale ; deuxièmement, identifier des sites donneurs comparables sur des plaines irriguées de basse altitude au lieu de sites sur le plateau des hautes terres ou dans les zones sèches.
+## Dispositif DiD à traitement échelonné
 
-Les résultats de cette analyse constituent une estimation de première génération qui motive, et sera affinée par, l'analyse au niveau des ménages prévue pour 2026.
+Les cinq observatoires exposés définissent quatre cohortes d'exposition :
+
+| Cohorte ($g$) | Sites | Type AP | Dispositif |
+|:---:|:---|:---|:---|
+| 2003 | Marovoay rive est (2 sites) | Strict (catégorie II UICN) | Division intra-site |
+| 2006 | Farafangana (9 sites) | Multifonctionnel (catégorie V UICN) | Au niveau de l'observatoire |
+| 2007 | Toliara Nord (4) + Fénérive Est (10) | Mixte V/II + Faible intensité (IV) | Au niveau de l'observatoire |
+| 2008 | Alaotra (3 sites) | Multifonctionnel (catégorie V UICN) | Au niveau de l'observatoire |
+| $\infty$ | Marovoay ouest (2) + 5 donneurs propres (36) | Jamais exposés | Contrôles |
+
+: Quatre cohortes d'exposition échelonnées pour le DiD Callaway & Sant'Anna {#tbl-staggered}
+
+Une caractéristique cruciale : *les unités pas encore exposées servent de contrôles.* Alaotra (exposé à partir de 2008) constitue un contrôle valide pour l'effet de Marovoay pendant 2003–2007 avant que sa propre exposition ne commence. Cette identification croisée des cohortes est impossible dans le cadre gsynth.
+
+## Analyses prévues
+
+Lorsque la vague d'enquête 2026 sera disponible, la spécification principale sera une estimation de différences-en-différences échelonnées Callaway–Sant'Anna [-@CallawayS2021] au niveau des ménages, avec une estimation doublement robuste, des covariables au niveau des ménages et un clustering au niveau du site. Un estimateur complémentaire Sun–Abraham [-@SunAbraham2021] pondéré par l'interaction via `fixest::sunab()` fournira un résumé d'étude d'événements transparent. Les estimations gsynth des Chapitres 4 et 5 serviront de vérification de robustesse qui assouplit l'hypothèse de tendances parallèles aux effets fixes interactifs. Si gsynth et DiD s'accordent, les preuves sont plus crédibles indépendamment de l'hypothèse d'identification préférée. Si la vague 2026 couvre Fénérive Est, la petite empreinte de la Réserve de Tampolo permet un dispositif de distance intra-observatoire contrastant les sites proches et éloignés de l'AP, ajoutant un troisième contexte géographique indépendant aux côtés de Marovoay et Alaotra.
+
+Ce chapitre sera mis à jour lorsque les données 2026 seront disponibles. Les résultats gsynth actuels doivent être lus comme une analyse de première passe qui sera complétée par une estimation au niveau des ménages exploitant toute la profondeur des données.
+
+
+# Références {.unnumbered}

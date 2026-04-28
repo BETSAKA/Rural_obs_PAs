@@ -80,9 +80,56 @@ ggplot(att_fara_df, aes(rel_time, att)) +
   theme_minimal(base_size = 12)
 ```
 
-## Toliara Nord et l'AP Amoron'i Onilahy {#sec-tol-site}
+::: {.callout-warning}
+Farafangana ne dispose que de 3 années post-traitement (2006–2008). Les estimations gsynth sont présentées à titre d'illustration mais doivent être traitées avec une prudence extrême. L'ajustement pré-traitement est évalué sur 7 ans ; la précision post-traitement est insuffisante pour des conclusions fermes.
+:::
 
-L'observatoire de Toliara Nord (obs. 23) est adjacent à plusieurs aires protégées créées en 2007–2008 dans la région côtière du sud-ouest. Amoron'i Onilahy (catégorie V UICN) est la plus proche, à ~8 km de plusieurs communes de l'observatoire. La multiplicité des AP adjacentes et leurs catégories UICN variables compliquent l'identification d'une exposition nette.
+L'estimation ponctuelle est {{< var att_fara >}} points logarithmiques (~{{< var att_fara_pct >}}), mais avec de très larges intervalles de confiance (*p* = {{< var att_fara_p >}}) qui couvrent à la fois des valeurs négatives et positives. Avec seulement 3 observations post-traitement, cette estimation a une faible fiabilité et ne doit pas être interprétée indépendamment.
+
+## Toliara Nord et la cascade d'AP côtières {#sec-tol-site}
+
+L'observatoire 23 est situé sur la côte aride du sud-ouest de Madagascar, un paysage de fourré épineux et de forêt sèche. Trois aires protégées sont devenues opérationnelles en rapide succession :
+
+1. Amoron'i Onilahy (catégorie V UICN, 17 janvier 2007, ~12 km) : AP de paysage ripuarien et côtier couvrant l'estuaire de l'Onilahy.
+2. Parc National de Mikea (catégorie II UICN, 13 avril 2007, ~16 km) : réserve stricte protégeant la forêt de fourré épineux sec de Mikea.
+3. Ranobe PK 32 (catégorie V UICN, 2 décembre 2008, ~1,4 km) : grande AP terrestre (1 685 km²) bordant l'observatoire à très courte distance.
+
+L'année d'exposition est {{< var treat_year_tol >}} — la première année d'enquête complète suivant le décret initial de janvier 2007. Le décret Ranobe de décembre 2008 constitue une intensification secondaire dans la fenêtre post-exposition. Le caractère dominant de la conservation est catégorie V/multifonctionnel, bien que la présence du PN de Mikea (catégorie II) à 16 km introduise un élément strict.
+
+```{r}
+#| label: fig-map-tol
+#| fig-cap: "Observatoire de Toliara Nord et aires protégées à proximité. Trois AP sont devenues opérationnelles en 2007–2008."
+#| fig-height: 7
+#| fig-width: 7
+tol_pas <- dyn_study |>
+  filter(str_detect(NAME, "Ranobe PK 32|Amoron|Mikea")) |>
+  mutate(pa_label = case_when(
+    str_detect(NAME, "Ranobe")  ~ "Ranobe PK 32 (V, 2008)",
+    str_detect(NAME, "Amoron")  ~ "Amoron'i Onilahy (V, 2007)",
+    str_detect(NAME, "Mikea")   ~ "Mikea NP (II, 2007)"
+  ))
+tol_bbox <- st_bbox(c(xmin = 43.2, ymin = -24.0, xmax = 44.8, ymax = -22.8), crs = 4326)
+tol_mad_c  <- st_crop(madagascar, tol_bbox)
+tol_pas_c  <- tryCatch(st_crop(tol_pas, tol_bbox), error = function(e) tol_pas)
+tol_fkt_c  <- tryCatch(st_crop(tol_fokontany, tol_bbox), error = function(e) tol_fokontany) |>
+  mutate(layer = "Fokontany enquêtés")
+tol_pal <- c("Ranobe PK 32 (V, 2008)" = "#EF5350",
+             "Amoron'i Onilahy (V, 2007)" = "#FF8A65",
+             "Mikea NP (II, 2007)" = "#E53935")
+tm_shape(tol_mad_c) + tm_borders(col = "grey75", lwd = 0.3) + tm_fill(fill = "grey96") +
+tm_shape(tol_pas_c) +
+  tm_fill(fill = "pa_label", fill.scale = tm_scale_categorical(values = tol_pal),
+          fill.legend = tm_legend(title = ""), fill_alpha = 0.45) +
+  tm_borders(col = "pa_label", col.scale = tm_scale_categorical(values = tol_pal),
+             col.legend = tm_legend(show = FALSE), lwd = 0.8) +
+tm_shape(tol_fkt_c) +
+  tm_fill(fill = "layer", fill.scale = tm_scale_categorical(values = c("Fokontany enquêtés" = "#E3F2FD")),
+          fill.legend = tm_legend(title = ""), fill_alpha = 0.8) +
+  tm_borders(col = "grey40", lwd = 0.4) +
+tm_scalebar(position = c("left", "bottom")) +
+tm_title("Toliara Nord & APs à proximité (2007\u20132008)") +
+tm_layout(legend.position = c("right", "top"))
+```
 
 ```{r}
 #| label: fig-tol-att
@@ -108,9 +155,41 @@ ggplot(att_tol_df, aes(rel_time, att)) +
   theme_minimal(base_size = 12)
 ```
 
+
+L'ATT de Toliara Nord estime un effet de traitement composite de la cascade d'AP 2007–2008. L'estimation ponctuelle est {{< var att_tol >}} points logarithmiques (*p* = {{< var att_tol_p >}}), non significative statistiquement. Le décret secondaire de décembre 2008 (Ranobe PK 32, l'AP la plus proche à <1,5 km) coïncide avec un changement visible dans la trajectoire ATT, mais il est impossible de séparer les effets de 2007 et 2008 sans données micro supplémentaires. Le caractère dominant est multifonctionnel (catégorie V), cohérent avec l'effet agrégé quasi nul sur le revenu.
+
 ## Fénérive Est et la Réserve de Tampolo {#sec-fen-site}
 
-L'observatoire de Fénérive Est (obs. 24) est adjacent à la Réserve de Tampolo (catégorie IV UICN), une petite réserve de recherche forestière de ~7,3 km² gérée par ESSA-Forêts. Sa taille est un ordre de grandeur inférieure à celle des autres AP examinées dans cette étude, ce qui rend moins plausible une perturbation substantielle des moyens de subsistance.
+La Réserve de Tampolo (catégorie IV UICN, ~7,3 km²) est une petite forêt littorale côtière gérée par ESSA-Forêts comme forêt de recherche et d'enseignement. Un décret de protection temporaire a été émis le 20 août 2007 (WDPA 354011). La fonction principale de la réserve est l'accès scientifique et la recherche en conservation, et non l'exclusion des ressources communautaires. Sa petite superficie et son caractère institutionnel suggèrent une faible intensité d'exposition.
+
+L'année d'exposition est {{< var treat_year_fen >}}. L'enquête compte 8 années pré-traitement (1999–2006) et 8 années post-traitement (2007–2014) — le panel le plus symétrique parmi les nouveaux sites.
+
+```{r}
+#| label: fig-map-fen
+#| fig-cap: "Observatoire de Fénérive Est et la Réserve de Tampolo (catégorie IV UICN, 2007). La réserve est petite (~7,3 km²) sur la côte littorale nord-est."
+#| fig-height: 7
+#| fig-width: 7
+fen_pas <- dyn_study |> filter(str_detect(NAME, "Tampolo")) |>
+  mutate(pa_label = "Réserve de Tampolo (IV, 2007)")
+fen_bbox <- st_bbox(c(xmin = 49.1, ymin = -17.7, xmax = 49.9, ymax = -16.9), crs = 4326)
+fen_mad_c  <- st_crop(madagascar, fen_bbox)
+fen_fkt_c  <- tryCatch(st_crop(fen_fokontany, fen_bbox), error = function(e) fen_fokontany) |>
+  mutate(layer = "Fokontany enquêtés")
+fen_pas_c  <- tryCatch(st_crop(fen_pas, fen_bbox), error = function(e) fen_pas)
+tm_shape(fen_mad_c) + tm_borders(col = "grey75", lwd = 0.3) + tm_fill(fill = "grey96") +
+tm_shape(fen_pas_c) +
+  tm_fill(fill = "pa_label", fill.scale = tm_scale_categorical(values = c("Réserve de Tampolo (IV, 2007)" = "#CE93D8")),
+          fill.legend = tm_legend(title = ""), fill_alpha = 0.5) +
+  tm_borders(col = "pa_label", col.scale = tm_scale_categorical(values = c("Réserve de Tampolo (IV, 2007)" = "#6A1B9A")),
+             col.legend = tm_legend(show = FALSE), lwd = 0.8) +
+tm_shape(fen_fkt_c) +
+  tm_fill(fill = "layer", fill.scale = tm_scale_categorical(values = c("Fokontany enquêtés" = "#FFF8E1")),
+          fill.legend = tm_legend(title = ""), fill_alpha = 0.8) +
+  tm_borders(col = "grey40", lwd = 0.4) +
+tm_scalebar(position = c("left", "bottom")) +
+tm_title("Fénérive Est & Réserve de Tampolo (2007)") +
+tm_layout(legend.position = c("right", "top"))
+```
 
 ```{r}
 #| label: fig-fen-att
@@ -136,25 +215,206 @@ ggplot(att_fen_df, aes(rel_time, att)) +
   theme_minimal(base_size = 12)
 ```
 
-# Trois régularités dans cinq cas {#sec-patterns}
+L'ATT de Fénérive Est affiche un petit effet positif mais non significatif ({{< var att_fen >}} points logarithmiques, *p* = {{< var att_fen_p >}}) — peut-être le résultat le plus clair parmi les trois nouveaux sites. Une forêt de recherche de 7,3 km² ne peut plausiblement pas imposer des coûts de revenu à l'échelle de la population sur un observatoire multi-communes. La symétrie 8/8 pré-/post-traitement fournit l'évaluation de tendances pré-traitement la plus crédible des nouveaux sites.
 
-En combinant les résultats des deux cas primaires (Chapitre 4) et des trois extensions (Chapitre 5), trois régularités apparaissent :
+## Résumé du dispositif {#sec-ext-design}
 
-**Régularité 1 : Seul l'enforcement strict est associé à un écart de revenu négatif.** Le site présentant l'enforcement le plus exclusif — Ankarafantsika (catégorie II UICN) — est le seul pour lequel gsynth identifie un ATT substantiellement négatif. Cette régularité persiste à travers les spécifications et jusqu'en 2025. L'interprétation reste cependant prudente en raison du déclin régional documenté de la plaine de Marovoay, qui prédate l'exposition au parc et pourrait contribuer à l'écart observé.
+```{r}
+#| label: tbl-ext-design
+#| tbl-cap: "Cinq observatoires exposés : résumé du dispositif"
+tribble(
+  ~Observatoire,         ~`AP (principale)`,                     ~UICN, ~Type,               ~`Année trait.`, ~Pré, ~Post, ~Enquête,
+  "Marovoay (03)",       "Ankarafantsika NP",                    "II",  "Strict",             2003L, 4L,  11L, "1999\u20132014",
+  "Alaotra (21)",        "Lac Alaotra PHP",                      "V",   "Multifonctionnel",   2008L, 9L,   6L, "1999\u20132014",
+  "Farafangana (15)",    "Corridor Ambositra-Vondrozo",          "V",   "Multifonctionnel",   2006L, 7L,   3L, "1999\u20132008 \u26a0",
+  "Toliara N. (23)",     "Amoron'i Onilahy + Mikea + Ranobe",   "V/II","Mixte (V dom.)",     2007L, 8L,   8L, "1999\u20132014",
+  "F\u00e9n\u00e9rive E. (24)", "R\u00e9serve de Tampolo", "IV",  "Faible intensité",   2007L, 8L,   8L, "1999\u20132014"
+) |>
+  gt() |>
+  tab_header(
+    title = md("**Cinq observatoires exposés : résumé du dispositif**"),
+    subtitle = "\u26a0 Farafangana : seulement 3 années post-traitement \u2014 estimations indicatives"
+  ) |>
+  tab_style(style = cell_fill(color = "#FFCDD2"), locations = cells_body(rows = grepl("Marovoay", Observatoire))) |>
+  tab_style(style = cell_fill(color = "#BBDEFB"), locations = cells_body(rows = grepl("Alaotra", Observatoire))) |>
+  tab_style(style = cell_fill(color = "#DCEDC8"), locations = cells_body(rows = grepl("Farafangana", Observatoire))) |>
+  tab_style(style = cell_fill(color = "#FFE0B2"), locations = cells_body(rows = grepl("Toliara", Observatoire))) |>
+  tab_style(style = cell_fill(color = "#E8EAF6"), locations = cells_body(rows = grepl("n\u00e9rive", Observatoire)))
+```
 
-**Régularité 2 : La conservation multifonctionnelle et le parc de recherche produisent des effets proches de zéro.** Alaotra (catégorie V), Farafangana (catégorie V), Toliara Nord (catégorie V) et Fénérive Est (catégorie IV) présentent tous des ATT proches de zéro et statistiquement non significatifs. La cohérence de ce résultat nul sur quatre cas indépendants renforce la conclusion que les dispositifs de conservation participatifs ou à intensité modérée n'imposent pas de coût de revenu agrégé aux ménages adjacents.
+# Résultats par observatoire {#sec-ext-results}
 
-**Régularité 3 : Les effets nuls ne prouvent pas l'absence d'impact.** Avec un seul site exposé pour several cas, la puissance minimale réalisable est insuffisante pour détecter des effets inférieurs à 15–20%. Les résultats nuls doivent être interprétés comme « aucun effet détectable » plutôt que comme « certitude d'absence d'effet ».
+La stratégie d'identification et l'estimateur sont identiques au [Chapitre 4](04_results.qmd). Nous estimons l'ATT gsynth séparément pour chaque observatoire exposé, en utilisant les cinq observatoires propres comme pool de donneurs commun. Les résultats pour Farafangana, Toliara Nord et Fénérive Est sont présentés ci-dessus dans leurs sections respectives. Ici nous présentons les estimations de Marovoay et Alaotra avec ce pool de donneurs restreint, afin de montrer que les résultats principaux du [Chapitre 4](04_results.qmd) restent stables.
 
-# Mises en garde {#sec-caveats}
+## Ankarafantsika (donneurs propres) {#sec-ext-maro}
 
-Plusieurs mises en garde s'appliquent à l'ensemble des résultats de ce chapitre. 
+La ré-estimation du modèle de la rive est de Marovoay avec le pool de donneurs restreint donne un ATT moyen post-traitement de {{< var att_maro_clean >}} points logarithmiques ($\approx$ {{< var att_maro_clean_pct >}}, $p$ = {{< var att_maro_clean_p >}}), cohérent avec l'estimation à pool complet du [Chapitre 4](04_results.qmd). L'estimation ponctuelle est légèrement atténuée car le pool de donneurs plus petit supporte moins de facteurs latents, mais la conclusion qualitative est inchangée : l'enforcement strict est associé à un déclin de revenu persistent et statistiquement significatif.
 
-La courte fenêtre post-traitement pour Farafangana (3 ans) ne permet pas à gsynth d'établir une trajectoire ATT stable ; les résultats doivent être considérés comme illustratifs plutôt qu'informatifs. 
+```{r}
+#| label: fig-att-maro-clean
+#| fig-cap: "Ankarafantsika : trajectoire ATT gsynth (pool de donneurs propres). Début d'exposition 2003."
+#| fig-height: 4.5
+#| fig-width: 8
+gs_maro <- read_rds("data/paper14_gsynth_maro_oecd.rds")
+att_maro_df <- tibble(
+  rel_time = as.numeric(rownames(gs_maro$est_att)),
+  att = gs_maro$est_att[, "ATT"],
+  ci_lo = gs_maro$est_att[, "CI.lower"],
+  ci_hi = gs_maro$est_att[, "CI.upper"]
+)
+ggplot(att_maro_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
+  geom_line(color = "#D32F2F", linewidth = 0.8) +
+  geom_point(color = "#D32F2F", size = 2.5) +
+  labs(x = "Années relatives à l'exposition (2003)", y = "ATT (revenu log équivalisé)",
+       title = "Ankarafantsika (strict, catégorie II UICN)",
+       subtitle = paste0(gs_maro$N_co, " sites donneurs ; r* = ", gs_maro$r_cv)) +
+  theme_minimal(base_size = 12)
+```
 
-Pour Toliara Nord, la proximité simultanée de plusieurs aires protégées de catégories et dates différentes complique l'identification d'une exposition nette à une AP spécifique. L'ATT estimé absorbe potentiellement des signaux d'exposition multiples.
+## Lac Alaotra (donneurs propres) {#sec-ext-ala}
 
-La Réserve de Tampolo à Fénérive Est est si petite (~7,3 km²) que son footprint spatial délimite seulement une infime fraction des terres utilisées par l'observatoire. Même si une exclusion réelle avait lieu, l'effet agrégé au niveau de l'observatoire pourrait rester indétectable.
+L'ATT à l'échelle de l'observatoire d'Alaotra avec les donneurs propres reste proche de zéro et statistiquement non significatif : {{< var att_ala_clean >}} points logarithmiques ($p$ = {{< var att_ala_clean_p >}}). Le résultat nul est robuste au changement de pool de donneurs, renforçant l'interprétation selon laquelle la conservation participative sous CBNRM n'a pas imposé de coûts de revenu agrégés détectables.
 
-Enfin, la restriction du pool de donneurs aux cinq observatoires propres dans ce chapitre réduit le nombre de sites donneurs par rapport au Chapitre 4, ce qui peut augmenter la variabilité des estimations pour les cas à pool de donneurs réduit.
+```{r}
+#| label: fig-att-ala-clean
+#| fig-cap: "Lac Alaotra : trajectoire ATT gsynth (pool de donneurs propres). Début d'exposition 2008."
+#| fig-height: 4.5
+#| fig-width: 8
+gs_ala <- read_rds("data/paper14_gsynth_ala_oecd.rds")
+att_ala_df <- tibble(
+  rel_time = as.numeric(rownames(gs_ala$est_att)),
+  att = gs_ala$est_att[, "ATT"],
+  ci_lo = gs_ala$est_att[, "CI.lower"],
+  ci_hi = gs_ala$est_att[, "CI.upper"]
+)
+ggplot(att_ala_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
+  geom_line(color = "#1565C0", linewidth = 0.8) +
+  geom_point(color = "#1565C0", size = 2.5) +
+  labs(x = "Années relatives à l'exposition (2008)", y = "ATT (revenu log équivalisé)",
+       title = "Lac Alaotra (multifonctionnel, catégorie V UICN)",
+       subtitle = paste0(gs_ala$N_co, " sites donneurs ; r* = ", gs_ala$r_cv)) +
+  theme_minimal(base_size = 12)
+```
 
+# Synthèse à cinq cas {#sec-synthesis}
+
+## Résultats comparatifs
+
+```{r}
+#| label: tbl-five-att
+#| tbl-cap: "Résultats comparatifs des cinq observatoires. Les estimations de Farafangana (\u26a0) sont peu fiables en raison de seulement 3 années post-traitement."
+get_ci <- function(gs, side) if (!is.null(gs$est_avg)) gs$est_avg[1, side] else NA_real_
+get_se <- function(gs) if (!is.null(gs$est_avg)) gs$est_avg[1, "S.E."] else NA_real_
+get_pv <- function(gs) if (!is.null(gs$est_avg)) gs$est_avg[1, "p.value"] else NA_real_
+
+att_vals <- c(gs_maro$att_avg, gs_ala$att_avg, gs_fara$att_avg, gs_tol$att_avg, gs_fen$att_avg)
+se_vals  <- c(get_se(gs_maro), get_se(gs_ala), get_se(gs_fara), get_se(gs_tol), get_se(gs_fen))
+ci_lo_vals <- c(get_ci(gs_maro, "CI.lower"), get_ci(gs_ala, "CI.lower"), get_ci(gs_fara, "CI.lower"), get_ci(gs_tol, "CI.lower"), get_ci(gs_fen, "CI.lower"))
+ci_hi_vals <- c(get_ci(gs_maro, "CI.upper"), get_ci(gs_ala, "CI.upper"), get_ci(gs_fara, "CI.upper"), get_ci(gs_tol, "CI.upper"), get_ci(gs_fen, "CI.upper"))
+pval_vals  <- c(get_pv(gs_maro), get_pv(gs_ala), get_pv(gs_fara), get_pv(gs_tol), get_pv(gs_fen))
+
+tibble(
+  Observatoire = c("Marovoay (03)", "Alaotra (21)", "Farafangana (15) \u26a0", "Toliara Nord (23)", "F\u00e9n\u00e9rive Est (24)"),
+  `Type AP` = c("Strict (II)", "Multifonctionnel (V)", "Multifonctionnel (V)", "Mixte (V/II)", "Faible intensité (IV)"),
+  `Année trait.` = c(2003, 2008, 2006, 2007, 2007),
+  `ATT (pts log)` = round(att_vals, 3),
+  ES = round(se_vals, 3),
+  `IC 95%` = paste0("[", round(ci_lo_vals, 3), ", ", round(ci_hi_vals, 3), "]"),
+  `ATT (%)` = paste0(round((exp(att_vals) - 1) * 100, 1), "%"),
+  `p-valeur` = round(pval_vals, 3),
+  `r*` = c(gs_maro$r_cv, gs_ala$r_cv, gs_fara$r_cv, gs_tol$r_cv, gs_fen$r_cv),
+  `N donneurs` = c(gs_maro$N_co, gs_ala$N_co, gs_fara$N_co, gs_tol$N_co, gs_fen$N_co),
+  `Années post` = c(11L, 6L, 3L, 8L, 8L)
+) |>
+  gt() |>
+  tab_header(title = md("**Résultats comparatifs des cinq observatoires**"),
+             subtitle = "\u26a0 Farafangana : seulement 3 années post-traitement \u2014 résultats indicatifs") |>
+  tab_style(style = cell_fill(color = "#FFCDD2"), locations = cells_body(rows = grepl("Marovoay", Observatoire))) |>
+  tab_style(style = cell_fill(color = "#BBDEFB"), locations = cells_body(rows = grepl("Alaotra", Observatoire))) |>
+  tab_style(style = cell_fill(color = "#DCEDC8"), locations = cells_body(rows = grepl("Farafangana", Observatoire))) |>
+  tab_style(style = cell_fill(color = "#FFE0B2"), locations = cells_body(rows = grepl("Toliara", Observatoire))) |>
+  tab_style(style = cell_fill(color = "#E8EAF6"), locations = cells_body(rows = grepl("n\u00e9rive", Observatoire)))
+```
+
+```{r}
+#| label: fig-att-all-overlay
+#| fig-cap: "Trajectoires ATT des cinq observatoires exposés sur le même axe de temps relatif. Les bandes IC sont supprimées pour la lisibilité."
+#| fig-height: 5.5
+#| fig-width: 11
+all_att <- bind_rows(
+  att_maro_df |> mutate(obs = "Marovoay (strict, II)",         color_grp = "Marovoay (strict)"),
+  att_ala_df  |> mutate(obs = "Alaotra (multifonctionnel, V)",  color_grp = "Alaotra (multifonctionnel)"),
+  att_fara_df |> mutate(obs = "Farafangana (multifonctionnel, V)", color_grp = "Farafangana (multifonctionnel)"),
+  att_tol_df  |> mutate(obs = "Toliara Nord (mixte, V/II)",     color_grp = "Toliara Nord (mixte)"),
+  att_fen_df  |> mutate(obs = "F\u00e9n\u00e9rive Est (faible int., IV)", color_grp = "F\u00e9n\u00e9rive Est (faible int.)")
+)
+ggplot(all_att, aes(rel_time, att, color = color_grp, linetype = color_grp)) +
+  geom_hline(yintercept = 0, color = "grey60", linewidth = 0.4) +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey50", linewidth = 0.4) +
+  annotate("rect", xmin = -0.5, xmax = Inf, ymin = -Inf, ymax = Inf, fill = "grey90", alpha = 0.18) +
+  geom_line(linewidth = 0.85) +
+  geom_point(size = 1.8) +
+  scale_color_manual(
+    values = c("Marovoay (strict)" = "#D32F2F", "Alaotra (multifonctionnel)" = "#1565C0",
+               "Farafangana (multifonctionnel)" = "#2E7D32", "Toliara Nord (mixte)" = "#E65100",
+               "F\u00e9n\u00e9rive Est (faible int.)" = "#6A1B9A"), name = NULL) +
+  scale_linetype_manual(
+    values = c("Marovoay (strict)" = "solid", "Alaotra (multifonctionnel)" = "solid",
+               "Farafangana (multifonctionnel)" = "dashed", "Toliara Nord (mixte)" = "solid",
+               "F\u00e9n\u00e9rive Est (faible int.)" = "solid"), name = NULL) +
+  labs(x = "Années relatives au début de l'exposition", y = "ATT (revenu log équivalisé)",
+       title = "Trajectoires ATT : cinq modèles de gouvernance de conservation",
+       subtitle = "Tirets = Farafangana (indicatif seulement, 3 années post-traitement)") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom", legend.text = element_text(size = 8.5))
+```
+
+```{r}
+#| label: fig-forest-plot
+#| fig-cap: "Graphique en forêt des ATT moyens post-traitement avec IC bootstrap paramétrique à 95%. Farafangana présenté avec opacité réduite."
+#| fig-height: 4
+#| fig-width: 8
+forest_df <- tibble(
+  obs   = c("Marovoay\n(strict, II, 2003)",
+            "Alaotra\n(multifonctionnel, V, 2008)",
+            "Farafangana \u26a0\n(multifonctionnel, V, 2006)",
+            "Toliara Nord\n(mixte, V/II, 2007)",
+            "F\u00e9n\u00e9rive Est\n(faible int., IV, 2007)"),
+  att   = att_vals,
+  ci_lo = ci_lo_vals,
+  ci_hi = ci_hi_vals,
+  col   = c("#D32F2F", "#1565C0", "#2E7D32", "#E65100", "#6A1B9A"),
+  indicative = c(FALSE, FALSE, TRUE, FALSE, FALSE)
+) |> arrange(att) |> mutate(obs = factor(obs, levels = obs))
+ggplot(forest_df, aes(y = obs, x = att, xmin = ci_lo, xmax = ci_hi, color = col, alpha = indicative)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_linerange(linewidth = 1.2) +
+  geom_point(size = 3.5) +
+  scale_color_identity() +
+  scale_alpha_manual(values = c("FALSE" = 1, "TRUE" = 0.45), guide = "none") +
+  labs(x = "ATT (revenu log équivalisé)", y = NULL,
+       title = "Graphique en forêt : estimations ATT des cinq observatoires",
+       subtitle = "\u26a0 = Farafangana (3 années post-traitement, indicatif seulement)") +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.major.y = element_blank())
+```
+
+## Trois régularités {#sec-patterns}
+
+La comparaison à cinq cas suggère trois régularités générales, dont chacune mérite une interprétation prudente compte tenu du faible nombre d'unités exposées par modèle.
+
+La première régularité est un large écart de revenu négatif sous enforcement strict. Ankarafantsika (Marovoay) affiche le plus grand et le plus persistent écart négatif par rapport à son contrefactuel synthétique, statistiquement significatif et apparent jusqu'à la ré-enquête de 2025. C'est cohérent avec l'exclusion directe des ressources d'un grand parc activement patrouillé. Cependant, comme discuté à @sec-maro-rcs et @sec-counterfactual, la comparaison intra-Marovoay entre les villages de la rive est et de la rive ouest ne trouve pas de différence de revenu équivalente, ce qui soulève la possibilité que le gsynth capte le déclin économique régional — la détérioration à long terme de l'économie rizicole irriguée de Marovoay — plutôt qu'un effet spécifique au parc. Le résultat de Marovoay doit donc être traité comme suggérant une perte de revenu liée à la conservation plutôt que comme une preuve concluante.
+
+La deuxième régularité est des effets quasi nuls estimés sous gouvernance participative ou multifonctionnelle. Le Lac Alaotra, Toliara Nord et Farafangana (sous réserve) affichent tous des estimations ponctuelles proches de zéro sans départ statistiquement significatif. Le cadre de gestion communautaire à Alaotra, et la réglementation plus légère sur les autres sites, semble cohérent avec l'absence de coûts de revenu agrégés détectables — bien que la faible puissance statistique (une unité exposée par modèle) signifie que des effets modérés ne peuvent pas être exclus.
+
+La troisième régularité est qu'une petite réserve orientée vers la recherche avec un enforcement minimal laisse le revenu estimé inchangé. Fénérive Est affiche un ATT quasi nul avec un intervalle de confiance modérément étroit, ce qui est le résultat attendu d'une forêt scientifique de 7,3 km² qui ne contraint pas les moyens de subsistance communautaires à l'échelle.
+
+## Mises en garde {#sec-caveats}
+
+Plusieurs limitations tempèrent l'interprétation de la comparaison étendue. Avec seulement trois années post-traitement, l'estimation de Farafangana a une faible fiabilité et ne doit pas être comparée numériquement aux autres. À Toliara Nord, la succession rapide de trois aires protégées en 2007–2008 signifie que l'ATT estimé capture un composite d'événements qui se chevauchent plutôt qu'une seule intervention propre. L'utilisation de seulement cinq observatoires donneurs plutôt que des neuf disponibles au Chapitre 4 réduit la précision contrefactuelle, ce qui explique pourquoi les estimations ATT pour Marovoay et Alaotra diffèrent légèrement entre les deux chapitres. L'identification pour les trois nouveaux sites repose sur les dates de décret et la proximité spatiale sans la validation comportementale disponible pour Marovoay et Alaotra. Enfin, chaque modèle au niveau de l'observatoire a exactement une unité exposée, ce qui impose une p-valeur de permutation minimale d'environ $1/N_{\text{donneurs}}$ ; les effets inférieurs à environ 20% ne peuvent pas être distingués de manière fiable du hasard.
