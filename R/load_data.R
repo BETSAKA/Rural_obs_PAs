@@ -230,7 +230,7 @@ obs_locations <- tibble(
   name = c(
     "Antsirabe",
     "Marovoay",
-    "Antsohihy",      # survey ends 2005; pre-dates Bongolava corridor (Sep 2006) → clean donor
+    "Antsohihy", # survey ends 2005; pre-dates Bongolava corridor (Sep 2006) → clean donor
     "Tsiroanomandidy",
     "Farafangana",
     "Ambovombe",
