@@ -115,7 +115,7 @@ donor_status <- all_donors_base |>
   arrange(exposure_status, OBS_CODE)
 ```
 
-L'estimateur du contrôle synthétique généralisé requiert que les **unités du pool de donneurs ne soient jamais exposées** à l'intervention de conservation d'intérêt. Dans cette étude, les neuf observatoires donneurs utilisés dans l'analyse principale ([Chapitre 4](04_results.qmd)) ne devraient pas eux-mêmes être adjacents à des aires protégées ayant fait l'objet d'une application active pendant la période d'étude 1999–2014. Cette hypothèse est plausible par construction — les observatoires SOR ont été choisis pour le suivi agricole, non pour leur proximité aux AP — mais n'a jamais été vérifiée systématiquement. Cette annexe fournit un audit spatial.
+Dans cette étude, neuf observatoires ont d'abord été envisagés comme donneurs candidats. Parmi eux, six sont retenus comme donneurs purs pour l'analyse principale ([Chapitre 4](04_results.qmd)) : ils ne doivent pas être adjacents à des aires protégées ayant fait l'objet d'une application active pendant la période d'étude 1999–2014. Cette hypothèse est plausible par construction — les observatoires SOR ont été choisis pour le suivi agricole, non pour leur proximité aux AP — mais requiert une vérification systématique. Cette annexe fournit un audit spatial des neuf candidats.
 
 
 # Insuffisance des limites statiques des AP {#sec-b-static}
@@ -541,7 +541,7 @@ ggplot(detail_data, aes(x = pa_label, y = dist_km, colour = exposure_type)) +
 
 L'audit de contamination a deux conséquences :
 
-1. **Pool de donneurs restreint** : en retirant les trois observatoires aussi exposés (Farafangana, Toliara Nord, Fénérive Est), il reste six donneurs propres (Antsirabe, Antsohihy, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). Antsohihy est inclus car son enquête précède le corridor de Bongolava (2006), ne fournissant que des observations pré-traitement. Les estimations gsynth pour Marovoay et Alaotra doivent être ré-estimées avec ce pool restreint comme test de robustesse.
+1. **Pool de donneurs restreint** : en retirant les trois observatoires aussi exposés (Farafangana, Toliara Nord, Fénérive Est), il reste six donneurs propres (Antsirabe, Antsohihy, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). Antsohihy est inclus car son enquête précède le corridor de Bongolava (2006), ne fournissant que des observations pré-traitement. **La spécification principale des Chapitres 4 et 5 utilise déjà ce pool restreint de six donneurs purs** ; les trois observatoires aussi exposés sont reclassifiés comme unités exposées au Chapitre 5.
 
 2. **Validité pré-traitement préservée pour Marovoay** : le début de l'exposition (2003) précède tous les événements secondaires d'AP (le plus tôt : 2006). Les tests d'équilibre pré-traitement (ATT placebo avant 2003) ne sont pas affectés par l'exposition post-2006 des donneurs.
 

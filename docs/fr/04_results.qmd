@@ -1,0 +1,489 @@
+---
+title: "Results"
+subtitle: "Strict vs. multipurpose conservation impacts on household income"
+---
+
+```{r}
+#| label: setup
+source("R/load_data.R")
+source("R/gsynth_helpers.R")
+source("R/plot_themes.R")
+```
+
+```{r}
+#| label: load-results
+# Cached gsynth results (paper14 = clean 6-donor pool)
+gs_maro <- read_rds("data/paper14_gsynth_maro_oecd.rds")
+gs_ala <- read_rds("data/paper14_gsynth_ala_oecd.rds")
+
+# Pre-computed site-year aggregates for trajectory plot (raw data, no gsynth)
+maro_gs_ext <- read_rds("data/maro_gs_ext_panel.rds")
+```
+
+# Ankarafantsika: strict conservation (IUCN II) {#sec-maro}
+
+## Panel construction
+
+The Marovoay model comprises 2 exposed sites (Bepako and Madiromiongana, east bank) and donor sites from the 6 clean observatories identified in [Appendix B](A2_donor_validity.qmd) (Antsirabe, Antsohihy, Tsiroanomandidy, Ambovombe, Mahanoro, Itasy). The exposure period begins in 2003, providing 4 pre-exposure years (1999–2002) and up to 12 post-exposure years (2003–2014).
+
+## gsynth ATT path {#sec-maro-att}
+
+```{r}
+#| label: fig-maro-att
+#| fig-cap: "Ankarafantsika: gsynth ATT path for east-bank sites relative to exposure onset (2003). Outcome: log OECD-equivalised income. Shaded band: 95% parametric bootstrap CI."
+#| fig-height: 5
+#| fig-width: 8
+att_maro_df <- tibble(
+  rel_time = as.numeric(rownames(gs_maro$est_att)),
+  att = gs_maro$est_att[, "ATT"],
+  ci_lo = gs_maro$est_att[, "CI.lower"],
+  ci_hi = gs_maro$est_att[, "CI.upper"]
+)
+
+ggplot(att_maro_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#D32F2F", alpha = 0.15) +
+  geom_line(color = "#D32F2F", linewidth = 0.8) +
+  geom_point(color = "#D32F2F", size = 2.5) +
+  labs(
+    x = "Years relative to exposure (2003)",
+    y = "ATT (log equiv. income)",
+    title = "Ankarafantsika: gsynth ATT Path",
+    subtitle = paste0(
+      "Site-level exposure vs ",
+      gs_maro$N_co,
+      " donor sites. r* = ",
+      gs_maro$r_cv,
+      " factor(s)."
+    )
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+The generalized synthetic control model finds a persistent negative gap between the east-bank Marovoay sites and their synthetic counterfactual. The average post-exposure average treatment effect (ATT) is approximately {{< var att_maro >}} log points (95% CI: [{{< var att_maro_ci_lo >}}, {{< var att_maro_ci_hi >}}], *p* = {{< var att_maro_p >}}), corresponding to a roughly {{< var att_maro_pct >}} difference relative to the projected counterfactual. The gap opens shortly after the 2002 park extension and does not close over the observation period.
+
+How much of this gap is attributable to the park itself — rather than to the broader economic trajectory of the Marovoay region — is a question that the data alone cannot fully resolve. Marovoay was historically Madagascar's most productive irrigated rice zone, often called the *grenier à blé* of the country. From the 1980s onward, the region experienced a well-documented decline driven by the silting of the Betsiboka River, the degradation of colonial-era irrigation infrastructure, and the collapse of state agricultural support. This regional trajectory predates the 2002 park extension and could plausibly account for part of the divergence that gsynth attributes to conservation exposure, if the donor observatories on the highland plateau or in the southern drylands were not similarly affected by the deterioration of irrigated lowland agriculture.
+
+### Within-Marovoay household DiD check {#sec-maro-rcs}
+
+The household-level repeated cross-section design described in @sec-complementary applies the Callaway–Sant'Anna estimator to the 1999–2014 + 2025 Marovoay panel, contrasting east-bank (Bepako and Madiromiongana) against west-bank fokontany (Ampijoroa and Maroala).
+
+```{r}
+#| label: tbl-maro-rcs
+#| tbl-cap: "Within-Marovoay household DiD (Callaway–Sant'Anna, panel = FALSE), east versus west bank. Two standard errors are reported: design-based (influence function, no clustering) and site-clustered."
+sec_did <- read_rds("data/secondary_did_results.rds")
+sec_did$maro$summary |>
+  transmute(
+    Design = "East bank vs west bank",
+    Estimate = estimate,
+    `SE (IF)` = se_if,
+    `SE (cluster)` = se_cluster,
+    `% income` = sprintf("%+.1f%%", pct_income)
+  ) |>
+  gt() |>
+  fmt_number(columns = c(Estimate, `SE (IF)`, `SE (cluster)`), decimals = 3) |>
+  tab_header(title = "Marovoay: within-observatory DiD")
+```
+
+The within-Marovoay point estimate is close to zero with a tight cluster-robust standard error — strikingly different in magnitude from the gsynth gap of {{< var att_maro >}} log points reported above. This contrast is a key diagnostic, and it cannot simply be dismissed as the two methods answering different questions.
+
+The gsynth compares the east-bank villages against donor observatories located in the highland plateau or the southern drylands — places with different agronomic systems, different exposure to Betsiboka siltation, and different relationships with irrigated rice. If the Marovoay region as a whole has declined relative to those places for reasons unconnected to the park — the collapse of irrigation infrastructure, the retreat of the state from the rice economy, cycles of flooding and soil erosion — then gsynth will attribute that regional divergence to the PA, because the exposure timing coincides with the beginning of the observable panel. The within-Marovoay design controls for this regional shock: because east-bank and west-bank villages share the same river, the same downstream rice economy, and the same local market, a regional shock hits both sides simultaneously and cancels out of the east-west comparison.
+
+The fact that east-bank and west-bank incomes tracked each other so closely throughout the study period is therefore a genuine warning. It suggests that the bulk of the divergence that gsynth identifies is a regional phenomenon — the decline of a once-prosperous agricultural region — rather than an effect that can be confidently attributed to the park boundary. A real park effect may still exist: east-bank communities face the park fence directly, while west-bank communities do not. But the within-observatory evidence places a much tighter bound on the plausible conservation-specific component than the gsynth estimate alone would suggest. The two results should be read together, with neither overruling the other.
+
+## Unit-specific effects
+
+```{r}
+#| label: fig-maro-units
+#| fig-cap: "Unit-specific exposure effects for the two east-bank fokontany."
+#| fig-height: 5
+#| fig-width: 9
+eff_mat <- gs_maro$eff
+years <- as.numeric(rownames(eff_mat))
+
+unit_effects <- bind_rows(
+  tibble(
+    year = years,
+    effect = eff_mat[, "031"],
+    village = "Bepako (east bank)"
+  ),
+  tibble(
+    year = years,
+    effect = eff_mat[, "032"],
+    village = "Madiromiongana (east bank)"
+  )
+) |>
+  filter(year >= TREAT_YEAR_MARO)
+
+ggplot(unit_effects, aes(x = factor(year), y = effect, fill = village)) +
+  geom_col(position = "dodge") +
+  geom_hline(yintercept = 0, color = "grey60") +
+  scale_fill_manual(
+    values = c(
+      "Bepako (east bank)" = "#fb6a4a",
+      "Madiromiongana (east bank)" = "#cb181d"
+    )
+  ) +
+  facet_wrap(~village) +
+  labs(
+    x = NULL,
+    y = "Exposure effect (log equiv. income)",
+    title = "Unit-Specific Post-Exposure Effects"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+
+Both exposed fokontany show negative effects, though with different magnitudes. Bepako (4.1 km from the park boundary) shows a larger and more consistent effect than Madiromiongana (11.7 km), consistent with a distance gradient in enforcement intensity.
+
+# Lac Alaotra: multipurpose conservation (IUCN VI) {#sec-ala}
+
+## Panel construction
+
+The Alaotra model has 1 exposed unit (the aggregated observatory) and donor sites from 6 clean observatories. The exposure period begins in 2008, providing 9 pre-exposure years (1999–2007) and 7 post-exposure years (2008–2014).
+
+## gsynth ATT path {#sec-ala-att}
+
+```{r}
+#| label: fig-ala-att
+#| fig-cap: "Lac Alaotra: gsynth ATT path for the aggregated observatory relative to exposure onset (2008). Outcome: log OECD-equivalised income. Shaded band: 95% parametric bootstrap CI."
+#| fig-height: 5
+#| fig-width: 8
+att_ala_df <- tibble(
+  rel_time = as.numeric(rownames(gs_ala$est_att)),
+  att = gs_ala$est_att[, "ATT"],
+  ci_lo = gs_ala$est_att[, "CI.lower"],
+  ci_hi = gs_ala$est_att[, "CI.upper"]
+)
+
+ggplot(att_ala_df, aes(rel_time, att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#1565C0", alpha = 0.15) +
+  geom_line(color = "#1565C0", linewidth = 0.8) +
+  geom_point(color = "#1565C0", size = 2.5) +
+  labs(
+    x = "Years relative to exposure (2008)",
+    y = "ATT (log equiv. income)",
+    title = "Lac Alaotra: gsynth ATT Path",
+    subtitle = paste0(
+      "Observatory-level exposure vs ",
+      gs_ala$N_co,
+      " donor sites. r* = ",
+      gs_ala$r_cv,
+      " factor(s)."
+    )
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+The Alaotra gsynth estimates an average post-exposure ATT of approximately {{< var att_ala >}} log points (95% CI: [{{< var att_ala_ci_lo >}}, {{< var att_ala_ci_hi >}}], *p* = {{< var att_ala_p >}}) — close to zero and not statistically significant. Year-by-year estimates are noisy with no clear trend away from the counterfactual.
+
+The null result is consistent with several interpretations: participatory conservation under CBNRM may impose lower costs on aggregate income; the 7-year post-exposure window may be insufficient to detect a gradual effect; and the single-unit design limits statistical power.
+
+### Within-Alaotra household DiD check {#sec-ala-rcs}
+
+The household-level repeated cross-section design described in @sec-complementary applies the Callaway–Sant'Anna estimator to the 1999–2014 + 2025 Alaotra panel under two within-observatory exposure proxies: distance to the nearest PA boundary (≤ 10 km) and the 2025 share of households declaring PA-dependent extractive uses (≥ 12.5%).
+
+```{r}
+#| label: tbl-ala-rcs
+#| tbl-cap: "Within-Alaotra household DiD (Callaway–Sant'Anna, panel = FALSE) on the merged seven-fokontany panel, under two exposure proxies. Two standard errors are reported: design-based (influence function, no clustering) and site-clustered."
+sec_did_ala <- read_rds("data/secondary_did_results.rds")$ala
+sec_did_ala$summary |>
+  transmute(
+    Design = recode(
+      design,
+      dist = "Distance ≤ 10 km",
+      ext = "Extractive usage ≥ 12.5%"
+    ),
+    Estimate = estimate,
+    `SE (IF)` = se_if,
+    `SE (cluster)` = se_cluster,
+    `% income` = sprintf("%+.1f%%", pct_income)
+  ) |>
+  gt() |>
+  fmt_number(columns = c(Estimate, `SE (IF)`, `SE (cluster)`), decimals = 3) |>
+  tab_header(title = "Alaotra: within-observatory DiD")
+```
+
+Both within-Alaotra designs yield small point estimates and wide cluster-robust standard errors that comfortably include zero. Their conclusion agrees with gsynth along a different identifying contrast: not against an outside donor pool, but against the less exposed merged fokontany of the same observatory. The convergence narrows the range of plausible interpretations of the Alaotra null: the absence of an aggregate income effect of the *Paysage Harmonieux Protégé* is robust to whether the counterfactual is built from outside observatories (gsynth) or from within-observatory exposure heterogeneity (within-observatory DiD).
+
+# Comparison {#sec-comparison}
+
+```{r}
+#| label: tbl-comparison
+#| tbl-cap: "Summary of gsynth results: strict (Ankarafantsika) vs multipurpose (Alaotra) conservation."
+get_ci <- function(gs, side) {
+  if (!is.null(gs$est_avg)) gs$est_avg[1, side] else NA_real_
+}
+get_se <- function(gs) {
+  if (!is.null(gs$est_avg)) gs$est_avg[1, "S.E."] else NA_real_
+}
+get_pval <- function(gs) {
+  if (!is.null(gs$est_avg)) gs$est_avg[1, "p.value"] else NA_real_
+}
+
+tibble(
+  PA = c("Ankarafantsika PN", "Lac Alaotra PHP"),
+  `IUCN Category` = c("II (strict)", "V (multipurpose)"),
+  `Exposure year` = c(TREAT_YEAR_MARO, TREAT_YEAR_ALA),
+  `Exposed unit(s)` = c(
+    "Madiromiongana & Bepako (east bank)",
+    "Aggregated observatory"
+  ),
+  `ATT (log pts)` = round(c(gs_maro$att_avg, gs_ala$att_avg), 3),
+  `SE` = round(c(get_se(gs_maro), get_se(gs_ala)), 3),
+  `95% CI` = c(
+    paste0(
+      "[",
+      round(get_ci(gs_maro, "CI.lower"), 3),
+      ", ",
+      round(get_ci(gs_maro, "CI.upper"), 3),
+      "]"
+    ),
+    paste0(
+      "[",
+      round(get_ci(gs_ala, "CI.lower"), 3),
+      ", ",
+      round(get_ci(gs_ala, "CI.upper"), 3),
+      "]"
+    )
+  ),
+  `ATT (pct)` = paste0(
+    round((exp(c(gs_maro$att_avg, gs_ala$att_avg)) - 1) * 100, 1),
+    "%"
+  ),
+  `p-value` = round(c(get_pval(gs_maro), get_pval(gs_ala)), 3),
+  `r* (CV)` = c(gs_maro$r_cv, gs_ala$r_cv),
+  `N donors` = c(gs_maro$N_co, gs_ala$N_co)
+) |>
+  gt() |>
+  tab_header(
+    title = "Comparative gsynth Results",
+    subtitle = "Separate estimation for each PA (1999–2014)"
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFCDD2"),
+    locations = cells_body(rows = 1)
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#BBDEFB"),
+    locations = cells_body(rows = 2)
+  )
+```
+
+```{r}
+#| label: fig-comparison
+#| fig-cap: "Overlaid ATT paths. Ankarafantsika (strict, red) shows a persistent negative effect from 2003; Lac Alaotra (multipurpose, blue) shows no significant effect from 2008. Horizontal scale normalized to each PA's exposure onset."
+#| fig-height: 5
+#| fig-width: 9
+bind_rows(
+  att_maro_df |> mutate(case = "Ankarafantsika (strict)"),
+  att_ala_df  |> mutate(case = "Lac Alaotra (multipurpose)")
+) |>
+  ggplot(aes(rel_time, att, color = case, fill = case)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", color = "grey40") +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), alpha = 0.12, color = NA) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  scale_color_manual(
+    values = c("Ankarafantsika (strict)" = "#D32F2F",
+               "Lac Alaotra (multipurpose)" = "#1565C0"),
+    name = NULL
+  ) +
+  scale_fill_manual(
+    values = c("Ankarafantsika (strict)" = "#D32F2F",
+               "Lac Alaotra (multipurpose)" = "#1565C0"),
+    name = NULL
+  ) +
+  labs(
+    x = "Years relative to exposure",
+    y = "ATT (log equiv. income)",
+    title = "ATT Paths: Strict vs Multipurpose Conservation"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom")
+```
+
+The contrast between the two estimated ATT paths is sharp on paper: a large persistent negative gap at Ankarafantsika, and a near-zero gap at Alaotra. Before drawing governance conclusions, however, some caution is warranted. At Marovoay, the within-observatory comparison between east and west bank finds no detectable difference, raising the possibility that the gsynth estimate is capturing regional economic decline rather than conservation effects. At Alaotra, the null result may reflect genuinely benign governance or insufficient statistical power. These two caveats temper but do not dissolve the contrast: the evidence is suggestive that strict exclusionary management carries higher livelihood costs than participatory co-management, but the data cannot definitively establish the causal mechanism.
+
+# Long-run assessment: 2025 resurvey {#sec-longrun}
+
+```{r}
+#| label: longrun-setup
+#| include: false
+res_deb_25 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_deb.dta")
+n_hh_maro_25 <- res_deb_25 |>
+  dplyr::filter(obs == "01") |>
+  nrow()
+sec_did_lr <- read_rds("data/secondary_did_results.rds")
+```
+
+A 2025 resurvey of Marovoay (`r n_hh_maro_25` households across the four
+fokontany: Bepako and Madiromiongana on the east bank, Ampijoroa and Maroala on
+the west bank) extends the observation window to 22 years post-exposure.
+Because the resurvey covered only Marovoay (and Alaotra), no clean
+inter-observatory donor has 2025 data. Extending gsynth to 2025 would require
+importing the Marovoay west-bank fokontany as donors — collapsing the
+inter-observatory comparison into a within-observatory one and making the 2025
+ATT redundant with the within-observatory DiD. The long-run evidence therefore
+relies entirely on the within-observatory DiD design described in
+@sec-complementary, consistent with the framing used throughout this chapter.
+
+## Site-level income trajectories {#sec-maro-traj}
+
+The raw site-level trajectories below show the full 26-year income record for
+all four Marovoay fokontany.
+
+```{r}
+#| label: fig-ext-traj
+#| fig-cap: |
+#|   Site-level income trajectories for the four Marovoay fokontany
+#|   (1999–2025). East-bank (exposed, red) and west-bank (control, blue)
+#|   tracked together through 2003, then diverge persistently.
+#| fig-height: 5.5
+#| fig-width: 9
+traj_data <- maro_gs_ext |>
+  filter(site_id %in% c("031", "032", "033", "034")) |>
+  mutate(
+    village = case_when(
+      site_id == "031" ~ "Bepako (E)",
+      site_id == "032" ~ "Madiromiongana (E)",
+      site_id == "033" ~ "Ampijoroa (W)",
+      site_id == "034" ~ "Maroala (W)"
+    ),
+    bank = if_else(
+      site_id %in% c("031", "032"),
+      "Exposed (East)",
+      "Control (West)"
+    )
+  )
+
+ggplot(
+  traj_data,
+  aes(x = year, y = ln_revtot_w, color = village, linetype = bank)
+) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  geom_vline(xintercept = 2003, linetype = "dashed", alpha = 0.5) +
+  annotate(
+    "text",
+    x = 2003.5,
+    y = min(traj_data$ln_revtot_w, na.rm = TRUE) + 0.3,
+    label = "PA extension\n(2003)",
+    hjust = 0,
+    size = 3,
+    color = "grey40"
+  ) +
+  scale_color_manual(
+    values = c(
+      "Ampijoroa (W)" = "#2171b5",
+      "Maroala (W)" = "#6baed6",
+      "Madiromiongana (E)" = "#cb181d",
+      "Bepako (E)" = "#fb6a4a"
+    )
+  ) +
+  scale_y_continuous(limits = c(0, NA)) +
+  guides(
+    color = guide_legend(nrow = 1, byrow = TRUE, order = 1),
+    linetype = guide_legend(nrow = 1, order = 2)
+  ) +
+  labs(
+    title = "Site-Level Income Trajectories: Marovoay 1999–2025",
+    x = NULL,
+    y = "Mean log(equiv. income)",
+    color = "Village",
+    linetype = "Exposure group"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    legend.spacing.y = unit(2, "pt")
+  )
+```
+
+The four fokontany tracked closely through 2002. From 2003 onward, east-bank
+sites diverge downward relative to the west bank; by 2025 the gap has widened
+rather than closed.
+
+## Marovoay DiD event study (1999–2025) {#sec-maro-dyn}
+
+The event study from the within-observatory Callaway–Sant'Anna estimator shows
+the year-by-year ATT relative to the pre-treatment baseline. Relative times
+−4 to +11 (1999–2014) are estimated on the main panel; the 2025 point (+22
+years) is the long-run observation from the same estimator. Pre-treatment
+estimates near zero confirm parallel trends between east- and west-bank sites
+before the park extension. Standard errors are influence-function based; with
+only two treated sites, site-level cluster-robust period SEs are unreliable
+(the pooled ATT in @tbl-maro-rcs reports both).
+
+```{r}
+#| label: fig-maro-dyn
+#| fig-cap: "Marovoay within-observatory DiD event study (1999–2025). East-bank vs west-bank households, Callaway–Sant'Anna (panel = FALSE). Year 2003 is the exposure onset; the rightmost diamond (2025) is the long-run resurvey point. Error bars: 95% pointwise CI (influence-function SE)."
+#| fig-height: 5
+#| fig-width: 10
+dyn_maro <- sec_did_lr$maro$res$dyns[["bank_nocl"]]
+event_df <- tibble(
+  rel_time = dyn_maro$egt,
+  att      = dyn_maro$att.egt,
+  se       = dyn_maro$se.egt
+) |>
+  mutate(
+    year    = rel_time + TREAT_YEAR_MARO,
+    ci_lo   = att - 1.96 * se,
+    ci_hi   = att + 1.96 * se,
+    is_2025 = rel_time == 22
+  )
+
+ggplot(event_df, aes(x = year, y = att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = TREAT_YEAR_MARO - 0.5,
+             linetype = "dashed", color = "grey40") +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
+                width = 0.4, color = "#D32F2F", alpha = 0.6) +
+  geom_point(aes(size = is_2025, shape = is_2025),
+             color = "#D32F2F", show.legend = FALSE) +
+  scale_size_manual(values = c("FALSE" = 2.5, "TRUE" = 4.5)) +
+  scale_shape_manual(values = c("FALSE" = 16, "TRUE" = 18)) +
+  annotate(
+    "text", x = 2025, y = min(event_df$ci_lo, na.rm = TRUE) - 0.04,
+    label = "2025\n(+22 yrs)", color = "#D32F2F", size = 3, vjust = 1
+  ) +
+  labs(
+    x = "Year",
+    y = "ATT (log equiv. income)",
+    title = "Marovoay: Within-Observatory DiD Event Study (1999–2025)",
+    subtitle = "East-bank vs west-bank households. SE: influence function (no site clustering)."
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+Pre-treatment coefficients fluctuate near zero, supporting the parallel-trends
+assumption. Post-2003 estimates turn negative and deepen progressively.
+The 2025 point — 22 years post-exposure — shows the largest negative estimate
+of the series, confirming that the east-to-west income gap has widened rather
+than closed over the long run. This persistence is identified entirely from the
+within-observatory east-versus-west contrast, independent of any
+inter-observatory comparison.
+
+## Robustness of the 2025 gap {#sec-ext-robust}
+
+The east-west income gap in 2025 is not driven by outliers: it is visible at every percentile of the income distribution, IQR-based outlier removal widens rather than narrows the gap, and the west-bank advantage appears across five of seven major income components. In statistical terms, the gap is large enough to pass standard tests (Wilcoxon rank-sum $p = 2.1 \times 10^{-10}$; Welch $t$-test $p = 1.8 \times 10^{-5}$).
+
+What remains unresolved is whether this gap reflects cumulative park exposure or the long-term effects of the same regional decline discussed in @sec-maro-rcs. By 2025, the Marovoay irrigation system has deteriorated further, rural-to-urban migration has reshaped communities, and the region's rice economy has never recovered its former position. The 2025 gap is real and robust; its attribution to conservation policy specifically requires caution.
+
+## Alaotra long-run assessment {#sec-ala-longrun}
+
+The within-observatory DiD for Alaotra also covers the 2025 resurvey wave.
+Both exposure proxies — distance to the PA boundary and extractive-use share —
+continue to yield near-zero estimates with wide confidence intervals, consistent
+with the pooled result over the 1999–2014 panel (ATT ≈ {{< var att_ala >}},
+$p$ = {{< var att_ala_p >}}). The absence of a detectable income effect under
+participatory conservation management is therefore stable across the full
+1999–2025 observation window.

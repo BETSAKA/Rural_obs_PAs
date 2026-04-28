@@ -66,9 +66,12 @@ Les ATT groupe-temps peuvent être agrégés en :
 - **Effets spécifiques au groupe** : $\bar{ATT}(g) = \sum_{t \geq g} w_t \cdot ATT(g, t)$.
 - **ATT global** : moyenne pondérée sur toutes les cellules $(g, t)$.
 
-## Implémentation (prévue pour les données 2026)
+## Implémentation
 
-Nous utiliserons le package R `did` avec l'estimation doublement robuste (pondération par l'inverse des probabilités combinée à la régression des résultats), des covariables au niveau du ménage (taille du ménage, éducation du chef, activité agricole) et le regroupement au niveau du site.
+Nous utilisons le package R `did` (`att_gt()`) avec `panel = FALSE` (coupes transversales répétées), `control_group = "nevertreated"` et des erreurs-types basées sur la fonction d'influence. Deux spécifications analytiquement distinctes sont estimées :
+
+- **DiD CS inter-observatoires** (Annexe A3) : regroupe les cohortes Marovoay (g = 2003) et Alaotra (g = 2008) en utilisant les observatoires donneurs purs comme groupe de comparaison. Inférence clustérisée au niveau `site_id` via bootstrap multiplicateur.
+- **DiD intra-observatoire** ([Chapitre 4, @sec-maro-dyn](04_results.qmd)) : Marovoay uniquement ; fokontany de rive est (031, 032) comparés aux fokontany de rive ouest (033, 034), étendu à la ré-enquête 2025 ($e = 22$). Utilise des erreurs-types basées sur la fonction d'influence sans clustering au niveau site (seulement deux sites traités, rendant les erreurs-types clustérisées peu fiables).
 
 
 # Différences-en-différences synthétiques {#sec-d-sdid}
@@ -100,7 +103,7 @@ Chaque modèle gsynth au niveau de l'observatoire a exactement une unité trait�
 
 2. **Inférence par permutation** : pour chaque unité témoin, ré-estimer gsynth en traitant cette unité comme si elle était traitée. La $p$-valeur est la fraction d'ATT placebo dépassant l'ATT réel. Avec $N$ unités donneuses, la $p$-valeur minimale atteignable est $1/N$. Avec ~50–60 sites donneurs, cela donne un plancher de $\approx 0,017$ — suffisant pour détecter des effets importants mais limitant pour des effets modérés.
 
-3. **Bootstrap cluster sauvage** (prévu pour le DiD) : le bootstrap sauvage de Cameron, Gelbach & Miller [-@Cameron2008] s'applique au problème des peu de clusters dans l'estimation DiD. Avec 43 clusters au niveau site (5 observatoires exposés + 38 sites témoins), l'inférence est faisable bien que conservatrice.
+3. **Erreurs-types par fonction d'influence** (DiD intra-observatoire, Chapitre 4) : avec seulement deux sites traités dans la comparaison intra-observatoire de Marovoay, le bootstrap au niveau cluster est peu fiable. Nous utilisons des erreurs-types analytiques basées sur la fonction d'influence, valides pour les coupes transversales répétées dans le cadre CS même sans clustering.
 
 ## Implications pratiques
 

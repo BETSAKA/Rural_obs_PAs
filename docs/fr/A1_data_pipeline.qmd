@@ -1,0 +1,348 @@
+---
+title: "Data Pipeline"
+subtitle: "Georeferencing, PA overlaps, and variable harmonisation"
+---
+
+```{r}
+#| label: setup
+source("R/load_data.R")
+```
+
+This appendix documents the full reproducible data pipeline from raw ROS survey files to the consolidated household-level panel dataset. The paper chapter ([Chapter 2](02_data.qmd)) provides a condensed summary; this appendix gives all details needed for reproducibility.
+
+
+# Georeferencing ROS localities {#sec-a-georef}
+
+## The problem
+
+The Rural Observatory System collected household panel data in rural Madagascar from 1995 to 2015. Critically, surveys were **not geolocated**: location fields were free-text, not linked to official administrative codes. To enable spatial analysis --- particularly overlay with protected-area boundaries --- every ROS observation must be aligned with a standardised commune and *fokontany* using P-codes from the OCHA/BNGRC Common Operational Datasets (CODs).
+
+## Reference datasets
+
+Two spatial reference datasets anchor the georeferencing:
+
+1. **Madagascar Subnational Administrative Boundaries** (COD-AB): five administrative levels from country to *fokontany*, with official P-codes.
+2. **Madagascar Populated Places** (COD-PS): 28,184 populated places with toponyms and P-codes (source: NGA/GIST, distributed by UN OCHA ROSA).
+
+## String cleaning
+
+All location strings are normalised before matching. The `clean_string()` function lowercases, strips non-alphanumeric characters, removes qualifiers ("centre", "haut", "bas"), translates French cardinal directions to Malagasy, standardises alternative city names (e.g. "Fort Dauphin" → "Tolanaro"), and converts Roman numerals I--VI to Arabic.
+
+## Hierarchical fuzzy matching
+
+Matching uses **Jaro-Winkler distance** (default threshold 0.25), applied observatory-wise to restrict candidate sets. A four-method cascade assigns communes:
+
+1. **Method 1** --- Fuzzy-match the municipality field (`j42`) against known observatory commune names. Visually verified; false positives removed manually.
+2. **Method 2** --- For records with no municipality, extract the first word of the village name and fuzzy-match it against commune names.
+3. **Method 3** --- Fuzzy-match the full village name against COD populated places (threshold tightened to 0.22).
+4. **Method 4** --- Fuzzy-match remaining village names against already-matched names from prior steps (threshold 0.28).
+
+After commune assignment, a dedicated `fuzzy_match_village()` function matches village names to ADM4 (*fokontany*) names within the matched commune (Jaro-Winkler threshold 0.2). A final **Method 6** adds 13 hand-coded entries for observatory 52 (Menabe).
+
+```{r}
+#| label: fig-map-georef
+#| fig-cap: "All matched ROS communes and fokontany across Madagascar."
+#| fig-height: 10
+#| fig-width: 8
+# Aggregate communes per observatory for labelling
+obs_union <- obs_communes |>
+  group_by(OBS_CODE) |>
+  summarise(.groups = "drop") |>
+  st_centroid() |>
+  left_join(
+    obs_communes |> st_drop_geometry() |> distinct(OBS_CODE, OBS_NAME),
+    by = "OBS_CODE"
+  )
+
+obs_pts <- bind_cols(
+  obs_union |> st_drop_geometry(),
+  as_tibble(st_coordinates(obs_union))
+)
+
+ggplot() +
+  geom_sf(
+    data = madagascar,
+    fill = "grey97",
+    colour = "grey80",
+    linewidth = 0.2
+  ) +
+  geom_sf(
+    data = obs_communes,
+    aes(fill = factor(OBS_CODE)),
+    colour = "grey50",
+    linewidth = 0.2,
+    alpha = 0.6
+  ) +
+  geom_sf(
+    data = sel_fokontany,
+    fill = NA,
+    colour = "grey30",
+    linewidth = 0.1,
+    linetype = "dotted"
+  ) +
+  geom_label_repel(
+    data = obs_pts,
+    aes(x = X, y = Y, label = OBS_NAME),
+    size = 2.2,
+    fontface = "bold",
+    fill = alpha("white", 0.85),
+    label.size = 0.15,
+    box.padding = 0.4,
+    max.overlaps = 20
+  ) +
+  scale_fill_brewer(palette = "Paired", guide = "none") +
+  labs(
+    title = "Georeferenced ROS Survey Locations",
+    subtitle = "Commune polygons (filled) with matched fokontany boundaries (dotted)"
+  ) +
+  theme_void(base_size = 10) +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+## Match rates
+
+Communes were re-identified for **91.8%** of observations; villages for **61.5%** of name variations. The 8.2% commune failures are concentrated in observatories with highly abbreviated or non-standard location strings. 98% of unique commune name variations and 62% of village name variations were resolved.
+
+
+# Protected-area overlap analysis {#sec-a-overlaps}
+
+## Spatial overlaps
+
+ROS commune and *fokontany* polygons are overlaid with the **dynamic WDPA** (`dynamic_wdpa.rds`), a temporally explicit database of PA boundaries for Madagascar. An interactive map visualises all observatory polygons against PA boundaries.
+
+```{r}
+#| label: fig-map-overlaps
+#| fig-cap: "ROS survey communes (coloured by observatory) overlaid with PA boundaries (dark green)."
+#| fig-height: 10
+#| fig-width: 8
+ggplot() +
+  geom_sf(
+    data = madagascar,
+    fill = "grey97",
+    colour = "grey80",
+    linewidth = 0.2
+  ) +
+  geom_sf(
+    data = dyn_study,
+    fill = "#2E7D32",
+    colour = "#2E7D32",
+    alpha = 0.25,
+    linewidth = 0.3
+  ) +
+  geom_sf(
+    data = obs_communes,
+    aes(fill = factor(OBS_CODE)),
+    colour = "grey40",
+    linewidth = 0.25,
+    alpha = 0.6
+  ) +
+  geom_label_repel(
+    data = obs_pts,
+    aes(x = X, y = Y, label = OBS_NAME),
+    size = 2.2,
+    fontface = "bold",
+    fill = alpha("white", 0.85),
+    label.size = 0.15,
+    box.padding = 0.4,
+    max.overlaps = 20
+  ) +
+  scale_fill_brewer(palette = "Paired", guide = "none") +
+  labs(
+    title = "ROS Survey Communes and Protected Area Boundaries",
+    subtitle = "Green: PA boundaries (dynamic WDPA) \u00b7 Coloured: survey communes"
+  ) +
+  theme_void(base_size = 10) +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+## ROS survey inventory
+
+Household-level datasets for 1995--2015 are loaded and tabulated by observatory and year. Survey continuity varies: some observatories have nearly continuous 20-year panels, others cover only 3--8 years.
+
+```{r}
+#| label: tbl-survey-inventory
+#| tbl-cap: "Number of surveyed households per observatory per year (1995--2015)."
+obs_names_full <- obs_locations |> mutate(obs = code) |> select(obs, name)
+
+household_consolidated |>
+  count(obs, year, name = "n_hh") |>
+  left_join(obs_names_full, by = "obs") |>
+  mutate(name = coalesce(name, paste0("Obs ", obs))) |>
+  select(Observatory = name, Year = year, `N households` = n_hh) |>
+  pivot_wider(names_from = Year, values_from = `N households`) |>
+  gt() |>
+  tab_header(
+    title = "ROS Survey Inventory",
+    subtitle = "Number of households per observatory per year (blank = no survey)"
+  ) |>
+  sub_missing(missing_text = "\u2014")
+```
+
+## Temporal overlap logic
+
+Three scenarios determine usability for impact evaluation:
+
+1. **PA predates ROS entirely** → no pre-treatment baseline → unusable (e.g. Ranomafana, created 1991).
+2. **PA created during ROS surveys** → impact analysis possible → *these are our exposure cases*.
+3. **PA created after ROS ended** → baseline only; resurvey needed for evaluation.
+
+## Decree date revision
+
+Official creation years were cross-checked against the Madagascar legal database ([CNLEGIS](https://cnlegis.gov.mg)). Several temporary decree dates were revised:
+
+| PA | Original year | Revised year | Source |
+|:---|:---:|:---:|:---|
+| Ankarafantsika NP | 1927 | **2002** | Decree 2002-798 (extension) |
+| Lac Alaotra PHP | 2003 | **2007** | Temporary decree |
+| Corridor Ankeniheny--Zahamena | 2002 | **2005** | Temporary decree |
+| Menabe Antimena | 2003 | **2006** | Temporary decree |
+| Corridor Ambositra-Vondrozo | 2003 | **2006** | WDPA / CNLEGIS |
+| Mikea NP | 2003 | **2007** | Temporary decree |
+| Ranobe PK 32 | 2003 | **2008** | Temporary decree |
+| Amoron'i Onilahy | 2003 | **2007** | Temporary decree |
+
+: Revised PA decree dates used in this study {#tbl-decree-dates}
+
+```{r}
+#| label: fig-timeline
+#| fig-cap: "Timeline of ROS survey years (blue dots) vs. revised PA creation years (red triangles) for priority observatory--PA pairs."
+#| fig-height: 7
+#| fig-width: 10
+survey_coverage <- household_consolidated |>
+  distinct(obs, year) |>
+  left_join(obs_names_full, by = "obs") |>
+  mutate(name = coalesce(name, paste0("Obs ", obs)))
+
+pa_events <- tribble(
+  ~name                     , ~pa_name                      , ~pa_year        ,
+  "Marovoay"                , "Ankarafantsika NP"           , TREAT_YEAR_MARO ,
+  "Alaotra"                 , "Lac Alaotra PHP"             , TREAT_YEAR_ALA  ,
+  "Farafangana"             , "Corridor Ambositra-Vondrozo" , TREAT_YEAR_FARA ,
+  "Toliara North"           , "Amoron'i Onilahy"            , TREAT_YEAR_TOL  ,
+  "F\u00e9n\u00e9rive East" , "R\u00e9serve de Tampolo"     , TREAT_YEAR_FEN
+)
+
+ggplot() +
+  geom_point(
+    data = survey_coverage,
+    aes(x = year, y = name),
+    colour = "#1565C0",
+    size = 2.5,
+    alpha = 0.7
+  ) +
+  geom_point(
+    data = pa_events,
+    aes(x = pa_year, y = name),
+    colour = "#D32F2F",
+    shape = 17,
+    size = 4
+  ) +
+  geom_text_repel(
+    data = pa_events,
+    aes(x = pa_year, y = name, label = pa_name),
+    colour = "#D32F2F",
+    size = 2.5,
+    nudge_y = 0.3,
+    fontface = "italic",
+    max.overlaps = 10
+  ) +
+  scale_x_continuous(breaks = seq(1995, 2015, 2)) +
+  labs(
+    x = "Year",
+    y = NULL,
+    title = "ROS Survey Coverage and PA Exposure Dates",
+    subtitle = "Blue dots: survey years \u00b7 Red triangles: PA creation/extension"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(panel.grid.minor = element_blank())
+```
+
+## Priority pairs
+
+The spatial and temporal overlay identifies Marovoay--Ankarafantsika and Alaotra--Lac Alaotra as the most promising pairs for causal analysis (long panels, clear exposure dates). Farafangana, Toliara North, and Fénérive East are secondary candidates explored in [Chapter 5](05_extensions.qmd). A 10 km buffer (CRS EPSG:29701, Laborde Madagascar) around PAs is used for the proximity screening.
+
+::: {.callout-note}
+ROS observatories were selected for agricultural and socio-economic monitoring, not proximity to PAs. Overlaps are partly coincidental and require cautious interpretation.
+:::
+
+
+# Variable construction {#sec-a-variables}
+
+## Georeferencing households
+
+Household identifiers (`j5`) are joined to the locality correspondence table from @sec-a-georef. A critical correction: **1995 household IDs are re-aligned using the 1996 survey** (which records whether a household was surveyed in 1995 and provides its 1996 identifier).
+
+## Household composition
+
+Individual-level files (member records) provide sex, age, and headship. Households with multiple heads are resolved by keeping the first member ID. Key variables: `household_size` (member count) and head's sex and age.
+
+## Education
+
+Education variables present several data gaps:
+
+- Literacy (`s1a`, `s1b`): missing in 1996 and 1998.
+- Primary school attendance (`s2`): missing in 1996.
+- Years of schooling (`s3a`): missing in 1996.
+
+Household-level indicators are constructed: `any_literate_adult` (≥1 adult reads), `max_years_edu`, `mean_years_edu_adults`, `pct_with_schooling` (share of members ≥6 with any schooling), and head's education variables.
+
+## Agricultural activities
+
+Activity codes (`a1`) are harmonised across the 1996--2015 coding schemes. **1995 is a special case**: no individual `a1` variable; activities are reconstructed from separate main/secondary activity files (`res_apm.dta`, `res_asm.dta`). Two agricultural classifications are used:
+
+- **Stricto sensu** (codes 95, 96): farming or livestock only.
+- **Lato sensu** (19 codes): farming, livestock, fishing, gathering, apiculture, agriculture-related crafts.
+
+## Food security
+
+The core measure is **months of food self-sufficiency from own production**, harmonised across varying question formats:
+
+- 1995: single question (`sa3a`).
+- 1996--1997: single question (`sa2`).
+- 1998--2015: three components (`sa2a` + `sa2b` + `sa2c` for rice 1st season + rice 2nd season + maize).
+
+Summed and capped at 12 months.
+
+## Income construction
+
+Income is reconstructed via dedicated functions for each component:
+
+- **Current income** = main activity + secondary activity + net rice + other crops + livestock + fishing.
+- **Exceptional income** = land rents + miscellaneous + HIMO (public works) + asset sales + monetary and non-monetary transfers.
+- **Total income** (`revtot`) = current + exceptional.
+
+The OECD-modified equivalence scale assigns weight 1.0 to the first adult, 0.5 to each additional adult (≥14), and 0.3 to each child (<14). OECD-equivalised income = `revtot / oecd_scale`. Both total and equivalised income are log-transformed and winsorised at the 1st--99th percentiles for the main analysis.
+
+```{r}
+#| label: tbl-income-components
+#| tbl-cap: "Income component construction and variable sources."
+tribble(
+  ~Component           , ~Variables            , ~Coverage        , ~Notes                                                      ,
+  "Rice income (net)"  , "rev_riz"             , "1995\u20132015" , "Revenue minus production costs"                            ,
+  "Other crops"        , "rev_cu"              , "1995\u20132015" , "Cash crops, fruit, vegetables"                             ,
+  "Livestock"          , "revel"               , "1995\u20132015" , "Cattle, poultry, other animals"                            ,
+  "Fishing"            , "revpeche"            , "1995\u20132015" , "Inland and coastal"                                        ,
+  "Main activity"      , "revppal"             , "1995\u20132015" , "Primary non-agricultural activity"                         ,
+  "Secondary activity" , "revsec"              , "1995\u20132015" , "Secondary non-agricultural activity"                       ,
+  "Current income"     , "revcou"              , "Derived"        , "Sum of 6 components above"                                 ,
+  "Exceptional income" , "revext"              , "1995\u20132015" , "Land rents, transfers, HIMO, asset sales"                  ,
+  "Total income"       , "revtot"              , "Derived"        , "Current + exceptional"                                     ,
+  "OECD-equiv. income" , "revtot / oecd_equiv" , "Derived"        , "Scale: 1.0 + 0.5\u00d7(adults\u22121) + 0.3\u00d7children"
+) |>
+  gt() |>
+  tab_header(
+    title = "Income Component Construction",
+    subtitle = "From ROS household surveys to analysis-ready income variables"
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      rows = Component %in%
+        c("Current income", "Total income", "OECD-equiv. income")
+    )
+  )
+```
+
+## Consolidation
+
+All component tables are deduplicated to unique (year, household ID) via mean aggregation, then left-joined into a single dataset: `household_consolidated.rds` ({{< var n_hh_obs >}} household-year observations across {{< var n_obs >}} observatories). A uniqueness check confirms one row per household per year.
