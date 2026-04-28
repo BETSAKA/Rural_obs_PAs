@@ -37,9 +37,10 @@ vignettes/*.pdf
 *.knit.md
 
 # Quarto figure/resource folders (intermediate, outside docs/)
-# NOTE: docs/*_files/ must NOT be ignored — those hold rendered images for GitHub Pages
+# NOTE: docs/**/*_files/ must NOT be ignored — those hold rendered images for GitHub Pages
 *_files/
 !docs/*_files/
+!docs/**/*_files/
 
 # R Environment Variables
 .Renviron
