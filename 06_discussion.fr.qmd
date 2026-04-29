@@ -77,5 +77,5 @@ La mesure du revenu par enquête dans les économies de subsistance est intrins�
 Les six observatoires propres couvrent des zones agro-écologiques très différentes — plateau des hautes terres, nord côtier, sud semi-aride, côte est humide. La question de savoir si une moyenne pondérée de ces économies diverses peut représenter de manière crédible ce que la plaine rizicole irriguée de Marovoay, ou la pêcherie lacustre d’Alaotra, aurait gagné en l’absence de l’AP reste ouverte.
 
 
-# Prochaines étapes : la vague d'enquête 2026 {#sec-next-steps}
+# Prochaines étapes {#sec-next-steps}
 
