@@ -390,21 +390,4 @@ bind_rows(maro_class, ala_summary) |>
   tab_header(title = "DiD intra-observatoire : classifications d'intensité d'exposition")
 ```
 
-# Extensions à trois observatoires supplémentaires {#sec-extensions}
 
-Trois paires observatoire–AP supplémentaires identifiées lors de l'audit du pool de donneurs fournissent des extensions de l'analyse principale :
-
-| Observatoire | Aire protégée | UICN | Année | Gouvernance |
-|---|---|---|---|---|
-| Farafangana | Corridor Forestier Ambositra-Vondrozo (CFAV) | V | 2006 | Corridor de hautes terres multifonctionnel |
-| Toliara Nord | Amoron'i Onilahy | V | 2007 | Protections côtières et forêt sèche |
-| Fénérive Est | Réserve de Tampolo | IV | 2007 | Petite forêt de recherche (~7,3 km²) |
-
-: Observatoires d'extension. {#tbl-ext-cases}
-
-Ces trois observatoires passent de contraintes dans le pool de donneurs à des unités exposées informatives. Ensemble avec Marovoay et Alaotra, ils permettent une comparaison à cinq cas de la façon dont le type de gouvernance de conservation, l'intensité d'enforcement et la taille de l'AP façonnent les résultats de revenu des ménages. Les fenêtres post-exposition plus courtes (8–9 ans contre 12 pour Marovoay et 7 pour Alaotra) limitent la précision mais élargissent la variation institutionnelle. L'analyse complète est présentée au [Chapitre 5](05_extensions.qmd).
-
-
-# Perspectives : estimation complète au niveau des ménages {#sec-did-roadmap}
-
-Les vérifications DiD intra-observatoire secondaires présentées à @sec-complementary exploitent déjà les informations au niveau des ménages à l'intérieur de chaque observatoire, mais restent limités par le faible nombre de sites disponibles *au sein* d'un seul observatoire (G = 4 à 7). Une analyse au niveau des ménages plus riche regrouperait l'ensemble des cinq observatoires exposés avec les donneurs jamais exposés dans un dispositif à traitement échelonné unique, exploitant quatre cohortes d'exposition échelonnées (Ankarafantsika 2003, Farafangana/Toliara/Fénérive 2006–07, Alaotra 2008, plus jamais exposés). L'estimateur naturel est à nouveau Callaway–Sant'Anna avec `panel = FALSE`, complété par des études d'événements Sun–Abraham via `fixest::sunab()`. La vague 2026 du SOR augmentera l'information post-exposition et devrait affiner ces estimations. Ce dispositif prospectif est discuté à @sec-next-steps.

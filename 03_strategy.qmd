@@ -769,23 +769,3 @@ bind_rows(maro_class, ala_summary) |>
 4. **Small G**: With only four to seven sites the cluster-robust SE is wide; the design-based IF SE is tighter but identifies a more restrictive estimand.
 
 For these reasons the secondary designs are explicitly complementary rather than confirmatory of the main gsynth analysis. Where they agree with gsynth (Alaotra), the agreement narrows the range of plausible interpretations; where they disagree (Marovoay), the disagreement diagnoses *which* identifying contrast is doing the work in each estimator. Two further estimators — Synthetic DiD [@Arkhangelsky2021] and standard two-way fixed effects — are reported in [Appendix C](A3_robustness.qmd) as additional sensitivity checks against the gsynth specification choice.
-
-
-# Extensions to three additional observatories {#sec-extensions}
-
-The two-case comparison above — strict enforcement at Ankarafantsika versus participatory conservation at Lac Alaotra — limits external validity. Three additional observatory–PA pairs identified in the donor-pool audit (@sec-donor-pool) provide shorter but informative extensions:
-
-| Observatory | Protected area | IUCN | Year | Governance |
-|---|---|---|---|---|
-| Farafangana | Corridor Forestier Ambositra-Vondrozo (CFAV) | V | 2006 | Multipurpose highland corridor |
-| Toliara North | Amoron'i Onilahy | V | 2007 | Coastal and dry-forest protections |
-| Fénérive East | Réserve de Tampolo | IV | 2007 | Small (~7.3 km²) research forest |
-
-: Extension observatories. {#tbl-ext-cases}
-
-These three observatories move from liabilities in the donor pool to informative exposed units, enabling a five-case comparison of how conservation governance type, enforcement intensity, and PA size shape household-income outcomes. The shorter post-exposure windows (8–9 years versus 12 for Marovoay and 7 for Alaotra) limit precision but broaden the institutional variation. The full analysis is presented in [Chapter 5](05_extensions.qmd).
-
-
-# Looking ahead: full household-level estimation {#sec-did-roadmap}
-
-The secondary within-observatory DiD checks introduced in @sec-complementary already exploit household-level information within each observatory, but they remain limited by the small number of sites available *inside* a single observatory (G = 4 to 7). A richer household-level analysis would pool all five exposed observatories together with the never-exposed donors into a single staggered-treatment design, exploiting four staggered exposure cohorts (Ankarafantsika 2003, Farafangana/Toliara/Fenérive 2006–07, Alaotra 2008, plus never-exposed). The natural estimator is again Callaway–Sant'Anna with `panel = FALSE`, complemented by Sun–Abraham event studies via `fixest::sunab()`. The 2026 ROS wave will increase post-exposure information and is expected to sharpen these estimates further. This forward-looking design is discussed in @sec-next-steps.
