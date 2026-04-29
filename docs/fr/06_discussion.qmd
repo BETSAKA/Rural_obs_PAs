@@ -83,30 +83,4 @@ The six clean donor observatories span very different agro-ecological zones — 
 Finally, this study measures income effects only. A protected area that imposes short-term income costs but prevents longer-run ecological degradation — soil erosion from deforestation, loss of water regulation — may be welfare-improving over a longer horizon. The full welfare comparison requires ecological outcome data that are outside the scope of this analysis.
 
 
-# Next steps: the 2026 survey wave {#sec-next-steps}
-
-The limitations above --- aggregation, balanced-panel requirements, single-unit power --- are largely artefacts of the gsynth framework rather than the data themselves. The Rural Observatory panel data, with \~500 households per observatory per year across repeated cross-sections and staggered treatment timing, are also suited to household-level difference-in-differences estimation.
-
-## Staggered DiD design
-
-The five exposed observatories define four exposure cohorts:
-
-| Cohort ($g$) | Sites | PA type | Design |
-|:---:|:---|:---|:---|
-| 2003 | Marovoay east-bank (2 sites) | Strict (IUCN II) | Site-level split |
-| 2006 | Farafangana (9 sites) | Multipurpose (IUCN V) | Observatory-level |
-| 2007 | Toliara North (4) + Fénérive East (10) | Mixed V/II + Low intensity (IV) | Observatory-level |
-| 2008 | Alaotra (3 sites) | Multipurpose (IUCN V) | Observatory-level |
-| $\infty$ | Marovoay west (2) + 6 clean donors | Never exposed | Controls |
-
-: Four staggered exposure cohorts for Callaway & Sant'Anna DiD {#tbl-staggered}
-
-A crucial feature here: *not-yet-exposed units serve as controls.* Alaotra (exposed from 2008) provides a valid control for the Marovoay effect during 2003--2007 before its own exposure begins. This cross-cohort identification is impossible in the gsynth framework.
-
-## Current and future analyses
-
-The inter-observatory CS-DiD presented in [Appendix C](A3_robustness.qmd) already implements staggered Callaway--Sant'Anna estimation at the household level with `panel = FALSE`, pooling the Marovoay (g = 2003) and Alaotra (g = 2008) cohorts against the six clean donor observatories. Results confirm the qualitative pattern from gsynth: a negative Marovoay cohort ATT and a null Alaotra cohort ATT.
-
-When the 2026 survey round becomes available, the estimator can be extended with a fifth cohort (Fénérive East, once its post-treatment outcomes are observed). A Sun--Abraham [-@SunAbraham2021] interaction-weighted estimator via `fixest::sunab()` can provide a transparent event-study summary alongside the CS estimator. If gsynth and pooled DiD agree across the extended set of sites, the evidence is more credible regardless of which identifying assumption one prefers. If the 2026 wave covers Fénérive East, the small footprint of the Réserve de Tampolo allows a within-observatory distance design contrasting near-PA and far-PA sites, adding a third independent geographic context alongside Marovoay and Alaotra.
-
-The current gsynth results should be read as a first-pass analysis that will benefit from household-level estimation exploiting the full depth of the data once survey depth and coverage expand.
+# Next steps {#sec-next-steps}

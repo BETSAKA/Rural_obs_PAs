@@ -245,13 +245,7 @@ window.Quarto = {
   </ul>
 </li>
   <li><a href="#sec-limitations" id="toc-sec-limitations" class="nav-link" data-scroll-target="#sec-limitations"><span class="header-section-number">10</span> Limitations</a></li>
-  <li>
-<a href="#sec-next-steps" id="toc-sec-next-steps" class="nav-link" data-scroll-target="#sec-next-steps"><span class="header-section-number">11</span> Next steps: the 2026 survey wave</a>
-  <ul class="collapse">
-<li><a href="#staggered-did-design" id="toc-staggered-did-design" class="nav-link" data-scroll-target="#staggered-did-design"><span class="header-section-number">11.1</span> Staggered DiD design</a></li>
-  <li><a href="#current-and-future-analyses" id="toc-current-and-future-analyses" class="nav-link" data-scroll-target="#current-and-future-analyses"><span class="header-section-number">11.2</span> Current and future analyses</a></li>
-  </ul>
-</li>
+  <li><a href="#sec-next-steps" id="toc-sec-next-steps" class="nav-link" data-scroll-target="#sec-next-steps"><span class="header-section-number">11</span> Next steps</a></li>
   </ul>
 <div class="toc-actions"><ul>
 <li><a href="https://github.com/BETSAKA/Rural_obs_PAs/blob/main/06_discussion.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li>
@@ -326,70 +320,7 @@ window.Quarto = {
 <p>The six clean donor observatories span very different agro-ecological zones — highland plateau, semi-arid north, semi-arid south, humid east coast. Whether a weighted average of such diverse economies can credibly represent what Marovoay’s irrigated rice plain, or Alaotra’s lake fishery, would have earned absent the PA is an open question. The Marovoay model has only four pre-treatment years in which to validate this projection.</p>
 <p>Finally, this study measures income effects only. A protected area that imposes short-term income costs but prevents longer-run ecological degradation — soil erosion from deforestation, loss of water regulation — may be welfare-improving over a longer horizon. The full welfare comparison requires ecological outcome data that are outside the scope of this analysis.</p>
 </section><section id="sec-next-steps" class="level1" data-number="11"><h1 data-number="11">
-<span class="header-section-number">11</span> Next steps: the 2026 survey wave</h1>
-<p>The limitations above — aggregation, balanced-panel requirements, single-unit power — are largely artefacts of the gsynth framework rather than the data themselves. The Rural Observatory panel data, with ~500 households per observatory per year across repeated cross-sections and staggered treatment timing, are also suited to household-level difference-in-differences estimation.</p>
-<section id="staggered-did-design" class="level2" data-number="11.1"><h2 data-number="11.1" class="anchored" data-anchor-id="staggered-did-design">
-<span class="header-section-number">11.1</span> Staggered DiD design</h2>
-<p>The five exposed observatories define four exposure cohorts:</p>
-<div id="tbl-staggered" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-staggered-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 11.1: Four staggered exposure cohorts for Callaway &amp; Sant’Anna DiD
-</figcaption><div aria-describedby="tbl-staggered-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="caption-top table">
-<colgroup>
-<col style="width: 29%">
-<col style="width: 23%">
-<col style="width: 23%">
-<col style="width: 23%">
-</colgroup>
-<thead><tr class="header">
-<th style="text-align: center;">Cohort (<span class="math inline">\(g\)</span>)</th>
-<th style="text-align: left;">Sites</th>
-<th style="text-align: left;">PA type</th>
-<th style="text-align: left;">Design</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">2003</td>
-<td style="text-align: left;">Marovoay east-bank (2 sites)</td>
-<td style="text-align: left;">Strict (IUCN II)</td>
-<td style="text-align: left;">Site-level split</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">2006</td>
-<td style="text-align: left;">Farafangana (9 sites)</td>
-<td style="text-align: left;">Multipurpose (IUCN V)</td>
-<td style="text-align: left;">Observatory-level</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">2007</td>
-<td style="text-align: left;">Toliara North (4) + Fénérive East (10)</td>
-<td style="text-align: left;">Mixed V/II + Low intensity (IV)</td>
-<td style="text-align: left;">Observatory-level</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">2008</td>
-<td style="text-align: left;">Alaotra (3 sites)</td>
-<td style="text-align: left;">Multipurpose (IUCN V)</td>
-<td style="text-align: left;">Observatory-level</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><span class="math inline">\(\infty\)</span></td>
-<td style="text-align: left;">Marovoay west (2) + 6 clean donors</td>
-<td style="text-align: left;">Never exposed</td>
-<td style="text-align: left;">Controls</td>
-</tr>
-</tbody>
-</table>
-</div>
-</figure>
-</div>
-<p>A crucial feature here: <em>not-yet-exposed units serve as controls.</em> Alaotra (exposed from 2008) provides a valid control for the Marovoay effect during 2003–2007 before its own exposure begins. This cross-cohort identification is impossible in the gsynth framework.</p>
-</section><section id="current-and-future-analyses" class="level2" data-number="11.2"><h2 data-number="11.2" class="anchored" data-anchor-id="current-and-future-analyses">
-<span class="header-section-number">11.2</span> Current and future analyses</h2>
-<p>The inter-observatory CS-DiD presented in <a href="./A3_robustness.html">Appendix C</a> already implements staggered Callaway–Sant’Anna estimation at the household level with <code>panel = FALSE</code>, pooling the Marovoay (g = 2003) and Alaotra (g = 2008) cohorts against the six clean donor observatories. Results confirm the qualitative pattern from gsynth: a negative Marovoay cohort ATT and a null Alaotra cohort ATT.</p>
-<p>When the 2026 survey round becomes available, the estimator can be extended with a fifth cohort (Fénérive East, once its post-treatment outcomes are observed). A Sun–Abraham <span class="citation" data-cites="SunAbraham2021">(<a href="references.html#ref-SunAbraham2021" role="doc-biblioref">2021</a>)</span> interaction-weighted estimator via <code>fixest::sunab()</code> can provide a transparent event-study summary alongside the CS estimator. If gsynth and pooled DiD agree across the extended set of sites, the evidence is more credible regardless of which identifying assumption one prefers. If the 2026 wave covers Fénérive East, the small footprint of the Réserve de Tampolo allows a within-observatory distance design contrasting near-PA and far-PA sites, adding a third independent geographic context alongside Marovoay and Alaotra.</p>
-<p>The current gsynth results should be read as a first-pass analysis that will benefit from household-level estimation exploiting the full depth of the data once survey depth and coverage expand.</p>
+<span class="header-section-number">11</span> Next steps</h1>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
@@ -402,14 +333,11 @@ Oldekop, Johan A., George Holmes, William E. Harris, and Karl L. Evans. 2016. <s
 <div id="ref-Sims2010" class="csl-entry" role="listitem">
 Sims, Katharine R. E. 2010. <span>“Measuring the Effects of Protected Areas on Deforestation in <span>Madagascar</span>.”</span> <em>Journal of Environmental Economics and Management</em> 59 (2): 180–90. <a href="https://doi.org/10.1016/j.jeem.2009.10.003">https://doi.org/10.1016/j.jeem.2009.10.003</a>.
 </div>
-<div id="ref-SunAbraham2021" class="csl-entry" role="listitem">
-Sun, Liyang, and Sarah Abraham. 2021. <span>“Estimating Dynamic Treatment Effects in Event Studies with Heterogeneous Treatment Effects.”</span> <em>Journal of Econometrics</em> 225 (2): 175–99. <a href="https://doi.org/10.1016/j.jeconom.2020.09.006">https://doi.org/10.1016/j.jeconom.2020.09.006</a>.
-</div>
 <div id="ref-Xu2017" class="csl-entry" role="listitem">
 Xu, Yiqing. 2017. <span>“Generalized Synthetic Control Method: Causal Inference with Interactive Fixed Effects Models.”</span> <em>Political Analysis</em> 25 (1): 57–76. <a href="https://doi.org/10.1017/pan.2016.2">https://doi.org/10.1017/pan.2016.2</a>.
 </div>
 </div>
-</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
     const anchorJS = new window.AnchorJS();
