@@ -79,29 +79,3 @@ Les six observatoires propres couvrent des zones agro-écologiques très différ
 
 # Prochaines étapes : la vague d'enquête 2026 {#sec-next-steps}
 
-Les limites ci-dessus — agrégation, exigences de panel équilibré, puissance à unité unique — sont largement des artefacts du cadre gsynth plutôt que des données elles-mêmes. Les données du panel des Observatoires Ruraux, avec ~500 ménages par observatoire par année d'enquête sur des coupes transversales répétées et un traitement échelonné, se prêtent également à une estimation de différences-en-différences au niveau des ménages.
-
-## Dispositif DiD à traitement échelonné
-
-Les cinq observatoires exposés définissent quatre cohortes d'exposition :
-
-| Cohorte ($g$) | Sites | Type AP | Dispositif |
-|:---:|:---|:---|:---|
-| 2003 | Marovoay rive est (2 sites) | Strict (catégorie II UICN) | Division intra-site |
-| 2006 | Farafangana (9 sites) | Multifonctionnel (catégorie V UICN) | Au niveau de l'observatoire |
-| 2007 | Toliara Nord (4) + Fénérive Est (10) | Mixte V/II + Faible intensité (IV) | Au niveau de l'observatoire |
-| 2008 | Alaotra (3 sites) | Multifonctionnel (catégorie V UICN) | Au niveau de l'observatoire |
-| $\infty$ | Marovoay ouest (2) + 6 donneurs propres | Jamais exposés | Contrôles |
-
-: Quatre cohortes d'exposition échelonnées pour le DiD Callaway & Sant'Anna {#tbl-staggered}
-
-Une caractéristique cruciale : *les unités pas encore exposées servent de contrôles.* Alaotra (exposé à partir de 2008) constitue un contrôle valide pour l'effet de Marovoay pendant 2003–2007 avant que sa propre exposition ne commence. Cette identification croisée des cohortes est impossible dans le cadre gsynth.
-
-## Analyses actuelles et futures
-
-Le DiD CS inter-observatoires présenté dans l'[Annexe C](A3_robustness.qmd) implémente déjà l'estimation Callaway–Sant'Anna à traitement échelonné au niveau des ménages avec `panel = FALSE`, regroupant les cohortes Marovoay (g = 2003) et Alaotra (g = 2008) face aux six observatoires donneurs propres. Les résultats confirment le schéma qualitatif de gsynth : un ATT négatif pour la cohorte Marovoay et un ATT nul pour la cohorte Alaotra.
-
-Lorsque la vague d'enquête 2026 sera disponible, l'estimateur pourra être étendu avec une cinquième cohorte (Fénérive Est, une fois ses résultats post-traitement observés). Un estimateur Sun–Abraham [-@SunAbraham2021] pondéré par l'interaction via `fixest::sunab()` peut fournir un résumé d'étude d'événements transparent aux côtés de l'estimateur CS. Si gsynth et DiD groupé convergent sur l'ensemble élargi de sites, les preuves sont plus crédibles indépendamment de l'hypothèse d'identification préférée. Si la vague 2026 couvre Fénérive Est, la petite empreinte de la Réserve de Tampolo permet un dispositif de distance intra-observatoire contrastant les sites proches et éloignés de l'AP, ajoutant un troisième contexte géographique indépendant aux côtés de Marovoay et Alaotra.
-
-Les résultats gsynth actuels doivent être lus comme une première analyse qui bénéficiera d'une estimation au niveau des ménages exploitant toute la profondeur des données lorsque la couverture des enquêtes s'élargira.
-

@@ -337,7 +337,7 @@ The null result is consistent with several plausible interpretations: participat
 
 ### Within-Alaotra household DiD check {#sec-ala-rcs}
 
-The household-level repeated cross-section design applies the Callaway–Sant'Anna estimator to the 1999–2014 + 2025 Alaotra panel under two within-observatory exposure proxies: distance to the nearest PA boundary (≤ 10 km) and the 2025 share of households declaring PA-dependent extractive uses (≥ 12.5%).
+The household-level repeated cross-section design applies the Callaway–Sant'Anna estimator to the 1999–2014 + 2025 Alaotra panel under two within-observatory exposure proxies: distance to the nearest PA boundary (≤ 10 km) and the 2025 share of households declaring PA-dependent extractive uses (≥ 12.5%). The exposure-intensity classifications underlying both proxies are described in @tbl-secondary-design (see [Strategy chapter](03_strategy.qmd#tbl-secondary-design)).
 
 ```{r}
 #| label: tbl-ala-rcs
@@ -423,6 +423,66 @@ ggplot(event_ala_df, aes(x = year, y = att)) +
 ```
 
 Pre-treatment coefficients (1999–2007) fluctuate around zero — wide SEs reflecting inter-fokontany variability but no systematic trend, supporting the parallel-trends assumption. Across the full post-exposure window (2008–2025), estimates remain close to zero with confidence intervals comfortably including zero. The 2025 point — 17 years post-exposure — confirms the absence of a detectable income effect under participatory conservation management. This result is stable across the full 1999–2025 observation window.
+
+The event study below repeats the analysis under the extractive-use proxy (fokontany with ≥ 12.5% of households reporting PA-dependent extractive use in 2025 versus less dependent fokontany), which provides a behavioural rather than geographic measure of exposure intensity.
+
+```{r}
+#| label: fig-ala-dyn-ext
+#| fig-cap: "Alaotra within-observatory DiD event study — extractive-use proxy (1999–2025). High-use fokontany (≥ 12.5% extractive users) vs low-use fokontany, Callaway–Sant'Anna (panel = FALSE). Year 2008 is the exposure onset; the rightmost diamond (2025) is the long-run resurvey point. Error bars: 95% pointwise CI (influence-function SE)."
+#| fig-height: 5
+#| fig-width: 10
+dyn_ala_ext <- read_rds("data/secondary_did_results.rds")$ala$res$dyns[["ext_nocl"]]
+event_ala_ext_df <- tibble(
+  rel_time = dyn_ala_ext$egt,
+  att      = dyn_ala_ext$att.egt,
+  se       = dyn_ala_ext$se.egt
+) |>
+  mutate(
+    year    = rel_time + TREAT_YEAR_ALA,
+    ci_lo   = att - 1.96 * se,
+    ci_hi   = att + 1.96 * se,
+    is_2025 = rel_time == 17
+  )
+
+ggplot(event_ala_ext_df, aes(x = year, y = att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(
+    xintercept = TREAT_YEAR_ALA - 0.5,
+    linetype = "dashed",
+    color = "grey40"
+  ) +
+  geom_errorbar(
+    aes(ymin = ci_lo, ymax = ci_hi),
+    width = 0.4,
+    color = "#0D47A1",
+    alpha = 0.6
+  ) +
+  geom_point(
+    aes(size = is_2025, shape = is_2025),
+    color = "#0D47A1",
+    show.legend = FALSE
+  ) +
+  scale_size_manual(values = c("FALSE" = 2.5, "TRUE" = 4.5)) +
+  scale_shape_manual(values = c("FALSE" = 16, "TRUE" = 18)) +
+  annotate(
+    "text",
+    x = 2025,
+    y = min(event_ala_ext_df$ci_lo, na.rm = TRUE) - 0.04,
+    label = "2025\n(+17 yrs)",
+    color = "#0D47A1",
+    size = 3,
+    vjust = 1
+  ) +
+  labs(
+    x = "Year",
+    y = "ATT (log equiv. income)",
+    title = "Alaotra: Within-Observatory DiD Event Study — Extractive-Use Proxy (1999–2025)",
+    subtitle = "High-use vs low-use fokontany. SE: influence function (no site clustering)."
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+The extractive-use event study mirrors the distance proxy: pre-treatment estimates are centred at zero with no systematic trend, and post-2008 estimates remain small and statistically indistinguishable from zero. The 2025 point for high-use households does not diverge from the low-use group, indicating that households who actively depended on PA resources in 2025 did not experience systematically different income trajectories — consistent with the interpretation that participatory management preserved resource access rather than restricting it.
 
 # Comparison {#sec-comparison}
 
@@ -527,5 +587,81 @@ bind_rows(
 ```
 
 The contrast between the two estimated ATT paths is sharp on paper: a large persistent negative gap at Ankarafantsika, and a near-zero gap at Alaotra. Before drawing governance conclusions, however, some caution is warranted. At Marovoay, the within-observatory comparison between east and west bank finds no detectable difference, raising the possibility that the gsynth estimate is capturing regional economic decline rather than conservation effects. At Alaotra, the null result may reflect genuinely benign governance or insufficient statistical power. These two caveats temper but do not dissolve the contrast: the evidence is suggestive that strict exclusionary management carries higher livelihood costs than participatory co-management, but the data cannot definitively establish the causal mechanism.
+
+@fig-did-comparison overlays all three within-observatory DiD event studies on a common calendar-year axis, allowing direct visual comparison of the dynamic patterns at both sites.
+
+```{r}
+#| label: fig-did-comparison
+#| fig-cap: "Overlaid within-observatory DiD event studies (calendar year, 1999–2025). Marovoay: east-bank vs west-bank households (red). Alaotra — distance proxy: near (≤ 10 km) vs distant fokontany (light blue). Alaotra — extractive-use proxy: high-use vs low-use fokontany (dark blue). Vertical dashed lines mark each PA's exposure onset. Error bars: 95% pointwise CI (influence-function SE)."
+#| fig-height: 5.5
+#| fig-width: 12
+sec_did_all <- read_rds("data/secondary_did_results.rds")
+
+dyn_maro_c  <- sec_did_all$maro$res$dyns[["bank_nocl"]]
+dyn_ala_d   <- sec_did_all$ala$res$dyns[["dist_nocl"]]
+dyn_ala_e   <- sec_did_all$ala$res$dyns[["ext_nocl"]]
+
+mk_evdf <- function(dyn, treat_year, series_label) {
+  tibble(
+    rel_time = dyn$egt,
+    att      = dyn$att.egt,
+    se       = dyn$se.egt
+  ) |>
+    mutate(
+      year   = rel_time + treat_year,
+      ci_lo  = att - 1.96 * se,
+      ci_hi  = att + 1.96 * se,
+      series = series_label
+    )
+}
+
+evt_all <- bind_rows(
+  mk_evdf(dyn_maro_c, TREAT_YEAR_MARO, "Marovoay (east vs west bank)"),
+  mk_evdf(dyn_ala_d,  TREAT_YEAR_ALA,  "Alaotra — distance proxy"),
+  mk_evdf(dyn_ala_e,  TREAT_YEAR_ALA,  "Alaotra — extractive-use proxy")
+) |>
+  mutate(series = factor(series, levels = c(
+    "Marovoay (east vs west bank)",
+    "Alaotra — distance proxy",
+    "Alaotra — extractive-use proxy"
+  )))
+
+colors <- c(
+  "Marovoay (east vs west bank)"  = "#D32F2F",
+  "Alaotra — distance proxy"       = "#1565C0",
+  "Alaotra — extractive-use proxy" = "#42A5F5"
+)
+
+ggplot(evt_all, aes(x = year, y = att, color = series)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = TREAT_YEAR_MARO - 0.5,
+             linetype = "dashed", color = "#D32F2F", alpha = 0.4) +
+  geom_vline(xintercept = TREAT_YEAR_ALA - 0.5,
+             linetype = "dashed", color = "#1565C0", alpha = 0.4) +
+  geom_errorbar(
+    aes(ymin = ci_lo, ymax = ci_hi),
+    width = 0.35, alpha = 0.4,
+    position = position_dodge(width = 0.6)
+  ) +
+  geom_point(
+    size = 2.5,
+    position = position_dodge(width = 0.6)
+  ) +
+  scale_color_manual(values = colors, name = NULL) +
+  annotate("text", x = TREAT_YEAR_MARO + 0.3,
+           y = Inf, label = "Maro\nexposure",
+           color = "#D32F2F", size = 2.8, vjust = 1.3, hjust = 0) +
+  annotate("text", x = TREAT_YEAR_ALA + 0.3,
+           y = Inf, label = "Ala\nexposure",
+           color = "#1565C0", size = 2.8, vjust = 1.3, hjust = 0) +
+  labs(
+    x = "Year",
+    y = "ATT (log equiv. income)",
+    title = "Within-Observatory DiD Event Studies: Marovoay vs Alaotra (1999–2025)",
+    subtitle = "Callaway–Sant'Anna (panel = FALSE). SE: influence function."
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom")
+```
 
 
