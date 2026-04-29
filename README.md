@@ -1,137 +1,170 @@
-# Impact des aires protégées sur les conditions des ménages à partir des données des observatoires ruraux à Madagascar
+# Conservation impacts on rural household welfare — Madagascar Rural Observatories
 
-## Contexte
+*La version française se trouve ci-dessous — French version below.*
 
-Des enquêtes d'observatoires ruraux ont été menées dans 26 zones géographiques entre 1995 et 2015. Des aires protégées ont été créées en bordure immédiate de plusieurs de ces zones. Dans le cadre du projet BETSAKA, on sélectionnera trois de ces zones pour mener de nouvelles enquêtes (2 en 2025, 3 en 2026), près de 10 ans plus tard, afin d'étudier l'évolution des conditions de vie attribuables à la conservation, en comparant les villages les plus proches des aires protégées et ceux qui en sont plus éloignés.
+**Live book (EN):** <https://betsaka.github.io/Rural_obs_PAs/>  
+**Live book (FR):** <https://betsaka.github.io/Rural_obs_PAs/fr/>
 
-## Objectif
+---
 
-Ce dépôt vise à organiser le travail statistique visant à l'exploitation des données existantes et à la sélection des sites. Il est construit comme un cahier de laboratoire, avec un chapitre d'introduction (index.qmd) et des chapitres spécifiques (autres fichiers qmd). L'idée est de documenter les différents essais et travaux, et de fournir une base qui facilitera la production d'articles publiables.
+## Overview
 
-Spécifiquement, il s'agit de :
+This repository contains the analysis and manuscript for a study of the welfare effects of protected area creation on adjacent rural households in Madagascar, using longitudinal data from the Rural Observatory System (ROS/SOR, 1995–2015) and a 2025 resurvey.
 
--   **Exploitation des données existantes** : Analyser les données des enquêtes passées pour identifier les tendances et évaluer l'impact des aires protégées.
+The study compares two conservation governance types:
 
--   **Sélection des sites pour nouvelles Enquêtes** : Identifier les zones pertinentes et planifier les nouvelles enquêtes de 2025 et 2026.
+- **Ankarafantsika National Park** (strict, IUCN II) — treatment from 2003 extension
+- **Lac Alaotra Protected Landscape** (multipurpose, IUCN V) — treatment from 2007/2008
 
--   **Documentation et méthodologie** : Documenter les méthodes statistiques utilisées et fournir un guide détaillé pour la reproduction des analyses.
+Three extension sites (Farafangana, Fénérive East, Toliara North) are analysed in a separate chapter. The primary identification strategy is a generalised synthetic control model (gsynth), complemented by within-observatory Callaway–Sant'Anna DiD checks using the 2025 resurvey data.
 
--   **Diffusion des résultats** : Préparer des rapports et publications scientifiques, avec une reconnaissance équitable des contributions.
+The book is bilingual (English / French) using `babelquarto`.
 
--   **Renforcement des Capacités** : Accompagner les collègues qui se familiarisent avec ces outils à prendre en main R et les pratiques de science ouverte.
+## Repository structure
 
-## Préparation des fichiers
-
-Pour utiliser ce code sous RStudio, commencez par cloner ce dépôt sur votre machine locale. Ouvrez RStudio et créez un nouveau projet en sélectionnant "File" \> "New Project" \> "Version Control" \> "Git". Entrez l'URL du dépôt GitHub et choisissez un répertoire local où cloner le projet.
-
-Le fichier .gitignore est utilisé pour spécifier les fichiers et répertoires à exclure de la synchronisation avec le dépôt Git. Par exemple, le dossier data/\* est exclu car il contient des données volumineuses et confidentielles.
-
-Le code a besoin des données pour fonctionner. Il faut donc coller les données des OR dans un sous dossier du dossier
-
-```         
-data
-├── ROS_MDG_microdata
-│   ├── 1995
-│   ├── 1996
-│   ├── 1997
-│   ├── ...
-│   └── 2015
+```
+_quarto.yml              # Book configuration (babelquarto)
+_variables.yml           # Shared inline variables (ATTs, CIs, p-values...)
+index.qmd / index.fr.qmd
+01_context.qmd / .fr.qmd
+02_data.qmd / .fr.qmd
+03_strategy.qmd / .fr.qmd
+04_results.qmd / .fr.qmd
+05_extensions.qmd / .fr.qmd
+06_discussion.qmd / .fr.qmd
+references.qmd / .fr.qmd
+A1_data_pipeline.qmd / .fr.qmd
+A2_donor_validity.qmd / .fr.qmd
+A3_robustness.qmd / .fr.qmd
+A4_methodology.qmd / .fr.qmd
+R/                       # Helper scripts (load_data.R, gsynth_helpers.R, plot_themes.R)
+data/                    # Data files (gitignored — see below)
+docs/                    # Rendered HTML output (deployed via GitHub Pages)
+documentation/           # Internal notes and strategy documents
 ```
 
-## Installation des dépendances
+## Data
 
-Avant d'exécuter les scripts, assurez-vous d'installer les packages R nécessaires. Vous pouvez utiliser le fichier `install_packages.R` pour installer toutes les dépendances :
+Survey data are confidential and excluded from the repository via `.gitignore`. To reproduce the analyses, place the ROS microdata in:
 
-``` r
+```
+data/
+└── ROS_MDG_microdata/
+    ├── 1995/
+    ├── ...
+    └── 2025/
+```
+
+## Rendering
+
+The book uses [`babelquarto`](https://docs.ropensci.org/babelquarto/) to render both language versions simultaneously. Standard `quarto render` will **not** produce the French version.
+
+```r
+babelquarto::render_book(
+  preview  = FALSE,
+  site_url = "https://betsaka.github.io/Rural_obs_PAs"
+)
+```
+
+The rendered output goes to `docs/` and is deployed via GitHub Pages from the `main` branch.
+
+## Dependencies
+
+Install required R packages:
+
+```r
 source("install_packages.R")
 ```
 
-## Contributions
+Key packages: `gsynth`, `did`, `tidyverse`, `sf`, `gt`, `patchwork`, `babelquarto`, `quarto`.
 
-Les contributions sont les bienvenues ! Voici quelques moyens de contribuer :
+## Issues and contributions
 
--    **Création de nouveaux fichiers d'analyse** : Ajoutez de nouveaux fichiers R ou QMD pour analyser les données existantes ou nouvelles.
+Use the [Issues](https://github.com/BETSAKA/Rural_obs_PAs/issues) tab for bug reports, questions, or suggestions.
 
--    **Modification des fichiers existants** : Améliorez les fichiers existants en les modifiant pour ajouter des fonctionnalités, optimiser le code ou corriger des erreurs.
+---
 
--    **Documentation** : Étoffez le README ou créez des notes de documentation pour aider les autres à comprendre et utiliser le code ou les données.
+# Impacts de la conservation sur le bien-être des ménages ruraux — Observatoires ruraux de Madagascar
 
--    **Questions et problèmes** : Si vous rencontrez des difficultés ou avez des questions, créez un ticket dans la section "Issues" du repository en ligne.
+*English version above — La version anglaise se trouve ci-dessus.*
 
-## Comment poster des modifications
+**Livre en ligne (EN) :** <https://betsaka.github.io/Rural_obs_PAs/>  
+**Livre en ligne (FR) :** <https://betsaka.github.io/Rural_obs_PAs/fr/>
 
-Pour poster vos modifications, voici plusieurs solutions :
+---
 
-1.   **Commit direct sur le dépôt** :
+## Vue d'ensemble
 
-    -   Utilisez l'onglet "Git" dans RStudio pour faire un commit directement sur le dépôt.
+Ce dépôt contient l'analyse et le manuscrit d'une étude sur les effets de la création d'aires protégées sur le bien-être des ménages ruraux adjacents à Madagascar, à partir des données longitudinales du Système des Observatoires Ruraux (SOR/ROS, 1995–2015) et d'une ré-enquête en 2025.
 
-    -   Note : Ce n'est pas idéal car il y a un risque d'insérer des erreurs, mais c'est plus simple pour commencer.
+L'étude compare deux types de gouvernance de la conservation :
 
-2.  **Créer un fork et faire une pull request** :
+- **Parc National d'Ankarafantsika** (strict, catégorie II UICN) — exposition à partir de l'extension de 2003
+- **Paysage Harmonieux Protégé du Lac Alaotra** (multifonctionnel, catégorie V UICN) — exposition à partir de 2007/2008
 
-    -   Créez un fork du dépôt sur GitHub.
+Trois sites d'extension (Farafangana, Fénérive Est, Toliara Nord) sont analysés dans un chapitre séparé. La stratégie d'identification principale est un modèle de contrôle synthétique généralisé (gsynth), complété par des vérifications DiD intra-observatoire Callaway–Sant'Anna utilisant les données de ré-enquête 2025.
 
-    -   Clonez votre fork sur votre machine locale en utilisant RStudio :
+Le livre est bilingue (anglais / français) grâce à `babelquarto`.
 
-        -   Allez dans "File" \> "New Project" \> "Version Control" \> "Git".
+## Structure du dépôt
 
-        -   Entrez l'URL de votre fork et choisissez un répertoire local pour cloner le projet.
+```
+_quarto.yml              # Configuration du livre (babelquarto)
+_variables.yml           # Variables inline partagées (ATT, IC, p-valeurs...)
+index.qmd / index.fr.qmd
+01_context.qmd / .fr.qmd
+02_data.qmd / .fr.qmd
+03_strategy.qmd / .fr.qmd
+04_results.qmd / .fr.qmd
+05_extensions.qmd / .fr.qmd
+06_discussion.qmd / .fr.qmd
+references.qmd / .fr.qmd
+A1_data_pipeline.qmd / .fr.qmd
+A2_donor_validity.qmd / .fr.qmd
+A3_robustness.qmd / .fr.qmd
+A4_methodology.qmd / .fr.qmd
+R/                       # Scripts utilitaires (load_data.R, gsynth_helpers.R, plot_themes.R)
+data/                    # Données (exclues du dépôt — voir ci-dessous)
+docs/                    # Sortie HTML rendue (déployée via GitHub Pages)
+documentation/           # Notes internes et documents de stratégie
+```
 
-    -   Appliquez vos modifications et faites des commits en utilisant l'onglet "Git" dans RStudio.
+## Données
 
-    -   Proposez d'intégrer vos modifications en effectuant une pull request sur l'interface GitHub.
+Les données d'enquête sont confidentielles et exclues du dépôt via `.gitignore`. Pour reproduire les analyses, placez les microdonnées ROS dans :
 
-3.  **Utiliser l'interface en ligne pour poster des "Issues"** :
+```
+data/
+└── ROS_MDG_microdata/
+    ├── 1995/
+    ├── ...
+    └── 2025/
+```
 
-    -   Si vous avez des idées, des suggestions ou des problèmes, utilisez l'interface GitHub pour créer une "Issue".
+## Rendu
 
-## Instructions détaillées pour les débutants
+Le livre utilise [`babelquarto`](https://docs.ropensci.org/babelquarto/) pour rendre les deux versions linguistiques simultanément. La commande standard `quarto render` ne produira **pas** la version française.
 
-Si vous n'avez jamais utilisé Git ou GitHub, voici des instructions simples pour vous aider à démarrer :
+```r
+babelquarto::render_book(
+  preview  = FALSE,
+  site_url = "https://betsaka.github.io/Rural_obs_PAs"
+)
+```
 
-1.  **Forker le dépôt** :
+Le résultat rendu est placé dans `docs/` et déployé via GitHub Pages depuis la branche `main`.
 
-    -   Allez sur la page GitHub du dépôt et cliquez sur le bouton "Fork" en haut à droite pour créer une copie de ce dépôt sur votre compte GitHub.
+## Dépendances
 
-2.  **Cloner votre fork** :
+Installez les packages R nécessaires :
 
-    -   Ouvrez RStudio.
+```r
+source("install_packages.R")
+```
 
-    -   Allez dans "File" \> "New Project" \> "Version Control" \> "Git".
+Packages principaux : `gsynth`, `did`, `tidyverse`, `sf`, `gt`, `patchwork`, `babelquarto`, `quarto`.
 
-    -   Entrez l'URL de votre fork GitHub et choisissez un répertoire local où cloner le projet.
+## Issues et contributions
 
-3.  **Créer une nouvelle branche** :
+Utilisez l'onglet [Issues](https://github.com/BETSAKA/Rural_obs_PAs/issues) pour signaler des bugs, poser des questions ou faire des suggestions.
 
-    -   Dans RStudio, ouvrez l'onglet "Git".
-
-    -   Cliquez sur "New Branch", donnez un nom descriptif à votre branche, puis cliquez sur "Create".
-
-4.  **Faire des modifications**
-
-    -   Ouvrez les fichiers dans RStudio, faites vos modifications ou ajoutez de nouveaux fichiers, puis enregistrez-les.
-
-5.  **Commiter vos changements** :
-
-    -   Sélectionnez les fichiers modifiés dans le panneau "Git" de RStudio.
-
-    -   Cliquez sur "Commit", ajoutez un message descriptif pour vos changements, puis cliquez sur "Commit".
-
-    -   Cliquez sur "Push" pour envoyer vos modifications à votre fork sur GitHub.
-
-6.  **Ouvrir une Pull Request**
-
-    -   Allez sur la page GitHub de votre fork.
-
-    -   Cliquez sur "Compare & pull request".
-
-    -   Décrivez vos modifications et soumettez la Pull Request.
-
-## Wiki
-
-Consultez [le Wiki du projet](https://github.com/BETSAKA/Tools/wiki) pour des guides détaillés, des tutoriels et des informations supplémentaires sur le projet. Vous pouvez également contribuer au Wiki en ajoutant ou en modifiant des pages pour partager vos connaissances et ressources.
-
-### Issues
-
-Si vous rencontrez des problèmes, avez des questions ou souhaitez suggérer des améliorations, utilisez la section [Issues](https://github.com/votre-utilisateur/Rural_obs_PAs/issues) du dépôt. Vous pouvez créer une nouvelle issue pour signaler un bug, poser une question ou proposer une nouvelle fonctionnalité. N'oubliez pas de vérifier les issues existantes avant d'en créer une nouvelle pour éviter les doublons.
