@@ -294,11 +294,42 @@ Figure 3.2: Couverture des données par observatoire et par année d’enquête
 <li>Correspondance approximative : distance de Jaro-Winkler par rapport au gazettier COD, filtrée par l’appartenance au district de l’observatoire, avec un seuil de distance maximale de 0,25.</li>
 <li>Niveaux spatiaux en cascade : correspondance d’abord au niveau de la commune (ADM3), puis affinée au fokontany (ADM4) lorsque possible.</li>
 </ol>
-<p>Le résultat est un tableau de correspondance géocodé reliant chaque identifiant de ménage ROS (<code>j5</code>) à sa commune et son fokontany codés P.</p>
+<p>Le résultat est un tableau de correspondance géocodé reliant chaque identifiant de ménage ROS (<code>j5</code>) à sa commune et son fokontany codés P. Cela permet le recoupement spatial avec les limites des aires protégées.</p>
 </section><section id="sec-pa-overlaps" class="level1" data-number="5"><h1 data-number="5">
 <span class="header-section-number">5</span> Chevauchements avec les aires protégées</h1>
-<p>Les bases de données standard d’aires protégées — dont la WDPA actuelle et l’atlas Vahatra — n’enregistrent que la frontière et le classement les plus récents de chaque aire protégée. Nous utilisons à la place une WDPA dynamique pour Madagascar — une base de données temporellement explicite qui attribue à chaque état d’une AP un intervalle précis valide-de / valide-à dérivé des textes juridiques CNLEGIS malgaches et des versions historiques de la base de données géospatiale SAPM.</p>
-<p>Pour chacun des 11 observatoires d’étude, nous calculons la distance minimale entre les centroïdes de communes (projetés en UTM 38S) et la limite d’AP la plus proche active durant 1999–2014. Toutes les paires (commune, AP) situées à moins de 20 km sont signalées.</p>
+<p>Les bases de données standard d’aires protégées — dont la WDPA actuelle et l’atlas Vahatra — n’enregistrent que la frontière et le classement les plus récents de chaque aire protégée. Nous utilisons à la place une WDPA dynamique pour Madagascar — une base de données temporellement explicite qui attribue à chaque état d’une AP un intervalle précis valide-de / valide-à dérivé des textes juridiques CNLEGIS malgaches et des versions historiques de la base de données géospatiale SAPM [<strong>INCLURE RÉFÉRENCE ARTICLE DE DONNÉES</strong>]. Cela nous permet de déterminer si un observatoire était adjacent à une AP <em>active</em> à tout moment pendant la période d’étude (voir l’<a href="A2_donor_validity.qmd">Annexe B</a> pour les détails complets de construction).</p>
+<p>Pour chacun des 11 observatoires d’étude, nous calculons la distance minimale entre les centroïdes de communes (projetés en UTM 38S) et la limite d’AP la plus proche active durant 1999–2014. Toutes les paires (commune, AP) situées à moins de 20 km sont signalées. Trois configurations temporelles se dégagent :</p>
+<div id="tbl-pa-timing" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pa-timing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table 5.1: Aperçu des relations temporelles observatoire–AP.
+</figcaption><div aria-describedby="tbl-pa-timing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead><tr class="header">
+<th>Configuration</th>
+<th>Observatoires</th>
+<th>Utilisation</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>AP antérieure aux enquêtes ROS (pas de ligne de base)</td>
+<td>ex. Ranomafana, Andringitra</td>
+<td>Exclus</td>
+</tr>
+<tr class="even">
+<td>AP créée <em>pendant</em> le ROS (1999–2014)</td>
+<td>Marovoay (2003), Alaotra (2008)</td>
+<td>Traitement principal</td>
+</tr>
+<tr class="odd">
+<td>AP créée pendant le ROS mais plus tardive</td>
+<td>Farafangana, Toliara, Fénérive (2006–07)</td>
+<td>Traitement extension (<a href="05_extensions.qmd">Ch. 5</a>)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-pa-overlaps" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -311,16 +342,22 @@ Figure 5.1: Fenêtres de couverture des enquêtes et événements d’expositio
 </div>
 </div>
 </div>
-<p>Les deux paires principales — Marovoay / Ankarafantsika (stricte, catégorie II UICN, extension 2003) et Alaotra / Lac Alaotra (multifonctionnelle, catégorie V UICN, décret temporaire 2007) — offrent les fenêtres pré- et post-exposition les plus longues. Trois paires supplémentaires — Farafangana, Toliara Nord et Fénérive Est — fournissent des extensions plus courtes mais informatives (<a href="05_extensions.qmd">Chapitre 5</a>).</p>
+<p>La <a href="#fig-pa-overlaps" class="quarto-xref">Figure <span>5.1</span></a> montre que, bien que le ROS ait été conçu pour le suivi agricole et non pour l’évaluation d’impact de la conservation, certaines AP ont été créées à proximité relative de sites d’observatoire. Le gsynth nécessite un nombre suffisant d’années pré-traitement pour apprendre les coefficients factoriels spécifiques aux unités, et un nombre suffisant d’années post-traitement pour que le contrefactuel soit informatif. Nous appliquons un seuil minimal de 4 années d’enquête pré-exposition et 3 post-exposition.</p>
+<p>Les deux paires principales — <strong>Marovoay / Ankarafantsika</strong> (stricte, catégorie II UICN, extension 2003) et <strong>Alaotra / Lac Alaotra</strong> (multifonctionnelle, catégorie V UICN, décret temporaire 2007) — offrent les fenêtres pré- et post-exposition les plus longues. Trois paires supplémentaires — Farafangana, Toliara Nord et Fénérive Est — fournissent des extensions plus courtes mais informatives (<a href="05_extensions.qmd">Chapitre 5</a>). Les observatoires sans AP à proximité (en bleu) constituent le pool de donneurs. Un audit spatial systématique de la validité du pool de donneurs est présenté dans l’<a href="A2_donor_validity.qmd">Annexe B</a>.</p>
 </section><section id="sec-outcome" class="level1" data-number="6"><h1 data-number="6">
 <span class="header-section-number">6</span> Variable de résultat</h1>
 <p>La variable de résultat principale est le logarithme du revenu équivalisé des ménages. La construction se déroule comme suit :</p>
 <ol type="1">
-<li>Revenu total (<code>revtot</code>) : somme des composantes de revenus courants.</li>
-<li>Équivalisation : à l’aide de l’échelle OCDE modifiée : <span class="math inline">\(1 + 0{,}5 \times (\text{adultes supplémentaires}) + 0{,}3 \times (\text{enfants de moins de 14 ans})\)</span>.</li>
-<li>Winsorisation : aux 1er et 99e percentiles par année.</li>
-<li>Transformation logarithmique : <span class="math inline">\(y_{it} = \log(\text{revenu équivalisé}_{it} + 1)\)</span>.</li>
+<li>
+<strong>Revenu total</strong> (<code>revtot</code>) : somme des composantes de revenus courants : revenus riz (<code>rev_riz</code>), autres cultures (<code>rev_cu</code>), élevage (<code>revel</code>), pêche (<code>revpeche</code>), activité principale (<code>revppal</code>) et activité secondaire (<code>revsec</code>). Les composantes manquantes sont mises à zéro ; le total est imputé à partir des sous-composantes disponibles quand <code>revtot</code> lui-même est manquant.</li>
+<li>
+<strong>Équivalisation</strong> : à l’aide de l’échelle OCDE modifiée : <span class="math inline">\(1 + 0{,}5 \times (\text{adultes supplémentaires}) + 0{,}3 \times (\text{enfants de moins de 14 ans})\)</span>, calculée à partir des enregistrements démographiques individuels <span class="citation" data-cites="karvonen2021">(<a href="references.fr.html#ref-karvonen2021" role="doc-biblioref">Karvonen et al. 2021</a>)</span>.</li>
+<li>
+<strong>Winsorisation</strong> : aux 1er et 99e percentiles par année pour limiter l’influence des valeurs extrêmes.</li>
+<li>
+<strong>Transformation logarithmique</strong> : <span class="math inline">\(y_{it} = \log(\text{revenu équivalisé}_{it} + 1)\)</span>.</li>
 </ol>
+<p>L’harmonisation entre années n’est pas triviale : les noms de variables, les modules du questionnaire et les définitions des revenus ont évolué au fil des vagues d’enquête. Les détails complets de ces ajustements figurent dans l’<a href="A1_data_pipeline.qmd">Annexe A</a>.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-income-trends" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -341,23 +378,23 @@ Figure 6.1: Revenu moyen logarithmique équivalisé dans le temps, par observat
 Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
 </figcaption><div aria-describedby="tbl-descriptives-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="ujjocucqbz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ujjocucqbz table {
+<div id="jgkptjiizi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#jgkptjiizi table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ujjocucqbz thead, #ujjocucqbz tbody, #ujjocucqbz tfoot, #ujjocucqbz tr, #ujjocucqbz td, #ujjocucqbz th {
+#jgkptjiizi thead, #jgkptjiizi tbody, #jgkptjiizi tfoot, #jgkptjiizi tr, #jgkptjiizi td, #jgkptjiizi th {
   border-style: none;
 }
 
-#ujjocucqbz p {
+#jgkptjiizi p {
   margin: 0;
   padding: 0;
 }
 
-#ujjocucqbz .gt_table {
+#jgkptjiizi .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -383,12 +420,12 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   border-left-color: #D3D3D3;
 }
 
-#ujjocucqbz .gt_caption {
+#jgkptjiizi .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ujjocucqbz .gt_title {
+#jgkptjiizi .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -400,7 +437,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   border-bottom-width: 0;
 }
 
-#ujjocucqbz .gt_subtitle {
+#jgkptjiizi .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -412,7 +449,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   border-top-width: 0;
 }
 
-#ujjocucqbz .gt_heading {
+#jgkptjiizi .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -424,13 +461,13 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   border-right-color: #D3D3D3;
 }
 
-#ujjocucqbz .gt_bottom_border {
+#jgkptjiizi .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ujjocucqbz .gt_col_headings {
+#jgkptjiizi .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -445,7 +482,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   border-right-color: #D3D3D3;
 }
 
-#ujjocucqbz .gt_col_heading {
+#jgkptjiizi .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -465,7 +502,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   overflow-x: hidden;
 }
 
-#ujjocucqbz .gt_column_spanner_outer {
+#jgkptjiizi .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -477,15 +514,15 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   padding-right: 4px;
 }
 
-#ujjocucqbz .gt_column_spanner_outer:first-child {
+#jgkptjiizi .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ujjocucqbz .gt_column_spanner_outer:last-child {
+#jgkptjiizi .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ujjocucqbz .gt_column_spanner {
+#jgkptjiizi .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -497,11 +534,11 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   width: 100%;
 }
 
-#ujjocucqbz .gt_spanner_row {
+#jgkptjiizi .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ujjocucqbz .gt_group_heading {
+#jgkptjiizi .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -527,7 +564,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   text-align: left;
 }
 
-#ujjocucqbz .gt_empty_group_heading {
+#jgkptjiizi .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -542,15 +579,15 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   vertical-align: middle;
 }
 
-#ujjocucqbz .gt_from_md > :first-child {
+#jgkptjiizi .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ujjocucqbz .gt_from_md > :last-child {
+#jgkptjiizi .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ujjocucqbz .gt_row {
+#jgkptjiizi .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -569,7 +606,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   overflow-x: hidden;
 }
 
-#ujjocucqbz .gt_stub {
+#jgkptjiizi .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -582,7 +619,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   padding-right: 5px;
 }
 
-#ujjocucqbz .gt_stub_row_group {
+#jgkptjiizi .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -596,15 +633,15 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   vertical-align: top;
 }
 
-#ujjocucqbz .gt_row_group_first td {
+#jgkptjiizi .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ujjocucqbz .gt_row_group_first th {
+#jgkptjiizi .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ujjocucqbz .gt_summary_row {
+#jgkptjiizi .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -614,16 +651,16 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   padding-right: 5px;
 }
 
-#ujjocucqbz .gt_first_summary_row {
+#jgkptjiizi .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ujjocucqbz .gt_first_summary_row.thick {
+#jgkptjiizi .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ujjocucqbz .gt_last_summary_row {
+#jgkptjiizi .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -633,7 +670,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   border-bottom-color: #D3D3D3;
 }
 
-#ujjocucqbz .gt_grand_summary_row {
+#jgkptjiizi .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -643,7 +680,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   padding-right: 5px;
 }
 
-#ujjocucqbz .gt_first_grand_summary_row {
+#jgkptjiizi .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -653,7 +690,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   border-top-color: #D3D3D3;
 }
 
-#ujjocucqbz .gt_last_grand_summary_row_top {
+#jgkptjiizi .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -663,11 +700,11 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   border-bottom-color: #D3D3D3;
 }
 
-#ujjocucqbz .gt_striped {
+#jgkptjiizi .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ujjocucqbz .gt_table_body {
+#jgkptjiizi .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -676,7 +713,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   border-bottom-color: #D3D3D3;
 }
 
-#ujjocucqbz .gt_footnotes {
+#jgkptjiizi .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -690,7 +727,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   border-right-color: #D3D3D3;
 }
 
-#ujjocucqbz .gt_footnote {
+#jgkptjiizi .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -699,7 +736,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   padding-right: 5px;
 }
 
-#ujjocucqbz .gt_sourcenotes {
+#jgkptjiizi .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -713,7 +750,7 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   border-right-color: #D3D3D3;
 }
 
-#ujjocucqbz .gt_sourcenote {
+#jgkptjiizi .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -721,72 +758,72 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
   padding-right: 5px;
 }
 
-#ujjocucqbz .gt_left {
+#jgkptjiizi .gt_left {
   text-align: left;
 }
 
-#ujjocucqbz .gt_center {
+#jgkptjiizi .gt_center {
   text-align: center;
 }
 
-#ujjocucqbz .gt_right {
+#jgkptjiizi .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ujjocucqbz .gt_font_normal {
+#jgkptjiizi .gt_font_normal {
   font-weight: normal;
 }
 
-#ujjocucqbz .gt_font_bold {
+#jgkptjiizi .gt_font_bold {
   font-weight: bold;
 }
 
-#ujjocucqbz .gt_font_italic {
+#jgkptjiizi .gt_font_italic {
   font-style: italic;
 }
 
-#ujjocucqbz .gt_super {
+#jgkptjiizi .gt_super {
   font-size: 65%;
 }
 
-#ujjocucqbz .gt_footnote_marks {
+#jgkptjiizi .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ujjocucqbz .gt_asterisk {
+#jgkptjiizi .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ujjocucqbz .gt_indent_1 {
+#jgkptjiizi .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ujjocucqbz .gt_indent_2 {
+#jgkptjiizi .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ujjocucqbz .gt_indent_3 {
+#jgkptjiizi .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ujjocucqbz .gt_indent_4 {
+#jgkptjiizi .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ujjocucqbz .gt_indent_5 {
+#jgkptjiizi .gt_indent_5 {
   text-indent: 25px;
 }
 
-#ujjocucqbz .katex-display {
+#jgkptjiizi .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#ujjocucqbz div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#jgkptjiizi div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -858,6 +895,9 @@ Table 7.1: Statistiques descriptives pour l’échantillon d’analyse.
 <div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-Andrianjafindrainibe2024" class="csl-entry" role="listitem">
 Andrianjafindrainibe, Velomalala Solo, Nicole Andrianirina, Florent Bédécarrats, et al. 2024. <span>« Madagascar Rural Observatory Surveys, a Longitudinal Dataset on Household Living Conditions 1995–2015 »</span>. <em>Scientific Data</em> 11 (1): 1061. <a href="https://doi.org/10.1038/s41597-024-03879-9">https://doi.org/10.1038/s41597-024-03879-9</a>.
+</div>
+<div id="ref-karvonen2021" class="csl-entry" role="listitem">
+Karvonen, Sakari, Pasi Moisio, Kristian Vepsäläinen, et Joonas Ollonqvist. 2021. <span>« Assessing health gradient with different equivalence scales for household income–a sensitivity analysis »</span>. <em>SSM-Population Health</em> 15: 100892.
 </div>
 </div>
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">

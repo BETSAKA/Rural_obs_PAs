@@ -164,13 +164,21 @@ La procédure de correspondance est hiérarchique :
 2. Correspondance approximative : distance de Jaro-Winkler par rapport au gazettier COD, filtrée par l'appartenance au district de l'observatoire, avec un seuil de distance maximale de 0,25.
 3. Niveaux spatiaux en cascade : correspondance d'abord au niveau de la commune (ADM3), puis affinée au fokontany (ADM4) lorsque possible.
 
-Le résultat est un tableau de correspondance géocodé reliant chaque identifiant de ménage ROS (`j5`) à sa commune et son fokontany codés P.
+Le résultat est un tableau de correspondance géocodé reliant chaque identifiant de ménage ROS (`j5`) à sa commune et son fokontany codés P. Cela permet le recoupement spatial avec les limites des aires protégées.
 
 # Chevauchements avec les aires protégées {#sec-pa-overlaps}
 
-Les bases de données standard d'aires protégées — dont la WDPA actuelle et l'atlas Vahatra — n'enregistrent que la frontière et le classement les plus récents de chaque aire protégée. Nous utilisons à la place une WDPA dynamique pour Madagascar — une base de données temporellement explicite qui attribue à chaque état d'une AP un intervalle précis valide-de / valide-à dérivé des textes juridiques CNLEGIS malgaches et des versions historiques de la base de données géospatiale SAPM.
+Les bases de données standard d'aires protégées — dont la WDPA actuelle et l'atlas Vahatra — n'enregistrent que la frontière et le classement les plus récents de chaque aire protégée. Nous utilisons à la place une WDPA dynamique pour Madagascar — une base de données temporellement explicite qui attribue à chaque état d'une AP un intervalle précis valide-de / valide-à dérivé des textes juridiques CNLEGIS malgaches et des versions historiques de la base de données géospatiale SAPM [**INCLURE RÉFÉRENCE ARTICLE DE DONNÉES**]. Cela nous permet de déterminer si un observatoire était adjacent à une AP *active* à tout moment pendant la période d'étude (voir l'[Annexe B](A2_donor_validity.qmd) pour les détails complets de construction).
 
-Pour chacun des 11 observatoires d'étude, nous calculons la distance minimale entre les centroïdes de communes (projetés en UTM 38S) et la limite d'AP la plus proche active durant 1999–2014. Toutes les paires (commune, AP) situées à moins de 20 km sont signalées.
+Pour chacun des 11 observatoires d'étude, nous calculons la distance minimale entre les centroïdes de communes (projetés en UTM 38S) et la limite d'AP la plus proche active durant 1999–2014. Toutes les paires (commune, AP) situées à moins de 20 km sont signalées. Trois configurations temporelles se dégagent :
+
+| Configuration | Observatoires | Utilisation |
+|---|---|---|
+| AP antérieure aux enquêtes ROS (pas de ligne de base) | ex. Ranomafana, Andringitra | Exclus |
+| AP créée *pendant* le ROS (1999–2014) | Marovoay (2003), Alaotra (2008) | Traitement principal |
+| AP créée pendant le ROS mais plus tardive | Farafangana, Toliara, Fénérive (2006–07) | Traitement extension ([Ch. 5](05_extensions.qmd)) |
+
+: Aperçu des relations temporelles observatoire–AP. {#tbl-pa-timing}
 
 ```{r}
 #| label: fig-pa-overlaps
@@ -304,16 +312,20 @@ ggplot(gantt_data, aes(y = obs_label)) +
   theme(legend.position = "bottom", panel.grid.minor = element_blank())
 ```
 
-Les deux paires principales — Marovoay / Ankarafantsika (stricte, catégorie II UICN, extension 2003) et Alaotra / Lac Alaotra (multifonctionnelle, catégorie V UICN, décret temporaire 2007) — offrent les fenêtres pré- et post-exposition les plus longues. Trois paires supplémentaires — Farafangana, Toliara Nord et Fénérive Est — fournissent des extensions plus courtes mais informatives ([Chapitre 5](05_extensions.qmd)).
+La @fig-pa-overlaps montre que, bien que le ROS ait été conçu pour le suivi agricole et non pour l'évaluation d'impact de la conservation, certaines AP ont été créées à proximité relative de sites d'observatoire. Le gsynth nécessite un nombre suffisant d'années pré-traitement pour apprendre les coefficients factoriels spécifiques aux unités, et un nombre suffisant d'années post-traitement pour que le contrefactuel soit informatif. Nous appliquons un seuil minimal de 4 années d'enquête pré-exposition et 3 post-exposition.
+
+Les deux paires principales — **Marovoay / Ankarafantsika** (stricte, catégorie II UICN, extension 2003) et **Alaotra / Lac Alaotra** (multifonctionnelle, catégorie V UICN, décret temporaire 2007) — offrent les fenêtres pré- et post-exposition les plus longues. Trois paires supplémentaires — Farafangana, Toliara Nord et Fénérive Est — fournissent des extensions plus courtes mais informatives ([Chapitre 5](05_extensions.qmd)). Les observatoires sans AP à proximité (en bleu) constituent le pool de donneurs. Un audit spatial systématique de la validité du pool de donneurs est présenté dans l'[Annexe B](A2_donor_validity.qmd).
 
 # Variable de résultat {#sec-outcome}
 
 La variable de résultat principale est le logarithme du revenu équivalisé des ménages. La construction se déroule comme suit :
 
-1. Revenu total (`revtot`) : somme des composantes de revenus courants.
-2. Équivalisation : à l'aide de l'échelle OCDE modifiée : $1 + 0{,}5 \times (\text{adultes supplémentaires}) + 0{,}3 \times (\text{enfants de moins de 14 ans})$.
-3. Winsorisation : aux 1er et 99e percentiles par année.
-4. Transformation logarithmique : $y_{it} = \log(\text{revenu équivalisé}_{it} + 1)$.
+1. **Revenu total** (`revtot`) : somme des composantes de revenus courants : revenus riz (`rev_riz`), autres cultures (`rev_cu`), élevage (`revel`), pêche (`revpeche`), activité principale (`revppal`) et activité secondaire (`revsec`). Les composantes manquantes sont mises à zéro ; le total est imputé à partir des sous-composantes disponibles quand `revtot` lui-même est manquant.
+2. **Équivalisation** : à l'aide de l'échelle OCDE modifiée : $1 + 0{,}5 \times (\text{adultes supplémentaires}) + 0{,}3 \times (\text{enfants de moins de 14 ans})$, calculée à partir des enregistrements démographiques individuels [@karvonen2021].
+3. **Winsorisation** : aux 1er et 99e percentiles par année pour limiter l'influence des valeurs extrêmes.
+4. **Transformation logarithmique** : $y_{it} = \log(\text{revenu équivalisé}_{it} + 1)$.
+
+L'harmonisation entre années n'est pas triviale : les noms de variables, les modules du questionnaire et les définitions des revenus ont évolué au fil des vagues d'enquête. Les détails complets de ces ajustements figurent dans l'[Annexe A](A1_data_pipeline.qmd).
 
 ```{r}
 #| label: fig-income-trends

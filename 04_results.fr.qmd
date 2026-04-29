@@ -80,6 +80,95 @@ Le gsynth compare les villages de la rive est contre des observatoires donneurs 
 
 Le fait que les revenus de la rive est et de la rive ouest aient évolué si étroitement tout au long de la période d'étude constitue donc un avertissement sérieux. Il suggère que la majeure partie de la divergence identifiée par gsynth est un phénomène régional — le déclin d'une région agricole autrefois prospère — plutôt qu'un effet pouvant être attribué avec confiance à la limite du parc. Les deux résultats doivent être lus ensemble, aucun ne l'emportant sur l'autre.
 
+Une ré-enquête 2025 à Marovoay (quatre fokontany : Bepako et Madiromiongana sur la rive est, Ampijoroa et Maroala sur la rive ouest) étend la fenêtre d'observation à 22 ans post-exposition. Étant donné qu'aucun observatoire donneur propre ne dispose de données 2025, étendre le gsynth à 2025 réduirait la comparaison inter-observatoires à une comparaison intra-observatoire, rendant l'ATT 2025 redondant avec le DiD intra-observatoire. L'évaluation à long terme repose donc entièrement sur le dispositif DiD intra-observatoire.
+
+```{r}
+#| label: fig-ext-traj
+#| fig-cap: |
+#|   Trajectoires de revenu au niveau des sites pour les quatre fokontany de Marovoay
+#|   (1999–2025). Rive est (exposée, rouge) et rive ouest (contrôle, bleu)
+#|   suivaient une trajectoire commune jusqu'en 2003, puis divergent de manière persistante.
+#| fig-height: 5.5
+#| fig-width: 9
+traj_data <- maro_gs_ext |>
+  filter(site_id %in% c("031", "032", "033", "034")) |>
+  mutate(
+    village = case_when(
+      site_id == "031" ~ "Bepako (Est)",
+      site_id == "032" ~ "Madiromiongana (Est)",
+      site_id == "033" ~ "Ampijoroa (Ouest)",
+      site_id == "034" ~ "Maroala (Ouest)"
+    ),
+    bank = if_else(site_id %in% c("031", "032"), "Exposée (Est)", "Contrôle (Ouest)")
+  )
+
+ggplot(traj_data, aes(x = year, y = ln_revtot_w, color = village, linetype = bank)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  geom_vline(xintercept = 2003, linetype = "dashed", alpha = 0.5) +
+  annotate("text", x = 2003.5, y = min(traj_data$ln_revtot_w, na.rm = TRUE) + 0.3,
+           label = "Extension du parc\n(2003)", hjust = 0, size = 3, color = "grey40") +
+  scale_color_manual(values = c(
+    "Ampijoroa (Ouest)" = "#2171b5", "Maroala (Ouest)" = "#6baed6",
+    "Madiromiongana (Est)" = "#cb181d", "Bepako (Est)" = "#fb6a4a")) +
+  scale_y_continuous(limits = c(0, NA)) +
+  guides(color = guide_legend(nrow = 1, byrow = TRUE, order = 1),
+         linetype = guide_legend(nrow = 1, order = 2)) +
+  labs(title = "Trajectoires de revenu au niveau des sites : Marovoay 1999–2025",
+       x = NULL, y = "Revenu log équivalisé moyen",
+       color = "Village", linetype = "Groupe d'exposition") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom", legend.box = "vertical", legend.spacing.y = unit(2, "pt"))
+```
+
+Les quatre fokontany suivaient une trajectoire commune jusqu'en 2002. À partir de 2003, les sites de la rive est divergent à la baisse par rapport à la rive ouest ; en 2025 l'écart s'est creusé plutôt que réduit.
+
+```{r}
+#| label: fig-maro-dyn
+#| fig-cap: "Étude d'événement DiD intra-observatoire Marovoay (1999–2025). Ménages rive est vs rive ouest, Callaway–Sant'Anna (panel = FALSE). L'année 2003 est le début de l'exposition ; le losange le plus à droite (2025) est le point de ré-enquête à long terme. Barres d'erreur : IC à 95% ponctuel (erreur standard fonction d'influence)."
+#| fig-height: 5
+#| fig-width: 10
+sec_did <- read_rds("data/secondary_did_results.rds")
+dyn_maro <- sec_did$maro$res$dyns[["bank_nocl"]]
+event_df <- tibble(
+  rel_time = dyn_maro$egt,
+  att      = dyn_maro$att.egt,
+  se       = dyn_maro$se.egt
+) |>
+  mutate(
+    year    = rel_time + TREAT_YEAR_MARO,
+    ci_lo   = att - 1.96 * se,
+    ci_hi   = att + 1.96 * se,
+    is_2025 = rel_time == 22
+  )
+
+ggplot(event_df, aes(x = year, y = att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = TREAT_YEAR_MARO - 0.5,
+             linetype = "dashed", color = "grey40") +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
+                width = 0.4, color = "#D32F2F", alpha = 0.6) +
+  geom_point(aes(size = is_2025, shape = is_2025),
+             color = "#D32F2F", show.legend = FALSE) +
+  scale_size_manual(values = c("FALSE" = 2.5, "TRUE" = 4.5)) +
+  scale_shape_manual(values = c("FALSE" = 16, "TRUE" = 18)) +
+  annotate(
+    "text", x = 2025, y = min(event_df$ci_lo, na.rm = TRUE) - 0.04,
+    label = "2025\n(+22 ans)", color = "#D32F2F", size = 3, vjust = 1
+  ) +
+  labs(
+    x = "Année",
+    y = "ATT (revenu log équivalisé)",
+    title = "Marovoay : étude d'événement DiD intra-observatoire (1999–2025)",
+    subtitle = "Ménages rive est vs rive ouest. ES : fonction d'influence (sans clustering par site)."
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+Les coefficients pré-traitement fluctuent autour de zéro, ce qui corrobore l'hypothèse de tendances parallèles. Les estimations post-2003 deviennent négatives et se creusent progressivement. Le point 2025 — 22 ans après l'exposition — affiche l'estimation la plus négative de la série, confirmant que l'écart de revenu est-ouest s'est creusé plutôt que réduit sur le long terme. Cette persistance est identifiée entièrement à partir du contraste rive est contre rive ouest intra-observatoire, indépendamment de toute comparaison inter-observatoires.
+
+L'écart de revenu est-ouest en 2025 n'est pas dû à des valeurs aberrantes : il est visible à chaque percentile de la distribution des revenus, la suppression des valeurs aberrantes basée sur l'EIQ élargit plutôt qu'il ne réduit l'écart, et l'avantage de la rive ouest apparaît dans cinq des sept principales composantes du revenu. En termes statistiques, l'écart est suffisamment important pour passer les tests standards (test des rangs de Wilcoxon $p = 2{,}1 \times 10^{-10}$ ; test $t$ de Welch $p = 1{,}8 \times 10^{-5}$). Ce qui reste non résolu, c'est de savoir si cet écart reflète une exposition cumulative au parc ou les effets à long terme du même déclin régional discuté ci-dessus. En 2025, le système d'irrigation de Marovoay s'est encore détérioré, la migration rurale-urbaine a remodelé les communautés et l'économie rizicole de la région n'a jamais retrouvé sa position antérieure. L'écart de 2025 est réel et robuste ; son attribution à la politique de conservation spécifiquement exige de la prudence.
+
 ## Effets spécifiques aux unités
 
 ```{r}
@@ -164,7 +253,7 @@ ggplot(att_ala_df, aes(rel_time, att)) +
 
 Le modèle gsynth pour Alaotra produit un ATT moyen de {{< var att_ala >}} points de log, statistiquement indiscernable de zéro (IC 95% : [{{< var att_ala_ci_lo >}}, {{< var att_ala_ci_hi >}}], *p* = {{< var att_ala_p >}}). L'absence d'impact détectable sur le revenu au Lac Alaotra contraste avec l'écart négatif à Ankarafantsika. L'interprétation la plus parcimonieuse est que le cadre CBNRM de Durrell, qui régule l'accès aux ressources de manière participative plutôt que de les prohiber entièrement, a préservé les moyens de subsistance des ménages tandis que les restrictions d'exclusion à Ankarafantsika les ont érodés.
 
-Le dispositif DiD au niveau des ménages décrit à @sec-complementary applique l'estimateur Callaway–Sant'Anna au panel 1999–2014 + 2025 d'Alaotra sous deux proxys d'exposition intra-observatoire : la distance à la limite de l'AP la plus proche (≤ 10 km) et la part de ménages de 2025 déclarant des usages extractifs dépendants de l'AP (≥ 12,5%).
+Le dispositif DiD au niveau des ménages décrit à @sec-ala-rcs applique l'estimateur Callaway–Sant'Anna au panel 1999–2014 + 2025 d'Alaotra sous deux proxys d'exposition intra-observatoire : la distance à la limite de l'AP la plus proche (≤ 10 km) et la part de ménages de 2025 déclarant des usages extractifs dépendants de l'AP (≥ 12,5%).
 
 ## Vérification DiD intra-Alaotra {#sec-ala-rcs}
 
@@ -191,6 +280,50 @@ sec_did_ala$summary |>
 
 Les deux dispositifs intra-Alaotra produisent de petites estimations ponctuelles et de larges erreurs types cluster-robustes qui incluent confortablement zéro. Leur conclusion rejoint le gsynth selon un contraste d'identification différent : non pas contre un pool de donneurs extérieur, mais contre les fokontany fusionnés moins exposés du même observatoire. Cette convergence réduit l'éventail des interprétations plausibles du résultat nul d'Alaotra : l'absence d'effet agrégé sur le revenu du *Paysage Harmonieux Protégé* est robuste, que le contrefactuel soit construit à partir d'observatoires extérieurs (gsynth) ou à partir de l'hétérogénéité de l'exposition intra-observatoire (DiD intra-observatoire).
 
+La ré-enquête 2025 à Alaotra permet d'étendre la fenêtre d'observation à 17 ans post-exposition. L'étude d'événement ci-dessous affiche l'ATT annuel du proxy de distance (fokontany à ≤ 10 km de la limite de l'AP versus fokontany plus éloignés).
+
+```{r}
+#| label: fig-ala-dyn
+#| fig-cap: "Étude d'événement DiD intra-observatoire Alaotra (1999–2025). Fokontany proches (≤ 10 km) vs fokontany éloignés, Callaway–Sant'Anna (panel = FALSE). L'année 2008 est le début de l'exposition ; le losange le plus à droite (2025) est le point de ré-enquête à long terme. Barres d'erreur : IC à 95% ponctuel (erreur standard fonction d'influence)."
+#| fig-height: 5
+#| fig-width: 10
+dyn_ala <- read_rds("data/secondary_did_results.rds")$ala$res$dyns[["dist_nocl"]]
+event_ala_df <- tibble(
+  rel_time = dyn_ala$egt,
+  att      = dyn_ala$att.egt,
+  se       = dyn_ala$se.egt
+) |>
+  mutate(
+    year    = rel_time + TREAT_YEAR_ALA,
+    ci_lo   = att - 1.96 * se,
+    ci_hi   = att + 1.96 * se,
+    is_2025 = rel_time == 17
+  )
+
+ggplot(event_ala_df, aes(x = year, y = att)) +
+  geom_hline(yintercept = 0, color = "grey60") +
+  geom_vline(xintercept = TREAT_YEAR_ALA - 0.5,
+             linetype = "dashed", color = "grey40") +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
+                width = 0.4, color = "#1565C0", alpha = 0.6) +
+  geom_point(aes(size = is_2025, shape = is_2025),
+             color = "#1565C0", show.legend = FALSE) +
+  scale_size_manual(values = c("FALSE" = 2.5, "TRUE" = 4.5)) +
+  scale_shape_manual(values = c("FALSE" = 16, "TRUE" = 18)) +
+  annotate(
+    "text", x = 2025, y = min(event_ala_df$ci_lo, na.rm = TRUE) - 0.04,
+    label = "2025\n(+17 ans)", color = "#1565C0", size = 3, vjust = 1
+  ) +
+  labs(
+    x = "Année",
+    y = "ATT (revenu log équivalisé)",
+    title = "Alaotra : étude d'événement DiD intra-observatoire (1999–2025)",
+    subtitle = "Fokontany proches vs éloignés de l'AP. ES : fonction d'influence (sans clustering)."
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+Les coefficients pré-traitement (1999–2007) fluctuent autour de zéro — large SE reflétant la variabilité inter-fokontany mais sans tendance systématique, ce qui soutient l'hypothèse de tendances parallèles. Sur l'ensemble de la période post-exposition (2008–2025), les estimations restent proches de zéro et leurs intervalles de confiance incluent confortablement zéro. Le point 2025 — 17 ans après l'exposition — confirme l'absence d'effet détectable sur le revenu sous gestion participative de la conservation. Ce résultat est stable sur l'ensemble de la fenêtre d'observation 1999–2025.
 
 # Comparaison des deux cas {#sec-comparison}
 
@@ -267,119 +400,4 @@ bind_rows(
 
 Le contraste entre les deux trajectoires ATT estimées est net : un large écart négatif persistant à Ankarafantsika, et un écart quasi nul à Alaotra. Avant de tirer des conclusions de gouvernance, une certaine prudence s'impose. À Marovoay, la comparaison intra-observatoire entre rive est et rive ouest ne détecte aucune différence, soulevant la possibilité que l'estimation gsynth capte le déclin économique régional plutôt que les effets de la conservation. À Alaotra, le résultat nul peut refléter une gouvernance genuinement bénigne ou une puissance statistique insuffisante. Ces deux mises en garde tempèrent mais ne dissolvent pas le contraste : les éléments suggèrent que la gestion exclusionnaire stricte engendre des coûts sur les moyens de subsistance plus élevés que le co-management participatif, mais les données ne peuvent pas établir définitivement le mécanisme causal.
 
-# Évaluation à long terme : ré-enquête 2025 {#sec-longrun}
 
-```{r}
-#| label: longrun-setup
-#| include: false
-res_deb_25 <- haven::read_dta("data/ROS_MDG_microdata/2025/res_deb.dta")
-n_hh_maro_25 <- res_deb_25 |>
-  dplyr::filter(obs == "01") |>
-  nrow()
-sec_did_lr <- read_rds("data/secondary_did_results.rds")
-```
-
-Une ré-enquête 2025 à Marovoay (`r n_hh_maro_25` ménages répartis entre les quatre fokontany : Bepako et Madiromiongana sur la rive est, Ampijoroa et Maroala sur la rive ouest) étend la fenêtre d'observation à 22 ans post-exposition.
-Étant donné que la ré-enquête n'a couvert que Marovoay (et Alaotra), aucun observatoire donneur propre ne dispose de données 2025. Étendre le gsynth à 2025 nécessiterait d'importer les fokontany de la rive ouest de Marovoay comme donneurs — ce qui réduirait la comparaison inter-observatoires à une comparaison intra-observatoire et rendrait l'ATT 2025 redondant avec le DiD intra-observatoire. L'évaluation à long terme repose donc entièrement sur le dispositif DiD intra-observatoire décrit à @sec-complementary, conformément au cadrage utilisé tout au long de ce chapitre.
-
-## Trajectoires de revenu au niveau des sites {#sec-maro-traj}
-
-Les trajectoires brutes au niveau des sites ci-dessous montrent l'ensemble de l'historique de revenu sur 26 ans pour les quatre fokontany de Marovoay.
-
-```{r}
-#| label: fig-ext-traj
-#| fig-cap: |
-#|   Trajectoires de revenu au niveau des sites pour les quatre fokontany de Marovoay
-#|   (1999–2025). Rive est (exposée, rouge) et rive ouest (contrôle, bleu)
-#|   suivaient une trajectoire commune jusqu'en 2003, puis divergent de manière persistante.
-#| fig-height: 5.5
-#| fig-width: 9
-traj_data <- maro_gs_ext |>
-  filter(site_id %in% c("031", "032", "033", "034")) |>
-  mutate(
-    village = case_when(
-      site_id == "031" ~ "Bepako (Est)",
-      site_id == "032" ~ "Madiromiongana (Est)",
-      site_id == "033" ~ "Ampijoroa (Ouest)",
-      site_id == "034" ~ "Maroala (Ouest)"
-    ),
-    bank = if_else(site_id %in% c("031", "032"), "Exposée (Est)", "Contrôle (Ouest)")
-  )
-
-ggplot(traj_data, aes(x = year, y = ln_revtot_w, color = village, linetype = bank)) +
-  geom_line(linewidth = 0.8) +
-  geom_point(size = 2) +
-  geom_vline(xintercept = 2003, linetype = "dashed", alpha = 0.5) +
-  annotate("text", x = 2003.5, y = min(traj_data$ln_revtot_w, na.rm = TRUE) + 0.3,
-           label = "Extension du parc\n(2003)", hjust = 0, size = 3, color = "grey40") +
-  scale_color_manual(values = c(
-    "Ampijoroa (Ouest)" = "#2171b5", "Maroala (Ouest)" = "#6baed6",
-    "Madiromiongana (Est)" = "#cb181d", "Bepako (Est)" = "#fb6a4a")) +
-  scale_y_continuous(limits = c(0, NA)) +
-  guides(color = guide_legend(nrow = 1, byrow = TRUE, order = 1),
-         linetype = guide_legend(nrow = 1, order = 2)) +
-  labs(title = "Trajectoires de revenu au niveau des sites : Marovoay 1999–2025",
-       x = NULL, y = "Revenu log équivalisé moyen",
-       color = "Village", linetype = "Groupe d'exposition") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "bottom", legend.box = "vertical", legend.spacing.y = unit(2, "pt"))
-```
-
-Les quatre fokontany suivaient une trajectoire commune jusqu'en 2002. À partir de 2003, les sites de la rive est divergent à la baisse par rapport à la rive ouest ; en 2025 l'écart s'est creusé plutôt que réduit.
-
-## Étude d'événement DiD Marovoay (1999–2025) {#sec-maro-dyn}
-
-L'étude d'événement issue de l'estimateur Callaway–Sant'Anna intra-observatoire affiche l'ATT année par année par rapport à la ligne de base pré-traitement. Les temps relatifs −4 à +11 (1999–2014) sont issus du panel principal ; le point 2025 (+22 ans) est l'observation à long terme du même estimateur. Les estimations pré-traitement proches de zéro confirment les tendances parallèles entre les sites de la rive est et de la rive ouest avant l'extension du parc. Les erreurs standards sont basées sur la fonction d'influence ; avec seulement deux sites traités, les erreurs standards par période robustes au clustering par site sont peu fiables (l'ATT agrégé du @tbl-maro-rcs utilise les deux).
-
-```{r}
-#| label: fig-maro-dyn
-#| fig-cap: "Étude d'événement DiD intra-observatoire Marovoay (1999–2025). Ménages rive est vs rive ouest, Callaway–Sant'Anna (panel = FALSE). L'année 2003 est le début de l'exposition ; le losange le plus à droite (2025) est le point de ré-enquête à long terme. Barres d'erreur : IC à 95% ponctuel (erreur standard fonction d'influence)."
-#| fig-height: 5
-#| fig-width: 10
-dyn_maro <- sec_did_lr$maro$res$dyns[["bank_nocl"]]
-event_df <- tibble(
-  rel_time = dyn_maro$egt,
-  att      = dyn_maro$att.egt,
-  se       = dyn_maro$se.egt
-) |>
-  mutate(
-    year    = rel_time + TREAT_YEAR_MARO,
-    ci_lo   = att - 1.96 * se,
-    ci_hi   = att + 1.96 * se,
-    is_2025 = rel_time == 22
-  )
-
-ggplot(event_df, aes(x = year, y = att)) +
-  geom_hline(yintercept = 0, color = "grey60") +
-  geom_vline(xintercept = TREAT_YEAR_MARO - 0.5,
-             linetype = "dashed", color = "grey40") +
-  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
-                width = 0.4, color = "#D32F2F", alpha = 0.6) +
-  geom_point(aes(size = is_2025, shape = is_2025),
-             color = "#D32F2F", show.legend = FALSE) +
-  scale_size_manual(values = c("FALSE" = 2.5, "TRUE" = 4.5)) +
-  scale_shape_manual(values = c("FALSE" = 16, "TRUE" = 18)) +
-  annotate(
-    "text", x = 2025, y = min(event_df$ci_lo, na.rm = TRUE) - 0.04,
-    label = "2025\n(+22 ans)", color = "#D32F2F", size = 3, vjust = 1
-  ) +
-  labs(
-    x = "Année",
-    y = "ATT (revenu log équivalisé)",
-    title = "Marovoay : étude d'événement DiD intra-observatoire (1999–2025)",
-    subtitle = "Ménages rive est vs rive ouest. ES : fonction d'influence (sans clustering par site)."
-  ) +
-  theme_minimal(base_size = 12)
-```
-
-Les coefficients pré-traitement fluctuent autour de zéro, ce qui corrobore l'hypothèse de tendances parallèles. Les estimations post-2003 deviennent négatives et se creusent progressivement. Le point 2025 — 22 ans après l'exposition — affiche l'estimation la plus négative de la série, confirmant que l'écart de revenu est-ouest s'est creusé plutôt que réduit sur le long terme. Cette persistance est identifiée entièrement à partir du contraste rive est contre rive ouest intra-observatoire, indépendamment de toute comparaison inter-observatoires.
-
-## Robustesse de l'écart 2025 {#sec-ext-robust}
-
-L'écart de revenu est-ouest en 2025 n'est pas dû à des valeurs aberrantes : il est visible à chaque percentile de la distribution des revenus, la suppression des valeurs aberrantes basée sur l'EIQ élargit plutôt qu'il ne réduit l'écart, et l'avantage de la rive ouest apparaît dans cinq des sept principales composantes du revenu. En termes statistiques, l'écart est suffisamment important pour passer les tests standards (test des rangs de Wilcoxon $p = 2{,}1 \times 10^{-10}$ ; test $t$ de Welch $p = 1{,}8 \times 10^{-5}$).
-
-Ce qui reste non résolu, c'est de savoir si cet écart reflète une exposition cumulative au parc ou les effets à long terme du même déclin régional discuté à @sec-maro-rcs. En 2025, le système d'irrigation de Marovoay s'est encore détérioré, la migration rurale-urbaine a remodelé les communautés et l'économie rizicole de la région n'a jamais retrouvé sa position antérieure. L'écart de 2025 est réel et robuste ; son attribution à la politique de conservation spécifiquement exige de la prudence.
-
-## Évaluation à long terme d'Alaotra {#sec-ala-longrun}
-
-Le DiD intra-observatoire pour Alaotra couvre également la ré-enquête 2025. Les deux proxys d'exposition — la distance à la limite de l'AP et la part d'usages extractifs — continuent de produire des estimations proches de zéro avec de larges intervalles de confiance, cohérents avec le résultat agrégé sur le panel 1999–2014 (ATT ≈ {{< var att_ala >}}, $p$ = {{< var att_ala_p >}}). L'absence d'effet détectable sur le revenu sous gestion participative de la conservation est donc stable sur l'ensemble de la fenêtre d'observation 1999–2025.
